@@ -279,17 +279,24 @@ def chat_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR) -> str:
 
 
 def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR) -> tuple[str, str]:
-    """Like smart_reply(), but also returns which path answered the message
-    ("即時資料查詢" / "sinco-code 程式碼模型" / "sinco 聊天模型") so callers
-    (the GUI's "thinking process" trace) can show real routing decisions
-    instead of a fake/decorative "thinking..." animation.
+    """Like smart_reply(), but also returns *why* that path answered the
+    message — the actual rule/pattern that fired, not a decorative label and
+    not a fabricated reasoning chain (sinco is a small memorization model,
+    it has no real step-by-step reasoning to show; this reports the real
+    routing decision instead, which is the honest version of "thinking").
     """
-    tool_reply = route_reply(message)
-    if tool_reply is not None:
-        return "即時資料查詢(天氣/搜尋)", tool_reply
+    routed = route_reply(message)
+    if routed is not None:
+        return routed
     if is_code_request(message):
-        return "sinco-code 程式碼模型", chat_reply(message, out_dir=CODE_OUT_DIR)
-    return "sinco 聊天模型", chat_reply(message, out_dir=out_dir)
+        return (
+            '訊息以「寫一個／寫一段」或「Python 怎麼寫」開頭，判斷為程式碼請求 → 使用 sinco-code 模型',
+            chat_reply(message, out_dir=CODE_OUT_DIR),
+        )
+    return (
+        "沒有比對到即時查詢或程式碼請求的句型 → 交給 sinco 一般聊天模型",
+        chat_reply(message, out_dir=out_dir),
+    )
 
 
 def smart_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR) -> str:

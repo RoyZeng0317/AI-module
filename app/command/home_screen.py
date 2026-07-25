@@ -59,8 +59,12 @@ def ask_model(header: str, model_input: str):
 
     chat_display.configure(state="normal")
     chat_display.insert(tk.END, f"{header}\n")
-    pending_start = chat_display.index(tk.END)
-    chat_display.insert(tk.END, "思考中...\n\n")
+    # 用 tag 記錄「思考中」佔位文字的範圍，而不是存一個固定的 index 字串——
+    # 實測發現 chat_display.index(tk.END) 抓到的位置，跟接下來 insert(tk.END, ...)
+    # 實際落下去的位置會差一行（Tk Text 內部永遠多一個看不見的結尾空行），拿
+    # 那個位置去 delete 會少刪一行，「思考中...」殘留、新內容直接接在後面。
+    # tag_ranges() 會自動追蹤標記過的文字範圍，不受這個位置誤差影響。
+    chat_display.insert(tk.END, "思考中...\n\n", "pending")
     chat_display.configure(state="disabled")
     chat_display.see(tk.END)
 
@@ -70,8 +74,9 @@ def ask_model(header: str, model_input: str):
         def show_result():
             global busy
             chat_display.configure(state="normal")
-            chat_display.delete(pending_start, tk.END)
-            chat_display.insert(tk.END, f"[思考過程：{trace}]\nAI: {reply}\n\n")
+            start, end = chat_display.tag_ranges("pending")
+            chat_display.delete(start, end)
+            chat_display.insert(start, f"[思考過程：{trace}]\nAI: {reply}\n\n")
             chat_display.configure(state="disabled")
             chat_display.see(tk.END)
             busy = False

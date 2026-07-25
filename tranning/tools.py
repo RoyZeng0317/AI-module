@@ -73,18 +73,25 @@ def _extract_location(message: str) -> str:
     return text.rstrip("的").strip() or "Taipei"
 
 
-def route_reply(message: str) -> str | None:
-    """Return a live-data reply for weather/search-shaped messages, else None."""
+def route_reply(message: str) -> tuple[str, str] | None:
+    """Return (reason, reply) for weather/search-shaped messages, else None.
+
+    `reason` names the actual rule that fired (e.g. which keyword/pattern
+    matched) so callers can show a real trace of the decision instead of a
+    generic label — still just reporting what really happened, not a
+    fabricated reasoning chain.
+    """
     message = message.strip()
     if not message:
         return None
 
     if _WEATHER_KEYWORD.search(message):
         location = _extract_location(message)
+        reason = f'偵測到關鍵字「天氣」，判斷地點為「{location}」，查詢 wttr.in'
         try:
-            return f"{location} 目前天氣：{get_weather(location)}"
+            return reason, f"{location} 目前天氣：{get_weather(location)}"
         except requests.RequestException:
-            return "抱歉，天氣查詢暫時失敗，請稍後再試。"
+            return reason, "抱歉，天氣查詢暫時失敗，請稍後再試。"
 
     for pattern in _SEARCH_PATTERNS:
         m = pattern.match(message)
@@ -93,10 +100,11 @@ def route_reply(message: str) -> str | None:
         subject = m.group(1).strip().strip("的?？!！")
         if not subject or subject.lower() in _SELF_REFERENCE:
             return None
+        reason = f'比對到搜尋句型，查詢主題「{subject}」，查詢 DuckDuckGo'
         try:
             result = web_search(subject)
         except requests.RequestException:
             result = None
-        return result or f"抱歉，沒有找到「{subject}」的相關資料。"
+        return reason, (result or f"抱歉，沒有找到「{subject}」的相關資料。")
 
     return None
