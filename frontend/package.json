@@ -1,7 +1,0 @@
-{
-  "name": "ai-module-frontend",
-  "private": true,
-  "dependencies": {
-    "firebase": "^12.16.0"
-  }
-}

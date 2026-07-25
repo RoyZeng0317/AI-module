@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: ai-module-backend
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    healthCheckPath: /

@@ -1,0 +1,25 @@
+# Never let secrets or dev-only artifacts into the build context — .dockerignore
+# filters BEFORE files are sent to the Docker daemon, so this is a stronger
+# guarantee than excluding them from the image after the fact.
+frontend/src/.env
+frontend/src/components/*.py
+!frontend/src/components/chats.py
+frontend/src/components/*.csv
+frontend/src/components/*.pkl
+frontend/src/components/__pycache__/
+frontend/src/components/.pytest_cache/
+frontend/data/
+
+.git/
+.venv/
+venv/
+**/node_modules/
+**/package.json
+**/package-lock.json
+backend/tests/
+backend/__pycache__/
+backend/.pytest_cache/
+shape-vision/
+
+**/__pycache__/
+*.pyc

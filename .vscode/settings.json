@@ -3,6 +3,7 @@
     "python-envs.defaultPackageManager": "ms-python.python:pip",
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
     "python.analysis.extraPaths": [
-        "${workspaceFolder}/backend"
+        "${workspaceFolder}/web/backend",
+        "${workspaceFolder}/tranning"
     ]
 }

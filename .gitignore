@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-.pytest_cache/
-*.pt
-*.pkl
-venv/
-.venv/
-node_modules/

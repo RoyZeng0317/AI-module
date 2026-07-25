@@ -1,0 +1,52 @@
+[debug] [2026-07-17T03:51:51.146Z] ----------------------------------------------------------------------
+[debug] [2026-07-17T03:51:51.148Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js projects:create ai-module --display-name AI-module
+[debug] [2026-07-17T03:51:51.148Z] CLI Version:   15.22.4
+[debug] [2026-07-17T03:51:51.148Z] Platform:      win32
+[debug] [2026-07-17T03:51:51.148Z] Node Version:  v26.4.0
+[debug] [2026-07-17T03:51:51.148Z] Detected Agent: claude-code_2-1-212_agent
+[debug] [2026-07-17T03:51:51.148Z] Time:          Fri Jul 17 2026 11:51:51 GMT+0800 (台北標準時間)
+[debug] [2026-07-17T03:51:51.148Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-17T03:51:51.234Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-17T03:51:51.234Z] > authorizing via signed-in user (boyud9.5@gmail.com)
+[debug] [2026-07-17T03:51:51.236Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:51:51.236Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:51:51.236Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects [none]
+[debug] [2026-07-17T03:51:51.236Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"projectId":"ai-module","name":"AI-module"}
+[debug] [2026-07-17T03:51:52.176Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects 409
+[debug] [2026-07-17T03:51:52.176Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"error":{"code":409,"message":"Requested entity already exists","status":"ALREADY_EXISTS"}}
+[debug] [2026-07-17T03:51:52.234Z] FirebaseError: Request to https://cloudresourcemanager.googleapis.com/v1/projects had HTTP Error: 409, Requested entity already exists
+    at responseToError (C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\responseToError.js:53:12)
+    at RetryOperation._fn (C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:381:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to create project because there is already a project with ID ai-module. Please try again with a unique project ID.
+[debug] [2026-07-17T03:51:58.903Z] ----------------------------------------------------------------------
+[debug] [2026-07-17T03:51:58.904Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js projects:create ai-module-roy --display-name AI-module
+[debug] [2026-07-17T03:51:58.904Z] CLI Version:   15.22.4
+[debug] [2026-07-17T03:51:58.904Z] Platform:      win32
+[debug] [2026-07-17T03:51:58.904Z] Node Version:  v26.4.0
+[debug] [2026-07-17T03:51:58.904Z] Detected Agent: claude-code_2-1-212_agent
+[debug] [2026-07-17T03:51:58.904Z] Time:          Fri Jul 17 2026 11:51:58 GMT+0800 (台北標準時間)
+[debug] [2026-07-17T03:51:58.904Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-17T03:51:58.989Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-17T03:51:58.989Z] > authorizing via signed-in user (boyud9.5@gmail.com)
+[debug] [2026-07-17T03:51:58.991Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:51:58.991Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:51:58.992Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects [none]
+[debug] [2026-07-17T03:51:58.992Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"projectId":"ai-module-roy","name":"AI-module"}
+[debug] [2026-07-17T03:52:00.124Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects 200
+[debug] [2026-07-17T03:52:00.124Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"name":"operations/create_project.global.5059308844056004486"}
+[debug] [2026-07-17T03:52:00.125Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:52:00.125Z] Checked if tokens are valid: true, expires at: 1784263821444
+[debug] [2026-07-17T03:52:00.125Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.5059308844056004486 [none]
+[debug] [2026-07-17T03:52:00.956Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.5059308844056004486 200
+[debug] [2026-07-17T03:52:00.956Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.5059308844056004486 {"name":"operations/create_project.global.5059308844056004486","metadata":{"@type":"type.googleapis.com/google.cloudresourcemanager.v1.ProjectCreationStatus","ready":true},"done":true,"error":{"code":8,"message":"The project cannot be created because you have exceeded your allotted project quota.","details":[{"@type":"type.googleapis.com/google.rpc.QuotaFailure","violations":[{"description":"The project cannot be created because you have exceeded your allotted project quota."}]}]}}
+[debug] [2026-07-17T03:52:01.037Z] FirebaseError: The project cannot be created because you have exceeded your allotted project quota.
+    at OperationPoller.poll (C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\operation-poller.js:25:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async createCloudProject (C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:237:29)
+    at async createFirebaseProjectAndLog (C:\Users\roy\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:102:9)
+[error] 
+[error] Error: Failed to create project. See firebase-debug.log for more info.
