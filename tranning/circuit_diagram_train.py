@@ -1,6 +1,6 @@
 """Circuit-diagram component detector — training scaffold.
 
-Fine-tunes a local YOLOv8 model (Ultralytics, same library backend/detector.py
+Fine-tunes a local YOLO11 model (Ultralytics, same library backend/detector.py
 already uses) to detect circuit-schematic components (resistor, capacitor,
 IC, diode, ...) so 視覺電路圖.py can invoke it directly on live camera frames
 instead of on screenshots/recordings.
@@ -15,7 +15,7 @@ likely be a small circuit-component dataset (same reasoning as
 road_sign_train.py, adapted to detection):
 
   Underfitting:
-    - Starts from COCO-pretrained yolov8n.pt (transfer learning) instead of
+    - Starts from COCO-pretrained yolo11n.pt (transfer learning) instead of
       random init — the backbone already has generic edge/corner features
       useful for line-drawn schematic symbols.
     - cos_lr cosine schedule instead of a fixed step decay.
@@ -50,7 +50,7 @@ from pathlib import Path
 import yaml
 from ultralytics import YOLO
 
-DEFAULT_WEIGHTS = Path(__file__).resolve().parents[1] / "web" / "backend" / "yolov8n.pt"
+DEFAULT_WEIGHTS = Path(__file__).resolve().parents[1] / "web" / "backend" / "yolo11n.pt"
 
 
 def build_data_yaml(dataset_dir: Path, classes: list) -> Path:
@@ -138,7 +138,7 @@ def main():
                         help="dataset root with images/{train,val}, labels/{train,val}")
     parser.add_argument("--classes", nargs="+", help="class names, index = label id (used with --dataset-dir)")
     parser.add_argument("--weights", type=Path, default=DEFAULT_WEIGHTS,
-                        help="starting weights (default: backend/yolov8n.pt, COCO-pretrained)")
+                        help="starting weights (default: backend/yolo11n.pt, COCO-pretrained)")
     parser.add_argument("--out-dir", type=Path, default=Path("circuit_diagram_runs") / "train")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch", type=int, default=16)

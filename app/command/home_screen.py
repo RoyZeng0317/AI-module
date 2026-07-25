@@ -215,7 +215,11 @@ def bg():
     color = colorchooser.askcolor(color=windows["bg"], title="Choose Background Color")[1]
     if color:
         windows.configure(bg=color)
-
+def voice():
+    tk.Button("Microphone")
+    # 與 AI 進行對話
+    # 要能夠輸出生波看起來像是有在聆聽以及回應
+    
 input_frame = tk.Frame(windows, relief="sunken", bd=1)
 input_frame.pack(side="bottom", pady=(0, 8))
 

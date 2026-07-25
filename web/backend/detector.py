@@ -7,7 +7,7 @@ from functools import lru_cache
 
 import numpy as np
 
-MODEL_NAME = "yolov8n.pt"  # nano: fastest CPU inference, downloaded on first use
+MODEL_NAME = "yolo11n.pt"  # nano: fastest CPU inference, downloaded on first use
 
 
 @lru_cache(maxsize=4)
