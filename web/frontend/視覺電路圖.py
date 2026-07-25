@@ -6,9 +6,9 @@
 # ultralytics 本機權重、非雲端 API) -> 把偵測結果畫回畫面 -> tkinter 即時顯示。
 # 不落地成截圖檔或錄影檔，也不提供存檔按鈕；每一幀處理完就丟棄。
 #
-# 尚未提供電路元件標註資料集，所以預設仍載入 backend/yolov8n.pt (COCO 類別，
+# 尚未提供電路元件標註資料集，所以預設仍載入 backend/yolo11n.pt (COCO 類別，
 # 只認得 person/car 這類物件，不認得電阻/電容)。等
-# frontend/src/components/circuit_diagram_train.py 訓練出電路元件權重後，
+# tranning/circuit_diagram_train.py 訓練出電路元件權重後，
 # 用 --weights 指到 best.pt 就能認電路元件。
 
 import argparse
@@ -106,7 +106,9 @@ class CircuitVisionApp:
 def resolve_weights(weights_arg: str) -> str:
     if weights_arg:
         return weights_arg
-    trained = Path(__file__).resolve().parent / "src" / "components" / "circuit_diagram_runs" / "train" / "weights" / "best.pt"
+    # circuit_diagram_train.py now lives in tranning/ (moved out of the old
+    # frontend/src/components/), and its default --out-dir is repo-root-relative
+    trained = Path(__file__).resolve().parents[2] / "tranning" / "circuit_diagram_runs" / "train" / "weights" / "best.pt"
     if trained.exists():
         return str(trained)
     print(f"[視覺電路圖] 尚未訓練電路元件權重,退回通用 COCO 模型 ({MODEL_NAME})——"
@@ -119,7 +121,7 @@ def main():
     parser.add_argument("--camera", type=int, default=0, help="攝影機編號 (預設 0)")
     parser.add_argument("--video", default=None, help="改用影片檔而非攝影機")
     parser.add_argument("--weights", default=None,
-                        help="本機權重路徑;預設先找已訓練好的電路元件權重,找不到才退回 yolov8n.pt")
+                        help="本機權重路徑;預設先找已訓練好的電路元件權重,找不到才退回 yolo11n.pt")
     parser.add_argument("--conf", type=float, default=0.35, help="信心度門檻")
     args = parser.parse_args()
 
