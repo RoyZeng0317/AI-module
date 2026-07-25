@@ -85,7 +85,7 @@ pyinstaller --onefile --console --name install_check app/install/install_check.p
 | `data_split.py` | 分層 train/val/test 切分（稀有類別也會分到三個 split） | 完成 |
 | `machine_learning.py` | 線性迴歸教學範例（身高體重） | 完成，教學用 |
 | `neural_network.py` | 極簡 PyTorch 全連接網路範例 | 草稿，僅定義了模型結構 |
-| `OCR.py` | 文字辨識 | 空檔，尚未實作 |
+| `OCR.py` | 文字辨識（CRNN + CTC，字元級 charset，不做翻轉增強因為文字有方向性） | 架構完成，等真實文字辨識資料集 |
 
 每支訓練腳本都有對應的 `test_*.py`，用合成假資料驗證訓練管線本身能跑完、不會噴錯（不代表真實辨識準確度）。
 
