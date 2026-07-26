@@ -93,14 +93,29 @@ def stop_recording() -> str:
     return recognize_waveform(waveform)
 
 
+# 「記住對話內容」原本試著把上一輪使用者訊息當純文字接在這一輪前面一起送進
+# 模型，但實測發現這樣做會讓 sinco 的回覆被「拉走」——例如 "你是誰｜再說一次"
+# 會答成「我是 sinco...」，"hi｜再見" 會答出兩句混在一起的亂碼——不管新問題是
+# 什麼，都被字串裡先出現的那段內容主導。根因跟 chat checkpoint 的 max_len=40
+# 有關（chats.encode() 會直接砍掉超過 39 字元的部分，塞歷史的空間本來就很
+# 少），但更根本的問題是模型從沒被訓練過要怎麼解讀「歷史｜這句話」這種格式，
+# 對它來說只是一段沒看過的亂碼輸入，會直接觸發最接近的已訓練樣式、而不是真的
+# 理解上下文。**所以目前只保留歷史紀錄本身（供之後真的要重訓多輪對話用），
+# 不會把歷史文字塞進模型的輸入**——這是唯一能在不重訓的前提下，做到「記得住」
+# 又不會讓現有回覆變差的做法。想要 sinco 真的懂上下文，需要重新設計多輪對話
+# 的訓練資料並重訓（見 chats.py 的討論）。
+MAX_HISTORY_TURNS = 20
+
+
 class Conversation:
     def __init__(self, windows: tk.Tk, chat_display: tk.Text, on_ask_start: Optional[Callable[[], None]] = None):
         self.windows = windows
         self.chat_display = chat_display
         self.on_ask_start = on_ask_start
         self.busy = False
+        self.history: list[tuple[str, str]] = []  # [(使用者訊息, sinco回覆), ...]，只保留最近 MAX_HISTORY_TURNS 輪
 
-    def ask(self, header: str, model_input: str):
+    def ask(self, header: str, model_input: str, record_as: Optional[str] = None):
         if self.busy:
             return
         self.busy = True
@@ -130,13 +145,16 @@ class Conversation:
                 chat_display.configure(state="disabled")
                 chat_display.see(tk.END)
                 self.busy = False
+                if record_as is not None:
+                    self.history.append((record_as, reply))
+                    del self.history[:-MAX_HISTORY_TURNS]
 
             self.windows.after(0, show_result)
 
         threading.Thread(target=worker, daemon=True).start()
 
     def send_message(self, user_text: str):
-        self.ask(f"You: {user_text}", user_text)
+        self.ask(f"You: {user_text}", user_text, record_as=user_text)
 
     def open_file(self):
         path = filedialog.askopenfilename(

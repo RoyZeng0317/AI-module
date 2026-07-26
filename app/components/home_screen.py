@@ -15,7 +15,8 @@ MODULE = "sinco 1.5"
 
 windows = tk.Tk()
 windows.geometry("800x600")
-windows.title(f"AI Module — {MODULE}")
+windows.title(f"{MODULE}")
+windows.iconbitmap()
 DEFAULT_BG = "#191a1b"
 
 input_frame = tk.Frame(windows, relief="sunken", bd=1)
@@ -34,7 +35,39 @@ chat_display = tk.Text(
 chat_display.pack(side="left", fill="both", expand=True)
 chat_scrollbar.config(command=chat_display.yview)
 
-message = tk.Entry(input_frame, width=30, relief="flat", bd=0)
+message = tk.Entry(
+    input_frame, width=30, relief="flat", bd=0,
+    fg="white", bg=DEFAULT_BG, insertbackground="white",
+)
+
+# 輸入框提示文字：Tkinter Entry 沒有原生 placeholder，用「灰色提示字 + 手動清除/還原」
+# 模擬。清除要同時掛在 FocusIn（滑鼠點進來）跟 KeyPress（送出後游標留在框內，
+# 沒有觸發新的 FocusIn，靠這個抓住下一次打字）兩個事件上，不然直接打字會把
+# 提示文字當成真的輸入內容夾在游標後面。
+PLACEHOLDER_TEXT = "Enter message to sinco"
+_showing_placeholder = False
+
+
+def _show_placeholder():
+    global _showing_placeholder
+    message.delete(0, tk.END)
+    message.insert(0, PLACEHOLDER_TEXT)
+    message.configure(fg="grey")
+    _showing_placeholder = True
+
+
+def _clear_placeholder(event=None):
+    global _showing_placeholder
+    if _showing_placeholder:
+        message.delete(0, tk.END)
+        message.configure(fg="white")
+        _showing_placeholder = False
+
+
+def _restore_placeholder_if_empty(event=None):
+    if not message.get():
+        _show_placeholder()
+
 
 # 語音波形：錄音中顯示麥克風即時音量，AI 回覆中顯示脈動動畫；兩者共用同一組
 # bar 高度陣列與畫布，靠 draw_waveform() 統一畫出來
@@ -93,7 +126,7 @@ camera_panel = CameraPanel(windows)
 
 # 提交按鈕
 def on_submit():
-    if conversation.busy:
+    if conversation.busy or _showing_placeholder:
         return
     text = message.get().strip()
     if text:
@@ -105,6 +138,7 @@ def on_submit():
             conversation.send_message(text)
     message.delete(0, tk.END)
     palette.hide_suggestions()
+    _show_placeholder()
 
 
 # 麥克風按鈕：click 開始錄音、再 click 一次結束錄音並送去辨識
@@ -115,6 +149,7 @@ def voice():
         text = stop_recording()
         voice_button.configure(text="🎤", fg="white")
         reset_waveform()
+        tk.Misc.lower(voice_canvas, message)
         if not text:
             return
         if "尚未訓練" in text:
@@ -134,6 +169,7 @@ def voice():
             chat_display.see(tk.END)
             return
         voice_button.configure(text="■", fg="#e74c3c")
+        tk.Misc.lift(voice_canvas, message)
 
 
 tk.Button(input_frame, text="+", relief="flat", bd=0, command=conversation.open_file).pack(side="left", padx=(4, 0))
@@ -141,20 +177,39 @@ tk.Button(input_frame, text="+", relief="flat", bd=0, command=conversation.open_
 voice_button = tk.Button(input_frame, text="🎤", relief="flat", bd=0, fg="white", bg=DEFAULT_BG, command=voice)
 voice_button.pack(side="left", padx=(4, 0))
 
-voice_canvas = tk.Canvas(input_frame, width=90, height=24, bg=DEFAULT_BG, highlightthickness=0)
-voice_canvas.pack(side="left", padx=(4, 0))
-
-tk.Button(input_frame, text="鏡頭", relief="flat", bd=0, command=camera_panel.open).pack(side="left", padx=(4, 0))
+tk.Button(
+    input_frame, text="◉", relief="flat", bd=0, fg="white", bg=DEFAULT_BG,
+    command=camera_panel.open,
+).pack(side="left", padx=(4, 0))
 
 message.pack(side="left", fill="y", ipady=4)
+
+# 錄音時的聲波疊在輸入框「裡面」，不要另外開一個聲波框：跟 message 疊在同一個
+# 位置/同一塊大小（in_=message 讓座標以 message 為基準），預設沉到 message
+# 底下（打字時完全看不到、看到的是正常輸入框），開始錄音才 lift 上來蓋住輸入
+# 框、改顯示波形，停止錄音再 lower 回去，輸入框就恢復原狀。
+voice_canvas = tk.Canvas(input_frame, bg=DEFAULT_BG, highlightthickness=0)
+voice_canvas.place(in_=message, x=0, y=0, relwidth=1, relheight=1)
+tk.Misc.lower(voice_canvas, message)
 message.bind("<Return>", lambda e: on_submit())
 message.bind("<KeyRelease>", palette.update_suggestions)
+message.bind("<KeyPress>", _clear_placeholder)
+message.bind("<FocusIn>", _clear_placeholder)
+message.bind("<FocusOut>", _restore_placeholder_if_empty)
 message.bind("<Escape>", lambda e: palette.hide_suggestions())
 message.bind("<Tab>", palette.complete)
 message.bind("<Up>", palette.on_arrow_up)
 message.bind("<Down>", palette.on_arrow_down)
+_show_placeholder()
 
 tk.Button(input_frame, text="➤", relief="flat", bd=0, command=on_submit).pack(side="left")
+
+# AI 免責聲明：跟一般 AI 產品同樣的位置跟語氣，提醒使用者 sinco 可能出錯
+disclaimer = tk.Label(
+    windows, text="sinco is AI and can make mistakes. Please double-check response.",
+    font=("Segoe UI", 8), fg="grey", bg=DEFAULT_BG,
+)
+disclaimer.pack(side="bottom", pady=(0, 4))
 
 menubar = tk.Menu(windows)
 windows.config(menu=menubar)
