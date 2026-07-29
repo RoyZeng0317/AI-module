@@ -29,7 +29,7 @@ from typing import Callable, Optional
 import numpy as np
 import sounddevice as sd
 
-from chats import smart_reply_traced
+from chats import DEFAULT_OUT_DIR, smart_reply_traced
 from function import read_as_chat_content
 from speech_to_text import SAMPLE_RATE, recognize_waveform
 
@@ -115,33 +115,55 @@ class Conversation:
         self.busy = False
         self.history: list[tuple[str, str]] = []  # [(使用者訊息, sinco回覆), ...]，只保留最近 MAX_HISTORY_TURNS 輪
 
-    def ask(self, header: str, model_input: str, record_as: Optional[str] = None):
+        # /model（CLAUDE.md 需求 #01）：手動覆蓋 chats.smart_reply_traced() 的
+        # chat/code 自動判斷，"auto" = 維持既有行為。
+        self.force_mode = "auto"
+        # /character（需求 #02）：目前對話用的人格 checkpoint，預設 sinco。
+        # character_browser.py 選好角色後會呼叫 set_persona() 改這兩個值。
+        self.out_dir = DEFAULT_OUT_DIR
+        self.persona = "sinco"
+
+    def set_persona(self, out_dir, name: str):
+        self.out_dir = out_dir
+        self.persona = name
+
+    def ask(self, header: str, model_input: str, record_as: Optional[str] = None,
+            header_tag: str = "user_bubble"):
         if self.busy:
             return
         self.busy = True
 
         chat_display = self.chat_display
         chat_display.configure(state="normal")
-        chat_display.insert(tk.END, f"{header}\n")
+        chat_display.insert(tk.END, f"{header}\n", header_tag)
+        chat_display.insert(tk.END, "\n")
         # 用 tag 記錄「思考中」佔位文字的範圍，而不是存一個固定的 index 字串——
         # 實測發現 chat_display.index(tk.END) 抓到的位置，跟接下來 insert(tk.END, ...)
         # 實際落下去的位置會差一行（Tk Text 內部永遠多一個看不見的結尾空行），拿
         # 那個位置去 delete 會少刪一行，「思考中...」殘留、新內容直接接在後面。
         # tag_ranges() 會自動追蹤標記過的文字範圍，不受這個位置誤差影響。
-        chat_display.insert(tk.END, "思考中...\n\n", "pending")
+        chat_display.insert(tk.END, f"{self.persona} 思考中...\n\n", "pending")
         chat_display.configure(state="disabled")
         chat_display.see(tk.END)
         if self.on_ask_start is not None:
             self.on_ask_start()
 
         def worker():
-            trace, reply = smart_reply_traced(model_input)
+            trace, reply = smart_reply_traced(model_input, out_dir=self.out_dir, force_mode=self.force_mode)
 
             def show_result():
                 chat_display.configure(state="normal")
                 start, end = chat_display.tag_ranges("pending")
                 chat_display.delete(start, end)
-                chat_display.insert(start, f"[思考過程：{trace}]\nAI: {reply}\n\n")
+                # 用 tk.INSERT 這個「活」標記依序插入三段各自不同 tag 的文字——
+                # 每次 insert(tk.INSERT, ...) 都會插在標記目前所在位置、再把標記
+                # 推到新插入內容的後面，才能讓三段文字照順序接起來；如果直接對
+                # start 這個「當下那一刻」的固定索引重複 insert，後面插入的內容
+                # 會被塞到前面插入內容的前面（索引沒有跟著移動）。
+                chat_display.mark_set(tk.INSERT, start)
+                chat_display.insert(tk.INSERT, f"{self.persona}\n", "ai_label")
+                chat_display.insert(tk.INSERT, f"{trace}\n", "trace")
+                chat_display.insert(tk.INSERT, f"{reply}\n\n", "ai_text")
                 chat_display.configure(state="disabled")
                 chat_display.see(tk.END)
                 self.busy = False
@@ -154,7 +176,7 @@ class Conversation:
         threading.Thread(target=worker, daemon=True).start()
 
     def send_message(self, user_text: str):
-        self.ask(f"You: {user_text}", user_text, record_as=user_text)
+        self.ask(user_text, user_text, record_as=user_text)
 
     def open_file(self):
         path = filedialog.askopenfilename(
@@ -165,4 +187,4 @@ class Conversation:
             return
 
         content = read_as_chat_content(Path(path))
-        self.ask(f"--- {os.path.basename(path)} ---\n{content}", content)
+        self.ask(f"--- {os.path.basename(path)} ---\n{content}", content, header_tag="system")

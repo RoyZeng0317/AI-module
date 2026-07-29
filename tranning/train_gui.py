@@ -2,7 +2,8 @@
 launch/monitor training without memorizing each script's CLI flags.
 
 Wraps road_sign_train.py, OCR.py, circuit_diagram_train.py, speech_to_text.py,
-chats.py and data_split.py. Each "開始訓練" button runs the *exact* command
+chats.py, character_model.py, voice_clone.py, kicad_dataset_convert.py,
+image_classifier_bnn.py and data_split.py. Each "開始訓練"/"匯入" button runs the *exact* command
 line that script's own module docstring documents under "Usage" — as a real
 subprocess (`python -u <script>.py --flag value ...`), not an in-process
 function call. That keeps this one GUI process light (it never imports
@@ -53,7 +54,7 @@ class Field:
 
     key: str
     label: str
-    kind: str  # "dir" | "file" | "str" | "int" | "float" | "bool"
+    kind: str  # "dir" | "file" | "save" | "str" | "int" | "float" | "bool"
     flag: str | None
     default: object = ""
     required: bool = False
@@ -70,6 +71,17 @@ def _browse_dir(var: tk.StringVar):
 
 def _browse_file(var: tk.StringVar, filetypes):
     path = filedialog.askopenfilename(filetypes=filetypes or (("All files", "*.*"),))
+    if path:
+        var.set(path)
+
+
+def _browse_save(var: tk.StringVar, filetypes):
+    """跟 _browse_file 不同：這是給「還不存在、將要被寫出來」的檔案用的
+    （dataset_import.py 的 --out），用 asksaveasfilename 而不是
+    askopenfilename，不然使用者選不到一個還沒被建立的檔名。
+    """
+    path = filedialog.asksaveasfilename(filetypes=filetypes or (("All files", "*.*"),),
+                                          defaultextension=".json")
     if path:
         var.set(path)
 
@@ -102,6 +114,11 @@ def build_form(parent: tk.Widget, fields: list[Field], start_row: int = 0) -> in
             elif f.kind == "file":
                 ttk.Button(parent, text="瀏覽…",
                            command=lambda v=f.var, ft=f.filetypes: _browse_file(v, ft)).grid(
+                    row=row, column=2, pady=4
+                )
+            elif f.kind == "save":
+                ttk.Button(parent, text="另存為…",
+                           command=lambda v=f.var, ft=f.filetypes: _browse_save(v, ft)).grid(
                     row=row, column=2, pady=4
                 )
 
@@ -174,6 +191,48 @@ def build_argv(fields: list[Field], values: dict) -> list[str]:
 
 JSON_FT = (("JSON files", "*.json"), ("All files", "*.*"))
 YAML_FT = (("YAML files", "*.yaml *.yml"), ("All files", "*.*"))
+
+
+# ---------------------------------------------------------------------------
+# dataset_import.py 的「步驟零」欄位——手上沒有現成 JSON manifest，只有一般
+# 檔案（.txt / 圖片+.txt / 音檔+.txt / 影片）時，先在這裡自動轉換出 manifest
+# 或圖片資料夾，再貼到下面既有的訓練欄位裡（CLAUDE.md 需求 #04）。用工廠
+# function 而非共用同一份 list——同一批 Field 物件被兩個分頁共用會互相
+# 偷走 tk 變數，這是 CLAUDE.md to-do #16 已經踩過、寫進去的坑。
+# ---------------------------------------------------------------------------
+
+def _pairs_import_fields(out_default: str) -> list[Field]:
+    return [
+        Field("source", "原始 .txt 資料夾（每個檔案一組 prompt/reply）", "dir", "--source", required=True,
+              hint="每個 .txt 檔案格式二選一：(a) 第一行是 prompt，空一行後面是 reply；"
+                   "(b) 只有兩行，第一行 prompt、第二行 reply。檔名本身不重要。"),
+        Field("out", "輸出 manifest 路徑", "save", "--out", required=True, default=out_default,
+              filetypes=JSON_FT, hint="完成後把這個路徑（或下面切出來的 _train.json/_val.json）"
+                                       "貼到下方的 manifest 欄位。"),
+        Field("val_ratio", "驗證集比例（0 = 不切分，只寫一個檔案）", "float", "--val-ratio", default=0.0),
+    ]
+
+
+def _sidecar_import_fields(kind: str, out_default: str) -> list[Field]:
+    noun = "圖片" if kind == "image" else "音檔（16-bit PCM WAV）"
+    return [
+        Field("source", f"原始{noun}資料夾（每個檔案配一個同檔名 .txt 文字稿）", "dir", "--source",
+              required=True, hint="例如 sign01.png + sign01.txt，或 line01.wav + line01.txt。"),
+        Field("out", "輸出 manifest 路徑", "save", "--out", required=True, default=out_default,
+              filetypes=JSON_FT, hint="完成後把這個路徑（或下面切出來的 _train.json/_val.json）"
+                                       "貼到下方的 manifest 欄位。"),
+        Field("val_ratio", "驗證集比例（0 = 不切分，只寫一個檔案）", "float", "--val-ratio", default=0.0),
+    ]
+
+
+def _video_import_fields() -> list[Field]:
+    return [
+        Field("source", "原始影片資料夾（每個子資料夾 = 一個類別，內含影片檔）", "dir", "--source",
+              required=True, hint="例如 videos/停止/xxx.mp4、videos/讓路/yyy.mp4 ……"),
+        Field("out", "輸出圖片資料夾", "dir", "--out", required=True,
+              hint="完成後把這個路徑貼到下面「步驟一」的來源資料夾繼續分割。"),
+        Field("interval", "擷取間隔（秒）", "float", "--interval", default=1.0),
+    ]
 
 SPLIT_FIELDS = [
     Field("source", "來源資料夾（每個子資料夾一個類別）", "dir", "--source", required=True),
@@ -248,6 +307,71 @@ CHAT_FIELDS = [
     Field("max_len", "最大字元長度 (max len)", "int", "--max-len", default=40),
     Field("teacher_forcing_ratio", "Teacher forcing 比例", "float",
           "--teacher-forcing-ratio", default=0.5),
+    Field("dropout", "Dropout（貝氏 MC Dropout：聊天時保持開啟、重複取樣估計信心度）", "float",
+          "--dropout", default=0.3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
+]
+
+CHARACTER_FIELDS = [
+    Field("train_manifest", "訓練 manifest (JSON)", "file", "--train-manifest",
+          required=True, filetypes=JSON_FT),
+    Field("val_manifest", "驗證 manifest (JSON)", "file", "--val-manifest",
+          required=True, filetypes=JSON_FT),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="characters/character_runs"),
+    Field("characters_dir", "character card 輸出資料夾", "str", "--characters-dir", default="characters"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch_size", "Batch size", "int", "--batch-size", default=8),
+    Field("embed_size", "Embedding size", "int", "--embed-size", default=64),
+    Field("hidden_size", "GRU hidden size", "int", "--hidden-size", default=128),
+    Field("lr", "學習率 (lr)", "float", "--lr", default=1e-3),
+    Field("max_len", "最大字元長度 (max len)", "int", "--max-len", default=80),
+    Field("dropout", "Dropout", "float", "--dropout", default=0.3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=6),
+]
+
+VOICE_CLONE_FIELDS = [
+    Field("train_manifest", "訓練 manifest (JSON)", "file", "--train-manifest",
+          required=True, filetypes=JSON_FT),
+    Field("val_manifest", "驗證 manifest (JSON)", "file", "--val-manifest",
+          required=True, filetypes=JSON_FT),
+    Field("audio_root", "音檔根目錄（留空 = manifest 所在資料夾）", "dir", "--audio-root"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="characters/character_voice_runs/角色名稱",
+          hint="每個角色的聲音各自獨立訓練（single-speaker），請把「角色名稱」換成實際角色，"
+               "例如 characters/character_voice_runs/周柯宇。"),
+    Field("epochs", "Epochs", "int", "--epochs", default=300),
+    Field("batch_size", "Batch size", "int", "--batch-size", default=4),
+    Field("lr", "學習率 (lr)", "float", "--lr", default=1e-3),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=10),
+    Field("max_len", "最大文字長度 (max len)", "int", "--max-len", default=60),
+    Field("max_frames", "最大頻譜時間幀數 (max frames)", "int", "--max-frames", default=200),
+    Field("embed_size", "文字 Embedding size", "int", "--embed-size", default=64),
+    Field("hidden_size", "GRU hidden size", "int", "--hidden-size", default=256),
+    Field("prenet_size", "Prenet size", "int", "--prenet-size", default=128),
+    Field("dropout", "Dropout", "float", "--dropout", default=0.3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
+    Field("teacher_forcing_ratio", "Teacher forcing 比例", "float",
+          "--teacher-forcing-ratio", default=1.0),
+    Field("stop_loss_weight", "Stop token loss 權重", "float", "--stop-loss-weight", default=1.0),
+]
+
+KICAD_FT = (("KiCad schematic", "*.kicad_sch"), ("All files", "*.*"))
+
+KICAD_COMMON_FIELDS = [
+    Field("out_dir", "輸出資料夾（YOLO 資料集）", "dir", "--out-dir", required=True,
+          hint="轉換完成後，把這個路徑複製貼到下方「步驟二」的「資料夾 + 類別列表」模式的資料夾欄位，"
+               "類別名稱也要貼成一樣的清單，兩邊必須對齊（label id 由順序決定）。"),
+    Field("classes", "類別名稱（用空格或逗號分隔，順序 = label id）", "str", None,
+          default="resistor capacitor inductor diode ic transistor battery switch led wire_junction"),
+    Field("class_map", "class-map JSON（可留空，用內建的 DEFAULT_CLASS_MAP）", "file", "--class-map", filetypes=JSON_FT,
+          hint="你的 .kicad_sch 如果是用專案自帶符號庫（例如 interf_u:R 而不是 Device:R），"
+               "轉換完成後主控台會列出沒對到的 lib_id，需要用這個 JSON 檔補上對應關係。"),
+    Field("resolution", "匯出解析度 (DPI)", "int", "--resolution", default=300),
+    Field("kicad_cli", "kicad-cli 執行檔路徑（留空 = 從 PATH 找 kicad-cli）", "file", "--kicad-cli",
+          filetypes=(("kicad-cli.exe", "kicad-cli.exe"), ("All files", "*.*"))),
+    Field("exclude_drawing_sheet", "排除圖框／標題欄", "bool", "--exclude-drawing-sheet", default=False),
+    Field("val_ratio", "驗證集比例 (val ratio)", "float", "--val-ratio", default=0.2),
+    Field("seed", "隨機種子", "int", "--seed", default=42),
 ]
 
 CIRCUIT_COMMON_FIELDS = [
@@ -261,6 +385,35 @@ CIRCUIT_COMMON_FIELDS = [
     Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
     Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+
+IMAGE_SPLIT_FIELDS = [
+    Field("source", "來源資料夾（每個子資料夾一個類別）", "dir", "--source", required=True),
+    Field("output", "輸出資料夾", "dir", "--output", required=True,
+          hint="會在裡面產生 train/ val/ test/ 三個子資料夾，交給下方「訓練模型」的「資料夾」使用。"),
+    Field("train", "訓練集比例", "float", "--train", default=0.7),
+    Field("val", "驗證集比例", "float", "--val", default=0.15),
+    Field("test", "測試集比例", "float", "--test", default=0.15),
+    Field("seed", "隨機種子", "int", "--seed", default=42),
+    Field("move", "搬移檔案（取消勾選=複製）", "bool", "--move", default=False),
+]
+
+IMAGE_BNN_FIELDS = [
+    Field("data_dir", "資料夾（--source/--output 分割後的輸出）", "dir", "--data-dir", required=True),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="image_classifier_runs"),
+    Field("epochs", "Epochs", "int", "--epochs", default=30),
+    Field("batch_size", "Batch size", "int", "--batch-size", default=32),
+    Field("lr", "學習率 (lr)", "float", "--lr", default=3e-4),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=5),
+    Field("image_size", "圖片邊長 (image size)", "int", "--image-size", default=224),
+    Field("dropout", "Dropout（貝氏 MC Dropout：推論時同一層繼續發揮作用）", "float",
+          "--dropout", default=0.3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
+    Field("unfreeze_backbone", "解凍 backbone（train_acc 一直偏低才勾）", "bool",
+          "--unfreeze-backbone", default=False),
+    Field("no_hflip", "停用水平翻轉增強（類別有方向性時勾選，例如箭頭/文字）", "bool",
+          "--no-hflip", default=False),
 ]
 
 
@@ -291,10 +444,13 @@ class TrainGUI:
         notebook.pack(side="top", fill="both", expand=True, padx=10, pady=(10, 6))
 
         self._build_road_sign_tab(notebook)
+        self._build_image_bnn_tab(notebook)
         self._build_ocr_tab(notebook)
         self._build_circuit_tab(notebook)
         self._build_speech_tab(notebook)
         self._build_chat_tab(notebook)
+        self._build_character_tab(notebook)
+        self._build_voice_clone_tab(notebook)
 
         self._build_status_bar()
         self._build_log_console()
@@ -314,8 +470,21 @@ class TrainGUI:
         outer = self._new_tab(
             notebook, "路牌辨識",
             "MobileNetV2 遷移學習分類器 (road_sign_train.py)。原始圖片先用「步驟一」依類別子資料夾"
-            "分割成 train/val/test，再用「步驟二」指到分割後的輸出資料夾進行訓練。",
+            "分割成 train/val/test，再用「步驟二」指到分割後的輸出資料夾進行訓練。手上只有影片、"
+            "還沒有整理成一個子資料夾一個類別的圖片時，先用「步驟零」從影片擷取影格。",
         )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從影片擷取影格 (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        road_sign_video_fields = _video_import_fields()
+        build_form(step0, road_sign_video_fields)
+        video_btn = ttk.Button(
+            step0, text="擷取影格",
+            command=lambda: self._start_import("路牌影格擷取", "video-frames", road_sign_video_fields),
+        )
+        video_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(video_btn)
 
         step1 = tk.LabelFrame(outer, text=" 步驟一：分割資料集 (data_split.py) ",
                                bg=PANEL_BG, fg=FG, bd=1)
@@ -335,12 +504,71 @@ class TrainGUI:
         btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
         self.start_buttons.append(btn)
 
+    def _build_image_bnn_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "圖像分類（貝氏）",
+            "貝氏（MC Dropout）MobileNetV2 遷移學習分類器 (image_classifier_bnn.py)，"
+            "適用任何「一個子資料夾一個類別」的通用圖像分類任務（不限路牌，路牌請仍用"
+            "「路牌辨識」分頁）。原始圖片先用「步驟一」依類別子資料夾分割成 train/val/test，"
+            "再用「步驟二」指到分割後的輸出資料夾進行訓練。訓練用的 Dropout 層在推論時會"
+            "刻意保持開啟、重複取樣多次（MC Dropout），藉此估計「模型有多不確定」而不是"
+            "只給一個看似武斷的答案。訓練完成後，若要對單一圖片做這種貝氏推論"
+            "（含信心度/熵），請用終端機另外執行 "
+            "`python image_classifier_bnn.py --classify <image> --out-dir ... --mc-samples 20`"
+            "（此 GUI 只負責訓練）。手上只有影片、還沒有整理成一個子資料夾一個類別的圖片時，"
+            "先用「步驟零」從影片擷取影格。",
+        )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從影片擷取影格 (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        image_bnn_video_fields = _video_import_fields()
+        build_form(step0, image_bnn_video_fields)
+        video_btn = ttk.Button(
+            step0, text="擷取影格",
+            command=lambda: self._start_import("圖像分類影格擷取", "video-frames", image_bnn_video_fields),
+        )
+        video_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(video_btn)
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：分割資料集 (data_split.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(step1, IMAGE_SPLIT_FIELDS)
+        split_btn = ttk.Button(step1, text="分割資料集",
+                                command=lambda: self._start("資料集分割", "data_split.py", IMAGE_SPLIT_FIELDS))
+        split_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(split_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (image_classifier_bnn.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step2, IMAGE_BNN_FIELDS)
+        btn = ttk.Button(step2, text="開始訓練",
+                          command=lambda: self._start("圖像分類訓練", "image_classifier_bnn.py", IMAGE_BNN_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
     def _build_ocr_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "OCR 文字辨識",
             "從零打造的 CRNN + CTC 文字辨識模型 (OCR.py)。manifest 是一個 JSON 清單，"
-            '每筆為 {"image": 檔名, "text": 文字內容}。',
+            '每筆為 {"image": 檔名, "text": 文字內容}。手上沒有現成 JSON 的話，'
+            "先用「步驟零」從圖片 + 同檔名 .txt 文字稿自動產生 manifest。",
         )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從圖片＋文字稿匯入 manifest (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        ocr_import_fields = _sidecar_import_fields("image", "ocr_manifest.json")
+        build_form(step0, ocr_import_fields)
+        import_btn = ttk.Button(
+            step0, text="產生 manifest",
+            command=lambda: self._start_import("OCR manifest 匯入", "sidecar-image", ocr_import_fields),
+        )
+        import_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(import_btn)
+
         form = tk.Frame(outer, bg=PANEL_BG)
         form.pack(fill="both", expand=True, padx=10)
         build_form(form, OCR_FIELDS)
@@ -353,8 +581,22 @@ class TrainGUI:
         outer = self._new_tab(
             notebook, "語音辨識",
             "重用 OCR.py 的 CRNN + CTC 架構，輸入換成語音頻譜圖 (speech_to_text.py)。"
-            'manifest 每筆為 {"audio": 檔名(16-bit PCM WAV), "text": 文字內容}。',
+            'manifest 每筆為 {"audio": 檔名(16-bit PCM WAV), "text": 文字內容}。'
+            "手上沒有現成 JSON 的話，先用「步驟零」從錄音 + 同檔名 .txt 逐字稿自動產生 manifest。",
         )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從錄音＋逐字稿匯入 manifest (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        speech_import_fields = _sidecar_import_fields("audio", "speech_manifest.json")
+        build_form(step0, speech_import_fields)
+        import_btn = ttk.Button(
+            step0, text="產生 manifest",
+            command=lambda: self._start_import("語音 manifest 匯入", "sidecar-audio", speech_import_fields),
+        )
+        import_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(import_btn)
+
         form = tk.Frame(outer, bg=PANEL_BG)
         form.pack(fill="both", expand=True, padx=10)
         build_form(form, SPEECH_FIELDS)
@@ -367,8 +609,25 @@ class TrainGUI:
         outer = self._new_tab(
             notebook, "聊天模型",
             "從零打造的 GRU 注意力 seq2seq 聊天模型 (chats.py)。"
-            '資料為 JSON 清單，每筆為 {"prompt": 問句, "reply": 回覆}。',
+            '資料為 JSON 清單，每筆為 {"prompt": 問句, "reply": 回覆}。'
+            "手上沒有現成 JSON 的話，先用「步驟零」從一堆 .txt 對話檔自動產生 manifest。"
+            "2026-07-28 貝氏化：Dropout 在聊天推論時會刻意保持開啟、重複解碼 20 次多數決"
+            "（MC Dropout），回覆旁會附上信心度百分比——這不代表資料量需求變少，"
+            "只是讓你看得出模型是「真的確定」還是「猜出好幾種不同答案」。",
         )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從文字檔匯入對話 manifest (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        chat_import_fields = _pairs_import_fields("imported_pairs.json")
+        build_form(step0, chat_import_fields)
+        import_btn = ttk.Button(
+            step0, text="產生 manifest",
+            command=lambda: self._start_import("聊天 manifest 匯入", "pairs", chat_import_fields),
+        )
+        import_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(import_btn)
+
         form = tk.Frame(outer, bg=PANEL_BG)
         form.pack(fill="both", expand=True, padx=10)
         build_form(form, CHAT_FIELDS)
@@ -377,29 +636,129 @@ class TrainGUI:
         btn.pack(pady=10)
         self.start_buttons.append(btn)
 
+    def _build_character_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "人物氣質模型",
+            "從零打造的雙向 GRU 文字編碼器 (character_model.py)：把人物的文字描述轉成氣質特質評分 + "
+            "persona embedding。manifest 是一個 JSON 清單，每筆為 "
+            '{"name": 人物名稱, "description": 文字描述, "traits": {標籤: 0~1 強度, ...}}，'
+            "標籤（tag）不是寫死的，是從 --train-manifest 資料裡自動蒐集出來的。"
+            "訓練完的 checkpoint 要建立 character card，請用終端機另外執行 "
+            "`python character_model.py --build --name ... --description ...`（此 GUI 只負責訓練）。"
+            "注意：這裡只做文字→氣質，不含 voice clone——語音克隆需要真人參考音檔，是完全獨立、尚未開發的下一階段。",
+        )
+        form = tk.Frame(outer, bg=PANEL_BG)
+        form.pack(fill="both", expand=True, padx=10)
+        build_form(form, CHARACTER_FIELDS)
+        btn = ttk.Button(outer, text="開始訓練",
+                          command=lambda: self._start("人物氣質模型訓練", "character_model.py", CHARACTER_FIELDS))
+        btn.pack(pady=10)
+        self.start_buttons.append(btn)
+
+    def _build_voice_clone_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "角色聲音克隆",
+            "從零打造的單一講者 Tacotron 風格 TTS 模型 (voice_clone.py)：重用 chats.py 的 GRU 編碼器"
+            "＋注意力機制，解碼器逐幀生成語音頻譜圖，再用古典的 Griffin-Lim 演算法還原成聲音"
+            "（不需要額外的神經網路聲碼器）。manifest 是一個 JSON 清單，每筆為 "
+            '{"audio": 該角色錄的 16-bit PCM WAV 檔名, "text": 這段錄音講的文字內容}——'
+            "每個角色的聲音各自訓練一個 checkpoint，不是多人共用一個模型。"
+            "訓練完成後，若要讓這個聲音接上既有的人物氣質 character card（voice_ref 欄位），"
+            "或要試聽克隆結果，請用終端機另外執行 "
+            "`python voice_clone.py --clone --text ... --out-wav ...` 或 "
+            "`python voice_clone.py --attach-to-character <名稱> --out-dir ...`（此 GUI 只負責訓練）。"
+            "注意：單一角色能錄到的語句通常很少，過擬合風險比其他模型更高，"
+            "在真的錄到夠多語句之前不用太相信 val_loss 的絕對數字。手上已經有一批"
+            "錄音檔＋逐字稿（不是用 prompt_voice.py 一筆一筆輸入）的話，"
+            "先用「步驟零」批次匯入。",
+        )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：從錄音＋逐字稿匯入 manifest (dataset_import.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        voice_import_fields = _sidecar_import_fields("audio", "voice_manifest.json")
+        build_form(step0, voice_import_fields)
+        import_btn = ttk.Button(
+            step0, text="產生 manifest",
+            command=lambda: self._start_import("聲音克隆 manifest 匯入", "sidecar-audio", voice_import_fields),
+        )
+        import_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(import_btn)
+
+        form = tk.Frame(outer, bg=PANEL_BG)
+        form.pack(fill="both", expand=True, padx=10)
+        build_form(form, VOICE_CLONE_FIELDS)
+        btn = ttk.Button(outer, text="開始訓練",
+                          command=lambda: self._start("角色聲音克隆訓練", "voice_clone.py", VOICE_CLONE_FIELDS))
+        btn.pack(pady=10)
+        self.start_buttons.append(btn)
+
     def _build_circuit_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "電路圖偵測",
             "本機 YOLO 遷移學習偵測器 (circuit_diagram_train.py)，供 視覺電路圖.py 即時推論用。"
-            "資料來源二選一：已經有 Ultralytics data.yaml，或一個 images/{train,val}、"
-            "labels/{train,val} 的資料夾 + 類別名稱清單。",
+            "手上如果只有 KiCad 的 .kicad_sch 電路圖檔案（還沒有標好框的 YOLO 資料集），"
+            "先用「步驟一」自動轉換；已經有現成資料集的話可以跳過步驟一，直接用步驟二訓練。",
         )
 
-        mode_frame = tk.Frame(outer, bg=PANEL_BG)
-        mode_frame.pack(fill="x", padx=10, pady=(0, 6))
+        step1 = tk.LabelFrame(outer, text=" 步驟一：匯入 KiCad 電路圖 (kicad_dataset_convert.py，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        tk.Label(step1, text="把 .kicad_sch 的 symbol 位置自動轉成 YOLO 標註框（不用手動框圖），"
+                              "需要先安裝 KiCad（取得 kicad-cli）與 `pip install pymupdf`。",
+                  bg=PANEL_BG, fg=MUTED_FG, anchor="w", wraplength=800, justify="left").grid(
+            row=0, column=0, columnspan=3, sticky="w", padx=(10, 6), pady=(6, 4)
+        )
+
+        kicad_mode_frame = tk.Frame(step1, bg=PANEL_BG)
+        kicad_mode_frame.grid(row=1, column=0, columnspan=3, sticky="w", padx=(10, 6), pady=(0, 6))
+        self.kicad_mode = tk.StringVar(value="dir")
+        ttk.Radiobutton(kicad_mode_frame, text="整個資料夾（批次轉換）", variable=self.kicad_mode,
+                         value="dir", command=self._toggle_kicad_mode).pack(side="left", padx=(0, 16))
+        ttk.Radiobutton(kicad_mode_frame, text="單一檔案（先測試框有沒有對齊）", variable=self.kicad_mode,
+                         value="file", command=self._toggle_kicad_mode).pack(side="left")
+
+        self.kicad_dir_frame = tk.Frame(step1, bg=PANEL_BG)
+        self.kicad_dir_fields = [
+            Field("sch_dir", ".kicad_sch 資料夾", "dir", None, required=True),
+        ]
+        build_form(self.kicad_dir_frame, self.kicad_dir_fields)
+
+        self.kicad_file_frame = tk.Frame(step1, bg=PANEL_BG)
+        self.kicad_file_fields = [
+            Field("sch_file", "單一 .kicad_sch 檔案（無 val split）", "file", None,
+                  required=True, filetypes=KICAD_FT),
+        ]
+        build_form(self.kicad_file_frame, self.kicad_file_fields)
+
+        self.kicad_dir_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=(0, 0))
+        self._toggle_kicad_mode()
+
+        build_form(step1, KICAD_COMMON_FIELDS, start_row=3)
+        kicad_btn = ttk.Button(step1, text="匯入並轉換", command=self._start_kicad_import)
+        kicad_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(kicad_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (circuit_diagram_train.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        mode_frame = tk.Frame(step2, bg=PANEL_BG)
+        mode_frame.pack(fill="x", padx=10, pady=(6, 6))
         self.circuit_mode = tk.StringVar(value="yaml")
         ttk.Radiobutton(mode_frame, text="使用現有 data.yaml", variable=self.circuit_mode,
                          value="yaml", command=self._toggle_circuit_mode).pack(side="left", padx=(0, 16))
         ttk.Radiobutton(mode_frame, text="資料夾 + 類別列表", variable=self.circuit_mode,
                          value="dir", command=self._toggle_circuit_mode).pack(side="left")
 
-        self.circuit_yaml_frame = tk.LabelFrame(outer, text=" data.yaml ", bg=PANEL_BG, fg=FG, bd=1)
+        self.circuit_yaml_frame = tk.LabelFrame(step2, text=" data.yaml ", bg=PANEL_BG, fg=FG, bd=1)
         self.circuit_yaml_fields = [
             Field("data", "data.yaml 路徑", "file", None, required=True, filetypes=YAML_FT),
         ]
         build_form(self.circuit_yaml_frame, self.circuit_yaml_fields)
 
-        self.circuit_dir_frame = tk.LabelFrame(outer, text=" 資料夾 + 類別 ", bg=PANEL_BG, fg=FG, bd=1)
+        self.circuit_dir_frame = tk.LabelFrame(step2, text=" 資料夾 + 類別（可直接接續上面步驟一的輸出資料夾） ",
+                                                 bg=PANEL_BG, fg=FG, bd=1)
         self.circuit_dir_fields = [
             Field("dataset_dir", "資料夾（images/{train,val}, labels/{train,val}）", "dir", None,
                   required=True),
@@ -411,13 +770,46 @@ class TrainGUI:
         self.circuit_yaml_frame.pack(fill="x", padx=10, pady=(0, 10))
         self._toggle_circuit_mode()
 
-        common_frame = tk.LabelFrame(outer, text=" 共用參數 ", bg=PANEL_BG, fg=FG, bd=1)
+        common_frame = tk.LabelFrame(step2, text=" 共用參數 ", bg=PANEL_BG, fg=FG, bd=1)
         common_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         build_form(common_frame, CIRCUIT_COMMON_FIELDS)
 
-        btn = ttk.Button(outer, text="開始訓練", command=self._start_circuit)
+        btn = ttk.Button(step2, text="開始訓練", command=self._start_circuit)
         btn.pack(pady=10)
         self.start_buttons.append(btn)
+
+    def _toggle_kicad_mode(self):
+        if self.kicad_mode.get() == "dir":
+            self.kicad_file_frame.grid_forget()
+            self.kicad_dir_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=(0, 0))
+        else:
+            self.kicad_dir_frame.grid_forget()
+            self.kicad_file_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=(0, 0))
+
+    def _start_kicad_import(self):
+        common_values = collect_values(KICAD_COMMON_FIELDS)
+        if common_values is None:
+            return
+        argv = build_argv(KICAD_COMMON_FIELDS, common_values)
+
+        classes = [c for c in re.split(r"[,\s]+", common_values["classes"].strip()) if c]
+        if not classes:
+            messagebox.showerror("缺少欄位", "請填寫至少一個類別名稱")
+            return
+        argv += ["--classes", *classes]
+
+        if self.kicad_mode.get() == "dir":
+            values = collect_values(self.kicad_dir_fields)
+            if values is None:
+                return
+            argv += ["--sch-dir", values["sch_dir"]]
+        else:
+            values = collect_values(self.kicad_file_fields)
+            if values is None:
+                return
+            argv += ["--sch", values["sch_file"]]
+
+        self._launch("KiCad 電路圖匯入", ["kicad_dataset_convert.py"] + argv)
 
     def _toggle_circuit_mode(self):
         if self.circuit_mode.get() == "yaml":
@@ -457,6 +849,13 @@ class TrainGUI:
         if values is None:
             return
         self._launch(task_label, [script] + build_argv(fields, values))
+
+    def _start_import(self, task_label: str, mode: str, fields: list[Field]):
+        values = collect_values(fields)
+        if values is None:
+            return
+        argv = ["--mode", mode] + build_argv(fields, values)
+        self._launch(task_label, ["dataset_import.py"] + argv)
 
     def _launch(self, task_label: str, argv: list[str]):
         if self.proc is not None and self.proc.poll() is None:
