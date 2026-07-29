@@ -46,6 +46,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 
+from train_utils import EarlyStopper, accuracy_gap_warning, plateau_scheduler, save_checkpoint
+
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
@@ -124,14 +126,12 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
     optimizer = torch.optim.AdamW(
         (p for p in model.parameters() if p.requires_grad), lr=lr, weight_decay=weight_decay
     )
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2)
+    scheduler = plateau_scheduler(optimizer)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "classes.json").write_text(json.dumps(classes, ensure_ascii=False, indent=2))
 
-    best_val_loss = float("inf")
-    best_state = None
-    epochs_without_improvement = 0
+    stopper = EarlyStopper(patience)
     history = []
 
     for epoch in range(1, epochs + 1):
@@ -139,32 +139,18 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
         val_loss, val_acc = run_epoch(model, val_loader, criterion, optimizer, device, train=False)
         scheduler.step(val_loss)
 
-        gap = train_acc - val_acc
-        warning = ""
-        if gap > 0.15:
-            warning = "  [warning: train/val accuracy gap suggests overfitting]"
-        elif train_acc < 0.4 and epoch >= max(3, epochs // 3):
-            warning = "  [warning: low train accuracy this far in — possible underfitting; try --unfreeze-backbone]"
+        warning = accuracy_gap_warning(train_acc, val_acc, epoch, epochs, underfit_hint="--unfreeze-backbone")
 
         print(f"epoch {epoch:3d}  train_loss={train_loss:.4f} train_acc={train_acc:.3f}  "
               f"val_loss={val_loss:.4f} val_acc={val_acc:.3f}{warning}")
         history.append({"epoch": epoch, "train_loss": train_loss, "train_acc": train_acc,
                          "val_loss": val_loss, "val_acc": val_acc})
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
-            epochs_without_improvement = 0
-        else:
-            epochs_without_improvement += 1
-            if epochs_without_improvement >= patience:
-                print(f"Early stopping at epoch {epoch} (no val improvement for {patience} epochs)")
-                break
+        if stopper.step(val_loss, model, epoch):
+            break
 
-    if best_state is not None:
-        model.load_state_dict(best_state)
-    torch.save(model.state_dict(), out_dir / "best_model.pt")
-    (out_dir / "history.json").write_text(json.dumps(history, indent=2))
+    stopper.restore_best(model)
+    save_checkpoint(model, out_dir, history)
     return model, classes, history
 
 
