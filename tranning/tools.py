@@ -9,9 +9,13 @@ an API key.
 
 route_reply() is a small keyword/regex router, not real language
 understanding — it only catches messages that look like an explicit
-weather or "look this up" request (e.g. "台北天氣", "搜尋 X", "你認識 X 嗎").
-Anything else returns None so the caller (see chats.py smart_reply())
-falls back to the trained seq2seq model.
+weather or "look this up" request (e.g. "台北天氣", "搜尋 X", "你認識 X 嗎"),
+or a "出一題微積分/微分/積分/極限" -shaped request for a random calculus
+problem (handled by calculus_generator.py — deterministic sympy math, not
+another model, see that module's docstring for why this is inside Rule
+06's "no external AI model" boundary). Anything else returns None so the
+caller (see chats.py smart_reply()) falls back to the trained seq2seq
+model.
 
 fetch_page_text() is deliberately NOT a crawler (it never follows links,
 never fetches more than the one page it was given) — it exists only to back
@@ -37,6 +41,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+import calculus_generator
+
 WEATHER_TIMEOUT = 6
 SEARCH_TIMEOUT = 6
 PAGE_FETCH_TIMEOUT = 8
@@ -56,6 +62,44 @@ _SEARCH_PATTERNS = [
 # subjects that mean "sinco itself" — let the trained identity pairs answer
 # those instead of firing a pointless web search for "你"/"you".
 _SELF_REFERENCE = {"你", "妳", "你們", "sinco", "the", "you"}
+
+# calculus problem request: needs BOTH a "quiz me" verb and a topic keyword,
+# same two-part shape as the weather/search patterns above (a bare mention
+# of "微積分" with no request verb, e.g. "我要交微積分作業", should NOT fire).
+_CALCULUS_REQUEST_HINTS = (
+    "出一題", "出題", "來一題", "考我", "給我一題", "出个题",
+    "quiz me", "give me a problem", "practice",
+)
+# checked in this order: specific subtopic keywords first, generic "微積分"
+# last — "積分" is a literal substring of "微積分" (微/積/分), so if the
+# generic phrase were stripped out of the message *after* checking "積分"
+# instead of before, "出一題微積分" (no explicit subtopic) would always be
+# misread as an integral-only request instead of "pick any of the three".
+_CALCULUS_TOPIC_KEYWORDS = (
+    ("導數", "derivative"), ("求導", "derivative"), ("differentiate", "derivative"),
+    ("極限", "limit"), ("limit", "limit"),
+    ("微分", "derivative"), ("derivative", "derivative"),
+    ("積分", "integral"), ("integral", "integral"), ("integrate", "integral"),
+)
+
+
+def _calculus_topic_if_requested(message: str) -> str | None:
+    """None unless the message both (a) reads as a "quiz me" request and
+    (b) names a calculus topic — returns "derivative"/"integral"/"limit"
+    for an explicit subtopic, or "random" for a generic "微積分"/"calculus"
+    mention with no subtopic (calculus_generator.generate_problem() then
+    picks one at call time).
+    """
+    text = message.strip().lower()
+    if not any(hint in text for hint in _CALCULUS_REQUEST_HINTS):
+        return None
+
+    remaining = text.replace("微積分", "").replace("calculus", "")
+    mentioned_generic = remaining != text
+    for keyword, topic in _CALCULUS_TOPIC_KEYWORDS:
+        if keyword in remaining:
+            return topic
+    return "random" if mentioned_generic else None
 
 
 def get_weather(location: str) -> str:
@@ -166,6 +210,15 @@ def route_reply(message: str) -> tuple[str, str] | None:
             return reason, f"{location} 目前天氣：{get_weather(location)}"
         except requests.RequestException:
             return reason, "抱歉，天氣查詢暫時失敗，請稍後再試。"
+
+    calculus_topic = _calculus_topic_if_requested(message)
+    if calculus_topic is not None:
+        problem = calculus_generator.generate_problem(topic=calculus_topic)
+        reason = (
+            f'偵測到出題請求，主題「{problem["topic_zh"]}」，'
+            f'呼叫 calculus_generator 即時運算產生新題目（sympy，非模型記憶）'
+        )
+        return reason, calculus_generator.format_problem(problem)
 
     for pattern in _SEARCH_PATTERNS:
         m = pattern.match(message)
