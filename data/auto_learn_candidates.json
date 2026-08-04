@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1050a0ce",
+    "prompt": "search Calculus",
+    "reply": "Calculus is the branch of mathematics that studies continuous change, and is the principal precursor of modern mathematical analysis. Originally called infinitesimal calculus or the calculus of infinitesimals, it has two major branches, differential calculus and integral calculus. Differential calculus studies instantaneous rates of change and slopes of curves; integral calculus studies accumulation of quantities and areas under or between curves. These two branches are related to each other by the fundamental theorem of calculus. Calculus uses convergence of infinite sequences and infinite series to a well-defined mathematical limit. Calculus is the \"mathematical backbone\" for solving problems in which variable quantities change with time or another reference value. It has also been called \"the basic instrument of physical science\". In the late 17th century, Isaac Newton and Gottfried Wilhelm Leibniz each independently formulated infinitesimal calculus.",
+    "topic": "Calculus",
+    "source": "duckduckgo",
+    "created_at": "2026-07-29T16:27:46+00:00"
+  },
+  {
+    "id": "61799f6d",
+    "prompt": "你會微積分嗎",
+    "reply": "微積分學 或微分积分学，简称微积分，主要包括微分學和積分學两个部分，是研究極限、微分、積分和無窮級數等的一個數學分支。本質上，微積分學是一門研究连续變化的學問。",
+    "topic": "微積分",
+    "source": "wikipedia",
+    "created_at": "2026-07-29T16:37:37+00:00"
+  },
+  {
+    "id": "304ce1ab",
+    "prompt": "你知道 token 嗎?",
+    "reply": "Tokenization (data security) The process of substituting a sensitive data element with a non-sensitive equivalent, referred to...",
+    "topic": "token",
+    "source": "duckduckgo",
+    "created_at": "2026-07-30T00:43:26+00:00"
+  },
+  {
+    "id": "864ace53",
+    "prompt": "你知道周柯宇嗎?",
+    "reply": "周柯宇，本名周丹尼爾，出生於美國，中国歌手、舞者、演員，北京人。所属經紀公司為嘉行新悅，2021年參加《創造營2021》並以第10名成績成團出道。現為男子音樂組合BEST新悅少年成員，曾為國際男子唱演組合INTO1成員。",
+    "topic": "周柯宇",
+    "source": "wikipedia",
+    "created_at": "2026-07-30T02:18:36+00:00"
+  },
+  {
+    "id": "bce6fef7",
+    "prompt": "那你知道張凌赫嗎?",
+    "reply": "張凌赫 是一位演員。",
+    "topic": "張凌赫",
+    "source": "duckduckgo",
+    "created_at": "2026-07-30T02:26:06+00:00"
+  },
+  {
+    "id": "193f61bc",
+    "prompt": "搜尋Python",
+    "reply": "PYTHON was a Cold War contingency plan of the British Government for the continuity of government in the event of nuclear war.",
+    "topic": "Python",
+    "source": "duckduckgo",
+    "created_at": "2026-08-03T11:34:26+00:00"
+  }
+]
