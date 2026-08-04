@@ -1,0 +1,21 @@
+# Python 虛擬環境
+.venv/
+venv/
+env/
+
+# Python 編譯快取
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# CLI 執行紀錄
+app/components/.cli_history
+
+# 可重新下載/重新產生的訓練資料與訓練產物（不進版控）
+tranning/commonvoice_zhTW/
+tranning/gpt_chat_runs/
+tranning/gpt_pretrain_runs/
+tranning/speech_runs/
+tranning/speech_data/
+tranning/Tranning/
