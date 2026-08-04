@@ -180,10 +180,6 @@ def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "vocab.json").write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
-    (out_dir / "config.json").write_text(
-        json.dumps({"embed_size": embed_size, "hidden_size": hidden_size, "max_len": max_len}, indent=2)
-    )
 
     history = []
     for epoch in range(1, epochs + 1):
@@ -214,6 +210,17 @@ def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
         print(f"epoch {epoch:3d}  loss={avg_loss:.4f}")
         history.append({"epoch": epoch, "loss": avg_loss})
 
+    # vocab.json/config.json 跟權重檔一起在訓練「結束」後才寫入（而非開頭）：
+    # 舊版在迴圈開始前就先寫 vocab.json，如果重新訓練時字元集有變動（新增了
+    # 訓練資料），out_dir 會有一段長達整個訓練時間的空窗期，vocab.json 已經是
+    # 新的、但 encoder.pt/decoder.pt 還是舊的——這段時間任何人（CLI、GUI）
+    # 讀取這個 checkpoint 都會因為 embedding 維度對不上而直接 Error(s) in
+    # loading state_dict。全部搬到訓練迴圈之後一起寫，讓 out_dir 隨時只會是
+    #「完整的舊 checkpoint」或「完整的新 checkpoint」兩種狀態之一。
+    (out_dir / "vocab.json").write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "config.json").write_text(
+        json.dumps({"embed_size": embed_size, "hidden_size": hidden_size, "max_len": max_len}, indent=2)
+    )
     torch.save(encoder.state_dict(), out_dir / "encoder.pt")
     torch.save(decoder.state_dict(), out_dir / "decoder.pt")
     (out_dir / "history.json").write_text(json.dumps(history, indent=2))
