@@ -60,6 +60,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
 from OCR import CRNN, BLANK, build_charset, char_error_rate, greedy_decode
+from train_utils import EarlyStopper, loss_gap_warning, plateau_scheduler, save_checkpoint
 
 DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "speech_runs"
 SAMPLE_RATE = 16000
@@ -201,7 +202,7 @@ def train(train_manifest: Path, val_manifest: Path, audio_root: Path, out_dir: P
     model = CRNN(len(charset) + 1, FREQ_BINS, hidden_size, dropout).to(device)
     criterion = nn.CTCLoss(blank=BLANK, zero_infinity=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2)
+    scheduler = plateau_scheduler(optimizer)
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -210,9 +211,7 @@ def train(train_manifest: Path, val_manifest: Path, audio_root: Path, out_dir: P
         json.dumps({"max_frames": max_frames, "hidden_size": hidden_size}, indent=2)
     )
 
-    best_val_loss = float("inf")
-    best_state = None
-    epochs_without_improvement = 0
+    stopper = EarlyStopper(patience)
     history = []
 
     for epoch in range(1, epochs + 1):
@@ -246,29 +245,16 @@ def train(train_manifest: Path, val_manifest: Path, audio_root: Path, out_dir: P
         val_cer = cer_sum / val_samples
         scheduler.step(val_loss)
 
-        warning = ""
-        if val_loss > train_loss * 1.5 and train_loss < 5.0:
-            warning = "  [warning: val loss well above train loss — possible overfitting]"
-        elif train_loss > 3.0 and epoch >= max(3, epochs // 3):
-            warning = "  [warning: train loss still high this far in — possible underfitting]"
+        warning = loss_gap_warning(train_loss, val_loss, epoch, epochs)
 
         print(f"epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}  val_cer={val_cer:.3f}{warning}")
         history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss, "val_cer": val_cer})
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
-            epochs_without_improvement = 0
-        else:
-            epochs_without_improvement += 1
-            if epochs_without_improvement >= patience:
-                print(f"Early stopping at epoch {epoch} (no val improvement for {patience} epochs)")
-                break
+        if stopper.step(val_loss, model, epoch):
+            break
 
-    if best_state is not None:
-        model.load_state_dict(best_state)
-    torch.save(model.state_dict(), out_dir / "best_model.pt")
-    (out_dir / "history.json").write_text(json.dumps(history, indent=2))
+    stopper.restore_best(model)
+    save_checkpoint(model, out_dir, history)
     return model, charset, history
 
 
