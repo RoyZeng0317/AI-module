@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
-from speech_to_text import SAMPLE_RATE, recognize, recognize_waveform, train
+from speech_to_text import SAMPLE_RATE, recognize, recognize_waveform, remove_fillers, train
 
 TEXTS = ["12", "AB", "9X"]
 TONES = {"12": 220.0, "AB": 440.0, "9X": 660.0}
@@ -80,3 +80,21 @@ def test_training_and_recognize_run_end_to_end(tmp_path):
 def test_recognize_without_checkpoint_returns_placeholder(tmp_path):
     message = recognize_waveform(np.zeros(SAMPLE_RATE, dtype=np.float32), out_dir=tmp_path / "no_checkpoint_here")
     assert "尚未訓練" in message
+
+
+def test_remove_fillers_strips_standalone_chinese_interjections():
+    assert remove_fillers("嗯我覺得啊這樣可以") == "我覺得這樣可以"
+    assert remove_fillers("呃就是那個東西") == "就是那個東西"
+
+
+def test_remove_fillers_strips_repeated_filler_runs():
+    assert remove_fillers("嗯嗯嗯你說得對") == "你說得對"
+
+
+def test_remove_fillers_strips_english_filler_words():
+    assert remove_fillers("um I think uh this works") == "I think this works"
+
+
+def test_remove_fillers_leaves_clean_text_unchanged():
+    assert remove_fillers("我覺得這樣可以") == "我覺得這樣可以"
+    assert remove_fillers("this works fine") == "this works fine"

@@ -50,6 +50,7 @@ Usage:
 
 import argparse
 import json
+import re
 import wave
 from pathlib import Path
 
@@ -296,12 +297,43 @@ def _load(out_dir: Path):
     return loaded
 
 
+# --- 去口語化：轉錄後的文字過濾（見 CLAUDE.md to-do，使用者要的是「轉錄後
+# 文字過濾」而非模型本身學會跳過語助詞——後者需要語音資料集本身的文字標註
+# 就先人工濾掉語助詞，例如語音說「嗯我覺得」但標註寫「我覺得」，目前完全沒有
+# 真實語音資料集，做不到；文字過濾這條路不需要任何訓練資料就能先動起來）。
+#
+# 這是字元級 CTC 模型的輸出——沒有詞邊界、沒有標點，中文又沒有空白分詞，所以
+# 這裡採用「這些字元幾乎只會單獨當語助詞/感嘆詞用、極少是正常詞彙的一部分」
+# 的務實判斷（嗯/啊/呃/欸/誒/喔/齁/呦/噢/唉），不管它出現在句子的哪個位置都
+# 直接濾掉——這是簡單的規則式過濾，不是語言理解，符合 Rule 06 的精神：判斷
+# 「濾掉哪些字」的規則是 sinco 自己寫死的，不是叫另一個 AI 模型去理解語意再
+# 決定要不要濾。已知的取捨：「太好了啊」這種語尾語氣詞也會被濾成「太好了」
+# ——這正是「去口語化」要的效果（口語語氣詞本來就是要濾掉的東西），但如果
+# 未來語料庫出現「呃逆」（打嗝的醫學名詞）這種罕見詞，會被誤濾成「逆」，這是
+# 這個簡單規則的已知盲點，機率很低所以先不特別處理。
+_FILLER_CHARS = "嗯啊呃欸誒喔齁呦噢唉"
+_FILLER_CHAR_PATTERN = re.compile(f"[{_FILLER_CHARS}]+")
+_FILLER_WORDS_EN = re.compile(r"\b(?:um+|uh+|erm+|hmm+)\b", re.IGNORECASE)
+
+
+def remove_fillers(text: str) -> str:
+    """濾掉「嗯」「啊」這類語助詞/感嘆詞（中英文都處理），回傳去口語化後的
+    文字。純規則式字串處理，不呼叫任何模型。
+    """
+    text = _FILLER_WORDS_EN.sub("", text)
+    text = _FILLER_CHAR_PATTERN.sub("", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def recognize_waveform(waveform: np.ndarray, out_dir: Path = DEFAULT_OUT_DIR) -> str:
     """Run the self-trained CRNN+CTC model on raw samples already in memory
     (e.g. straight from a microphone capture) — no temp file needed.
 
     Returns a placeholder message (rather than crashing) if no checkpoint
-    has been trained yet at out_dir.
+    has been trained yet at out_dir. The raw transcription is passed through
+    remove_fillers() before returning — see that function's comment for why
+    this is a post-transcription text filter rather than something the
+    acoustic model itself is trained to skip.
     """
     loaded = _load(Path(out_dir))
     if loaded is None:
@@ -313,7 +345,7 @@ def recognize_waveform(waveform: np.ndarray, out_dir: Path = DEFAULT_OUT_DIR) ->
 
     with torch.no_grad():
         log_probs = model(spec)
-    return greedy_decode(log_probs, idx_to_char)[0]
+    return remove_fillers(greedy_decode(log_probs, idx_to_char)[0])
 
 
 def recognize(audio_path: Path, out_dir: Path = DEFAULT_OUT_DIR) -> str:
