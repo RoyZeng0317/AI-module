@@ -1,0 +1,1 @@
+{"messages": [{"role": "system", "content": "你是一個支援 Tool Calling 的 AI 助手。可用工具: \n- calc(expr): 執行數學計算\n當需要使用工具時，輸出 ```json\n{\"action\":\"calc\", \"input\": \"算式\"}\n```"}, {"role": "user", "content": "試問(35 + 45) * 12 =?"}, {"role": "tool", "content": "960"}, {"role": "assistant", "content": "Thought: 工具回傳結果為 960 ，計算完畢。\nFinal Answer: (35 + 45) * 12 的計算結果是 960。"}]}

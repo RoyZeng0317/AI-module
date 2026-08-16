@@ -16,11 +16,17 @@ every approval risks silently degrading it before anyone notices.
 """
 
 import json
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile (nova.exe, built to live at the project root): see
+    # lib/components/cli.py for why __file__ can't be used here when frozen.
+    DATA_DIR = Path(sys.executable).resolve().parent / "data"
+else:
+    DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 CANDIDATES_PATH = DATA_DIR / "auto_learn_candidates.json"
 PAIRS_PATH = DATA_DIR / "pairs.json"
 

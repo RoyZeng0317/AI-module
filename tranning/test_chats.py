@@ -8,6 +8,7 @@ prompt/reply pairs.
 
 import json
 
+import chats
 from chats import chat_reply, is_code_request, mc_chat_reply, smart_reply_traced, train
 
 
@@ -112,3 +113,48 @@ def test_smart_reply_traced_force_mode_overrides_auto_routing(tmp_path):
 
     forced_code_trace, _ = smart_reply_traced("hello", out_dir=out_dir, force_mode="code")
     assert "已手動切換為程式碼模式" in forced_code_trace
+
+
+def test_smart_reply_traced_nvidia_mode_routes_to_nvidia_reply(monkeypatch, tmp_path):
+    """/model nvidia（外部 NVIDIA 雲端 API，非本專案自訓練）：force_mode="nvidia"
+    要完全跳過 sinco/sinco-code 的自動判斷與 checkpoint 讀取，直接呼叫
+    chats._nvidia_reply()。這裡 monkeypatch 掉 _nvidia_reply 本身，不打真的
+    NVIDIA API（不需要真的 NVIDIA_API_KEY，也不依賴網路）。
+    """
+    monkeypatch.setattr(chats, "_nvidia_reply", lambda message, history=None: ("因為...", f"echo: {message}"))
+
+    trace, reply = smart_reply_traced("寫一個 python 函式", out_dir=tmp_path / "unused", force_mode="nvidia")
+
+    assert "NVIDIA" in trace
+    assert "因為..." in trace
+    assert reply == "echo: 寫一個 python 函式"
+
+
+def test_smart_reply_traced_nvidia_mode_without_reasoning(monkeypatch, tmp_path):
+    """_nvidia_reply() 回傳空字串思考過程時（模型沒開啟 thinking，或 API 呼叫
+    失敗走例外分支），trace 只保留原本的切換說明，不能出現空的「思考過程：」段落。
+    """
+    monkeypatch.setattr(chats, "_nvidia_reply", lambda message, history=None: ("", f"echo: {message}"))
+
+    trace, reply = smart_reply_traced("hello", out_dir=tmp_path / "unused", force_mode="nvidia")
+
+    assert "思考過程" not in trace
+
+
+def test_smart_reply_traced_nvidia_mode_forwards_history(monkeypatch, tmp_path):
+    """/resume 還原回來的歷史（或 GUI 累積的 Conversation.history）要原封不動
+    轉交給 _nvidia_reply()，nemotron 才能把之前幾輪當多輪對話的 messages 脈絡，
+    而不是每次都被當成全新對話（這是「NVIDIA 模型沒有還原對話紀錄」的根因）。
+    """
+    seen = {}
+
+    def fake_nvidia_reply(message, history=None):
+        seen["history"] = history
+        return "", f"echo: {message}"
+
+    monkeypatch.setattr(chats, "_nvidia_reply", fake_nvidia_reply)
+    history = [("你好", "哈囉，我是 nemotron")]
+
+    smart_reply_traced("再說一次", out_dir=tmp_path / "unused", force_mode="nvidia", history=history)
+
+    assert seen["history"] == history

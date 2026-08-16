@@ -33,7 +33,9 @@ import sounddevice as sd
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tranning"))
 
 from chats import DEFAULT_OUT_DIR, smart_reply_traced  # noqa: E402
-from function import read_as_chat_content  # noqa: E402
+from lib.components.function import read_as_chat_content  # noqa: E402
+from lib.components.markdown_view import insert_markdown  # noqa: E402
+from lib.components.session_store import record_turn  # noqa: E402
 from speech_to_text import SAMPLE_RATE, recognize_waveform  # noqa: E402
 
 # shorter than this is almost certainly an accidental click, not real speech
@@ -119,11 +121,8 @@ class Conversation:
         self.history: list[tuple[str, str]] = []  # [(使用者訊息, sinco回覆), ...]，只保留最近 MAX_HISTORY_TURNS 輪
 
         # /model（CLAUDE.md 需求 #01）：手動覆蓋 chats.smart_reply_traced() 的
-        # chat/code 自動判斷，"auto" = 維持既有行為。目前 tranning/chats.py 的
-        # smart_reply_traced() 還沒有 force_mode 參數（second 分支有一版 Bayesian
-        # MC-Dropout 升級才加了這個參數，main 尚未合併那份升級），所以這裡先只是
-        # 記錄使用者選了哪個模式、讓 /model 指令本身能正常運作，實際還不會影響
-        # 路由——跟這個專案其他「先接上 UI，模型端功能之後再補」的慣例一致。
+        # chat/code/nvidia 路由，"auto" = 維持既有行為。ask() 的 worker() 會把
+        # 這個值原樣傳給 smart_reply_traced(force_mode=...)。
         self.force_mode = "auto"
         # /character（需求 #02）：目前對話用的人格 checkpoint，預設 sinco。
         # character_browser.py 選好角色後會呼叫 set_persona() 改這兩個值。
@@ -156,7 +155,11 @@ class Conversation:
             self.on_ask_start()
 
         def worker():
-            trace, reply = smart_reply_traced(model_input, out_dir=self.out_dir)
+            # history 只有 nvidia 模式會真的用到（見 smart_reply_traced() 的
+            # 說明），這裡無條件傳，讓 /model nvidia 能接上 self.history（含
+            # /resume 還原回來的歷史）當多輪對話上下文。
+            trace, reply = smart_reply_traced(model_input, out_dir=self.out_dir, force_mode=self.force_mode,
+                                               history=self.history)
 
             def show_result():
                 chat_display.configure(state="normal")
@@ -170,13 +173,21 @@ class Conversation:
                 chat_display.mark_set(tk.INSERT, start)
                 chat_display.insert(tk.INSERT, f"{self.persona}\n", "ai_label")
                 chat_display.insert(tk.INSERT, f"{trace}\n", "trace")
-                chat_display.insert(tk.INSERT, f"{reply}\n\n", "ai_text")
+                # 用 insert_markdown() 把回覆渲染成排版後的預覽（標題/粗體/清單/
+                # 程式碼區塊），不是原封不動塞進 Text 元件顯示 "**粗體**" 這種
+                # 原始符號——同一個訴求 CLI 版是用 rich.markdown.Markdown。
+                insert_markdown(chat_display, reply, base_tag="ai_text")
+                chat_display.insert(tk.INSERT, "\n", "ai_text")
                 chat_display.configure(state="disabled")
                 chat_display.see(tk.END)
                 self.busy = False
                 if record_as is not None:
                     self.history.append((record_as, reply))
                     del self.history[:-MAX_HISTORY_TURNS]
+                    # 落地到 session.json，讓 /resume 能在電腦意外斷電/關機後
+                    # 還原到這一輪——跟上面 self.history 不同，這裡是寫檔案，
+                    # 不會隨程式關閉而消失。
+                    record_turn(record_as, reply, persona=self.persona, mode=self.force_mode)
 
             self.windows.after(0, show_result)
 

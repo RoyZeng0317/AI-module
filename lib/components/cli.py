@@ -13,10 +13,29 @@ import json
 import sys
 from pathlib import Path
 
-APP_COMPONENTS_DIR = Path(__file__).resolve().parent
-TRANNING_DIR = APP_COMPONENTS_DIR.parent.parent / "tranning"
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile: __file__ resolves inside the temp extraction dir
+    # (sys._MEIPASS) at runtime, not the real project folder, so every path
+    # derived from it below would point into a throwaway temp directory that
+    # has none of the trained checkpoints/data. nova.exe is built to live at
+    # the project root, so sys.executable's own directory is used instead.
+    PROJECT_ROOT_DIR = Path(sys.executable).resolve().parent
+    APP_COMPONENTS_DIR = PROJECT_ROOT_DIR / "lib" / "components"
+else:
+    APP_COMPONENTS_DIR = Path(__file__).resolve().parent
+    PROJECT_ROOT_DIR = APP_COMPONENTS_DIR.parent.parent
+TRANNING_DIR = PROJECT_ROOT_DIR / "tranning"
 COMMAND_DIR = APP_COMPONENTS_DIR.parent / "command"
 sys.path.insert(0, str(TRANNING_DIR))
+
+if not __package__:
+    # 直接用完整路徑執行這支檔案時（例如 `python .../lib/components/cli.py`），
+    # sys.path[0] 只會是 lib/components/ 這層目錄，專案根目錄不在 sys.path
+    # 裡，下面 `from lib.components.function import ...` 這種絕對匯入就會
+    # ModuleNotFoundError: No module named 'lib'（跟 lib/main.py 同一個根因，
+    # 見 ErrorLog.md）。正規跑法是在專案根目錄下用 `python -m` 啟動，這裡補上
+    # 保險：偵測到不是用 -m 執行時，把專案根目錄塞進 sys.path。
+    sys.path.insert(0, str(PROJECT_ROOT_DIR))
 
 # 台灣 Windows 的傳統主控台編碼是 cp950（Big5），沒有涵蓋 rich 用到的一些符號
 # （如 "›"、spinner 用的點字字元）。rich 偵測到「legacy windows console」時會
@@ -34,21 +53,40 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.history import FileHistory
 from rich.console import Console
+from rich.markdown import Markdown
 from rich.markup import escape
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.text import Text
 
 from chats import DEFAULT_OUT_DIR, is_code_request, smart_reply_traced, tokenize
-from function import read_as_chat_content
-from memory_store import CATEGORIES as MEMORY_CATEGORIES
-from memory_store import add_memory, delete_memory, format_memories, list_memories
+from lib.components.function import read_as_chat_content
+from lib.components.memory_store import CATEGORIES as MEMORY_CATEGORIES
+from lib.components.memory_store import add_memory, delete_memory, format_memories, list_memories
+from lib.components.session_store import clear_session, load_session, record_turn
 
-MODULE = "Nova 1.5"  # 應用程式/品牌名稱；聊天時的助理人格名稱仍是 "sinco"（DEFAULT_PERSONA，訓練資料/回覆內容都沒有改）
+MODULE = "Nova"  # 應用程式/品牌名稱；聊天時的助理人格名稱仍是 "sinco"（DEFAULT_PERSONA，訓練資料/回覆內容都沒有改）
 CHARACTERS_DIR = TRANNING_DIR / "characters"
 CHARACTER_CHAT_DIR = CHARACTERS_DIR / "character_chat_runs"
 DEFAULT_PERSONA = "sinco"
 HISTORY_PATH = APP_COMPONENTS_DIR / ".cli_history"  # 方向鍵輸入紀錄持久化檔，跨次執行 CLI 仍可叫出之前打過的內容
+
+# /model 手動切換 chats.smart_reply_traced() 的 force_mode，跟 GUI
+# （lib/components/command.py 的 CommandPalette._run_model / MODEL_MODES /
+# MODEL_LABELS）是同一套選項清單，這裡不 import command.py 是因為它會連帶
+# 拉進 tkinter，CLI 不需要 GUI 依賴。
+MODEL_MODES = ["auto", "sinco", "code", "nvidia"]
+MODEL_LABELS = {
+    "auto": "自動判斷（預設，程式碼問句自動轉去 code 模型）",
+    "sinco": "一般聊天模型（強制，即使問句看起來像程式碼）",
+    "code": "程式碼模型（強制，即使問句看起來不像程式碼）",
+    "nvidia": "NVIDIA 雲端模型（外部 API，非本專案自訓練，需自行設定環境變數 NVIDIA_API_KEY）",
+}
+
+# state["history"] 的輪數上限，跟 GUI 的 conversation.py MAX_HISTORY_TURNS／
+# command.py RESUME_HISTORY_CAP 是同一個數字，只是各自維護一份常數——不直接
+# import conversation.py 是同樣的理由（會連帶拉進 sounddevice 等音訊套件）。
+RESUME_HISTORY_CAP = 20
 
 console = Console(legacy_windows=False)
 
@@ -74,7 +112,7 @@ def _character_names() -> list[str]:
     return sorted(names)
 
 
-_BUILTIN_SLASH_COMMANDS = {"help", "clear", "open", "character", "memory"}
+_BUILTIN_SLASH_COMMANDS = {"help", "clear", "open", "character", "memory", "model", "resume"}
 
 
 def _slash_commands() -> list[str]:
@@ -90,6 +128,10 @@ def _arg_suggestions(name: str) -> list[str] | None:
         return _character_names()
     if name == "memory":
         return ["list", "add", "del"]
+    if name == "model":
+        return MODEL_MODES
+    if name == "resume":
+        return ["clear"]
     return None
 
 
@@ -145,10 +187,14 @@ def print_help(state: dict):
     lines.append("            清除畫面\n")
     lines.append("  /open ", style="bold")
     lines.append("<路徑>      讀取檔案內容並送給模型\n")
+    lines.append("  /model ", style="bold")
+    lines.append("<模式>    切換 auto/sinco/code/nvidia（不帶模式＝查看目前模式）\n")
     lines.append("  /character ", style="bold")
     lines.append("<名稱>   切換角色人格（不帶名稱＝查看目前人格與可選清單）\n")
     lines.append("  /memory", style="bold")
     lines.append("            編輯持久記憶（list/add/del，輸入 /memory 查看完整用法）\n")
+    lines.append("  /resume ", style="bold")
+    lines.append("<clear>   還原電腦重開機/關機前記錄下的對話（不帶引數＝重播；clear＝清除紀錄）\n")
     lines.append("  exit / quit", style="bold")
     lines.append("       離開\n")
 
@@ -158,7 +204,7 @@ def print_help(state: dict):
         for cmd in md_cmds:
             lines.append(f"  /{cmd}\n")
 
-    lines.append(f"\n目前人格：{state['persona']}", style="dim")
+    lines.append(f"\n目前人格：{state['persona']} ｜ 目前模式：{state['force_mode']}", style="dim")
     console.print(Panel(lines, border_style="cyan", expand=False))
 
 
@@ -244,10 +290,61 @@ def run_memory(arg: str):
     )
 
 
+# /model <auto|sinco|code|nvidia>：手動覆蓋 smart_reply_traced() 的自動
+# chat/code 判斷，跟 GUI（command.py 的 CommandPalette._run_model）同一套
+# force_mode 機制。沒帶引數就顯示目前模式＋可用選項。
+def run_model(arg: str, state: dict):
+    if not arg:
+        current: str = state["force_mode"]
+        label = MODEL_LABELS.get(current, current)
+        options = "\n".join(f"  {m} — {MODEL_LABELS[m]}" for m in MODEL_MODES)
+        console.print(f"[dim]目前模式：{escape(current)}（{escape(label)}）\n{escape(options)}[/dim]")
+        return
+    mode = arg.lower()
+    if mode not in MODEL_MODES:
+        console.print(f"[red]未知模式：{escape(arg)}（可用：{'、'.join(MODEL_MODES)}）[/red]")
+        return
+    state["force_mode"] = mode
+    console.print(f"[dim]已切換模式：{mode}（{escape(MODEL_LABELS[mode])}）[/dim]")
+
+
+# /resume [clear]：還原電腦重開機/意外關機前記錄下的對話——每一輪對話在
+# ask_model() 拿到回覆的當下就已經用 session_store.record_turn() 落地到
+# memory/session.json（不是等程式正常關閉才存），所以就算不是正常退出這支
+# CLI，重開機後 /resume 仍讀得到最後聊到哪。重播內容本身只是唸給你看，不會
+# 重新送進 sinco（sinco 字元級模型故意不吃歷史，見 conversation.py 開頭說明）；
+# 但同時把 state["history"] 補回去，讓 /model nvidia 能接上這段還原的歷史當
+# 多輪對話上下文（見 chats.smart_reply_traced()）——跟 GUI（command.py 的
+# CommandPalette._run_resume）同一套 session_store.py、同一份檔案，兩邊互通。
+def run_resume(arg: str, state: dict):
+    sub = arg.strip().lower()
+    if sub in ("clear", "reset"):
+        clear_session()
+        console.print("[dim]已清除記錄下的對話（/resume 之後不會再看到目前這些內容）[/dim]")
+        return
+
+    entries = load_session()
+    if not entries:
+        console.print("[dim]目前沒有記錄下的對話（還沒聊過，或紀錄已被清除）[/dim]")
+        return
+
+    console.print(Panel(f"還原對話紀錄（共 {len(entries)} 輪，最後更新於 {entries[-1]['created_at']}）",
+                         border_style="cyan", expand=False))
+    for entry in entries:
+        console.print(Text(f"You › {entry['user']}", style="bold green"))
+        console.print(Text(f"{entry['persona']} ›", style="bold magenta"))
+        console.print(Markdown(entry["reply"]))
+        console.print()
+
+    history = [(e["user"], e["reply"]) for e in entries]
+    state["history"] = history[-RESUME_HISTORY_CAP:]
+
+
 def ask_model(message: str, state: dict, check_code: bool = False):
     with console.status("[dim]思考中...[/dim]", spinner="dots"):
         try:
-            trace, reply = smart_reply_traced(message, out_dir=state["out_dir"])
+            trace, reply = smart_reply_traced(message, out_dir=state["out_dir"], force_mode=state["force_mode"],
+                                               history=state["history"])
         except Exception as exc:  # 模型端任何未預期錯誤都要看得到，不要整支 CLI 崩潰
             console.print(f"[red]發生錯誤：{escape(str(exc))}[/red]")
             return
@@ -271,8 +368,20 @@ def ask_model(message: str, state: dict, check_code: bool = False):
         console.print(Panel(Syntax(reply, "python", theme="monokai", word_wrap=True),
                              border_style="grey50", expand=False))
     else:
-        console.print(Text(reply))
+        # rich 的 Markdown 元件會把回覆內容當 markdown「渲染」（標題轉粗體大字、
+        # 清單轉項目符號、```程式碼區塊``` 轉語法標色），呈現的是排版後的預覽畫面，
+        # 不是印出原始的 "**粗體**"、"# 標題" 這些符號本身。純文字回覆一樣能正常
+        # 顯示（Markdown 對沒有語法的內容就當成一般段落），所以不用另外判斷。
+        console.print(Markdown(reply))
     console.print()
+
+    # 落地到 session.json，讓 /resume 能在電腦意外斷電/關機後還原到這一輪
+    # （不是等這支 CLI 正常執行到 exit/quit 那行才存）。
+    record_turn(message, reply, persona=state["persona"], mode=state["force_mode"])
+    # 同步累積到記憶體內的 state["history"]，讓同一個 process 內接下來若切到
+    # /model nvidia 也能立刻拿到這一輪當上下文，不用先 /resume 才補得回來。
+    state["history"].append((message, reply))
+    del state["history"][:-RESUME_HISTORY_CAP]
 
 
 def process_input(text: str, state: dict) -> bool:
@@ -315,6 +424,12 @@ def process_input(text: str, state: dict) -> bool:
     if cmd == "memory":
         run_memory(arg)
         return True
+    if cmd == "model":
+        run_model(arg, state)
+        return True
+    if cmd == "resume":
+        run_resume(arg, state)
+        return True
 
     md_path = COMMAND_DIR / f"{cmd}.md"
     if not md_path.exists():
@@ -329,7 +444,7 @@ def main():
     parser.add_argument("--character", help="啟動時就切換到指定角色人格")
     args = parser.parse_args()
 
-    state = {"out_dir": DEFAULT_OUT_DIR, "persona": DEFAULT_PERSONA}
+    state = {"out_dir": DEFAULT_OUT_DIR, "persona": DEFAULT_PERSONA, "force_mode": "auto", "history": []}
     if args.character:
         switch_character(args.character, state)
 

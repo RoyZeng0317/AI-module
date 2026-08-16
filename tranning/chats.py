@@ -50,6 +50,7 @@ Usage:
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
 
 import torch
@@ -59,10 +60,25 @@ from torch.utils.data import DataLoader, Dataset
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
 from tools import route_reply
 
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile (nova.exe, built to live at the project root):
+    # __file__ resolves inside the temp extraction dir at runtime, which has
+    # none of the actual checkpoints — use the running exe's own directory
+    # instead, same fix as lib/components/cli.py.
+    _TRANNING_DIR = Path(sys.executable).resolve().parent / "tranning"
+    _LIB_DIR = str(Path(sys.executable).resolve().parent / "lib")
+else:
+    _TRANNING_DIR = Path(__file__).resolve().parent
+    # lib/NVIDIA.py 所在資料夾：跟 conversation.py 把 tranning/ 加進 sys.path
+    # 是同一種寫法，只是這裡指向專案根目錄底下的 lib/。只有 force_mode="nvidia"
+    # 真的被呼叫到時才會 import（見 _nvidia_reply()），sinco/sinco-code 這兩個
+    # 從零訓練的預設模型完全不依賴這個資料夾或 openai 套件。
+    _LIB_DIR = str(Path(__file__).resolve().parent.parent / "lib")
+
 PAD, SOS, EOS, UNK = 0, 1, 2, 3
 SPECIAL_TOKENS = {"<pad>": PAD, "<sos>": SOS, "<eos>": EOS, "<unk>": UNK}
 
-DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "chat_runs"
+DEFAULT_OUT_DIR = _TRANNING_DIR / "chat_runs"
 # Code snippets ("寫一個氣泡排序法" -> a real function body) run 100-200+
 # characters, ~5x longer than a casual chat reply. Mixing both lengths into
 # one checkpoint made every reply collapse to the same garbage output (the
@@ -70,7 +86,7 @@ DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "chat_runs"
 # examples in the same 128-dim hidden state) — so code gets its own
 # checkpoint, trained with a longer --max-len, and smart_reply() below picks
 # which checkpoint to use per message.
-CODE_OUT_DIR = Path(__file__).resolve().parent / "code_runs"
+CODE_OUT_DIR = _TRANNING_DIR / "code_runs"
 MAX_LEN = 40
 
 _CODE_PREFIXES = ("寫一個", "寫一段", "寫個")
@@ -366,8 +382,32 @@ def chat_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     return reply
 
 
+def _nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+    """/model nvidia 專用：呼叫 lib/NVIDIA.py 的 NVIDIA 雲端 API（外部模型，
+    非本專案自訓練——CLAUDE.md 規則 #06 預設仍是 sinco/sinco-code，這個模式
+    要使用者透過 /model nvidia 明確選用才會走到這裡）。openai 套件與對外
+    網路請求都只在這個分支才會發生，不影響其餘模式。
+
+    `history` 原樣轉交給 nvidia_reply() 組成多輪 messages（見該函式說明）——
+    這裡不額外處理，只是單純傳遞，避免呼叫端跟實際組 messages 的邏輯分散
+    在兩個檔案。
+
+    回傳 (思考過程, 正式回覆)——nvidia_reply() 已經把 NVIDIA API 串流回應
+    裡的 reasoning_content（思考過程）跟 content（正式回覆）分開收集。
+    """
+    if _LIB_DIR not in sys.path:
+        sys.path.insert(0, _LIB_DIR)
+    from NVIDIA import nvidia_reply
+
+    try:
+        return nvidia_reply(message, history=history)
+    except Exception as exc:
+        return "", f"NVIDIA API 呼叫失敗：{exc}"
+
+
 def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
-                        force_mode: str = "auto") -> tuple[str, str]:
+                        force_mode: str = "auto",
+                        history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
     """Like smart_reply(), but also returns *why* that path answered the
     message — the actual rule/pattern that fired, not a decorative label and
     not a fabricated reasoning chain (sinco is a small memorization model,
@@ -378,13 +418,26 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     #01 的 /model 指令): "auto" (default, existing behaviour, unchanged) =
     decide via is_code_request(); "sinco" = always answer with the general
     chat checkpoint at out_dir even if the message looks code-shaped;
-    "code" = always answer with the code checkpoint even if it doesn't.
+    "code" = always answer with the code checkpoint even if it doesn't;
+    "nvidia" = 明確選用外部 NVIDIA 雲端模型（見 _nvidia_reply()），是唯一
+    會離開本機、呼叫外部 API 的模式，其餘模式維持 Rule 06「全部自建」。
     route_reply()（天氣/搜尋等即時查詢）一律優先，不受 force_mode 影響——
     那是誠實資料查詢，跟「要用哪個聊天 checkpoint 回答」是兩件事。
+
+    history 只有在 force_mode="nvidia" 時才會被用到（轉交給 _nvidia_reply()
+    組成多輪 messages）。sinco/sinco-code 這兩個字元級模型故意不吃歷史（見
+    lib/components/conversation.py 開頭的說明——塞歷史字串反而會把回覆拉走），
+    所以其餘分支完全忽略這個參數，呼叫端可以無條件傳，不用依模式判斷要不要帶。
     """
     routed = route_reply(message)
     if routed is not None:
         return routed
+    if force_mode == "nvidia":
+        reasoning, reply = _nvidia_reply(message, history=history)
+        trace = "已手動切換為 NVIDIA 雲端模型（nemotron-3-ultra，外部 API，非本專案自訓練）"
+        if reasoning:
+            trace += f"\n思考過程：\n{reasoning}"
+        return trace, reply
     use_code = force_mode == "code" or (force_mode == "auto" and is_code_request(message))
     if use_code:
         reply, confidence = mc_chat_reply(message, out_dir=CODE_OUT_DIR)

@@ -68,8 +68,14 @@ import auto_learn
 import calculus_generator
 import calculus_solver
 
-_PAIRS_PATH = Path(__file__).resolve().parent.parent / "data" / "pairs.json"
-_WEB_BACKEND_DIR = Path(__file__).resolve().parent.parent / "web" / "backend"
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile (nova.exe, built to live at the project root): see
+    # lib/components/cli.py for why __file__ can't be used here when frozen.
+    _PROJECT_ROOT = Path(sys.executable).resolve().parent
+else:
+    _PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_PAIRS_PATH = _PROJECT_ROOT / "data" / "pairs.json"
+_WEB_BACKEND_DIR = _PROJECT_ROOT / "web" / "backend"
 
 WEATHER_TIMEOUT = 6
 SEARCH_TIMEOUT = 6

@@ -14,8 +14,9 @@ the real project's memory/memory.json.
 
 from types import SimpleNamespace
 
-import cli
-import memory_store
+import lib.components.cli as cli
+import lib.components.memory_store as memory_store
+import lib.components.session_store as session_store
 
 
 def _completions(text: str) -> list[str]:
@@ -139,3 +140,129 @@ def test_run_memory_unknown_subcommand_shows_usage(tmp_path, monkeypatch, capsys
     _isolate_memory(tmp_path, monkeypatch)
     cli.run_memory("frobnicate")
     assert "用法" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_model() — /model 移植自 GUI 的 CommandPalette._run_model（見
+# lib/components/test_command.py 的對應測試），跟 /memory 一樣是 CLI 之前
+# 沒有的內建指令，靠 state["force_mode"] 覆蓋 smart_reply_traced() 的自動
+# chat/code 判斷。
+# ---------------------------------------------------------------------------
+
+def _state(**overrides) -> dict:
+    base = {"out_dir": cli.DEFAULT_OUT_DIR, "persona": cli.DEFAULT_PERSONA, "force_mode": "auto", "history": []}
+    base.update(overrides)
+    return base
+
+
+def test_model_argument_suggestions_are_the_modes():
+    assert cli._arg_suggestions("model") == cli.MODEL_MODES
+
+
+def test_run_model_no_arg_reports_current_mode(capsys):
+    state = _state()
+    cli.run_model("", state)
+    assert "目前模式：auto" in _printed(capsys)
+    assert state["force_mode"] == "auto"
+
+
+def test_run_model_switches_force_mode(capsys):
+    state = _state()
+    cli.run_model("code", state)
+    assert state["force_mode"] == "code"
+    assert "已切換模式：code" in _printed(capsys)
+
+
+def test_run_model_rejects_unknown_mode_without_changing_state(capsys):
+    state = _state()
+    cli.run_model("not-a-mode", state)
+    assert state["force_mode"] == "auto"
+    assert "未知模式" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_resume() — /resume 回到電腦未關機前記錄下的對話（session_store.py），
+# 跟 lib/components/test_command.py 的 GUI 對應測試共用同一份 session_store。
+# ---------------------------------------------------------------------------
+
+def _isolate_session(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_store, "SESSION_PATH", tmp_path / "session.json")
+
+
+def test_resume_argument_suggestions_are_clear():
+    assert cli._arg_suggestions("resume") == ["clear"]
+
+
+def test_run_resume_without_recorded_session_reports_empty(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    cli.run_resume("", _state())
+    assert "沒有記錄下的對話" in _printed(capsys)
+
+
+def test_run_resume_replays_recorded_turns(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+
+    cli.run_resume("", _state())
+
+    printed = _printed(capsys)
+    assert "你好" in printed
+    assert "哈囉，我是 sinco" in printed
+
+
+def test_run_resume_restores_history_for_nvidia_context(tmp_path, monkeypatch, capsys):
+    """/resume 重播只是唸給人看，不會送進 sinco；但要把 state["history"] 補回
+    去，讓 /model nvidia 能接上這段還原的歷史當多輪對話上下文（見
+    chats.smart_reply_traced() 的說明）——這是 NVIDIA 模式看起來「沒有還原
+    對話紀錄」的根因修正。"""
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+    state = _state()
+
+    cli.run_resume("", state)
+
+    assert state["history"] == [("你好", "哈囉，我是 sinco")]
+
+
+def test_run_resume_clear_wipes_recorded_session(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+
+    cli.run_resume("clear", _state())
+
+    assert "已清除" in _printed(capsys)
+    assert session_store.load_session(path=session_store.SESSION_PATH) == []
+
+
+def test_ask_model_records_turn_to_session(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+
+    cli.ask_model("測試訊息", _state())
+
+    entries = session_store.load_session(path=session_store.SESSION_PATH)
+    assert len(entries) == 1
+    assert entries[0]["user"] == "測試訊息"
+    assert entries[0]["reply"] == "回覆內容"
+
+
+def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypatch, capsys):
+    """同一個 process 內，state["history"] 要原樣轉交給 smart_reply_traced()，
+    /model nvidia 才接得到之前幾輪當上下文（sinco/code 模式會忽略這個參數，
+    見 chats.smart_reply_traced() 的說明，這裡只驗證有傳到，不驗證各模式怎麼用）。"""
+    _isolate_session(tmp_path, monkeypatch)
+    seen = {}
+
+    def fake_smart_reply_traced(message, out_dir, force_mode, history):
+        seen["history"] = list(history)  # 快照——ask_model() 接下來會就地 append 同一個 list
+        return "· trace", "回覆內容"
+
+    monkeypatch.setattr(cli, "smart_reply_traced", fake_smart_reply_traced)
+    state = _state(history=[("之前的問題", "之前的回覆")])
+
+    cli.ask_model("測試訊息", state)
+
+    assert seen["history"] == [("之前的問題", "之前的回覆")]
+    assert state["history"] == [("之前的問題", "之前的回覆"), ("測試訊息", "回覆內容")]

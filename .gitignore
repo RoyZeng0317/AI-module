@@ -3,6 +3,10 @@
 venv/
 env/
 
+# 環境變數／金鑰（不可進版控）
+.env
+**/.env
+
 # Python 編譯快取
 __pycache__/
 *.pyc
@@ -11,7 +15,10 @@ __pycache__/
 *.egg-info/
 
 # CLI 執行紀錄
-app/components/.cli_history
+lib/components/.cli_history
+
+# /resume 用的對話自動存檔（含實際聊天內容，不進版控）
+memory/session.json
 
 # 可重新下載/重新產生的訓練資料與訓練產物（不進版控）
 tranning/commonvoice_zhTW/
@@ -20,3 +27,7 @@ tranning/gpt_pretrain_runs/
 tranning/speech_runs/
 tranning/speech_data/
 tranning/Tranning/
+
+# nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
+/nova.exe
+/build/pyinstaller/

@@ -100,6 +100,89 @@ function buildUI(root) {
   `;
 }
 
+// 極簡 Markdown → HTML 轉換，只涵蓋模型回覆會用到的語法（標題、粗體、斜體、
+// 行內程式碼、程式碼區塊、清單），不是完整 CommonMark 實作。目的是讓聊天欄顯示
+// 排版後的「預覽」畫面，而不是原始的 "**粗體**"、"# 標題" 這些符號本身——跟
+// 桌面 GUI（lib/components/markdown_view.py）、CLI（rich.markdown.Markdown）
+// 是同一個訴求，這裡是網頁版的對應實作。escapeHtml() 先跑過一輪，避免回覆內容
+// 剛好含 "<script>" 之類字串被當成真的 HTML 標籤解析、注入頁面。
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
+
+function renderInlineMarkdown(line) {
+  let html = escapeHtml(line);
+  html = html.replace(/\*\*(.+?)\*\*|__(.+?)__/g, (_, a, b) => `<strong>${a ?? b}</strong>`);
+  html = html.replace(/`([^`]+)`/g, (_, code) => `<code class="md-code-inline">${code}</code>`);
+  html = html.replace(
+    /(?<!\*)\*([^*\n]+?)\*(?!\*)|(?<!_)_([^_\n]+?)_(?!_)/g,
+    (_, a, b) => `<em>${a ?? b}</em>`
+  );
+  return html;
+}
+
+function markdownToHtml(text) {
+  const lines = text.split('\n');
+  let html = '';
+  let listOpen = false;
+  const closeList = () => {
+    if (listOpen) {
+      html += '</ul>';
+      listOpen = false;
+    }
+  };
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (/^\s*```/.test(line)) {
+      closeList();
+      i++;
+      const codeLines = [];
+      while (i < lines.length && !/^\s*```/.test(lines[i])) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // 跳過收尾的 ```（若原文沒收尾，這時 i 已經等於 lines.length）
+      html += `<pre class="md-code-block"><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`;
+      continue;
+    }
+
+    const header = line.match(/^(#{1,3})\s+(.*)/);
+    if (header) {
+      closeList();
+      const level = header[1].length + 2; // 偏移到 h3~h5，避免蓋過頁面自己的 h1/h2
+      html += `<h${level} class="md-heading">${renderInlineMarkdown(header[2])}</h${level}>`;
+      i++;
+      continue;
+    }
+
+    const bullet = line.match(/^\s*[-*+]\s+(.*)/);
+    if (bullet) {
+      if (!listOpen) {
+        html += '<ul class="md-list">';
+        listOpen = true;
+      }
+      html += `<li>${renderInlineMarkdown(bullet[1])}</li>`;
+      i++;
+      continue;
+    }
+
+    closeList();
+    if (line.trim() === '') {
+      html += '<br>';
+    } else {
+      html += `<p class="md-p">${renderInlineMarkdown(line)}</p>`;
+    }
+    i++;
+  }
+  closeList();
+  return html;
+}
+
 // fetch()'s res.json() throws a cryptic "Unexpected end of JSON input" (or
 // "Unexpected token ... is not valid JSON") whenever the body isn't valid
 // JSON — e.g. an empty 405/500 from the wrong server, or a plain-text crash
@@ -155,7 +238,13 @@ function setupChat() {
     chatEmpty.remove();
     const div = document.createElement('div');
     div.className = `chat-message chat-${role}`;
-    div.textContent = content;
+    // 只有 AI 回覆（assistant）需要 markdown 預覽渲染；使用者自己打的訊息維持
+    // textContent 純文字顯示，不需要也不該被當成 markdown 解析。
+    if (role === 'assistant') {
+      div.innerHTML = markdownToHtml(content);
+    } else {
+      div.textContent = content;
+    }
     chatLog.appendChild(div);
     chatLog.scrollTop = chatLog.scrollHeight;
     return div;
@@ -181,7 +270,7 @@ function setupChat() {
         body: JSON.stringify({ message: text }),
       });
       const data = await safeJson(res);
-      pending.textContent = data.reply;
+      pending.innerHTML = markdownToHtml(data.reply);
       pending.classList.remove('is-pending');
     } catch (err) {
       pending.textContent = `錯誤：${err.message}`;

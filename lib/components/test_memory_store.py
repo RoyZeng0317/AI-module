@@ -5,7 +5,7 @@ touch the project's real memory/memory.json.
 
 import pytest
 
-from memory_store import (
+from lib.components.memory_store import (
     CATEGORIES,
     add_memory,
     delete_memory,

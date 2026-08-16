@@ -2,7 +2,7 @@
 /init (CLAUDE.md 需求 #01).
 """
 
-from project_init import END_MARK, START_MARK, build_summary, detect_stack, write_claude_md
+from lib.components.project_init import END_MARK, START_MARK, build_summary, detect_stack, write_claude_md
 
 
 def test_detect_stack_finds_marker_files(tmp_path):

@@ -8,13 +8,21 @@ import fitz  # PyMuPDF：kicad_dataset_convert.py 已經在用它把 PDF/SVG 光
              # 不必再另外裝 cairosvg（在 Windows 上常常要另外裝原生 Cairo 函式庫才能用）。
 from PIL import Image, ImageTk
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "FileConvert"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tranning"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "web", "backend"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "FileConvert"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tranning"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "web", "backend"))
 
-from camera import CameraPanel
-from command import CommandPalette
-from conversation import Conversation, is_recording, start_recording, stop_recording
+if not __package__:
+    # 直接用完整路徑執行這支檔案時（例如 VS Code「執行 Python 檔案」按鈕），
+    # sys.path[0] 只會是 lib/ 這層目錄，專案根目錄不在 sys.path 裡，下面
+    # `from lib.components...` 這種絕對匯入就會 ModuleNotFoundError: No module
+    # named 'lib'。正規跑法是在專案根目錄下 `python -m lib.main`（見 CLAUDE.md），
+    # 這裡補上保險：偵測到不是用 -m 執行時，把專案根目錄塞進 sys.path。
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from lib.components.camera import CameraPanel
+from lib.components.command import CommandPalette
+from lib.components.conversation import Conversation, is_recording, start_recording, stop_recording
 
 MODULE = "Sinco 1.5"  # 應用程式/品牌名稱；聊天時的助理人格名稱仍是 "sinco"（訓練資料/回覆內容都沒有改，見 CLAUDE.md to-do #15/#16）
 
@@ -230,6 +238,27 @@ chat_display.tag_configure("trace", foreground=MUTED_FG, font=(FONT_FAMILY, 8))
 chat_display.tag_configure("ai_text", foreground=TEXT_FG, font=(FONT_FAMILY, 10), spacing3=4)
 chat_display.tag_configure("system", foreground=MUTED_FG, font=(FONT_FAMILY, 9), spacing1=6, spacing3=6)
 
+# md_* 系列：markdown_view.insert_markdown() 解析 sinco 回覆時套用的渲染 tag，
+# 讓 ai_text 顯示的是排版後的「預覽」（標題變大字粗體、清單變項目符號、程式碼
+# 區塊變等寬字），跟 CLI 版用 rich.markdown.Markdown 是同一個目的、不同技術棧
+# （Tkinter Text 沒有內建 markdown 渲染能力，只能手動 tag_configure + insert）。
+# 這些 tag 都是在 ai_text 之後才建立，Tk 的 tag 優先權預設「後建立的蓋過先建立
+# 的」，所以疊加 ai_text 一起用時，字型/顏色會照這裡的設定顯示，不會被 ai_text
+# 蓋掉。
+CODE_FONT_FAMILY = "Consolas"
+chat_display.tag_configure("md_h1", font=(FONT_FAMILY, 15, "bold"), foreground=TEXT_FG, spacing1=10, spacing3=4)
+chat_display.tag_configure("md_h2", font=(FONT_FAMILY, 13, "bold"), foreground=TEXT_FG, spacing1=8, spacing3=3)
+chat_display.tag_configure("md_h3", font=(FONT_FAMILY, 11, "bold"), foreground=TEXT_FG, spacing1=6, spacing3=2)
+chat_display.tag_configure("md_bold", font=(FONT_FAMILY, 10, "bold"), foreground=TEXT_FG)
+chat_display.tag_configure("md_italic", font=(FONT_FAMILY, 10, "italic"), foreground=TEXT_FG)
+chat_display.tag_configure("md_code_inline", font=(CODE_FONT_FAMILY, 9), foreground=ACCENT, background=INPUT_BG)
+chat_display.tag_configure(
+    "md_code_block", font=(CODE_FONT_FAMILY, 9), foreground=TEXT_FG, background=INPUT_BG,
+    lmargin1=24, lmargin2=24, spacing1=4, spacing3=4,
+)
+chat_display.tag_configure("md_quote", font=(FONT_FAMILY, 10, "italic"), foreground=MUTED_FG, lmargin1=24, lmargin2=24)
+chat_display.tag_configure("md_bullet", font=(FONT_FAMILY, 10, "bold"), foreground=ACCENT)
+
 message = tk.Entry(
     input_frame, relief="flat", bd=0,
     fg=TEXT_FG, bg=INPUT_BG, insertbackground=TEXT_FG,
@@ -330,7 +359,7 @@ def on_submit():
         elif text.startswith("/"):
             palette.run(text[1:])
         else:
-            conversation.send_message(text)
+            palette.file(text)
     message.delete(0, tk.END)
     palette.hide_suggestions()
     _show_placeholder()
