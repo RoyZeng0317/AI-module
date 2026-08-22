@@ -19,7 +19,12 @@ def test_index_served():
 
 
 def test_public_assets_served():
-    for name in ("script.js", "style.css"):
+    # script.js was the planned Firebase-Hosting variant of the frontend
+    # (見 前端部屬scp.md) — it was never actually committed to this repo, so
+    # asserting on it here was testing a file that doesn't exist. The real
+    # PyScript frontend (index.html/style.css/action.py) lives under
+    # frontend/src/components/ and is what FRONTEND_DIR now points at.
+    for name in ("style.css", "action.py"):
         r = client.get(f"/{name}")
         assert r.status_code == 200
 
@@ -54,3 +59,30 @@ def test_detect_endpoint_returns_real_detections():
     assert "bus" in labels
     assert "person" in labels
     assert data["width"] > 0 and data["height"] > 0
+
+
+def test_detect_ws_endpoint_streams_detections_over_one_connection():
+    import ultralytics
+    sample = Path(ultralytics.__file__).resolve().parent / "assets" / "bus.jpg"
+    frame_bytes = sample.read_bytes()
+
+    with client.websocket_connect("/ws/detect?conf=0.35") as ws:
+        # 送兩張畫面驗證同一條連線可以重複收送，不是連一次只能偵測一次。
+        ws.send_bytes(frame_bytes)
+        first = ws.receive_json()
+        ws.send_bytes(frame_bytes)
+        second = ws.receive_json()
+
+    for data in (first, second):
+        labels = {d["label"] for d in data["detections"]}
+        assert "bus" in labels
+        assert "person" in labels
+        assert data["width"] > 0 and data["height"] > 0
+
+
+def test_detect_ws_endpoint_reports_bad_frame_without_closing():
+    with client.websocket_connect("/ws/detect?conf=0.35") as ws:
+        ws.send_bytes(b"not a jpeg")
+        data = ws.receive_json()
+        assert data["error"] == "could not decode image"
+        assert data["detections"] == []

@@ -1,0 +1,15 @@
+{
+  "stubPath": "typings",
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": "none",
+  "extraPaths": ["tranning", "web/backend"],
+  "exclude": [
+    "**/__pycache__",
+    "**/.*",
+    "**/node_modules",
+    ".venv",
+    "build",
+    "tranning/chat_runs",
+    "tranning/code_runs"
+  ]
+}

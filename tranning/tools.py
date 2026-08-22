@@ -55,6 +55,7 @@ memory-bounded on purpose, since a runaway fetch is the easy way to make a
 """
 
 import json
+import os
 import re
 import sys
 import time
@@ -76,6 +77,7 @@ else:
     _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _PAIRS_PATH = _PROJECT_ROOT / "data" / "pairs.json"
 _WEB_BACKEND_DIR = _PROJECT_ROOT / "web" / "backend"
+_LIB_DIR = _PROJECT_ROOT / "lib"
 
 WEATHER_TIMEOUT = 6
 SEARCH_TIMEOUT = 6
@@ -355,6 +357,59 @@ def web_search(query: str) -> str | None:
     return None
 
 
+def general_web_search(query: str, max_results: int = 3) -> str | None:
+    """一般網頁搜尋（不限定特定網站），走 Serper.dev（Google 搜尋結果的
+    REST API）。這是 web_search()/wikipedia_search() 兩個免金鑰資料源都查
+    不到時的第三層備援——那兩個都是「摘要卡」型 API（Instant Answer／
+    百科條目），碰到口語問題、時事、非百科主題常常直接查空；一般搜尋引擎
+    的索引範圍才是「沒有限定地方」。
+
+    需要環境變數 SEARCH_API_KEY（Serper.dev 的 API key，免費申請），使用者
+    自行在 lib/.env 設定（CLAUDE.md 規則 #05：.env 一律由使用者自行手動
+    輸入，本函式只用 python-dotenv 在執行期讀取成 process 環境變數，不會
+    建立、修改或印出 .env 的內容，寫法跟 lib/NVIDIA.py 讀 NVIDIA_API_KEY
+    完全一樣）。沒設定金鑰、或請求失敗，一律回傳 None，讓 _lookup() 保持
+    「查不到就是查不到」的原有行為，不會讓整個對話流程炸掉。
+
+    這是純資料 API（回傳搜尋引擎既有的網頁摘要，不做任何生成），不是 AI
+    模型——「上網搜尋」的判斷與最終組句仍是 route_reply() 自己的邏輯在做，
+    符合 Rule 06 對「非 AI 資料查詢」的既有例外，跟 get_weather()/
+    wikipedia_search() 同一類，差別只在於這個資料源需要金鑰。
+    """
+    from dotenv import load_dotenv
+    load_dotenv(_LIB_DIR / ".env")
+    api_key = os.environ.get("SEARCH_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        resp = requests.post(
+            "https://google.serper.dev/search",
+            headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+            json={"q": query, "num": max_results},
+            timeout=SEARCH_TIMEOUT,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.RequestException:
+        return None
+
+    results = (data.get("organic") or [])[:max_results]
+    if not results:
+        return None
+    lines = []
+    for r in results:
+        title = (r.get("title") or "").strip()
+        snippet = (r.get("snippet") or "").strip()
+        link = (r.get("link") or "").strip()
+        line = "：".join(part for part in (title, snippet) if part)
+        if link:
+            line = f"{line}（{link}）" if line else link
+        if line:
+            lines.append(line)
+    return "\n".join(lines) or None
+
+
 def wikipedia_search(query: str) -> str | None:
     """中文維基百科摘要 API——備援資料源。DuckDuckGo Instant Answer 主要是
     英文/維基百科導向的資料，中文詞條常常查無結果（實測「微積分」「台北101」
@@ -376,9 +431,12 @@ def wikipedia_search(query: str) -> str | None:
 
 def _lookup(subject: str) -> tuple[str | None, str]:
     """依序試 DuckDuckGo（web_search，英文/國際詞條較強）、查無結果再試中文
-    維基百科（wikipedia_search，中文詞條較強）。回傳 (結果或 None, 實際命中
-    的資料源代號)——找不到時 source 固定回 "duckduckgo"（第一個嘗試的來源，
-    純粹當個預設值，不影響任何邏輯，因為此時 result 是 None 不會被拿去用）。
+    維基百科（wikipedia_search，中文詞條較強）、兩者都查無結果再試一般網頁
+    搜尋引擎（general_web_search，沒有限定地方，但需要 SEARCH_API_KEY，見
+    該函式說明；沒設金鑰時單純回傳 None，不影響前兩層的既有行為）。回傳
+    (結果或 None, 實際命中的資料源代號)——三層都查無結果時 source 固定回
+    "general_search"（最後嘗試的來源，純粹當個預設值，不影響任何邏輯，
+    因為此時 result 是 None 不會被拿去用）。
     """
     try:
         result = web_search(subject)
@@ -391,10 +449,21 @@ def _lookup(subject: str) -> tuple[str | None, str]:
         result = wikipedia_search(subject)
     except requests.RequestException:
         result = None
-    return result, "wikipedia"
+    if result is not None:
+        return result, "wikipedia"
+
+    try:
+        result = general_web_search(subject)
+    except requests.RequestException:
+        result = None
+    return result, "general_search"
 
 
-_SOURCE_LABELS = {"duckduckgo": "DuckDuckGo", "wikipedia": "中文維基百科"}
+_SOURCE_LABELS = {
+    "duckduckgo": "DuckDuckGo",
+    "wikipedia": "中文維基百科",
+    "general_search": "網路搜尋引擎（Serper.dev）",
+}
 
 # --- image recognition: "辨識圖片 <本機路徑或網址>" ---------------------------
 IMAGE_TIMEOUT = 10

@@ -5,19 +5,70 @@
 """
 
 from pyscript import document, window
-from js import console
+from js import console, WebSocket
+from js import URL as _JsURL
+import asyncio
 import json as _json
 import re as _re
 
 # ═══════════════════════════════════════════════════════════════
 # 設定
 # ═══════════════════════════════════════════════════════════════
+# 留空字串代表「後端跟這個頁面同網域」——這時 API 路徑一律用**沒有開頭斜線
+# 的相對路徑**（"api/health" 而不是 "/api/health"），瀏覽器會自動相對於
+# 目前頁面的網址去解析。這樣不管這個頁面本身是掛在網域根目錄（本機直接
+# python app.py、Render.com）還是掛在子路徑下（Tailscale Serve 的
+# `--set-path=/AI-Module`，見 前端部屬scp.md），都不用改這支檔案——後端
+# `web/backend/app.py` 用同一套 MOUNT_PREFIX 環境變數掛同一個前綴，兩邊
+# 路徑會自動對齊。只有後端跟前端不同主機時才需要把 BACKEND_URL 填成完整
+# 網址（此時就一定是網域根目錄，不會有子路徑問題）。
 BACKEND_URL = ""
-HEALTH_URL = f"{BACKEND_URL}/api/health"
-DETECT_URL = f"{BACKEND_URL}/api/detect"
-CHAT_URL = f"{BACKEND_URL}/api/chat"
+
+
+def _api_url(path):
+    if BACKEND_URL:
+        return f"{BACKEND_URL}/{path}"
+    return path
+
+
+HEALTH_URL = _api_url("api/health")
+CHAT_URL = _api_url("api/chat")
 DETECT_INTERVAL_MS = 500
 CAPTURE_WIDTH = 640
+
+
+def _detect_ws_url():
+    """算出 /ws/detect 的 ws(s) 網址。
+
+    原本借 `new URL("ws/detect", 目前頁面網址)` 做相對路徑解析，但這個
+    建構子要求「base」必須是瀏覽器判定為可以當 base 的絕對網址——只要目前
+    頁面不是用一般 http(s) 網址「導覽」進來的（例如某些預覽/沙盒環境把頁面
+    塞進 `about:srcdoc` 的 iframe），`window.location.href` 就會是不能當
+    base 的網址，建構子會直接丟出
+    `TypeError: Failed to construct 'URL': Invalid base URL`，讓整支
+    action.py 在載入階段就當掉。改成直接用 `window.location` 的
+    protocol/host/pathname 自己拼字串，不經過會失敗的相對路徑解析，
+    對一般 http(s) 頁面行為完全相同（照樣會自動帶上子路徑前綴，例如
+    Tailscale Serve 的 /AI-Module/），但不會在奇怪的頁面情境下整個炸掉。
+    """
+    if BACKEND_URL:
+        parsed = _JsURL.new(BACKEND_URL)
+        scheme = str(parsed.protocol).rstrip(":")
+        host = str(parsed.host)
+        prefix = str(parsed.pathname)
+    else:
+        loc = window.location
+        scheme = str(loc.protocol).rstrip(":")
+        host = str(loc.host)
+        path = str(loc.pathname)
+        prefix = path.rsplit("/", 1)[0] + "/" if "/" in path else "/"
+    if not prefix.endswith("/"):
+        prefix += "/"
+    ws_scheme = "wss" if scheme == "https" else "ws"
+    return f"{ws_scheme}://{host}{prefix}ws/detect"
+
+
+DETECT_WS_URL = _detect_ws_url()
 
 # ═══════════════════════════════════════════════════════════════
 # SVG 圖示
@@ -108,6 +159,19 @@ def el(tag, cls=None, text=None, html=None, **attrs):
     for k, v in attrs.items():
         elem.setAttribute(k.replace("_", "-"), str(v))
     return elem
+
+
+def svg_span(html_str, cls=None):
+    """把一段 SVG innerHTML 字串包成一個真正的 DOM 節點再回傳。
+
+    appendChild() 需要的是 Node，不是字串——瀏覽器 DOM API 沒有隱式字串轉
+    Node 這種東西，直接把字串塞進 appendChild() 會丟 TypeError。之前幾個
+    呼叫點（見下面 _build_action_bar/_build_camera_card/_build_chat_card）
+    是直接 `parent.appendChild(ICONS[...].replace(...))`，第一次執行到就
+    整個 build_ui() 中斷在那一行，shell 永遠沒被 append 進 #root，畫面上
+    只剩下 body 的 CSS 背景——這支函式就是修正這個問題用的。
+    """
+    return el("span", cls=cls, html=html_str)
 
 
 def icon_button(icon_key, label, on_click=None, btn_id=None, **extra_attrs):
@@ -233,6 +297,9 @@ _state = {
     "loop_handle": None,
     "in_flight": False,
     "current_model": "sinco",
+    "ws": None,
+    "ws_ready": False,
+    "last_send_ts": None,
 }
 
 # DOM 引用（build_ui 時填入）
@@ -286,10 +353,77 @@ def start_camera():
         stage_empty.style.display = "none"
         toggle_btn.innerHTML = f'{ICONS["cameraOff"]}<span>關閉相機</span>'
         toggle_btn.classList.add("is-active")
-        results_el.textContent = "偵測中…"
-        _state["loop_handle"] = setInterval(capture_and_detect, DETECT_INTERVAL_MS)
+        results_el.textContent = "連線中…"
 
-    _go()
+        _open_detect_socket(_dom["conf_slider"].value)
+
+        # setInterval 是瀏覽器全域，pyscript 沒有把它塞進頂層命名空間，裸寫
+        # `setInterval(...)` 會是 NameError；跟下面 stop_camera() 的
+        # window.clearInterval(...) 對齊，一律走 window.。callback
+        # capture_and_send 是 async function，JS 的 setInterval 直接呼叫
+        # 它只會拿到一個「還沒開始跑」的 coroutine（呼叫 async function
+        # 本身不會執行函式內容，要交給事件迴圈排程才會真的跑），所以包一層
+        # asyncio.ensure_future() 才能讓它真的執行。
+        _state["loop_handle"] = window.setInterval(
+            lambda: asyncio.ensure_future(capture_and_send()), DETECT_INTERVAL_MS
+        )
+
+    # _go() 是 async function：直接呼叫只會產生一個 coroutine 物件、不會
+    # 執行任何內容（跟上面 setInterval 的 callback 是同一個道理）。這裡
+    # 呼叫 start_camera() 的是同步的 toggle_camera()（再上一層是
+    # addEventListener 的同步 lambda），沒有人會去 await 這個 coroutine，
+    # 原本寫法會讓「開啟相機」按鈕點了完全沒反應（相機權限視窗都不會跳出來）
+    # ——asyncio.ensure_future() 明確把它排進事件迴圈執行。
+    asyncio.ensure_future(_go())
+
+
+def _open_detect_socket(conf):
+    """開一條 /ws/detect 連線，相機開著就一直用同一條連線送畫面、收偵測
+    結果，取代原本「每一格畫面都重新 fetch 一次 /api/detect」的作法。
+
+    conf 只在連線當下帶一次（見 _detect_ws_url() 的註解），中途拉動信心值
+    滑桿不會立即生效，要關掉相機再重開才會用新的值——這是刻意的取捨，
+    避免要另外設計一套「同一條連線裡混雜二進位畫面跟文字設定訊息」的協定。
+    """
+    ws = WebSocket.new(f"{DETECT_WS_URL}?conf={conf}")
+    ws.binaryType = "arraybuffer"
+
+    def _on_open(_evt):
+        _state["ws_ready"] = True
+        _dom["results"].textContent = "偵測中…"
+
+    def _on_message(evt):
+        _state["in_flight"] = False
+        try:
+            data = _json.loads(str(evt.data))
+        except Exception as exc:
+            console.error(f"detect ws parse error: {exc}")
+            return
+
+        import time
+        t0 = _state.get("last_send_ts")
+        if t0 is not None:
+            _dom["latency"].textContent = f"{round(time.time() * 1000 - t0)} ms"
+
+        overlay = _dom["overlay"]
+        _draw_detections(data, overlay.getContext("2d"), overlay, _dom["results"])
+
+    def _on_close(_evt):
+        _state["ws_ready"] = False
+        _state["ws"] = None
+        _state["in_flight"] = False
+
+    def _on_error(_evt):
+        console.error("detect ws error")
+        _dom["results"].textContent = "偵測連線發生錯誤"
+
+    ws.addEventListener("open", _on_open)
+    ws.addEventListener("message", _on_message)
+    ws.addEventListener("close", _on_close)
+    ws.addEventListener("error", _on_error)
+
+    _state["ws"] = ws
+    _state["ws_ready"] = False
 
 
 def stop_camera():
@@ -297,6 +431,12 @@ def stop_camera():
     if handle is not None:
         window.clearInterval(handle)
         _state["loop_handle"] = None
+
+    ws = _state.get("ws")
+    if ws is not None:
+        ws.close()
+        _state["ws"] = None
+        _state["ws_ready"] = False
 
     stream = _state.get("stream")
     if stream is not None:
@@ -319,8 +459,9 @@ def toggle_camera():
         start_camera()
 
 
-async def capture_and_detect():
-    if _state["in_flight"]:
+async def capture_and_send():
+    ws = _state.get("ws")
+    if ws is None or not _state["ws_ready"] or _state["in_flight"]:
         return
     video = _dom["video"]
     if not video.videoWidth:
@@ -328,12 +469,6 @@ async def capture_and_detect():
 
     _state["in_flight"] = True
     try:
-        conf_slider = _dom["conf_slider"]
-        overlay = _dom["overlay"]
-        ctx = overlay.getContext("2d")
-        latency_el = _dom["latency"]
-        results_el = _dom["results"]
-
         cap_canvas = document.createElement("canvas")
         cap_ctx = cap_canvas.getContext("2d")
         scale = CAPTURE_WIDTH / video.videoWidth
@@ -341,25 +476,36 @@ async def capture_and_detect():
         cap_canvas.height = round(video.videoHeight * scale)
         cap_ctx.drawImage(video, 0, 0, cap_canvas.width, cap_canvas.height)
 
-        blob = await new Promise(lambda resolve: cap_canvas.toBlob(resolve, "image/jpeg", 0.7))
-        form_data = document.createElement("form")  # placeholder — 用 JS FormData
-        from js import FormData
-        fd = FormData.new()
-        fd.append("frame", blob, "frame.jpg")
+        # `new Promise(...)` 是 JS 語法，不是合法的 Python——pyodide 執行的
+        # 是真正的 CPython，`new` 不是關鍵字，這裡會直接 SyntaxError，整支
+        # action.py 連編譯都過不了，build_ui() 根本沒機會被呼叫到（畫面上
+        # 只剩下 body 的 CSS 背景，看起來就是完全沒有 JS/Python 錯誤那樣）。
+        # pyodide 呼叫 JS 建構子的慣例是 `<JS 類別>.new(...)`，Promise 也
+        # 一樣。`blob.arrayBuffer()` 本身回傳的就是真正的 JS Promise（不是
+        # callback-based API），pyodide 的 JsProxy 對 Promise 原生支援
+        # `await`，不需要再包一層 Promise.new()。
+        # toBlob() 是非同步 callback API，resolve/reject 要留到「稍後」瀏覽器
+        # 編碼完成才會被呼叫；但 pyodide 對這種借用代理（borrowed proxy）
+        # 預設只在當次同步呼叫（Promise.new 的 executor）結束前有效，一返回
+        # 就會被自動銷毀，等 toBlob 真正非同步呼叫 resolve 時就會撞上
+        # 「This borrowed proxy was automatically destroyed at the end of a
+        # function call」。用 create_once_callable() 包住 resolve，讓它的
+        # 生命週期改成「被呼叫一次之後才銷毀」，不受這次同步呼叫範圍限制。
+        from js import Promise
+        from pyodide.ffi import create_once_callable
+
+        def _executor(resolve, reject):
+            cap_canvas.toBlob(create_once_callable(resolve), "image/jpeg", 0.7)
+
+        blob = await Promise.new(_executor)
+        buf = await blob.arrayBuffer()
 
         import time
-        t0 = time.time() * 1000
-        resp = await window.fetch(f"{DETECT_URL}?conf={conf_slider.value}", {
-            "method": "POST",
-            "body": fd,
-        })
-        data = await resp.json()
-        latency_el.textContent = f"{round(time.time() * 1000 - t0)} ms"
-        _draw_detections(data, ctx, overlay, results_el)
+        _state["last_send_ts"] = time.time() * 1000
+        ws.send(buf)
     except Exception as exc:
-        _dom["results"].textContent = f"偵測錯誤：{exc}"
-    finally:
         _state["in_flight"] = False
+        _dom["results"].textContent = f"偵測錯誤：{exc}"
 
 
 def _draw_detections(data, ctx, overlay, results_el):
@@ -501,7 +647,7 @@ def _build_topbar():
     pill.appendChild(el("span", cls="status-dot"))
     status_text = el("span", id="statusText", text="連線中…")
     pill.appendChild(status_text)
-    pill.addEventListener("click", lambda _: check_health())
+    pill.addEventListener("click", lambda _: asyncio.ensure_future(check_health()))
     _dom["status_pill"] = pill
     _dom["status_text"] = status_text
     topbar.appendChild(pill)
@@ -539,7 +685,7 @@ def _build_action_bar():
 
     # ── 模型選擇 ──
     model_wrap = el("div", cls="model-select")
-    model_wrap.appendChild(ICONS["model"].replace('viewBox', f'style="width:15px;height:15px;stroke:var(--accent);flex-shrink:0" viewBox'))
+    model_wrap.appendChild(svg_span(ICONS["model"].replace('viewBox', 'style="width:15px;height:15px;stroke:var(--accent);flex-shrink:0" viewBox')))
     model_wrap.appendChild(el("span", text="模型"))
     select = el("select", id="modelSelect")
     for val in ("auto", "sinco", "code", "nvidia"):
@@ -561,10 +707,10 @@ def _build_action_bar():
     bar.appendChild(icon_button("character", "角色", on_click=lambda _: _on_character_click()))
 
     # ── 記憶 ──
-    bar.appendChild(icon_button("memory", "記憶", on_click=lambda _: _on_memory_click()))
+    bar.appendChild(icon_button("memory", "記憶", on_click=lambda _: asyncio.ensure_future(_on_memory_click())))
 
     # ── 學習 ──
-    bar.appendChild(icon_button("learn", "學習", on_click=lambda _: _on_learn_click()))
+    bar.appendChild(icon_button("learn", "學習", on_click=lambda _: asyncio.ensure_future(_on_learn_click())))
 
     # ── 彈性空間 ──
     spacer = el("div", cls="action-spacer")
@@ -584,7 +730,7 @@ def _build_action_bar():
 def _build_camera_card():
     card = el("section", cls="card")
     head = el("div", cls="card-head")
-    head.appendChild(ICONS["camera"].replace('viewBox', f'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox'))
+    head.appendChild(svg_span(ICONS["camera"].replace('viewBox', 'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox')))
     ht = el("div")
     ht.appendChild(el("h2", text="物件偵測"))
     ht.appendChild(el("p", text="即時攝影機影像 + YOLO 偵測"))
@@ -600,7 +746,7 @@ def _build_camera_card():
     video.setAttribute("muted", "")
     overlay = el("canvas", id="overlay")
     stage_empty = el("div", cls="stage-empty", id="stageEmpty")
-    stage_empty.appendChild(ICONS["cameraOff"].replace('viewBox', f'style="width:34px;height:34px;stroke:var(--text-faint)" viewBox'))
+    stage_empty.appendChild(svg_span(ICONS["cameraOff"].replace('viewBox', 'style="width:34px;height:34px;stroke:var(--text-faint)" viewBox')))
     stage_empty.appendChild(el("span", text="相機尚未開啟"))
     stage.appendChild(video)
     stage.appendChild(overlay)
@@ -622,7 +768,7 @@ def _build_camera_card():
 def _build_chat_card():
     card = el("section", cls="card")
     head = el("div", cls="card-head")
-    head.appendChild(ICONS["chat"].replace('viewBox', f'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox'))
+    head.appendChild(svg_span(ICONS["chat"].replace('viewBox', 'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox')))
     ht = el("div")
     ht.appendChild(el("h2", text="對話"))
     ht.appendChild(el("p", text="自建 seq2seq 模型（無外部 AI API）"))
@@ -651,11 +797,15 @@ def _build_chat_card():
     _dom["chat_send"] = send_btn
     form.appendChild(send_btn)
 
-    async def _on_submit(e):
+    # 用同步 handler 呼叫 e.preventDefault()（事件觸發當下就要同步呼叫），
+    # 實際的非同步工作交給 asyncio.ensure_future() 明確排程——跟這個檔案
+    # 其餘事件處理的寫法一致，不依賴「傳一個 async function 給
+    # addEventListener 會被自動排程」這種容易因 pyodide 版本而異的隱式行為。
+    def _on_submit(e):
         e.preventDefault()
         text = chat_input.value.strip()
         if text:
-            await send_chat(text)
+            asyncio.ensure_future(send_chat(text))
 
     form.addEventListener("submit", _on_submit)
     body.appendChild(form)
@@ -689,4 +839,4 @@ def build_ui():
 # 初始化
 # ═══════════════════════════════════════════════════════════════
 build_ui()
-check_health()
+asyncio.ensure_future(check_health())

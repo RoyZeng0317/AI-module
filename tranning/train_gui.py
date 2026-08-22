@@ -3,7 +3,7 @@ launch/monitor training without memorizing each script's CLI flags.
 
 Wraps road_sign_train.py, OCR.py, circuit_diagram_train.py, speech_to_text.py,
 chats.py, character_model.py, voice_clone.py, kicad_dataset_convert.py,
-image_classifier_bnn.py and data_split.py. Each "開始訓練"/"匯入" button runs the *exact* command
+code_snippet_import.py, image_classifier_bnn.py and data_split.py. Each "開始訓練"/"匯入" button runs the *exact* command
 line that script's own module docstring documents under "Usage" — as a real
 subprocess (`python -u <script>.py --flag value ...`), not an in-process
 function call. That keeps this one GUI process light (it never imports
@@ -234,6 +234,63 @@ def _video_import_fields() -> list[Field]:
         Field("interval", "擷取間隔（秒）", "float", "--interval", default=1.0),
     ]
 
+
+# ---------------------------------------------------------------------------
+# code_snippet_import.py 的欄位——手上是一批 GitHub 專案的原始碼檔案
+# （.py/.c/.h/.cpp/.cc/.cxx/.hpp/.cs），不是現成的 {prompt, reply} JSON。
+# extract 跟 pairs 兩步驟預設都指向同一個 data/code_pairs.json，pairs 內部
+# 走 dataset_import.write_manifest() 合併去重，重複匯入同一批來源不會
+# 產生重複條目，所以直接把兩邊「輸出/資料」欄位的預設值指到同一個檔案是
+# 安全的（不像 _pairs_import_fields 那樣預設一個中繼檔名要求手動複製貼上）。
+# ---------------------------------------------------------------------------
+
+_CODE_PAIRS_JSON_DEFAULT = "../data/code_pairs.json"
+
+
+def _code_extract_fields() -> list[Field]:
+    return [
+        Field("source", "GitHub 專案原始碼資料夾（.py/.c/.h/.cpp/.cc/.cxx/.hpp/.cs）", "dir", "--source",
+              required=True, hint="會遞迴掃描整個資料夾，逐一抓出每個函式／方法。"),
+        Field("out", "markdown 輸出資料夾", "dir", "--out", required=True,
+              hint="目錄結構會鏡射原始碼資料夾。C/C++/C# 是用簽名規則＋大括號配對抓的"
+                   "heuristic，不是完整語法剖析器；抓完建議先打開看幾個 .md 檔案，"
+                   "確認函式沒有被切壞，再進行下一步。"),
+    ]
+
+
+def _code_pairs_fields() -> list[Field]:
+    return [
+        Field("source", "markdown 資料夾（上面「步驟零」的輸出，或自己整理的）", "dir", "--source",
+              required=True),
+        Field("out", "追加寫入的訓練資料路徑", "save", "--out", required=True,
+              default=_CODE_PAIRS_JSON_DEFAULT, filetypes=JSON_FT,
+              hint="預設直接指到下方「開始訓練」用的同一個 data/code_pairs.json，"
+                   "合併時會自動去重，可以重複執行不會產生重複條目。"),
+        Field("val_ratio", "驗證集比例（0 = 不切分，只寫一個檔案）", "float", "--val-ratio", default=0.0),
+    ]
+
+
+CODE_FIELDS = [
+    Field("data", "程式碼訓練資料 (JSON, [{prompt, reply}, ...])", "file", "--data",
+          required=True, filetypes=JSON_FT, default=_CODE_PAIRS_JSON_DEFAULT),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="code_runs"),
+    Field("epochs", "Epochs", "int", "--epochs", default=6000,
+          hint="程式碼片段比日常對話長很多，需要遠比聊天模型多的 epochs 才會收斂"
+               "（README 建議值：6000）。"),
+    Field("batch_size", "Batch size", "int", "--batch-size", default=8),
+    Field("embed_size", "Embedding size", "int", "--embed-size", default=64),
+    Field("hidden_size", "GRU hidden size", "int", "--hidden-size", default=256),
+    Field("lr", "學習率 (lr)", "float", "--lr", default=1e-3),
+    Field("max_len", "最大字元長度 (max len)", "int", "--max-len", default=210,
+          hint="程式碼片段比一般聊天長，預設值拉高到 210（見 README 建議指令）。"),
+    Field("teacher_forcing_ratio", "Teacher forcing 比例", "float",
+          "--teacher-forcing-ratio", default=0.9),
+    Field("dropout", "Dropout（貝氏 MC Dropout：聊天時保持開啟、重複取樣估計信心度）", "float",
+          "--dropout", default=0.3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
+]
+
+
 SPLIT_FIELDS = [
     Field("source", "來源資料夾（每個子資料夾一個類別）", "dir", "--source", required=True),
     Field("output", "輸出資料夾", "dir", "--output", required=True,
@@ -293,6 +350,20 @@ SPEECH_FIELDS = [
     Field("dropout", "Dropout", "float", "--dropout", default=0.2),
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
 ]
+
+def _typo_augment_fields(data_default: str) -> list[Field]:
+    return [
+        Field("data", "原始訓練資料 (JSON)", "file", "--data", required=True,
+              filetypes=JSON_FT, default=data_default,
+              hint="prompt/reply 都不變，只是額外產生幾個「prompt 帶錯字」的版本一起訓練，"
+                   "讓模型對輸入端的錯字更耐噪（純統計層級的資料擴增，不是真的語意理解，"
+                   "見 typo_augment.py 開頭說明）。"),
+        Field("out", "輸出路徑（可跟上面相同，就地擴增）", "save", "--out", required=True,
+              default=data_default, filetypes=JSON_FT),
+        Field("variants", "每筆額外產生幾個錯字版本", "int", "--variants", default=2),
+        Field("rate", "每個字元觸發錯字的機率", "float", "--rate", default=0.15),
+    ]
+
 
 CHAT_FIELDS = [
     Field("data", "對話資料 (JSON, [{prompt, reply}, ...])", "file", "--data",
@@ -449,6 +520,7 @@ class TrainGUI:
         self._build_circuit_tab(notebook)
         self._build_speech_tab(notebook)
         self._build_chat_tab(notebook)
+        self._build_code_tab(notebook)
         self._build_character_tab(notebook)
         self._build_voice_clone_tab(notebook)
 
@@ -628,12 +700,80 @@ class TrainGUI:
         import_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
         self.start_buttons.append(import_btn)
 
+        step_typo = tk.LabelFrame(outer, text=" 步驟一：錯字擴增 (typo_augment.py，選用) ",
+                                   bg=PANEL_BG, fg=FG, bd=1)
+        step_typo.pack(fill="x", padx=10, pady=(0, 10))
+        chat_typo_fields = _typo_augment_fields("../data/pairs.json")
+        build_form(step_typo, chat_typo_fields)
+        typo_btn = ttk.Button(
+            step_typo, text="產生錯字擴增資料",
+            command=lambda: self._start("聊天資料錯字擴增", "typo_augment.py", chat_typo_fields),
+        )
+        typo_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(typo_btn)
+
         form = tk.Frame(outer, bg=PANEL_BG)
         form.pack(fill="both", expand=True, padx=10)
         build_form(form, CHAT_FIELDS)
         btn = ttk.Button(outer, text="開始訓練",
                           command=lambda: self._start("聊天模型訓練", "chats.py", CHAT_FIELDS))
         btn.pack(pady=10)
+        self.start_buttons.append(btn)
+
+    def _build_code_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "程式碼模型",
+            "跟「聊天模型」同一份 chats.py（GRU 注意力 seq2seq），但訓練/推論用獨立的 "
+            "checkpoint（code_runs/，不能跟 chat_runs/ 混訓練，混了會互相干擾）。"
+            "Python/C/C++/C# 混在同一個 checkpoint 裡，靠 prompt 裡的語言字樣"
+            "（例如「用 C++ 寫一個氣泡排序法」）讓模型自己學會依語言分辨，不是每個語言"
+            "各自一個模型。手上是一批 GitHub 專案的原始碼檔案、不是現成的 "
+            '{"prompt", "reply"} JSON 的話，先用「步驟零」把原始碼掃描成 markdown（人工'
+            "看過確認函式沒被切壞），再用「步驟一」轉成訓練配對追加進 data/code_pairs.json。",
+        )
+
+        step0 = tk.LabelFrame(outer, text=" 步驟零：原始碼掃描成 markdown (code_snippet_import.py extract，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step0.pack(fill="x", padx=10, pady=(0, 10))
+        code_extract_fields = _code_extract_fields()
+        build_form(step0, code_extract_fields)
+        extract_btn = ttk.Button(
+            step0, text="掃描成 markdown",
+            command=lambda: self._start_code_import("程式碼 markdown 掃描", "extract", code_extract_fields),
+        )
+        extract_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(extract_btn)
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：markdown 轉成訓練配對 (code_snippet_import.py pairs，選用) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        code_pairs_fields = _code_pairs_fields()
+        build_form(step1, code_pairs_fields)
+        pairs_btn = ttk.Button(
+            step1, text="產生訓練配對",
+            command=lambda: self._start_code_import("程式碼訓練配對匯入", "pairs", code_pairs_fields),
+        )
+        pairs_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(pairs_btn)
+
+        step_typo = tk.LabelFrame(outer, text=" 步驟二：錯字擴增 (typo_augment.py，選用) ",
+                                   bg=PANEL_BG, fg=FG, bd=1)
+        step_typo.pack(fill="x", padx=10, pady=(0, 10))
+        code_typo_fields = _typo_augment_fields(_CODE_PAIRS_JSON_DEFAULT)
+        build_form(step_typo, code_typo_fields)
+        typo_btn = ttk.Button(
+            step_typo, text="產生錯字擴增資料",
+            command=lambda: self._start("程式碼資料錯字擴增", "typo_augment.py", code_typo_fields),
+        )
+        typo_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(typo_btn)
+
+        step3 = tk.LabelFrame(outer, text=" 步驟三：訓練模型 (chats.py) ", bg=PANEL_BG, fg=FG, bd=1)
+        step3.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step3, CODE_FIELDS)
+        btn = ttk.Button(step3, text="開始訓練",
+                          command=lambda: self._start("程式碼模型訓練", "chats.py", CODE_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
         self.start_buttons.append(btn)
 
     def _build_character_tab(self, notebook: ttk.Notebook):
@@ -856,6 +996,16 @@ class TrainGUI:
             return
         argv = ["--mode", mode] + build_argv(fields, values)
         self._launch(task_label, ["dataset_import.py"] + argv)
+
+    def _start_code_import(self, task_label: str, subcommand: str, fields: list[Field]):
+        """code_snippet_import.py 用子指令（extract/pairs）而不是 --mode 旗標
+        （見該檔案 argparse 的 add_subparsers），跟 dataset_import.py 的呼叫
+        方式不同，所以另外寫一個而不是重用 _start_import。"""
+        values = collect_values(fields)
+        if values is None:
+            return
+        argv = [subcommand] + build_argv(fields, values)
+        self._launch(task_label, ["code_snippet_import.py"] + argv)
 
     def _launch(self, task_label: str, argv: list[str]):
         if self.proc is not None and self.proc.poll() is None:

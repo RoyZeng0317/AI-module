@@ -57,6 +57,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
+import code_retrieval
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
 from tools import route_reply
 
@@ -100,7 +101,16 @@ def is_code_request(message: str) -> bool:
     text = message.strip()
     if text.startswith(_CODE_PREFIXES):
         return True
-    return text.lower().startswith("python") and "寫" in text
+    if text.lower().startswith("python") and "寫" in text:
+        return True
+    # code_snippet_import.py 的 build_prompt() 產生的多語言 prompt 模板是
+    # 「用 <語言> 寫一個/寫一段/寫個 ...」（例如「用 C++ 寫一個氣泡排序法」），
+    # 開頭是語言字樣而不是「寫一個」，原本單純 startswith(_CODE_PREFIXES)
+    # 比對不到，會讓這批多語言程式碼訓練資料在實際聊天路由時被誤判成一般
+    # 聊天請求——這裡額外比對「用...寫」這個形狀。
+    if text.startswith("用") and any(prefix in text for prefix in _CODE_PREFIXES):
+        return True
+    return False
 
 
 def tokenize(text: str) -> list[str]:
@@ -440,12 +450,23 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
         return trace, reply
     use_code = force_mode == "code" or (force_mode == "auto" and is_code_request(message))
     if use_code:
+        reason_prefix = "已手動切換為程式碼模式" if force_mode == "code" else \
+            '訊息以「寫一個／寫一段」或「用<語言>寫」開頭，判斷為程式碼請求'
+        # 先試檢索式：data/code_pairs.json 裡有夠相似的既有範例就直接回傳
+        # 原文，不經過模型生成——比 sinco-code 生成可靠得多（見
+        # code_retrieval.py 開頭說明），資料庫沒覆蓋到才退回模型生成。
+        retrieved = code_retrieval.retrieve(message)
+        if retrieved is not None:
+            reply, score, matched_prompt = retrieved
+            return (
+                f'{reason_prefix} → 檢索式命中既有訓練範例「{matched_prompt}」'
+                f'（字元相似度 {score:.0%}，直接回傳訓練資料原文，非模型生成）',
+                reply,
+            )
         reply, confidence = mc_chat_reply(message, out_dir=CODE_OUT_DIR)
         warning = low_confidence_warning(confidence)
-        reason = ("已手動切換為程式碼模式" if force_mode == "code" else
-                  '訊息以「寫一個／寫一段」或「Python 怎麼寫」開頭，判斷為程式碼請求')
         return (
-            f'{reason} → 使用 sinco-code 模型'
+            f'{reason_prefix} → 資料庫沒有夠相似的既有範例，改用 sinco-code 模型生成'
             f'（貝氏 MC Dropout 信心度 {confidence:.0%}）{warning}',
             reply,
         )
