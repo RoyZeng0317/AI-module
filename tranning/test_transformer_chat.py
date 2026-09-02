@@ -9,7 +9,9 @@ tiny model config so it stays fast.
 
 import json
 
-from transformer_chat import finetune, pretrain, reply
+import torch
+
+from transformer_chat import _resolve_device, complete, finetune, pretrain, reply
 
 _TINY_MODEL_KWARGS = dict(
     batch_size=4, block_size=24, n_layer=2, n_embd=16, n_head=2, vocab_size=80,
@@ -79,3 +81,35 @@ def test_finetune_runs_end_to_end_after_pretrain(tmp_path):
 def test_reply_without_checkpoint_returns_placeholder(tmp_path):
     result = reply("hello", out_dir=tmp_path / "no_such_run")
     assert "尚未訓練" in result
+
+
+def test_complete_runs_on_pretrain_only_checkpoint(tmp_path):
+    """complete() is the entry point for a checkpoint that only ever went
+    through pretrain() (e.g. gpt_code_pretrain_runs/) -- no <sep>/reply
+    structure to expect, unlike reply()."""
+    corpus_path = tmp_path / "corpus.txt"
+    corpus_path.write_text(_make_synthetic_corpus(), encoding="utf-8")
+    pretrain_dir = tmp_path / "pretrain_runs"
+    pretrain(corpus_path=corpus_path, out_dir=pretrain_dir, epochs=1, val_split=0.2,
+              patience=5, **_TINY_MODEL_KWARGS)
+
+    generated = complete("sinco", out_dir=pretrain_dir, max_new_tokens=10)
+    assert isinstance(generated, str)
+    assert len(generated) > 0
+
+
+def test_complete_without_checkpoint_returns_placeholder(tmp_path):
+    result = complete("sinco", out_dir=tmp_path / "no_such_run")
+    assert "尚未訓練" in result
+
+
+def test_resolve_device_prefers_explicit_device_over_detection():
+    assert _resolve_device("cpu") == "cpu"
+    assert _resolve_device("xpu") == "xpu"
+
+
+def test_resolve_device_falls_back_to_cpu_when_no_accelerator(monkeypatch):
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    if hasattr(torch, "xpu"):
+        monkeypatch.setattr(torch.xpu, "is_available", lambda: False)
+    assert _resolve_device(None) == "cpu"

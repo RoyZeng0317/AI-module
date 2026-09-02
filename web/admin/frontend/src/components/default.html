@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="stylesheet" href="style.css" />
+    
+    <!-- FontAwesome 6 (全圖示化) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d97757'/%3E%3Cpath d='M9 21V11l7-4 7 4v10l-7 4-7-4Z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M9 11l7 4 7-4M16 15v10' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <title>Sinco</title>
+</head>
+<body>
+    <div id="app-container" class="app-container">
+        
+        <!-- 1. 左側邊欄 -->
+        <aside id="sidebar" class="sidebar">
+            <div class="brand-header">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <span class="brand-name">Sinco</span>
+            </div>
+
+            <div class="sidebar-header">
+                <button id="btn-new-chat" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>新增對話</span>
+                </button>
+                <button id="btn-new-folder" class="btn-secondary" title="新增資料夾">
+                    <i class="fa-regular fa-folder-closed"></i>
+                </button>
+            </div>
+            
+            <!-- 對話紀錄與資料夾清單 -->
+            <div id="history-list" class="history-list">
+                
+                <!-- 範例：已置頂的對話 -->
+                <div class="chat-item pinned" data-chat-id="chat-000">
+                    <i class="fa-solid fa-thumbtack pin-icon"></i>
+                    <span class="chat-title">常用指令集與模組</span>
+                    <div class="item-actions">
+                        <button class="btn-more"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                </div>
+
+                <!-- 資料夾項目 -->
+                <div class="folder-item" data-folder-id="folder-1">
+                    <div class="folder-header">
+                        <i class="fa-regular fa-folder"></i>
+                        <span class="folder-title">程式開發討論</span>
+                        <i class="fa-solid fa-chevron-down folder-toggle-icon"></i>
+                    </div>
+                    
+                    <div class="folder-content">
+                        <!-- 資料夾內的對話 (帶三點選單) -->
+                        <div class="chat-item active" data-chat-id="chat-101">
+                            <i class="fa-regular fa-message"></i>
+                            <span class="chat-title">PyScript DOM 操作</span>
+                            <div class="item-actions">
+                                <button class="btn-more" title="更多選項"><i class="fa-solid fa-ellipsis"></i></button>
+                                <!-- 下拉選單選項目 (可搭配 JS 控制 顯示/隱藏) -->
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item"><i class="fa-solid fa-thumbtack"></i> 釘選置頂</button>
+                                    <button class="dropdown-item"><i class="fa-regular fa-pen-to-square"></i> 重命名</button>
+                                    <button class="dropdown-item"><i class="fa-regular fa-folder"></i> 移動至...</button>
+                                    <div class="dropdown-divider"></div>
+                                    <button class="dropdown-item danger"><i class="fa-regular fa-trash-can"></i> 刪除對話</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-item" data-chat-id="chat-102">
+                            <i class="fa-regular fa-message"></i>
+                            <span class="chat-title">YOLO 鏡頭串流除錯</span>
+                            <div class="item-actions">
+                                <button class="btn-more" title="更多選項"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 獨立對話項目 -->
+                <div class="chat-item" data-chat-id="chat-201">
+                    <i class="fa-regular fa-message"></i>
+                    <span class="chat-title">今日閒聊與筆記</span>
+                    <div class="item-actions">
+                        <button class="btn-more" title="更多選項"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sidebar-footer">
+                <span id="model-status" class="status-indicator">
+                    <i class="fa-solid fa-circle status-dot"></i> 模型運作中
+                </span>
+            </div>
+        </aside>
+        
+        <!-- 2. 右側主區塊 -->
+        <main id="main-chat" class="main-chat">
+            
+            <!-- 頂部列（已移除右側刪除按鈕，僅保留匯出與資訊） -->
+            <header class="chat-header">
+                <div class="chat-title-info">
+                    <h2 id="current-chat-title">PyScript DOM 操作</h2>
+                    <span id="current-folder-badge" class="badge">
+                        <i class="fa-regular fa-folder"></i> 程式開發討論
+                    </span>
+                </div>
+                <div class="chat-actions">
+                    <button id="btn-export-chat" class="btn-icon" title="匯出對話紀錄">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <section id="chat-messages" class="chat-messages">
+                <div class="message system-message">
+                    <span>對話歷史紀錄已載入</span>
+                </div>
+                <div class="message user-message">
+                    <div class="message-bubble">請幫我設計一個支援歷史紀錄的 HTML 框架。</div>
+                </div>
+                <div class="message assistant-message">
+                    <div class="message-bubble">沒問題！以下是為你準備的頁面結構...</div>
+                </div>
+            </section>
+            
+            <footer class="chat-input-container">
+                <form id="chat-form" onsubmit="return false;">
+                    <textarea 
+                        id="chat-textarea" 
+                        placeholder="輸入訊息... (Shift + Enter 換行)" 
+                        rows="1"
+                    ></textarea>
+                    <div class="input-footer">
+                        <button type="submit" id="btn-send" class="btn-send">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                    </div>
+                </form>
+            </footer>
+            
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+<style>
+    /* ==========================================
+   1. 全域變數 (Claude Dark Theme)
+   ========================================== */
+:root {
+    --bg-main: #1e1e1e;
+    --bg-sidebar: #181818;
+    --bg-input: #262626;
+    --bg-hover: #2d2d2d;
+    --bg-menu: #2b2b2b;
+    
+    --text-primary: #e3e3e3;
+    --text-muted: #8e8e8e;
+    --text-heading: #ffffff;
+    
+    --accent: #da7756;
+    --accent-hover: #e58868;
+    --border: #2a2a2a;
+    --border-light: #333333;
+    
+    --sidebar-width: 260px;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ==========================================
+   2. 品牌 Header
+   ========================================== */
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px 12px 16px;
+}
+
+.brand-logo {
+    width: 28px;
+    height: 28px;
+    background-color: var(--accent);
+    color: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.brand-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================
+   3. 側邊欄與對話項目操作選單 (Sidebar Items & Dropdown)
+   ========================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 8px 14px 16px 14px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-primary {
+    flex: 1;
+    background-color: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 9px 14px;
+    font-weight: 500;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 8px 12px 8px;
+}
+
+.folder-item {
+    margin-bottom: 2px;
+}
+
+.folder-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.folder-header:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.folder-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.folder-toggle-icon {
+    font-size: 0.75rem;
+}
+
+.folder-content {
+    margin-left: 14px;
+    padding-left: 6px;
+    border-left: 1px solid var(--border);
+}
+
+/* 對話項目 (Chat Item) 結構與 Hover 隱藏邏輯 */
+.chat-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.chat-item:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.chat-item.active {
+    background-color: var(--bg-hover);
+    color: var(--text-heading);
+    font-weight: 500;
+}
+
+.chat-item.pinned .pin-icon {
+    font-size: 0.75rem;
+    color: var(--accent);
+}
+
+.chat-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 三點按鈕區塊 (預設隱藏，Hover 時顯示) */
+.item-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.btn-more {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+
+.chat-item:hover .btn-more,
+.btn-more.active {
+    opacity: 1;
+}
+
+.btn-more:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-heading);
+}
+
+/* 下拉選單 (Dropdown Menu) */
+.dropdown-menu {
+    display: none; /* 由 JS 切換顯示 (或搭配 .show 類別) */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    width: 140px;
+    background-color: var(--bg-menu);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 測試用：當按鈕被點擊開啟時顯示選單 */
+.item-actions.show-menu .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.dropdown-item.danger {
+    color: #ff5c5c;
+}
+
+.dropdown-item.danger:hover {
+    background-color: rgba(255, 92, 92, 0.1);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--border);
+    margin: 4px 0;
+}
+
+.sidebar-footer {
+    padding: 14px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    font-size: 0.5rem;
+    color: #4cd964;
+}
+
+/* ==========================================
+   4. 右側主要對話區 (Main Chat)
+   ========================================== */
+.main-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-main);
+    align-items: center;
+}
+
+.chat-header {
+    width: 100%;
+    height: 60px;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--bg-main);
+}
+
+.chat-title-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-title-info h2 {
+    font-size: 1rem;
+    color: var(--text-heading);
+    font-weight: 600;
+}
+
+.badge {
+    background-color: var(--bg-input);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-icon:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* 對話訊息區 */
+.chat-messages {
+    width: 100%;
+    max-width: 760px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.system-message {
+    align-self: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background-color: var(--bg-sidebar);
+    padding: 4px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.user-message {
+    align-items: flex-end;
+}
+
+.user-message .message-bubble {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.assistant-message {
+    align-items: flex-start;
+}
+
+.assistant-message .message-bubble {
+    background-color: transparent;
+    color: var(--text-primary);
+    padding: 4px 0;
+}
+
+.message-bubble {
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    word-break: break-word;
+    max-width: 88%;
+}
+
+/* 輸入框區域 */
+.chat-input-container {
+    width: 100%;
+    max-width: 760px;
+    padding: 0 20px 24px 20px;
+}
+
+#chat-form {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s;
+}
+
+#chat-form:focus-within {
+    border-color: var(--accent);
+}
+
+#chat-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-heading);
+    font-size: 0.95rem;
+    resize: none;
+    min-height: 48px;
+    max-height: 160px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.input-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.btn-send {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-send:hover {
+    background-color: var(--accent-hover);
+}
+</style>
+</html>

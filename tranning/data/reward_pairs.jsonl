@@ -1,0 +1,35 @@
+{"prompt": "(12 + 8) * 5 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"(12 + 8) * 5\"}\n```\nFinal Answer: (12 + 8) * 5 的計算結果是 100。", "rejected": "感覺應該是 90 吧,我用心算的。"}
+{"prompt": "36 除以 4 加 7 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"36 / 4 + 7\"}\n```\nFinal Answer: 36 除以 4 加 7 的計算結果是 16。", "rejected": "大概 20 左右吧。"}
+{"prompt": "試問 15 * 6 - 20 =?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"15 * 6 - 20\"}\n```\nFinal Answer: 15 * 6 - 20 的計算結果是 70。", "rejected": "```json\n{\"action\": \"calc\" \"input\": \"15 * 6 - 20\"}\n```\nFinal Answer: 應該是 70 吧。"}
+{"prompt": "100 減掉 37 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"100 - 37\"}\n```\nFinal Answer: 100 減掉 37 的計算結果是 63。", "rejected": "63 還是 73 我不太確定,你自己算算看。"}
+{"prompt": "9 的平方是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"9 ** 2\"}\n```\nFinal Answer: 9 的平方是 81。", "rejected": "9 的平方應該是 18 吧(9*2)。"}
+{"prompt": "(3 + 4) * (5 - 2) 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"(3 + 4) * (5 - 2)\"}\n```\nFinal Answer: (3 + 4) * (5 - 2) 的計算結果是 21。", "rejected": "這題我沒辦法算,你自己用計算機吧。"}
+{"prompt": "48 除以 6 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"48 / 6\"}\n```\nFinal Answer: 48 除以 6 的計算結果是 8。", "rejected": "```json\n{\"action\": \"calc\", \"input\": \"48 / 6\"\n```\nFinal Answer: 8。"}
+{"prompt": "23 加 19 減 5 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"23 + 19 - 5\"}\n```\nFinal Answer: 23 加 19 減 5 的計算結果是 37。", "rejected": "37 或 47 都有可能,我不確定。"}
+{"prompt": "7 乘以 8 再加 10 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"7 * 8 + 10\"}\n```\nFinal Answer: 7 乘以 8 再加 10 的計算結果是 66。", "rejected": "這個問題有點難,我猜是 56。"}
+{"prompt": "120 除以 (4 + 6) 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"120 / (4 + 6)\"}\n```\nFinal Answer: 120 除以 (4 + 6) 的計算結果是 12。", "rejected": "沒有工具我不會算數學題。"}
+{"prompt": "50 減去 (6 * 3) 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"50 - (6 * 3)\"}\n```\nFinal Answer: 50 減去 (6 * 3) 的計算結果是 32。", "rejected": "32 還是 42,忘記進位了,隨便挑一個吧。"}
+{"prompt": "2 的 6 次方是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"2 ** 6\"}\n```\nFinal Answer: 2 的 6 次方是 64。", "rejected": "2 的 6 次方大概是 12(2*6)。"}
+{"prompt": "99 加 1 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"99 + 1\"}\n```\nFinal Answer: 99 加 1 的計算結果是 100。", "rejected": "99 加 1 嗎?我覺得不重要,你自己想。"}
+{"prompt": "(18 - 3) / 5 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"(18 - 3) / 5\"}\n```\nFinal Answer: (18 - 3) / 5 的計算結果是 3。", "rejected": "應該是 3 點多吧,細節我沒算。"}
+{"prompt": "13 乘 13 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"13 * 13\"}\n```\nFinal Answer: 13 乘 13 的計算結果是 169。", "rejected": "169 還是 196 我搞混了,反正差不多。"}
+{"prompt": "60 除以 5 再乘以 3 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"60 / 5 * 3\"}\n```\nFinal Answer: 60 除以 5 再乘以 3 的計算結果是 36。", "rejected": "60 除以 5 再乘以 3,大概 20 上下吧。"}
+{"prompt": "45 加 55 是多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"45 + 55\"}\n```\nFinal Answer: 45 加 55 的計算結果是 100。", "rejected": "45 加 55,嗯...150 左右?"}
+{"prompt": "8 乘以 9 減 12 等於多少?", "chosen": "```json\n{\"action\": \"calc\", \"input\": \"8 * 9 - 12\"}\n```\nFinal Answer: 8 乘以 9 減 12 的計算結果是 60。", "rejected": "抱歉這題超出我的能力範圍。"}
+{"prompt": "可以幫我解釋一下什麼是遞迴 (recursion) 嗎?", "chosen": "遞迴是指一個函式在執行過程中呼叫自己來解決問題，通常包含兩個部分：(1) 基本情況（base case），讓遞迴停止；(2) 遞迴情況，把問題拆成更小的同類子問題。例如計算階乘 n! 時，n! = n * (n-1)!，直到 n=0 時回傳 1。你想看一個實際的程式碼範例嗎？", "rejected": "遞迴就是自己呼叫自己啊,很簡單。"}
+{"prompt": "我的 Python 程式跑出 IndexError,要怎麼修?", "chosen": "IndexError 通常代表你存取了超出串列範圍的索引，常見原因是迴圈條件寫錯（例如用 <= 而不是 <）或串列本身是空的。建議你檢查：(1) 迴圈的範圍是不是對到 len(list)；(2) 存取前先確認串列不是空的。方便把出錯那行程式碼貼給我看嗎？", "rejected": "看錯誤訊息就知道了吧。"}
+{"prompt": "什麼是機器學習裡的過擬合?", "chosen": "過擬合是指模型把訓練資料的雜訊和細節都背下來了，導致在訓練集表現很好、但遇到沒看過的資料表現變差。常見解法包括：增加資料量、Dropout、weight decay、early stopping。你目前是遇到哪個模型出現過擬合的狀況呢？", "rejected": "就是模型太笨。"}
+{"prompt": "幫我看看這段迴圈為什麼跑不完?", "chosen": "無窮迴圈常見原因是迴圈變數沒有正確更新，或是判斷條件永遠為真。可以檢查一下迴圈內是否有像 i += 1 這類遞增/遞減的敘述，或是條件寫反了。方便的話把程式碼貼出來，我可以幫你逐行確認。", "rejected": "我不知道,你自己debug看看。"}
+{"prompt": "早安,今天天氣如何?", "chosen": "早安！我這邊沒辦法直接感知天氣，不過如果你告訴我所在城市，我可以幫你查即時天氣資訊。要我幫你查嗎？", "rejected": "不知道,別問我這種問題。"}
+{"prompt": "你可以幫我 debug 這段 code 嗎?", "chosen": "當然可以，把程式碼跟錯誤訊息貼給我，我會幫你一步一步找出問題點在哪裡。", "rejected": "不行,我很忙。"}
+{"prompt": "loss 一直降不下去,可能是什麼原因?", "chosen": "loss 卡住常見原因有：學習率太小或太大、模型容量不足、資料沒有正規化、或是初始化不當。可以先試著調高學習率觀察 loss 有沒有反應，再逐步排查其他因素。你目前用的是什麼架構跟學習率呢？", "rejected": "loss 高就是模型爛啊。"}
+{"prompt": "什麼是 API?", "chosen": "API（Application Programming Interface）是讓不同軟體之間互相溝通的介面，定義了要用什麼格式傳送請求、會拿到什麼樣的回應。你可以把它想像成點餐的菜單——你不需要知道廚房怎麼煮，只要照著菜單點餐就能拿到餐點。想深入了解哪種類型的 API 呢，例如 REST API？", "rejected": "自己去查維基百科。"}
+{"prompt": "我要 commit 這次的修改,有什麼建議嗎?", "chosen": "commit 前建議先用 git status 確認要提交的檔案範圍正確，訊息盡量簡潔說明「為什麼」而不只是「做了什麼」。要不要我幫你看一下目前的變更內容,一起想個 commit 訊息？", "rejected": "自己打一打就好了。"}
+{"prompt": "你會不會覺得中英文夾雜很難?", "chosen": "中英夾雜對語言模型來說確實比純語言更需要學習語境切換,但只要訓練資料裡有足夠多這種自然夾雜的例子,是可以學會的。你是想讓我在回覆時多用一些中英夾雜的說法嗎？", "rejected": "難不難不知道,反正我就是這樣講話。"}
+{"prompt": "什麼是版本控制 (version control)?", "chosen": "版本控制是用來追蹤程式碼歷史變更的系統，讓你可以回到任何一個過去的版本、比較差異、或跟其他人協作而不互相覆蓋彼此的修改。Git 是目前最常見的版本控制工具。想了解基本的 git 指令嗎？", "rejected": "就是存檔案的東西。"}
+{"prompt": "幫我看看這個 function 有沒有問題?", "chosen": "可以，把 function 的程式碼貼給我，我會檢查邏輯是否正確、有沒有邊界情況沒處理到，例如空輸入或型別不符的狀況。", "rejected": "看起來還好吧,應該沒問題。"}
+{"prompt": "什麼是 overfitting 跟 underfitting 的差別?", "chosen": "overfitting 是模型太貼合訓練資料、學到了雜訊，導致在新資料上表現變差；underfitting 則是模型太簡單，連訓練資料本身的規律都學不好，訓練和驗證表現都不好。判斷方式通常是比較 train/val 的 loss 差距。你是在哪個模型上觀察到這個現象的？", "rejected": "就差不多意思啦,不用分那麼細。"}
+{"prompt": "我想學習寫測試,應該從哪裡開始?", "chosen": "建議從最簡單的單元測試開始，針對單一函式寫幾個輸入輸出的斷言，確認邏輯正確；熟悉之後再學習 mock、fixture 等進階技巧。Python 的話可以從 pytest 入門，語法簡潔好上手。你目前的專案是用哪個語言？", "rejected": "測試很麻煩,不寫也沒差。"}
+{"prompt": "可以幫我解釋一下什麼是類別 (class) 嗎?", "chosen": "類別是物件導向程式設計裡定義「藍圖」的方式，描述一群物件共有的屬性（資料）跟行為（方法）。例如一個 Car 類別可以有顏色、速度等屬性，跟加速、煞車等方法，之後就能用這個類別建立出多台不同顏色的實際車子物件。想看一個簡單的程式碼範例嗎？", "rejected": "class 就是類別啊,查一下不就知道了。"}
+{"prompt": "你可以陪我聊聊今天發生的事嗎?", "chosen": "當然可以，我在這裡聽你說。想先從今天最讓你印象深刻的一件事開始說起嗎？", "rejected": "喔。"}
+{"prompt": "可以幫我把這段英文翻成中文嗎?", "chosen": "當然可以，把你要翻譯的英文貼給我，我會幫你翻成中文，如果有專業術語我也會盡量說明背景讓你更容易理解。", "rejected": "翻譯軟體很多,自己找一個用。"}

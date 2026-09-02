@@ -1,0 +1,21 @@
+=== branch ===
+main
+=== HEAD commit ===
+99c5ab032ffdb215b95bb4faa6bc40f29ce6abc5
+=== 與 origin/main 同步狀態 ===
+## main...origin/main
+?? machine_migration/
+=== remote ===
+origin	https://github.com/RoyZeng0317/AI-module.git (fetch)
+origin	https://github.com/RoyZeng0317/AI-module.git (push)
+=== 最近 10 筆 commit ===
+99c5ab0 前端部屬與模型訓練功能增加
+3d232f4 版本更新與異動
+2ac5071 新增了RNN
+0973083 重新命名臨時推論腳本，避免被 pytest 誤收集
+254b938 合併 origin/main（second 分支 PR #2）：整合貝氏 MC Dropout 與網頁擷取功能
+b4ef028 更新 CLAUDE.md 專案歷史紀錄與待辦索引
+850da1e 新增 Transformer 對話模型與自動學習機制
+2f2bf8e 新增 BPE 分詞器與語料建構工具
+3889d56 新增語音辨識/合成資料前處理工具
+f23638e 新增自動學習候選資料與中文語料起始資料集

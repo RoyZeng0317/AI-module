@@ -85,13 +85,36 @@ PAGE_FETCH_TIMEOUT = 8
 MAX_PAGE_BYTES = 2 * 1024 * 1024  # stop reading a page past 2MB
 PAGE_FETCH_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; sinco-bot/1.0)"}
 
+# --- reply language: 依提問語言（繁體中文／美式英文）輸出 -------------------
+# route_reply() 這裡組出來的固定字串（天氣/圖片/影片/搜尋查無結果等）過去
+# 一律寫死繁體中文，使用者用英文提問（_SEARCH_PATTERNS／_IMAGE_PREFIXES／
+# _YOUTUBE_REQUEST_HINTS 本來就有收英文句型，只是回覆內容沒有跟著切換）時
+# 答非所問。這裡只是粗略啟發式（含中文字就當中文、否則含英文字母就當英文，
+# 兩者都沒有預設中文），不是真正的語言偵測模型——但夠用來決定下面這些
+# 「sinco 自己組的句子」要用哪個語言版本；外部資料源本身回傳的內容（例如
+# 台股行情、微積分出題內容）不在這次調整範圍內，見各自呼叫處的說明。
+_CJK_RE = re.compile(r"[一-鿿㐀-䶿]")
+
+
+def _detect_lang(message: str) -> str:
+    if _CJK_RE.search(message):
+        return "zh"
+    if re.search(r"[A-Za-z]", message):
+        return "en"
+    return "zh"
+
+
+def _bilingual(lang: str, zh: str, en: str) -> str:
+    return en if lang == "en" else zh
+
+
 _WEATHER_KEYWORD = re.compile(r"天氣")
 _WEATHER_PREFIXES = ("幫我查詢", "幫我查", "查詢", "查一下", "查")
 
 _SEARCH_PATTERNS = [
     re.compile(r"^(?:搜尋|search)\s*[:：]?\s*(.+)$", re.IGNORECASE),
     re.compile(r"^(?:查詢|查一下|幫我查)\s*(.+)$"),
-    re.compile(r"^你(?:認識|知道)\s*(.+?)\s*嗎[!?？]*$"),
+    re.compile(r"^你(?:認識|知道)\s*(.+?)\s*(?:嗎)?[!?？]*$"),
     re.compile(r"^(?:do you know|who is|what is)\s+(.+?)[!?？]*$", re.IGNORECASE),
     re.compile(r"^(.+?)是誰[!?？]*$"),
 ]
@@ -201,10 +224,10 @@ def _is_solve_last_request(message: str) -> bool:
     return normalized in {h.lower() for h in _SOLVE_LAST_HINTS}
 
 
-def get_weather(location: str) -> str:
+def get_weather(location: str, lang: str = "zh") -> str:
     resp = requests.get(
         f"https://wttr.in/{location}",
-        params={"format": "3", "lang": "zh"},
+        params={"format": "3", "lang": "en" if lang == "en" else "zh"},
         timeout=WEATHER_TIMEOUT,
     )
     resp.raise_for_status()
@@ -357,14 +380,14 @@ def web_search(query: str) -> str | None:
     return None
 
 
-def general_web_search(query: str, max_results: int = 3) -> str | None:
+def general_web_search(query: str, max_results: int = 3, lang: str = "zh") -> str | None:
     """一般網頁搜尋（不限定特定網站），走 Serper.dev（Google 搜尋結果的
     REST API）。這是 web_search()/wikipedia_search() 兩個免金鑰資料源都查
     不到時的第三層備援——那兩個都是「摘要卡」型 API（Instant Answer／
     百科條目），碰到口語問題、時事、非百科主題常常直接查空；一般搜尋引擎
     的索引範圍才是「沒有限定地方」。
 
-    需要環境變數 SEARCH_API_KEY（Serper.dev 的 API key，免費申請），使用者
+    需要環境變數 SERPER_API_KEY（Serper.dev 的 API key，免費申請），使用者
     自行在 lib/.env 設定（CLAUDE.md 規則 #05：.env 一律由使用者自行手動
     輸入，本函式只用 python-dotenv 在執行期讀取成 process 環境變數，不會
     建立、修改或印出 .env 的內容，寫法跟 lib/NVIDIA.py 讀 NVIDIA_API_KEY
@@ -378,15 +401,18 @@ def general_web_search(query: str, max_results: int = 3) -> str | None:
     """
     from dotenv import load_dotenv
     load_dotenv(_LIB_DIR / ".env")
-    api_key = os.environ.get("SEARCH_API_KEY")
+    api_key = os.environ.get("SERPER_API_KEY")
     if not api_key:
         return None
 
+    # hl/gl（介面語言／地區）依偵測到的提問語言切換，讓查詢命中對應語言的
+    # 結果，不是只換 sinco 自己組的文字——查詢語言不對，結果內容也會答非所問。
+    hl, gl = ("en", "us") if lang == "en" else ("zh-tw", "tw")
     try:
         resp = requests.post(
             "https://google.serper.dev/search",
             headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
-            json={"q": query, "num": max_results},
+            json={"q": query, "num": max_results, "hl": hl, "gl": gl},
             timeout=SEARCH_TIMEOUT,
         )
         resp.raise_for_status()
@@ -397,29 +423,37 @@ def general_web_search(query: str, max_results: int = 3) -> str | None:
     results = (data.get("organic") or [])[:max_results]
     if not results:
         return None
-    lines = []
+    entries = []
     for r in results:
         title = (r.get("title") or "").strip()
         snippet = (r.get("snippet") or "").strip()
         link = (r.get("link") or "").strip()
-        line = "：".join(part for part in (title, snippet) if part)
+        text = "：".join(part for part in (title, snippet) if part)
+        # 連結單獨佔一行、不跟其他文字（含全形括號）擠在同一行——括號夾住
+        # URL 時，部分終端機/GUI 的自動辨識連結功能會把括號一併算進網址或在
+        # 括號處提前截斷，點開就只拿到部分網址。獨立成行且該行只有網址本身
+        # 才能保證點開時取得完整 URL。
+        entry = text
         if link:
-            line = f"{line}（{link}）" if line else link
-        if line:
-            lines.append(line)
-    return "\n".join(lines) or None
+            entry = f"{entry}\n{link}" if entry else link
+        if entry:
+            entries.append(entry)
+    return "\n\n".join(entries) or None
 
 
-def wikipedia_search(query: str) -> str | None:
-    """中文維基百科摘要 API——備援資料源。DuckDuckGo Instant Answer 主要是
+def wikipedia_search(query: str, lang: str = "zh") -> str | None:
+    """中文/英文維基百科摘要 API——備援資料源。DuckDuckGo Instant Answer 主要是
     英文/維基百科導向的資料，中文詞條常常查無結果（實測「微積分」「台北101」
     這類常見中文詞 web_search() 都查不到，但英文 "Calculus" 查得到），這裡
-    補上查無結果時的第二個嘗試。一樣是純資料 API，不是 AI 模型，不需要金鑰，
-    符合 Rule 06。必須帶 User-Agent：Wikimedia 的 API 政策會直接擋掉沒有
-    標頭的請求（回 403），不是查無此詞條。
+    補上查無結果時的第二個嘗試。`lang` 依提問語言（_detect_lang()）決定查
+    zh.wikipedia.org 還是 en.wikipedia.org，避免英文提問卻查到中文條目摘要、
+    答非所問。一樣是純資料 API，不是 AI 模型，不需要金鑰，符合 Rule 06。
+    必須帶 User-Agent：Wikimedia 的 API 政策會直接擋掉沒有標頭的請求
+    （回 403），不是查無此詞條。
     """
+    host = "en.wikipedia.org" if lang == "en" else "zh.wikipedia.org"
     resp = requests.get(
-        f"https://zh.wikipedia.org/api/rest_v1/page/summary/{query}",
+        f"https://{host}/api/rest_v1/page/summary/{query}",
         headers={"User-Agent": "sinco-AI-module/1.0 (local desktop app; no contact URL)"},
         timeout=SEARCH_TIMEOUT,
     )
@@ -429,11 +463,11 @@ def wikipedia_search(query: str) -> str | None:
     return extract.strip() if extract else None
 
 
-def _lookup(subject: str) -> tuple[str | None, str]:
-    """依序試 DuckDuckGo（web_search，英文/國際詞條較強）、查無結果再試中文
-    維基百科（wikipedia_search，中文詞條較強）、兩者都查無結果再試一般網頁
-    搜尋引擎（general_web_search，沒有限定地方，但需要 SEARCH_API_KEY，見
-    該函式說明；沒設金鑰時單純回傳 None，不影響前兩層的既有行為）。回傳
+def _lookup(subject: str, lang: str = "zh") -> tuple[str | None, str]:
+    """依序試 DuckDuckGo（web_search，英文/國際詞條較強）、查無結果再試維基
+    百科（wikipedia_search，依 `lang` 查中文或英文條目）、兩者都查無結果再試
+    一般網頁搜尋引擎（general_web_search，沒有限定地方，但需要 SEARCH_API_KEY，
+    見該函式說明；沒設金鑰時單純回傳 None，不影響前兩層的既有行為）。回傳
     (結果或 None, 實際命中的資料源代號)——三層都查無結果時 source 固定回
     "general_search"（最後嘗試的來源，純粹當個預設值，不影響任何邏輯，
     因為此時 result 是 None 不會被拿去用）。
@@ -446,14 +480,14 @@ def _lookup(subject: str) -> tuple[str | None, str]:
         return result, "duckduckgo"
 
     try:
-        result = wikipedia_search(subject)
+        result = wikipedia_search(subject, lang=lang)
     except requests.RequestException:
         result = None
     if result is not None:
         return result, "wikipedia"
 
     try:
-        result = general_web_search(subject)
+        result = general_web_search(subject, lang=lang)
     except requests.RequestException:
         result = None
     return result, "general_search"
@@ -489,11 +523,12 @@ def _image_source_if_requested(message: str) -> str | None:
     return None
 
 
-def _load_image_bgr(source: str):
+def _load_image_bgr(source: str, lang: str = "zh"):
     """回傳 (image, error)：image 是 cv2 讀進來的 BGR ndarray，成功時
-    error 是 None；失敗時 image 是 None、error 是給使用者看的中文訊息。
-    本機路徑跟 http(s) 網址都支援——網址的部分只下載圖片本身的 bytes 交給
-    本機的 YOLO 模型判讀，不是把圖片丟給任何雲端視覺 API，一樣符合 Rule 06。
+    error 是 None；失敗時 image 是 None、error 是給使用者看的訊息（依 `lang`
+    輸出繁體中文或英文）。本機路徑跟 http(s) 網址都支援——網址的部分只下載
+    圖片本身的 bytes 交給本機的 YOLO 模型判讀，不是把圖片丟給任何雲端視覺
+    API，一樣符合 Rule 06。
     """
     import cv2
     import numpy as np
@@ -503,32 +538,36 @@ def _load_image_bgr(source: str):
             resp = requests.get(source, timeout=IMAGE_TIMEOUT)
             resp.raise_for_status()
         except requests.RequestException as exc:
-            return None, f"圖片下載失敗：{exc}"
+            return None, _bilingual(lang, f"圖片下載失敗：{exc}", f"Failed to download the image: {exc}")
         image = cv2.imdecode(np.frombuffer(resp.content, dtype=np.uint8), cv2.IMREAD_COLOR)
     else:
         path = Path(source).expanduser()
         if not path.is_file():
-            return None, f"找不到圖片檔案：{source}"
+            return None, _bilingual(lang, f"找不到圖片檔案：{source}", f"Image file not found: {source}")
         image = cv2.imread(str(path))
 
     if image is None:
-        return None, "無法解析這個檔案，確認它是有效的圖片格式（jpg/png/bmp/webp/gif）。"
+        return None, _bilingual(
+            lang,
+            "無法解析這個檔案，確認它是有效的圖片格式（jpg/png/bmp/webp/gif）。",
+            "Couldn't parse this file — make sure it's a valid image format (jpg/png/bmp/webp/gif).",
+        )
     return image, None
 
 
-def recognize_image(source: str) -> str:
-    """對 `source`（本機路徑或 http(s) 網址）跑本機 YOLO 偵測，回傳中文格式化
-    結果。沿用 web/backend/detector.py 同一個 detect()——跟
-    app/components/camera.py 即時攝影機用的是同一個模型，只是這裡的輸入是
-    單張靜態圖片而非連續影格。sys.path 手動補 web/backend 的路徑，因為
-    tools.py 可能在沒有先跑過 home_screen.py/cli.py（它們自己的進入點才會
-    加這個路徑）的情況下被單獨測試或呼叫。
+def recognize_image(source: str, lang: str = "zh") -> str:
+    """對 `source`（本機路徑或 http(s) 網址）跑本機 YOLO 偵測，回傳格式化
+    結果（依 `lang` 輸出繁體中文或英文）。沿用 web/backend/detector.py 同一個
+    detect()——跟 app/components/camera.py 即時攝影機用的是同一個模型，只是
+    這裡的輸入是單張靜態圖片而非連續影格。sys.path 手動補 web/backend 的
+    路徑，因為 tools.py 可能在沒有先跑過 home_screen.py/cli.py（它們自己的
+    進入點才會加這個路徑）的情況下被單獨測試或呼叫。
     """
     if str(_WEB_BACKEND_DIR) not in sys.path:
         sys.path.insert(0, str(_WEB_BACKEND_DIR))
     from detector import detect
 
-    image, error = _load_image_bgr(source)
+    image, error = _load_image_bgr(source, lang=lang)
     if error is not None:
         return error
     assert image is not None  # _load_image_bgr 的合約：error 是 None 時 image 一定不是 None
@@ -536,11 +575,14 @@ def recognize_image(source: str) -> str:
     try:
         detections = detect(image, conf=0.35)
     except Exception as exc:  # ultralytics/模型端任何未預期錯誤都要看得到原因
-        return f"圖片辨識失敗：{exc}"
+        return _bilingual(lang, f"圖片辨識失敗：{exc}", f"Image recognition failed: {exc}")
 
     if not detections:
-        return "沒有在這張圖片裡偵測到任何已知物件。"
+        return _bilingual(lang, "沒有在這張圖片裡偵測到任何已知物件。", "No known objects were detected in this image.")
 
+    if lang == "en":
+        items = ", ".join(f'{d["label"]} (confidence {d["confidence"]:.0%})' for d in detections[:10])
+        return f"Detected {len(detections)} object(s): {items}"
     items = "、".join(f'{d["label"]}（信心度 {d["confidence"]:.0%}）' for d in detections[:10])
     return f"偵測到 {len(detections)} 個物件：{items}"
 
@@ -577,30 +619,36 @@ def _video_query_if_requested(message: str) -> str | None:
     return query or None
 
 
-def _youtube_result_text(video: dict) -> str:
+def _youtube_result_text(video: dict, lang: str = "zh") -> str:
     title = "".join(r.get("text", "") for r in video.get("title", {}).get("runs", []))
     channel = "".join(
         r.get("text", "")
         for r in video.get("ownerText", {}).get("runs", []) or video.get("longBylineText", {}).get("runs", [])
     )
-    duration = video.get("lengthText", {}).get("simpleText", "直播/未知長度")
+    duration = video.get("lengthText", {}).get("simpleText", _bilingual(lang, "直播/未知長度", "live/unknown length"))
     views = (video.get("viewCountText") or video.get("shortViewCountText") or {}).get("simpleText", "")
     snippets = video.get("detailedMetadataSnippets") or []
     summary = "".join(r.get("text", "") for r in snippets[0].get("snippetText", {}).get("runs", [])) if snippets else ""
+    url = f"https://www.youtube.com/watch?v={video.get('videoId')}"
 
     line = f"《{title}》（{channel}，{duration}"
     if views:
         line += f"，{views}"
-    line += f"）\n連結：https://www.youtube.com/watch?v={video.get('videoId')}"
+    line += "）"
     if summary:
-        line += f"\n重點：{summary}"
+        line += f"\n{_bilingual(lang, '重點', 'Summary')}：{summary}"
+    # 連結單獨佔一行、不跟標籤黏在同一行文字裡混排其他內容——跟
+    # general_web_search() 同一個理由：那一行只有純網址，點開時才會取得
+    # 完整 URL，不會被前後文字截斷。
+    line += f"\n{url}"
     return line
 
 
-def youtube_search(query: str, max_results: int = 3) -> str | None:
+def youtube_search(query: str, max_results: int = 3, lang: str = "zh") -> str | None:
     """搜尋 YouTube，回傳前 `max_results` 部影片的整理結果（標題／頻道／長度／
-    觀看次數／連結，有簡介片段的話也一併附上）。找不到結果或請求失敗回傳
-    None，交由呼叫端（route_reply()）決定要顯示什麼訊息。
+    觀看次數／連結，有簡介片段的話也一併附上；`lang` 決定標籤文字用繁體中文
+    還是英文）。找不到結果或請求失敗回傳 None，交由呼叫端（route_reply()）
+    決定要顯示什麼訊息。
     """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -643,7 +691,7 @@ def youtube_search(query: str, max_results: int = 3) -> str | None:
     walk(data)
     if not videos:
         return None
-    return "\n\n".join(_youtube_result_text(v) for v in videos[:max_results])
+    return "\n\n".join(_youtube_result_text(v, lang=lang) for v in videos[:max_results])
 
 
 def _extract_location(message: str) -> str:
@@ -673,13 +721,22 @@ def route_reply(message: str) -> tuple[str, str] | None:
     if not message:
         return None
 
+    # 依提問語言（繁體中文／美式英文）決定下面這些 sinco 自己組的固定字串要
+    # 用哪個語言版本——見上方 _detect_lang()/_bilingual() 的說明。
+    lang = _detect_lang(message)
+
     if _WEATHER_KEYWORD.search(message):
         location = _extract_location(message)
         reason = f'偵測到關鍵字「天氣」，判斷地點為「{location}」，查詢 wttr.in'
         try:
-            return reason, f"{location} 目前天氣：{get_weather(location)}"
+            weather = get_weather(location, lang=lang)
+            return reason, _bilingual(
+                lang, f"{location} 目前天氣：{weather}", f"Current weather in {location}: {weather}"
+            )
         except requests.RequestException:
-            return reason, "抱歉，天氣查詢暫時失敗，請稍後再試。"
+            return reason, _bilingual(
+                lang, "抱歉，天氣查詢暫時失敗，請稍後再試。", "Sorry, the weather lookup failed. Please try again later."
+            )
 
     stock_match = _STOCK_KEYWORD.search(message)
     if stock_match:
@@ -692,13 +749,16 @@ def route_reply(message: str) -> tuple[str, str] | None:
     image_source = _image_source_if_requested(message)
     if image_source is not None:
         reason = f'偵測到圖片辨識請求，來源「{image_source}」，呼叫本機 YOLO 模型（web/backend/detector.py）'
-        return reason, recognize_image(image_source)
+        return reason, recognize_image(image_source, lang=lang)
 
     video_query = _video_query_if_requested(message)
     if video_query is not None:
         reason = f'偵測到影片搜尋請求，查詢主題「{video_query}」，查詢 YouTube 搜尋結果'
-        result = youtube_search(video_query)
-        return reason, (result or f"抱歉，沒有找到「{video_query}」的相關影片。")
+        result = youtube_search(video_query, lang=lang)
+        not_found = _bilingual(
+            lang, f"抱歉，沒有找到「{video_query}」的相關影片。", f'Sorry, no videos found for "{video_query}".'
+        )
+        return reason, (result or not_found)
 
     if _is_solve_last_request(message):
         if _last_calculus_problem is None:
@@ -721,7 +781,11 @@ def route_reply(message: str) -> tuple[str, str] | None:
         solved = calculus_solver.parse_and_solve(message)
     except calculus_solver.SolveError as exc:
         reason = "偵測到解題請求，但 sympy 無法求出封閉形式的解"
-        return reason, f"看得懂這題，但 sinco（sympy）目前算不出封閉形式的解：{exc}。可以換一題試試。"
+        return reason, _bilingual(
+            lang,
+            f"看得懂這題，但 sinco（sympy）目前算不出封閉形式的解：{exc}。可以換一題試試。",
+            f"I understood the problem, but sinco (sympy) couldn't find a closed-form solution: {exc}. Try a different one.",
+        )
     if solved is not None:
         _last_calculus_problem = solved
         reason = f'偵測到自由輸入的解題請求，主題「{solved["topic_zh"]}」，呼叫 calculus_solver 解析並用 sympy 計算'
@@ -735,11 +799,14 @@ def route_reply(message: str) -> tuple[str, str] | None:
         subject = m.group(1).strip().strip("的?？!！")
         if not subject or subject.lower() in _SELF_REFERENCE:
             return None
-        result, source = _lookup(subject)
+        result, source = _lookup(subject, lang=lang)
         reason = f'比對到搜尋句型，查詢主題「{subject}」，查詢 {_SOURCE_LABELS[source]}'
         if result is not None:
             auto_learn.save_candidate(prompt=message, reply=result, topic=subject, source=source)
-        return reason, (result or f"抱歉，沒有找到「{subject}」的相關資料。")
+        not_found = _bilingual(
+            lang, f"抱歉，沒有找到「{subject}」的相關資料。", f'Sorry, no information found about "{subject}".'
+        )
+        return reason, (result or not_found)
 
     # 上面都沒比對到、也還不是死心的時候：試著把這句話當成「問 sinco 知不知道
     # X」的隱含查詢句型，而不是直接讓死記式聊天模型硬答一句文不對題的內容。
@@ -755,7 +822,7 @@ def route_reply(message: str) -> tuple[str, str] | None:
             subject = m.group(1).strip().strip("的?？!！")
             if not subject or subject.lower() in _SELF_REFERENCE:
                 continue
-            result, source = _lookup(subject)
+            result, source = _lookup(subject, lang=lang)
             if result is None:
                 continue
             auto_learn.save_candidate(prompt=message, reply=result, topic=subject, source=source)

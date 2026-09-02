@@ -169,8 +169,10 @@ def collect_values(fields: list[Field]) -> dict | None:
     return values
 
 
-def build_argv(fields: list[Field], values: dict) -> list[str]:
+def build_argv(fields: list[Field], values: dict | None) -> list[str]:
     argv = []
+    if values is None:
+        return argv
     for f in fields:
         if f.flag is None:
             continue

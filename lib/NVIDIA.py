@@ -17,9 +17,30 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from lib.components.memory_store import list_memories
+
 MODEL = "nvidia/nemotron-3-ultra-550b-a55b"
 
+# /memory 存的規則／個性（見 lib/components/memory_store.py）平常只是給人用
+# `/memory list` 查看的結構化清單，不會自動影響任何模型的回覆——sinco 是字元級
+# 小模型，本來就沒有指令理解能力，塞了也不會生效；nemotron 是真正的 chat 模型，
+# 才有能力靠 system message 理解並遵守文字規則。所以只有這裡（NVIDIA 雲端模式）
+# 把這兩個分類的記憶現組成 system prompt，每次呼叫都夾帶最新內容——之後使用者
+# 用 `/memory add business_rule ...`／`/memory add developer_preference ...`
+# 新增或用 `/memory del <id>` 刪除，下一次 /model nvidia 對話會自動反映，不用
+# 另外同步。
+_SYSTEM_PROMPT_CATEGORIES = ("business_rule", "developer_preference")
+
 _client: OpenAI | None = None
+
+
+def _system_prompt() -> str | None:
+    entries = [e for category in _SYSTEM_PROMPT_CATEGORIES for e in list_memories(category)]
+    if not entries:
+        return None
+    lines = ["以下是使用者透過 /memory 設定、要求你每次回覆都必須遵守的規則與個性："]
+    lines.extend(f"- {e['text']}" for e in entries)
+    return "\n".join(lines)
 
 
 def _get_client() -> OpenAI:
@@ -36,12 +57,21 @@ def _get_client() -> OpenAI:
 def nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
     """呼叫 NVIDIA 雲端 API（nemotron-3-ultra）取得回覆。
 
-    回傳 (思考過程, 正式回覆) 兩段。請求已經帶 `enable_thinking: True` +
-    `reasoning_budget`，串流的每個 chunk 除了平常的 `delta.content`（正式
-    回覆）之外，推理模型還會多帶一個 `delta.reasoning_content`（模型的
-    思考過程）——這個欄位原本完全沒被讀取，直接被丟掉，所以之前不管
-    `enable_thinking` 有沒有開，使用者都看不到任何思考過程。這裡把兩段
-    分開收集，呼叫端（chats._nvidia_reply()）再決定思考過程要不要顯示。
+    回傳 (思考過程, 正式回覆) 兩段。請求帶 `enable_thinking: True`，串流的
+    每個 chunk 除了平常的 `delta.content`（正式回覆）之外，推理模型還會多帶
+    一個 `delta.reasoning_content`（模型的思考過程）——這個欄位原本完全沒被
+    讀取，直接被丟掉，所以之前不管 `enable_thinking` 有沒有開，使用者都看不到
+    任何思考過程。這裡把兩段分開收集，呼叫端（chats._nvidia_reply()）再決定
+    思考過程要不要顯示。
+
+    **不要加 `reasoning_budget` 到 extra_body**：曾經加過 `"reasoning_budget":
+    16384`（跟 `chat_template_kwargs` 同層），這個模型目前的後端（V2 vLLM
+    model runner）不支援這個參數，非串流呼叫會回乾淨的 400（`ValueError:
+    thinking_token_budget is not yet supported by the V2 model runner`），但
+    串流模式下 NVIDIA 沒把詳細訊息傳回來，openai SDK 只會看到一個空泛的
+    500 `Internal server error`，很容易誤判成金鑰或模型名稱有問題。已用真實
+    金鑰實測確認：只留 `chat_template_kwargs: {enable_thinking: True}`（拿掉
+    `reasoning_budget`）就能正常拿到回覆，`reasoning_content` 依然抓得到。
 
     把串流回應收集成兩個完整字串再回傳（不逐字印到終端機）——呼叫端
     （chats.smart_reply_traced()）是在背景執行緒跑，GUI／CLI 只在整段回覆
@@ -58,6 +88,9 @@ def nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) -> 
     """
     client = _get_client()
     messages = []
+    system_prompt = _system_prompt()
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
     for user_text, reply_text in history or []:
         messages.append({"role": "user", "content": user_text})
         messages.append({"role": "assistant", "content": reply_text})
@@ -69,7 +102,7 @@ def nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) -> 
         temperature=1,
         top_p=0.95,
         max_tokens=16384,
-        extra_body={"chat_template_kwargs": {"enable_thinking": True}, "reasoning_budget": 16384},
+        extra_body={"chat_template_kwargs": {"enable_thinking": True}},
         stream=True,
     )
 

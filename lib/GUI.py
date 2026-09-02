@@ -239,6 +239,12 @@ CODE_FONT_FAMILY = "Consolas"
 chat_display.tag_configure("md_h1", font=(FONT_FAMILY, 15, "bold"), foreground=TEXT_FG, spacing1=10, spacing3=4)
 chat_display.tag_configure("md_h2", font=(FONT_FAMILY, 13, "bold"), foreground=TEXT_FG, spacing1=8, spacing3=3)
 chat_display.tag_configure("md_h3", font=(FONT_FAMILY, 11, "bold"), foreground=TEXT_FG, spacing1=6, spacing3=2)
+# h4~h6：data/pairs.json 裡從 md-chat 匯入的真實回覆偶爾會用到四級以上標題
+# （例如巢狀技術文件的子小節），字級比 h3 更小、顏色轉 MUTED_FG，跟 GitHub
+# README 預覽裡越深層標題越不顯眼的視覺習慣一致。
+chat_display.tag_configure("md_h4", font=(FONT_FAMILY, 10, "bold"), foreground=TEXT_FG, spacing1=5, spacing3=2)
+chat_display.tag_configure("md_h5", font=(FONT_FAMILY, 10, "bold"), foreground=MUTED_FG, spacing1=4, spacing3=2)
+chat_display.tag_configure("md_h6", font=(FONT_FAMILY, 9, "bold"), foreground=MUTED_FG, spacing1=4, spacing3=2)
 chat_display.tag_configure("md_bold", font=(FONT_FAMILY, 10, "bold"), foreground=TEXT_FG)
 chat_display.tag_configure("md_italic", font=(FONT_FAMILY, 10, "italic"), foreground=TEXT_FG)
 chat_display.tag_configure("md_code_inline", font=(CODE_FONT_FAMILY, 9), foreground=ACCENT, background=INPUT_BG)
@@ -248,6 +254,13 @@ chat_display.tag_configure(
 )
 chat_display.tag_configure("md_quote", font=(FONT_FAMILY, 10, "italic"), foreground=MUTED_FG, lmargin1=24, lmargin2=24)
 chat_display.tag_configure("md_bullet", font=(FONT_FAMILY, 10, "bold"), foreground=ACCENT)
+# md_table：表格沒有真正的儲存格排版能力（Tk Text 不支援），改用等寬字型手動
+# 補齊欄寬對齊（見 markdown_view._insert_table()），避免 "| A | B |" 這種原始
+# 管線符號未經對齊、原封不動地露出來。
+chat_display.tag_configure(
+    "md_table", font=(CODE_FONT_FAMILY, 9), foreground=TEXT_FG, background=INPUT_BG,
+    lmargin1=24, lmargin2=24, spacing1=2, spacing3=2,
+)
 
 # message 只在這裡「建構」，特意不 pack——要等 main.py 把 plus/mic/camera 等
 # 按鈕都 pack(side="left") 完，最後才能 pack message(fill="both", expand=True)

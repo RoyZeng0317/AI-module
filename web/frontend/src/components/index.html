@@ -2,19 +2,37 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="color-scheme" content="dark" />
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
+        <title>Sinco AI</title>
         <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
         <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-        <link
-        rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b8cff'/%3E%3Cpath d='M9 21V11l7-4 7 4v10l-7 4-7-4Z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M9 11l7 4 7-4M16 15v10' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"
-        />
-        <title>AI Modules</title>
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d97757'/%3E%3Cpath d='M9 21V11l7-4 7 4v10l-7 4-7-4Z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M9 11l7 4 7-4M16 15v10' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+        <script type="py" src="python.py"></script>
+        <script src="script.js"></script>
+        <script type="module" src="firebase-init.js"></script>
     </head>
     <body>
-        <div id="root"></div>
-        <script type="py" src="action.py"></script>
+        <div class="root" id="root"></div>
+        <div class="box" id="box"></div>
+        <!-- 以下程式碼需要轉換成python -->
+        <!-- 用戶須知 (點選連結後要談出視窗)-->
+        <div class="user">
+            <span>使用者須知</span>
+            <ul>
+                <li>
+                    <li>您是協助開發測試對象，請配合以下幾點:</li>
+                    <li>01.此ai模型全為個人建置屬於測試階段</li>
+                    <li>02.目前功能僅開放聊天功能，寫程式功能還在開發中</li>
+                    <li>03.因ai模型現在開發不完善，欠缺學習功能，因此功能有所限制</li>
+                    <li>04.任何聊天問答過程當中您認為不是您滿意的地方，可以給予回饋</li>
+                    <li>05.模型的開放時間段有限，目前暫定為: 09:00-16:00(後續調整皆會通知)</li>
+                    <li>06.</li>
+                    <li>07.</li>
+                    <li>08.後續功能將會採取收費機制，而您身為協助開發成員，擁有折扣優惠</li>                    
+                </ul>
+            </div>
+            <div class="message-box">
+                <input type="text" >訊息輸入框
+            </div>
     </body>
 </html>

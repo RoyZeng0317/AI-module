@@ -15,6 +15,7 @@ the real project's memory/memory.json.
 from types import SimpleNamespace
 
 import lib.components.cli as cli
+import lib.components.conversation_store as conversation_store
 import lib.components.memory_store as memory_store
 import lib.components.session_store as session_store
 
@@ -150,7 +151,10 @@ def test_run_memory_unknown_subcommand_shows_usage(tmp_path, monkeypatch, capsys
 # ---------------------------------------------------------------------------
 
 def _state(**overrides) -> dict:
-    base = {"out_dir": cli.DEFAULT_OUT_DIR, "persona": cli.DEFAULT_PERSONA, "force_mode": "auto", "history": []}
+    base = {
+        "out_dir": cli.DEFAULT_OUT_DIR, "persona": cli.DEFAULT_PERSONA, "force_mode": "auto", "history": [],
+        "conversation_id": None,
+    }
     base.update(overrides)
     return base
 
@@ -187,6 +191,10 @@ def test_run_model_rejects_unknown_mode_without_changing_state(capsys):
 
 def _isolate_session(tmp_path, monkeypatch):
     monkeypatch.setattr(session_store, "SESSION_PATH", tmp_path / "session.json")
+
+
+def _isolate_conversations(tmp_path, monkeypatch):
+    monkeypatch.setattr(conversation_store, "CONVERSATIONS_PATH", tmp_path / "conversations.json")
 
 
 def test_resume_argument_suggestions_are_clear():
@@ -236,8 +244,52 @@ def test_run_resume_clear_wipes_recorded_session(tmp_path, monkeypatch, capsys):
     assert session_store.load_session(path=session_store.SESSION_PATH) == []
 
 
+def test_run_resume_shows_generated_subject(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("幫我訓練模型", "好的", path=session_store.SESSION_PATH)
+    session_store.record_turn("訓練模型完成了嗎", "還沒", path=session_store.SESSION_PATH)
+
+    cli.run_resume("", _state())
+
+    assert "主旨" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_chat() — /chat 把 session_store 記錄的對話下載成 Markdown 檔案
+# ---------------------------------------------------------------------------
+
+def test_chat_argument_registered_as_builtin_command():
+    assert "chat" in cli._BUILTIN_SLASH_COMMANDS
+
+
+def test_run_chat_with_explicit_path_writes_file(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", path=session_store.SESSION_PATH)
+    target = tmp_path / "exported.md"
+
+    cli.run_chat(str(target))
+
+    assert target.exists()
+    content = target.read_text(encoding="utf-8")
+    assert "你好" in content and "哈囉，我是 sinco" in content
+    assert "已下載對話紀錄" in _printed(capsys)
+
+
+def test_run_chat_without_arg_uses_default_output_dir(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    monkeypatch.setattr(session_store, "OUTPUT_DIR", tmp_path / "output" / "chats")
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+
+    cli.run_chat("")
+
+    saved = list((tmp_path / "output" / "chats").glob("chat_*.md"))
+    assert len(saved) == 1
+    assert "你好" in saved[0].read_text(encoding="utf-8")
+
+
 def test_ask_model_records_turn_to_session(tmp_path, monkeypatch, capsys):
     _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
     monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
 
     cli.ask_model("測試訊息", _state())
@@ -253,6 +305,7 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
     /model nvidia 才接得到之前幾輪當上下文（sinco/code 模式會忽略這個參數，
     見 chats.smart_reply_traced() 的說明，這裡只驗證有傳到，不驗證各模式怎麼用）。"""
     _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
     seen = {}
 
     def fake_smart_reply_traced(message, out_dir, force_mode, history):
@@ -266,3 +319,88 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
 
     assert seen["history"] == [("之前的問題", "之前的回覆")]
     assert state["history"] == [("之前的問題", "之前的回覆"), ("測試訊息", "回覆內容")]
+
+
+def test_ask_model_creates_and_appends_to_shared_conversation(tmp_path, monkeypatch, capsys):
+    """跟 session_store 的 record_turn() 是分開兩件事：這裡驗證 ask_model() 也
+    把這一輪寫進 conversation_store.py 的共用多筆對話（跟 GUI／網頁互通），
+    第一次呼叫沒有 conversation_id 時要自動建立一筆新對話。"""
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+    state = _state()
+
+    cli.ask_model("測試訊息", state)
+
+    assert state["conversation_id"] is not None
+    conv = conversation_store.get_conversation(state["conversation_id"])
+    assert [m["role"] for m in conv["messages"]] == ["user", "assistant"]
+    assert conv["messages"][0]["content"] == "測試訊息"
+    assert conv["messages"][1]["content"] == "回覆內容"
+    assert conv["messages"][0]["persona"] == cli.DEFAULT_PERSONA
+
+
+def test_ask_model_reuses_existing_conversation_id(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+    existing = conversation_store.create_conversation()
+    state = _state(conversation_id=existing["id"])
+
+    cli.ask_model("第一句", state)
+    cli.ask_model("第二句", state)
+
+    assert state["conversation_id"] == existing["id"]
+    conv = conversation_store.get_conversation(existing["id"])
+    assert len(conv["messages"]) == 4  # 兩輪 user+assistant，沒有另外建立新對話
+
+
+# ---------------------------------------------------------------------------
+# run_conversations() — /conversations，跟 GUI（test_command.py 的
+# _run_conversations 對應測試）、網頁側邊欄共用同一份 conversation_store.py。
+# ---------------------------------------------------------------------------
+
+def test_conversations_argument_registered_as_builtin_command():
+    assert "conversations" in cli._BUILTIN_SLASH_COMMANDS
+
+
+def test_conversations_argument_suggestions_are_the_subcommands():
+    assert cli._arg_suggestions("conversations") == ["list", "new", "open"]
+
+
+def test_run_conversations_list_reports_empty(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    cli.run_conversations("", _state())
+    assert "沒有任何對話紀錄" in _printed(capsys)
+
+
+def test_run_conversations_new_creates_and_switches_current_conversation(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    state = _state()
+
+    cli.run_conversations("new", state)
+
+    assert state["conversation_id"] is not None
+    assert conversation_store.list_conversations()[0]["id"] == state["conversation_id"]
+    assert "已建立新對話" in _printed(capsys)
+
+
+def test_run_conversations_open_restores_history_from_shared_store(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "你好", persona="sinco", mode="auto")
+    conversation_store.append_message(conv["id"], "assistant", "哈囉，我是 sinco", persona="sinco", mode="auto")
+    state = _state()
+
+    cli.run_conversations(f"open {conv['id']}", state)
+
+    assert state["conversation_id"] == conv["id"]
+    assert state["history"] == [("你好", "哈囉，我是 sinco")]
+    printed = _printed(capsys)
+    assert "你好" in printed and "哈囉，我是 sinco" in printed
+
+
+def test_run_conversations_open_unknown_id_reports_error(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    cli.run_conversations("open not-a-real-id", _state())
+    assert "找不到對話" in _printed(capsys)

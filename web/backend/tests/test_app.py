@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
+from web.backend import app as app_module
 from web.backend.app import app
 
 client = TestClient(app)
@@ -29,6 +30,15 @@ def test_public_assets_served():
         assert r.status_code == 200
 
 
+def test_public_assets_are_not_browser_cached():
+    # 手機瀏覽器（例如三星瀏覽器）沒有桌面 DevTools 的 disable-cache 選項，
+    # 改完 action.py 之後使用者沒辦法方便地手動清快取，靠這個標頭讓瀏覽器
+    # 每次都重新驗證，避免又吃到修正前的舊版程式碼跑在瀏覽器裡。
+    for path in ("/", "/action.py"):
+        r = client.get(path)
+        assert r.headers["cache-control"] == "no-cache"
+
+
 def test_source_and_data_dirs_not_exposed():
     for path in ("/src/.env", "/src/components/machine_learning.py", "/data/basic_data.sql"):
         r = client.get(path)
@@ -45,7 +55,59 @@ def test_chat_endpoint_returns_reply_from_self_built_model():
         r = client.post("/api/chat", json={"message": "hello"})
     mock_smart_reply.assert_called_once_with("hello")
     assert r.status_code == 200
-    assert r.json() == {"reply": "hi there"}
+    assert r.json() == {"reply": "hi there", "conversation_id": None}
+
+
+def test_chat_endpoint_without_conversation_id_does_not_persist(tmp_path, monkeypatch):
+    # 舊的呼叫方式（沒帶 conversation_id）要維持無狀態行為——不能因為新增
+    # 了對話紀錄功能，就逼著沒更新的呼叫端也得先建立一筆對話才能用 /api/chat。
+    monkeypatch.setattr("web.backend.app.convo_store.CONVERSATIONS_PATH", tmp_path / "conversations.json")
+    with patch("web.backend.app.smart_reply", return_value="hi there"):
+        client.post("/api/chat", json={"message": "hello"})
+    assert app_module.convo_store.list_conversations() == []
+
+
+def test_chat_endpoint_rejects_unknown_conversation_id():
+    r = client.post("/api/chat", json={"message": "hello", "conversation_id": "not-a-real-id"})
+    assert r.status_code == 404
+
+
+def test_conversation_lifecycle_create_chat_get_delete(tmp_path, monkeypatch):
+    monkeypatch.setattr("web.backend.app.convo_store.CONVERSATIONS_PATH", tmp_path / "conversations.json")
+
+    created = client.post("/api/conversations").json()
+    conv_id = created["id"]
+    assert created["title"] == "新對話"
+
+    with patch("web.backend.app.smart_reply", return_value="嗨，我是 sinco"):
+        chat_resp = client.post(
+            "/api/chat", json={"message": "你好", "conversation_id": conv_id}
+        )
+    assert chat_resp.status_code == 200
+    assert chat_resp.json() == {"reply": "嗨，我是 sinco", "conversation_id": conv_id}
+
+    fetched = client.get(f"/api/conversations/{conv_id}").json()
+    assert [m["role"] for m in fetched["messages"]] == ["user", "assistant"]
+    assert fetched["title"] == "你好"
+
+    listed = client.get("/api/conversations").json()
+    assert any(c["id"] == conv_id for c in listed)
+
+    renamed = client.patch(f"/api/conversations/{conv_id}", json={"title": "重新命名"}).json()
+    assert renamed["title"] == "重新命名"
+
+    cleared = client.post(f"/api/conversations/{conv_id}/clear").json()
+    assert cleared["messages"] == []
+
+    assert client.delete(f"/api/conversations/{conv_id}").status_code == 200
+    assert client.get(f"/api/conversations/{conv_id}").status_code == 404
+
+
+def test_conversation_endpoints_404_for_unknown_id():
+    assert client.get("/api/conversations/not-a-real-id").status_code == 404
+    assert client.patch("/api/conversations/not-a-real-id", json={"title": "x"}).status_code == 404
+    assert client.post("/api/conversations/not-a-real-id/clear").status_code == 404
+    assert client.delete("/api/conversations/not-a-real-id").status_code == 404
 
 
 def test_detect_endpoint_returns_real_detections():

@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from chats import DEFAULT_OUT_DIR, smart_reply_traced  # noqa: E402
 from lib.components.function import read_as_chat_content  # noqa: E402
 from lib.components.markdown_view import insert_markdown  # noqa: E402
+import lib.components.conversation_store as convo_store  # noqa: E402
 from lib.components.session_store import record_turn  # noqa: E402
 from speech_to_text import SAMPLE_RATE, recognize_waveform  # noqa: E402
 
@@ -119,6 +120,11 @@ class Conversation:
         self.on_ask_start = on_ask_start
         self.busy = False
         self.history: list[tuple[str, str]] = []  # [(使用者訊息, sinco回覆), ...]，只保留最近 MAX_HISTORY_TURNS 輪
+        # 目前寫入的 conversation_store.py 對話 id——None 代表這個視窗還沒送出
+        # 過第一句話，ask() 拿到第一輪回覆時才會用 create_conversation() 補上，
+        # 不用一開機就先建一筆空對話。/conversations new、/conversations open
+        # （command.py）會改這個值來新增/切換對話。
+        self.conversation_id: Optional[str] = None
 
         # /model（CLAUDE.md 需求 #01）：手動覆蓋 chats.smart_reply_traced() 的
         # chat/code/nvidia 路由，"auto" = 維持既有行為。ask() 的 worker() 會把
@@ -188,6 +194,16 @@ class Conversation:
                     # 還原到這一輪——跟上面 self.history 不同，這裡是寫檔案，
                     # 不會隨程式關閉而消失。
                     record_turn(record_as, reply, persona=self.persona, mode=self.force_mode)
+                    # 同時落地到 conversation_store.py（跟 CLI、網頁共用同一份
+                    # memory/conversations.json）——沒有目前對話就先建一筆，
+                    # 讓「開機後第一句話」自動起算成一筆新對話，不用先手動
+                    # /conversations new。
+                    if self.conversation_id is None:
+                        self.conversation_id = convo_store.create_conversation()["id"]
+                    convo_store.append_message(self.conversation_id, "user", record_as,
+                                                persona=self.persona, mode=self.force_mode)
+                    convo_store.append_message(self.conversation_id, "assistant", reply,
+                                                persona=self.persona, mode=self.force_mode)
 
             self.windows.after(0, show_result)
 

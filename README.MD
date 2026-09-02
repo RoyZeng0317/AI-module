@@ -2,6 +2,36 @@
 
 私人自建 AI 專案。核心規則：**禁止使用其他 AI 模型或雲端 API**（不呼叫 Claude／GPT／任何 LLM API），所有模型都自己從零設計、從零訓練，算力上限抓 **RTX 4060 8GB**，目前僅供個人使用，不考慮對外公開。完整規則見 [`CLAUDE.md`](CLAUDE.md)。
 
+## 使用大綱
+
+三個前端外殼共用同一套對話邏輯（`tranning/chats.py` 的 `smart_reply()`），差別只在介面：
+
+| 前端 | 啟動指令 | 說明 |
+|---|---|---|
+| 桌面 GUI | `python -m lib.main`（在專案根目錄執行） | Tk 主視窗，暗色主題，支援語音、攝影機面板、斜線指令自動完成 |
+| 終端機 CLI | `python lib/components/cli.py`<br>`python lib/components/cli.py --character 角色名` | 外觀仿終端機聊天工具，功能與桌面版同步 |
+| Web API | 見下方「Web 版本」 | FastAPI 後端 + 靜態前端 demo |
+
+**斜線指令**（桌面 GUI／CLI 通用，輸入 `/` 後會跳出建議清單，`Tab`／`↑↓` 選取）：
+
+- `/model auto|sinco|code|nvidia`：切換回覆走哪個模型（預設 `auto`＝一般聊天走 sinco、程式碼請求走 code 模型；`nvidia` 需另外設定 `NVIDIA_API_KEY`，是 Rule 06 唯一的外部 API 例外）
+- `/character`：另開獨立視窗（`character_browser.py`）選擇角色人格；未選角色時維持一般 sinco 模型
+- `/memory`：讀寫 `memory/memory.json` 的持久記憶
+- `/init`：掃描專案檔案樹，產生/更新 `CLAUDE.md`
+- `/learn`、`/resume`、`/chat`、`/conversations`、`/clear`：學習樣本回饋、繼續/切換對話紀錄、清空畫面
+- 其餘指令（`/rules`、`/BugFix`、`/Architecture`…）讀自 `app/command/*.md`，純粹是「讀出來當提示詞餵給模型」，不是會改變狀態的真指令
+
+**RAG 檢索問答**（`lib/RAG.py`，目前是獨立模組，尚未接進三個前端）：
+
+```python
+from lib.RAG import ingest_paths, rag_reply
+
+ingest_paths([Path("some_doc.txt")])   # 切塊、用自訓 embedding 模型存進本地 chromadb
+rag_reply("問題內容")                    # 檢索相關片段後交給 smart_reply_traced() 回答
+```
+
+**模型訓練**：見下方「sinco 聊天模型」與「訓練骨架」章節的指令，或直接查 [`CLAUDE.md`](CLAUDE.md) 的「常用指令」。
+
 ## 目錄結構
 
 ```
@@ -51,16 +81,18 @@ python tranning/chats.py --data data/code_pairs.json --out-dir tranning/code_run
 python tranning/chats.py --chat
 ```
 
-### 2. 桌面 GUI — `app/command/home_screen.py`
+### 2. 桌面 GUI — `lib/main.py`
+
+> ⚠️ 舊路徑 `app/components/`／`app/components/main.py` 已整個搬到 `lib/components/`／`lib/main.py`，此節已更新為現況（其餘尚未同步的段落見 [`CLAUDE.md`](CLAUDE.md) 說明）。
 
 Tkinter 聊天視窗，串接 sinco 的 `smart_reply_traced()`。
 
-- `/` 開頭會跳出指令建議清單，指令內容取自同資料夾內的 `*.md` 檔（讀出來當提示詞餵給模型）
+- `/` 開頭會跳出指令建議清單，內建指令（`/model`、`/memory`、`/init`、`/character`…）在 `lib/components/command.py`，其餘讀自 `app/command/*.md`（讀出來當提示詞餵給模型）
 - **Tab** 補全、**↑/↓** 在建議清單中移動反白、**Enter** 送出
 - 送出訊息後會先顯示「思考中…」，背景執行緒跑完模型/查詢後才換成真正的回覆，避免視窗被凍住
 - 「+」按鈕可以開啟本機檔案（含 `.md`）餵給模型當上下文
 
-啟動：`python app/command/home_screen.py`
+啟動（需在專案根目錄執行）：`python -m lib.main`
 
 ### 3. 安裝前置檢查 — `app/install/`
 

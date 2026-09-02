@@ -26,6 +26,7 @@ import torch.nn.functional as F
 
 from bpe_tokenizer import BPETokenizer, EOS, SEP
 from transformer_chat import GPT, DEFAULT_FINETUNE_DIR
+from reward_model import DEFAULT_REWARD_DIR, load_reward_model, score as rm_score
 
 DEFAULT_GRPO_DIR = Path(__file__).resolve().parent / "gpt_grpo_runs"
 
@@ -133,7 +134,8 @@ def _sequence_logprobs(model: GPT, prompt_ids: list[int], completion_ids: list[i
 def grpo_train(data_path: Path, base_dir: Path = DEFAULT_FINETUNE_DIR,
                out_dir: Path = DEFAULT_GRPO_DIR, steps: int = 50, group_size: int = 4,
                max_new_tokens: int = 64, temperature: float = 0.8, lr: float = 1e-5,
-               beta: float = 0.04, save_every: int = 10, device: str | None = None):
+               beta: float = 0.04, save_every: int = 10, device: str | None = None,
+               reward_mode: str = "rule", reward_model_dir: Path = DEFAULT_REWARD_DIR):
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
     loaded = _load_policy(base_dir, device)
@@ -148,6 +150,18 @@ def grpo_train(data_path: Path, base_dir: Path = DEFAULT_FINETUNE_DIR,
     ref_model = copy.deepcopy(model).to(device).eval()
     for p in ref_model.parameters():
         p.requires_grad_(False)
+
+    # reward_mode="learned" 用 reward_model.py 訓練出來的成對偏好 reward model
+    # 取代下面規則式的 total_reward()；rm_block_size 特意跟 policy 的
+    # block_size 分開存，因為兩顆 checkpoint 的設定可能不同。
+    rm, rm_tokenizer, rm_block_size = None, None, None
+    if reward_mode == "learned":
+        rm_loaded = load_reward_model(reward_model_dir, device)
+        if rm_loaded is None:
+            print(f"尚未找到可用的 reward model checkpoint：{reward_model_dir}\n"
+                  "請先執行 `python reward_model.py --data data/reward_pairs.jsonl ...` 訓練一個。")
+            return None
+        rm, rm_tokenizer, rm_block_size = rm_loaded
 
     examples = load_prompts(data_path)
     if not examples:
@@ -166,8 +180,13 @@ def grpo_train(data_path: Path, base_dir: Path = DEFAULT_FINETUNE_DIR,
         completions = [_sample_completion(model, prompt_ids, block_size, max_new_tokens,
                                            temperature, device) for _ in range(group_size)]
         texts = [tokenizer.decode(c) for c in completions]
-        rewards = torch.tensor([total_reward(t, example["target_answer"]) for t in texts],
-                                dtype=torch.float32)
+        if reward_mode == "learned":
+            rewards = torch.tensor(
+                [rm_score(rm, rm_tokenizer, example["prompt"], t, rm_block_size, device) for t in texts],
+                dtype=torch.float32)
+        else:
+            rewards = torch.tensor([total_reward(t, example["target_answer"]) for t in texts],
+                                    dtype=torch.float32)
 
         mean_r, std_r = rewards.mean(), rewards.std()
         loss_val = None
@@ -232,10 +251,14 @@ def main():
     parser.add_argument("--lr", type=float, default=1e-5)
     parser.add_argument("--beta", type=float, default=0.04, help="KL 懲罰係數")
     parser.add_argument("--save-every", type=int, default=10)
+    parser.add_argument("--reward-mode", choices=["rule", "learned"], default="rule",
+                         help="rule=規則式 reward（預設，向後相容）；learned=用 reward_model.py 訓練出來的偏好模型")
+    parser.add_argument("--reward-model-dir", type=Path, default=DEFAULT_REWARD_DIR)
     args = parser.parse_args()
 
     grpo_train(args.data, args.base_dir, args.out_dir, args.steps, args.group_size,
-               args.max_new_tokens, args.temperature, args.lr, args.beta, args.save_every)
+               args.max_new_tokens, args.temperature, args.lr, args.beta, args.save_every,
+               reward_mode=args.reward_mode, reward_model_dir=args.reward_model_dir)
 
 
 if __name__ == "__main__":

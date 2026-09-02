@@ -46,5 +46,29 @@
     "topic": "Python",
     "source": "duckduckgo",
     "created_at": "2026-08-03T11:34:26+00:00"
+  },
+  {
+    "id": "72659c2f",
+    "prompt": "你知道三星最新款的手機與手錶?",
+    "reply": "三星最新款的手機與手錶 相關資料。",
+    "topic": "三星最新款的手機與手錶",
+    "source": "duckduckgo",
+    "created_at": "2026-08-24T16:10:06+00:00"
+  },
+  {
+    "id": "4bc20c20",
+    "prompt": "你懂量子力學嗎",
+    "reply": "量子力學- 維基百科，自由的百科全書：量子力學（quantum mechanics）是物理學的分支學科。它描述原子尺度及原子尺度以下的自然行為 : 1.1 。 它是所有量子物理學的基礎，包括量子化學、量子場論、量子技術和 ...（https://zh.wikipedia.org/zh-hant/%E9%87%8F%E5%AD%90%E5%8A%9B%E5%AD%A6）\n量子力學簡單解釋｜Quantum Mechanics Explained Simply：量子力學的簡單解釋：從雙縫實驗的波粒二象性，到量子疊加、糾纏，再到量子計算與未來科技。用通俗易懂的方式，為你講述為什麼現實比科幻更奇妙。（https://www.youtube.com/watch?v=SmEYguFPgdk）\n數學傳播| 機率學者看量子力學：量子力學的機率觀點接受了(二), 我們現在敘述目前被普遍接受的量子力學之機率觀點; 它是Max Born (1882 , 我們設量子系為含有n 個量子態的系統。（https://www.math.sinica.edu.tw/mathmedia/journals/4881）",
+    "topic": "量子力學",
+    "source": "general_search",
+    "created_at": "2026-08-24T16:21:12+00:00"
+  },
+  {
+    "id": "0593890c",
+    "prompt": "你會編寫python程式語言嗎?",
+    "reply": "Python 教學基礎篇：初學者「一定要會」的基本語法與符號：Python 教學攻略來了！本文囊括初學者必學的基本語法與符號,如元祖,邏輯判斷式與迴圈等基礎Python 教學,搭配巨匠電腦的課程輕鬆上手Python 吧！\nhttps://www.pcschool.com.tw/blog/it/must-learn-about-python\n\n什麼是Python？ – Python 語言介紹：Python 是一種廣泛使用的程式設計語言，用於Web 應用程式、軟體開發、資料科學與機器學習(ML)。開發人員使用Python 的原因，在於Python 效率高又容易學習，並且可以在 ...\nhttps://aws.amazon.com/tw/what-is/python/\n\nPython - 維基百科，自由的百科全書：Python（英語發音：/ˈpaɪθən/； 英語發音：/ˈpaɪθɑːn/），是一種廣泛使用的直譯式、進階和通用的程式語言。Python支援多種程式設計範式，包括結構化、程序式、反射式、 ...\nhttps://zh.wikipedia.org/zh-tw/Python",
+    "topic": "編寫python程式語言",
+    "source": "general_search",
+    "created_at": "2026-08-29T06:55:56+00:00"
   }
 ]

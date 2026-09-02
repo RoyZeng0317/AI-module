@@ -12,10 +12,12 @@ import numpy as np
 import pytest
 
 from dataset_import import (
+    collect_md_chat,
     collect_pairs,
     collect_sidecar,
     extract_video_frames,
     is_16bit_pcm_wav,
+    parse_md_chat,
     split_prompt_reply,
     write_manifest,
 )
@@ -142,6 +144,100 @@ def test_write_manifest_merges_and_dedupes_existing_file(tmp_path):
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data.count({"prompt": "new", "reply": "新資料"}) == 1
     assert {"prompt": "old", "reply": "既有資料"} in data
+
+
+_MD_CHAT_SAMPLE = """# Demo Chat
+
+**Date**: August 23, 2026
+**Turns**: 4
+**Source**: [Gemini Chat](https://example.com)
+
+---
+
+## Turn 1
+
+### 👤 使用者
+
+第一句沒有立刻被回覆
+
+
+## Turn 2
+
+### 👤 使用者
+
+補充一句接著問
+
+### 🤖 助理
+
+這是助理的回覆，包含子標題：
+
+### 📚 子標題不應該被誤判成下一輪對話
+
+這段內容應該留在同一個回覆裡面
+
+## Turn 3
+
+### 👤 使用者
+
+這句話助理回了逐字重複的內容（模擬匯出工具的 bug）
+
+### 🤖 助理
+
+這是助理的回覆，包含子標題：
+
+### 📚 子標題不應該被誤判成下一輪對話
+
+這段內容應該留在同一個回覆裡面
+
+## Turn 4
+
+### 👤 使用者
+
+最後一句沒有回覆，應該被丟棄
+
+---
+
+*Exported from [Voyager](https://github.com/Nagi-ovo/voyager)*
+*Generated on August 23, 2026*
+"""
+
+
+def test_parse_md_chat_joins_consecutive_user_turns_until_a_reply():
+    entries = parse_md_chat(_MD_CHAT_SAMPLE)
+
+    assert entries[0] == {
+        "prompt": "第一句沒有立刻被回覆\n補充一句接著問",
+        "reply": "這是助理的回覆，包含子標題：\n\n### 📚 子標題不應該被誤判成下一輪對話\n\n這段內容應該留在同一個回覆裡面",
+    }
+
+
+def test_parse_md_chat_dedupes_exact_duplicate_replies():
+    entries = parse_md_chat(_MD_CHAT_SAMPLE)
+
+    # Turn 3 造出跟 Turn 2 逐字相同的助理回覆（模擬匯出工具的重複 bug），
+    # 且 Turn 4 只有使用者訊息、沒有回覆可配對 -> 應該只剩下 Turn 2 這一組。
+    assert len(entries) == 1
+
+
+def test_parse_md_chat_drops_trailing_user_only_turn():
+    entries = parse_md_chat(_MD_CHAT_SAMPLE)
+
+    assert all("最後一句沒有回覆" not in e["prompt"] for e in entries)
+
+
+def test_parse_md_chat_no_turns_returns_empty_list():
+    assert parse_md_chat("# 只有標題，沒有任何 Turn") == []
+
+
+def test_collect_md_chat_reads_folder_and_skips_files_without_pairs(tmp_path):
+    (tmp_path / "chat.md").write_text(_MD_CHAT_SAMPLE, encoding="utf-8")
+    (tmp_path / "empty.md").write_text("# 沒有任何對話內容", encoding="utf-8")
+
+    entries, skipped = collect_md_chat(tmp_path)
+
+    assert len(entries) == 1
+    assert len(skipped) == 1
+    assert "empty.md" in skipped[0]
 
 
 def test_extract_video_frames_writes_per_class_images(tmp_path):

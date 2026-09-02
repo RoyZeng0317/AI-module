@@ -9,6 +9,7 @@ transformer_chat.py SFT checkpoint.
 
 import json
 
+from reward_model import train_reward_model
 from train_grpo import (
     accuracy_reward,
     grpo_train,
@@ -97,6 +98,38 @@ def test_grpo_train_runs_end_to_end(tmp_path):
     assert (out_dir / "config.json").exists()
     assert (out_dir / "bpe_vocab.json").exists()
     assert (out_dir / "history.json").exists()
+
+
+def _make_reward_pairs_file(tmp_path):
+    pairs = [
+        {"prompt": "試問(35 + 45) * 12 =?", "chosen": "Final Answer: 960", "rejected": "我不知道"},
+    ] * 8
+    data_path = tmp_path / "reward_pairs.jsonl"
+    data_path.write_text("\n".join(json.dumps(p, ensure_ascii=False) for p in pairs) + "\n",
+                          encoding="utf-8")
+    return data_path
+
+
+def test_grpo_train_with_learned_reward_mode_runs_end_to_end(tmp_path):
+    """證明 --reward-mode learned 在 CLI/grpo_train() 這一層真的接得起來
+    （不是只有 reward_model.py 自己的管線能跑），train_grpo.py 換一顆學習型
+    reward model 一樣能跑完整個 GRPO rollout。"""
+    finetune_dir = _make_finetune_checkpoint(tmp_path)
+    reward_pairs_path = _make_reward_pairs_file(tmp_path)
+    reward_model_dir = tmp_path / "reward_runs"
+    train_reward_model(data_path=reward_pairs_path, base_dir=finetune_dir, out_dir=reward_model_dir,
+                        epochs=3, batch_size=4, val_split=0.2, patience=5)
+
+    data_path = _make_sft_agent_data(tmp_path)
+    out_dir = tmp_path / "grpo_runs"
+
+    model, tokenizer, history = grpo_train(
+        data_path=data_path, base_dir=finetune_dir, out_dir=out_dir,
+        steps=3, group_size=2, max_new_tokens=6, save_every=1,
+        reward_mode="learned", reward_model_dir=reward_model_dir,
+    )
+
+    assert len(history) == 3
 
 
 def test_grpo_train_without_checkpoint_returns_none(tmp_path):

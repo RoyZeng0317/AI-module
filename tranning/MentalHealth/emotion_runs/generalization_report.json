@@ -1,0 +1,386 @@
+[
+  {
+    "text": "今天在超商排隊時遇到插隊的人，心裡悶了一整天",
+    "actual_score": 2,
+    "predicted_score": 1.98,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天過的很美好",
+    "actual_score": 5,
+    "predicted_score": 3.74,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天收到網購的書籍，翻了一下覺得內容很吸引人",
+    "actual_score": 4,
+    "predicted_score": 3.89,
+    "predicted_label": 4
+  },
+  {
+    "text": "為什麼每個人都對我有這麼高的期待，我快崩潰了",
+    "actual_score": 1,
+    "predicted_score": 2.12,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天跟貓咪玩了好久，心情被治癒了",
+    "actual_score": 4,
+    "predicted_score": 4.03,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天收到了一封客戶的肯定訊息，覺得努力被看見了",
+    "actual_score": 4,
+    "predicted_score": 3.89,
+    "predicted_label": 4
+  },
+  {
+    "text": "每次跟某個朋友聊天過後，都會陷入嚴重的自我懷疑",
+    "actual_score": 2,
+    "predicted_score": 2.45,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天晚上看了場好笑的脫口秀，大笑之後壓力釋放了不少",
+    "actual_score": 4,
+    "predicted_score": 3.87,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天看了一部好笑的喜劇電影，大笑之後心情好多了",
+    "actual_score": 4,
+    "predicted_score": 4.36,
+    "predicted_label": 4
+  },
+  {
+    "text": "每天都覺得時間不夠用，壓力大到快要窒息",
+    "actual_score": 2,
+    "predicted_score": 1.6,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天傍晚的天空有很漂亮的雲彩，拍了好幾張照片",
+    "actual_score": 4,
+    "predicted_score": 3.67,
+    "predicted_label": 4
+  },
+  {
+    "text": "謝謝家人今天準備的晚餐，心裡暖暖的",
+    "actual_score": 4,
+    "predicted_score": 3.72,
+    "predicted_label": 4
+  },
+  {
+    "text": "覺得自己被邊緣化了，在團體中格格不入",
+    "actual_score": 2,
+    "predicted_score": 1.96,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天洗完頭用了一直捨不得用的護發素，頭髮好柔順",
+    "actual_score": 4,
+    "predicted_score": 3.15,
+    "predicted_label": 3
+  },
+  {
+    "text": "今天試著寫了十分鐘的手帳，把雜亂的心情梳理了一下",
+    "actual_score": 4,
+    "predicted_score": 4.0,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天把房間的鏡子擦得乾乾淨淨，照鏡子時心情好多了",
+    "actual_score": 4,
+    "predicted_score": 4.32,
+    "predicted_label": 4
+  },
+  {
+    "text": "每次情緒上來時就想把自己關在房間裡，誰也不想見",
+    "actual_score": 2,
+    "predicted_score": 1.97,
+    "predicted_label": 2
+  },
+  {
+    "text": "覺得自己的人生毫無價值，像個廢物一樣",
+    "actual_score": 1,
+    "predicted_score": 2.03,
+    "predicted_label": 2
+  },
+  {
+    "text": "我是不是不夠好?",
+    "actual_score": 2,
+    "predicted_score": 1.83,
+    "predicted_label": 2
+  },
+  {
+    "text": "覺得自己像個廢物一樣，連最簡單的家事都拖延不做",
+    "actual_score": 2,
+    "predicted_score": 2.03,
+    "predicted_label": 2
+  },
+  {
+    "text": "每次深夜情緒崩潰堤時，都覺得自己是世界上最孤獨的人",
+    "actual_score": 1,
+    "predicted_score": 1.23,
+    "predicted_label": 1
+  },
+  {
+    "text": "今天去超商剛好買到最後一份熱便當，覺得好幸運",
+    "actual_score": 4,
+    "predicted_score": 3.28,
+    "predicted_label": 3
+  },
+  {
+    "text": "腦海裡總是不斷放大自己的缺點，覺得自己一無是處",
+    "actual_score": 2,
+    "predicted_score": 1.94,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天早上記得帶環保袋，出門買東西很順利",
+    "actual_score": 4,
+    "predicted_score": 4.0,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天把陽台的植物澆了水，看到新長出的嫩葉很開心",
+    "actual_score": 4,
+    "predicted_score": 4.11,
+    "predicted_label": 4
+  },
+  {
+    "text": "看著鏡子裡的自己，突然覺得好陌生、好疲憊",
+    "actual_score": 2,
+    "predicted_score": 2.01,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天中午去吃了一直想嚐試的小吃，意外地很好吃",
+    "actual_score": 4,
+    "predicted_score": 4.21,
+    "predicted_label": 4
+  },
+  {
+    "text": "對身邊的一切都感到不耐煩，脾氣變得好暴躁",
+    "actual_score": 2,
+    "predicted_score": 1.9,
+    "predicted_label": 2
+  },
+  {
+    "text": "難道喜歡也是一種錯嗎?",
+    "actual_score": 2,
+    "predicted_score": 3.02,
+    "predicted_label": 3
+  },
+  {
+    "text": "今天把客廳的地板拖得乾乾淨淨，赤腳踩著好舒服",
+    "actual_score": 4,
+    "predicted_score": 3.98,
+    "predicted_label": 4
+  },
+  {
+    "text": "覺得自己的人生徹底失敗，找不到任何出口",
+    "actual_score": 1,
+    "predicted_score": 1.82,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天準時下班回家追劇，享受了悠閒的夜晚",
+    "actual_score": 4,
+    "predicted_score": 4.13,
+    "predicted_label": 4
+  },
+  {
+    "text": "覺得自己是一顆被世界遺棄的螺絲釘，哪裡也塞不進去",
+    "actual_score": 1,
+    "predicted_score": 1.25,
+    "predicted_label": 1
+  },
+  {
+    "text": "今天把房間的穿衣鏡擦得光亮，照鏡子心情變好了",
+    "actual_score": 4,
+    "predicted_score": 4.02,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天早上記得帶環保袋，出門買東西很順利",
+    "actual_score": 4,
+    "predicted_score": 4.0,
+    "predicted_label": 4
+  },
+  {
+    "text": "心裡明明有很多話想說，但打出來又全部刪掉",
+    "actual_score": 2,
+    "predicted_score": 2.08,
+    "predicted_label": 2
+  },
+  {
+    "text": "每次看到別人成雙成對，就覺得自己的孤單被無限放大",
+    "actual_score": 2,
+    "predicted_score": 2.22,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天去超商買到了想喝的季節限定飲品，覺得很幸運",
+    "actual_score": 4,
+    "predicted_score": 3.87,
+    "predicted_label": 4
+  },
+  {
+    "text": "跟久違的老朋友通電話，聊得很開心",
+    "actual_score": 4,
+    "predicted_score": 3.56,
+    "predicted_label": 4
+  },
+  {
+    "text": "總覺得自己無論多努力，在主管眼裡永遠都是不合格的",
+    "actual_score": 2,
+    "predicted_score": 1.97,
+    "predicted_label": 2
+  },
+  {
+    "text": "我就這麼糟糕嗎?",
+    "actual_score": 2,
+    "predicted_score": 1.59,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天試著做了幾分鐘的深呼吸冥想，心跳慢慢平穩下來",
+    "actual_score": 4,
+    "predicted_score": 3.32,
+    "predicted_label": 3
+  },
+  {
+    "text": "每到晚上就開始焦慮，完全不知道明天該怎麼面對",
+    "actual_score": 2,
+    "predicted_score": 2.11,
+    "predicted_label": 2
+  },
+  {
+    "text": "不夠完美",
+    "actual_score": 2,
+    "predicted_score": 2.43,
+    "predicted_label": 2
+  },
+  {
+    "text": "總覺得別人都在背後議論我的外表和身材，好焦慮",
+    "actual_score": 2,
+    "predicted_score": 2.04,
+    "predicted_label": 2
+  },
+  {
+    "text": "覺得自己就像陀螺一樣被逼著轉，完全停不下來",
+    "actual_score": 2,
+    "predicted_score": 1.44,
+    "predicted_label": 1
+  },
+  {
+    "text": "今天晚上聽著喜歡的輕音樂入睡，沒有失眠",
+    "actual_score": 4,
+    "predicted_score": 3.95,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天學會了一個新的實用快捷鍵，工作效率提高不少",
+    "actual_score": 4,
+    "predicted_score": 3.46,
+    "predicted_label": 3
+  },
+  {
+    "text": "主管今天當著大家的面指責我，我覺得自己好沒用",
+    "actual_score": 1,
+    "predicted_score": 2.54,
+    "predicted_label": 3
+  },
+  {
+    "text": "感覺自己隨時會窒息，壓力大到極點",
+    "actual_score": 1,
+    "predicted_score": 1.34,
+    "predicted_label": 1
+  },
+  {
+    "text": "今天陽光普照，出門散步心情變得很好",
+    "actual_score": 4,
+    "predicted_score": 4.24,
+    "predicted_label": 4
+  },
+  {
+    "text": "好焦慮",
+    "actual_score": 2,
+    "predicted_score": 2.56,
+    "predicted_label": 3
+  },
+  {
+    "text": "今天早上記得帶傘，剛好躲過了一場大雨",
+    "actual_score": 4,
+    "predicted_score": 3.49,
+    "predicted_label": 3
+  },
+  {
+    "text": "對未來一點目標也沒有，每天都在浪費時間",
+    "actual_score": 2,
+    "predicted_score": 1.88,
+    "predicted_label": 2
+  },
+  {
+    "text": "最近常失眠，半夜醒來腦中一直想事情",
+    "actual_score": 2,
+    "predicted_score": 2.49,
+    "predicted_label": 2
+  },
+  {
+    "text": "覺得自己的人生是一場徹底的災難，沒救了",
+    "actual_score": 1,
+    "predicted_score": 1.44,
+    "predicted_label": 1
+  },
+  {
+    "text": "只要想到明天的排程跟會議，胸口就開始悶了起來",
+    "actual_score": 2,
+    "predicted_score": 2.12,
+    "predicted_label": 2
+  },
+  {
+    "text": "覺得自己的人生就像一場荒謬的鬧劇，找不到意義",
+    "actual_score": 2,
+    "predicted_score": 1.68,
+    "predicted_label": 2
+  },
+  {
+    "text": "今天散步時看到夕陽把天空染成粉紅色，覺得很美",
+    "actual_score": 4,
+    "predicted_score": 4.05,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天把散落各處的充電線整理好，看了神清氣爽",
+    "actual_score": 4,
+    "predicted_score": 3.87,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天把車子拿去洗乾淨了，亮晶晶的看了心情真好",
+    "actual_score": 4,
+    "predicted_score": 4.28,
+    "predicted_label": 4
+  },
+  {
+    "text": "今天晚餐自己煎了牛排，熟度剛剛好覺得自己很有天分",
+    "actual_score": 4,
+    "predicted_score": 3.58,
+    "predicted_label": 4
+  },
+  {
+    "text": "每次要回覆主管的訊息前都要猶豫很久，好怕自己說錯話",
+    "actual_score": 2,
+    "predicted_score": 1.9,
+    "predicted_label": 2
+  },
+  {
+    "text": "一想到明天要上班就開始心跳加速、胃痛",
+    "actual_score": 2,
+    "predicted_score": 2.39,
+    "predicted_label": 2
+  }
+]

@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tranning"))
 
 import auto_learn
 import lib.components.command as command
+import lib.components.conversation_store as conversation_store
 import lib.components.memory_store as memory_store
 import lib.components.session_store as session_store
 from chats import DEFAULT_OUT_DIR
@@ -40,12 +41,14 @@ def palette(root, tmp_path, monkeypatch):
     monkeypatch.setattr(auto_learn, "CANDIDATES_PATH", tmp_path / "auto_learn_candidates.json")
     monkeypatch.setattr(auto_learn, "PAIRS_PATH", tmp_path / "pairs.json")
     monkeypatch.setattr(session_store, "SESSION_PATH", tmp_path / "session.json")
+    monkeypatch.setattr(conversation_store, "CONVERSATIONS_PATH", tmp_path / "conversations.json")
 
     message = tk.Entry(root)
     chat_display = tk.Text(root)
     chat_display.tag_configure("system")
     conversation = SimpleNamespace(
         force_mode="auto", persona="sinco", out_dir=DEFAULT_OUT_DIR,
+        conversation_id=None, history=[],
         ask=lambda *a, **k: conversation.ask_calls.append((a, k)),
         send_message=lambda text: conversation.send_calls.append(text),
         ask_calls=[],
@@ -297,6 +300,116 @@ def test_resume_clear_wipes_recorded_session(palette):
 
 def test_resume_arg_suggestions_registered():
     assert ARG_SUGGESTIONS["resume"] == ["clear"]
+
+
+def test_resume_replay_includes_subject(palette):
+    session_store.record_turn("幫我訓練模型", "好的", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+    session_store.record_turn("訓練模型完成了嗎", "還沒", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+
+    palette.run("resume")
+
+    assert "主旨" in _chat_text(palette)
+
+
+# ---------------------------------------------------------------------------
+# /chat — 把記錄下的對話下載成 Markdown 檔案（session_store.py）
+# ---------------------------------------------------------------------------
+
+def test_chat_with_explicit_path_saves_without_dialog(palette, tmp_path):
+    session_store.record_turn("你好", "哈囉，我是 sinco", path=session_store.SESSION_PATH)
+    target = tmp_path / "exported.md"
+
+    palette.run(f"chat {target}")
+
+    assert target.exists()
+    assert "你好" in target.read_text(encoding="utf-8")
+    assert "已下載對話紀錄" in _chat_text(palette)
+
+
+def test_chat_without_arg_opens_save_dialog(palette, monkeypatch, tmp_path):
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+    target = tmp_path / "picked.md"
+    monkeypatch.setattr(command.filedialog, "asksaveasfilename", lambda **kwargs: str(target))
+
+    palette.run("chat")
+
+    assert target.exists()
+    assert "已下載對話紀錄" in _chat_text(palette)
+
+
+def test_chat_without_arg_cancelled_dialog_does_nothing(palette, monkeypatch, tmp_path):
+    monkeypatch.setattr(command.filedialog, "asksaveasfilename", lambda **kwargs: "")
+    palette.run("chat")
+    assert _chat_text(palette).strip() == ""
+
+
+def test_chat_export_handles_empty_session(palette, tmp_path):
+    target = tmp_path / "empty.md"
+    palette.run(f"chat {target}")
+    assert "沒有記錄下的對話" in target.read_text(encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# /conversations — 跟 CLI／網頁共用的多筆對話紀錄（conversation_store.py）
+# ---------------------------------------------------------------------------
+
+def test_conversations_list_reports_empty(palette):
+    palette.run("conversations")
+    assert "沒有任何對話紀錄" in _chat_text(palette)
+
+
+def test_conversations_new_creates_and_switches_current_conversation(palette):
+    palette.run("conversations new")
+
+    assert palette.conversation.conversation_id is not None
+    assert conversation_store.list_conversations()[0]["id"] == palette.conversation.conversation_id
+    assert "已建立新對話" in _chat_text(palette)
+
+
+def test_conversations_list_marks_current_conversation(palette):
+    palette.run("conversations new")
+    conv_id = palette.conversation.conversation_id
+
+    palette.run("conversations list")
+
+    assert f"→ [{conv_id}]" in _chat_text(palette)
+
+
+def test_conversations_open_restores_history_from_shared_store(palette):
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "你好", persona="sinco", mode="auto")
+    conversation_store.append_message(conv["id"], "assistant", "哈囉，我是 sinco", persona="sinco", mode="auto")
+
+    palette.run(f"conversations open {conv['id']}")
+
+    assert palette.conversation.conversation_id == conv["id"]
+    assert palette.conversation.history == [("你好", "哈囉，我是 sinco")]
+    text = _chat_text(palette)
+    assert "你好" in text and "哈囉，我是 sinco" in text
+
+
+def test_conversations_open_unknown_id_reports_error(palette):
+    palette.run("conversations open not-a-real-id")
+    assert "找不到對話" in _chat_text(palette)
+
+
+def test_conversations_arg_suggestions_registered():
+    assert ARG_SUGGESTIONS["conversations"] == ["list", "new", "open"]
+
+
+def test_gui_and_web_writes_share_the_same_conversation(palette):
+    # GUI（command.py）跟網頁（web/backend/conversation_store.py）各自維護一份
+    # 幾乎相同的模組，但只要指向同一個實體檔案，讀寫就該完全互通——這裡直接
+    # 用 conversation_store（GUI 這邊 import 的模組）模擬「網頁那邊建立/回覆過
+    # 一則對話」，確認 GUI 的 /conversations 能看到它。
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "從網頁送出的訊息")
+
+    palette.run("conversations list")
+
+    assert conv["id"] in _chat_text(palette)
 
 
 # ---------------------------------------------------------------------------

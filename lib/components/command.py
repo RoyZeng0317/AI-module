@@ -9,7 +9,9 @@ mode / memory_store.py 的 JSON / 目標資料夾的 CLAUDE.md)，模型本身�
 （character_browser.py），角色瀏覽/切換邏輯都在那支檔案裡，這裡只是入口。
 `/learn` 審核 tools.py 自動網路查詢存下的候選訓練資料（auto_learn.py）——
 核准只會把它寫進 data/pairs.json，不會自動重訓，重訓永遠是你自己手動下
-`python chats.py --data ...` 的動作。
+`python chats.py --data ...` 的動作。`/chat` 把 session_store.py 記錄的
+對話下載成 Markdown 檔案，`/resume` 還原對話時會附上 session_store.py
+現算出來的主旨（見該檔案 session_subject()）。
 """
 
 import re
@@ -18,16 +20,23 @@ from pathlib import Path
 from tkinter import filedialog
 
 import auto_learn
+import lib.components.conversation_store as convo_store
 from lib.components.function import read_as_chat_content
 from lib.components.memory_store import CATEGORIES as MEMORY_CATEGORIES
 from lib.components.memory_store import add_memory, delete_memory, format_memories, list_memories
 from lib.components.project_init import IGNORE_DIRS, write_claude_md
-from lib.components.session_store import clear_session, load_session
+from lib.components.session_store import (
+    clear_session,
+    default_export_path,
+    load_session,
+    save_chat_export,
+    session_subject,
+)
 
 # .md 指令定義檔跟這支程式檔不是同一個資料夾：這支在 app/components/，
 # 指令檔在旁邊的 app/command/ 底下
 COMMAND_DIR = Path(__file__).resolve().parent.parent / "command"
-BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume"}
+BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume", "chat", "conversations"}
 COMMANDS = sorted(BUILTIN_COMMANDS | {p.stem for p in COMMAND_DIR.glob("*.md")})
 
 # @ 檔案附加：預設候選清單以整個專案資料夾為根，打相對路徑、即使打出 "../"
@@ -67,7 +76,7 @@ MODEL_LABELS = {
 # 輸入「/指令 」（帶一個空格）之後，還能針對特定指令跳出「引數」選項框
 # （需求 #01：「選項框顯示，一樣可以 tab 快速鍵入」），用跟指令名稱建議
 # 完全相同的 Listbox/Tab/上下鍵機制，不是另外做一套 UI。
-ARG_SUGGESTIONS = {"model": MODEL_MODES, "resume": ["clear"]}
+ARG_SUGGESTIONS = {"model": MODEL_MODES, "resume": ["clear"], "conversations": ["list", "new", "open"]}
 
 # /resume 還原歷史時，補回 self.conversation.history 要跟 conversation.py 的
 # MAX_HISTORY_TURNS 保持同一個上限——這裡不直接 import conversation.py 是
@@ -215,6 +224,12 @@ class CommandPalette:
             return
         if name == "resume":
             self._run_resume(arg)
+            return
+        if name == "chat":
+            self._run_chat(arg)
+            return
+        if name == "conversations":
+            self._run_conversations(arg)
             return
 
         path = COMMAND_DIR / f"{name}.md"
@@ -375,7 +390,7 @@ class CommandPalette:
         sub = arg.strip().lower()
         if sub in ("clear", "reset"):
             clear_session()
-            self._system_message("已清除記錄下的對話（/resume 之後不會再看到目前這些內容）")
+            self._system_message("已清除記錄下的對話（下次聊出新內容後，主旨會依新內容重新產生）")
             return
 
         entries = load_session()
@@ -383,7 +398,8 @@ class CommandPalette:
             self._system_message("目前沒有記錄下的對話（還沒聊過，或紀錄已被清除）")
             return
 
-        lines = [f"— 還原對話紀錄（共 {len(entries)} 輪，最後更新於 {entries[-1]['created_at']}）—"]
+        subject = session_subject(entries)
+        lines = [f"— 還原對話紀錄（共 {len(entries)} 輪，主旨：{subject}，最後更新於 {entries[-1]['created_at']}）—"]
         for entry in entries:
             lines.append(f"你：{entry['user']}")
             lines.append(f"{entry['persona']}：{entry['reply']}")
@@ -391,6 +407,96 @@ class CommandPalette:
 
         history = [(e["user"], e["reply"]) for e in entries]
         self.conversation.history = history[-RESUME_HISTORY_CAP:]
+
+    # /chat [路徑]：把 session_store 記錄的對話（跟 /resume 讀的是同一份
+    # session.json）下載成 Markdown 檔案（需求：「根據我的對話下載成 md
+    # 檔案」）。帶路徑就直接存去那裡；沒帶路徑就跳系統存檔對話框讓你自己選
+    # 檔名/位置（預設 output/chats/chat_<時間戳>.md），取消對話框就什麼都
+    # 不做——跟 /init 沒帶路徑時的 askdirectory 是同一套「有預設值但讓你能
+    # 改」的做法。
+    def _run_chat(self, arg: str):
+        entries = load_session()
+        if arg:
+            path = save_chat_export(entries, Path(arg).expanduser())
+            self._system_message(f"已下載對話紀錄：{path}")
+            return
+
+        default_path = default_export_path()
+        chosen = filedialog.asksaveasfilename(
+            title="下載對話紀錄",
+            initialdir=str(default_path.parent),
+            initialfile=default_path.name,
+            defaultextension=".md",
+            filetypes=[("Markdown", "*.md"), ("全部檔案", "*.*")],
+        )
+        if not chosen:
+            return
+        path = save_chat_export(entries, Path(chosen))
+        self._system_message(f"已下載對話紀錄：{path}")
+
+    # /conversations [list | new | open <id>]：conversation_store.py 記錄的
+    # 「多筆具名對話」，跟 /resume 的 session_store.py（單一連續 rolling
+    # window，只給斷電還原用）是不同機制——這裡才是永久、可以開多筆的對話
+    # 紀錄，CLI（cli.py 的 run_conversations()）跟網頁（web/backend/app.py
+    # 側邊欄）三端寫的是同一份 memory/conversations.json，彼此互通。
+    def _run_conversations(self, arg: str):
+        sub, _, rest = arg.partition(" ")
+        sub, rest = sub.strip().lower(), rest.strip()
+
+        if sub in ("", "list"):
+            conversations = convo_store.list_conversations()
+            if not conversations:
+                self._system_message("目前沒有任何對話紀錄")
+                return
+            current = self.conversation.conversation_id
+            lines = ["目前的對話紀錄（GUI/CLI/網頁共用）："]
+            for conv in conversations:
+                mark = "→ " if conv["id"] == current else "  "
+                lines.append(f"{mark}[{conv['id']}] {conv['title']}（最後更新於 {conv['updated_at']}）")
+            self._system_message("\n".join(lines))
+            return
+
+        if sub == "new":
+            conv = convo_store.create_conversation()
+            self.conversation.conversation_id = conv["id"]
+            self.conversation.history = []
+            self.chat_display.configure(state="normal")
+            self.chat_display.delete("1.0", tk.END)
+            self.chat_display.configure(state="disabled")
+            self._system_message(f"已建立新對話 [{conv['id']}]")
+            return
+
+        if sub == "open":
+            if not rest:
+                self._system_message("用法：/conversations open <id>（從 /conversations list 取得 id）")
+                return
+            conv = convo_store.get_conversation(rest)
+            if conv is None:
+                self._system_message(f"找不到對話 id：{rest}")
+                return
+            self.conversation.conversation_id = conv["id"]
+            messages = conv["messages"]
+            self.conversation.history = [
+                (messages[i]["content"], messages[i + 1]["content"])
+                for i in range(0, len(messages) - 1, 2)
+                if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant"
+            ][-20:]
+            self.chat_display.configure(state="normal")
+            self.chat_display.delete("1.0", tk.END)
+            self.chat_display.configure(state="disabled")
+            lines = [f"— 切換到對話 [{conv['id']}]「{conv['title']}」（共 {len(messages)} 則訊息）—"]
+            for message in messages:
+                speaker = "你" if message["role"] == "user" else message.get("persona", self.conversation.persona)
+                lines.append(f"{speaker}：{message['content']}")
+            self._system_message("\n".join(lines))
+            return
+
+        self._system_message(
+            "用法：\n"
+            "  /conversations             列出所有對話紀錄\n"
+            "  /conversations new         建立新對話\n"
+            "  /conversations open <id>   切換到指定對話"
+        )
 
     # 隱藏建議
     def hide_suggestions(self):

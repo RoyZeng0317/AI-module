@@ -37,8 +37,18 @@ Modes (pick exactly one with --mode):
                  「一個子資料夾一個類別」圖片資料夾，接著就能餵給
                  road_sign_train.py 或 image_classifier_bnn.py。
 
---val-ratio > 0（僅 pairs / sidecar-image / sidecar-audio 適用）：把蒐集到
-的 entries 隨機洗牌切成兩份，寫成 <out 去掉副檔名>_train.json /
+  md-chat        <source>/*.md（Voyager 匯出的 Gemini/ChatGPT 對話紀錄，
+                 格式為 "## Turn N" + "### 👤 使用者" / "### 🤖 助理"）
+                 -> [{"prompt": ..., "reply": ...}, ...] 供 chats.py 使用。
+                 同一個 Turn 沒有助理回覆的使用者訊息會先累積起來，直到
+                 下一次出現助理回覆才合併成一組 prompt/reply；連續多筆
+                 「不同問題、但助理回覆逐字相同」的組合（Voyager 匯出時
+                 偶爾會把上一則回覆重複貼到後面幾個 Turn 上，是匯出工具
+                 的 bug，不是真的重複回答）只保留第一次出現，避免模型
+                 學到「不管問什麼都回同一段話」。
+
+--val-ratio > 0（僅 pairs / sidecar-image / sidecar-audio / md-chat 適用）：
+把蒐集到的 entries 隨機洗牌切成兩份，寫成 <out 去掉副檔名>_train.json /
 _val.json，而不是像 CLAUDE.md to-do #14 那樣把 train 複製一份充當 val
 （那樣量少於 2 筆才會退回單一檔案，並印出提示）。
 
@@ -48,17 +58,26 @@ Usage:
     python dataset_import.py --mode sidecar-image --source <資料夾> --out <manifest.json>
     python dataset_import.py --mode sidecar-audio --source <資料夾> --out <manifest.json> --val-ratio 0.2
     python dataset_import.py --mode video-frames --source <資料夾> --out <輸出資料夾> --interval 1.0
+    python dataset_import.py --mode md-chat --source <資料夾> --out <manifest.json>
 """
 
 import argparse
 import json
 import random
+import re
 import wave
 from pathlib import Path
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".bmp"}
 AUDIO_EXTS = {".wav"}
 VIDEO_EXTS = {".mp4", ".avi", ".mov", ".mkv", ".webm"}
+MARKDOWN_EXTS = {".md"}
+
+_MD_TURN_RE = re.compile(r"^## Turn \d+\s*$", re.MULTILINE)
+_MD_ROLE_HEADER_RE = re.compile(r"^### (?:👤 使用者|🤖 助理)\s*$", re.MULTILINE)
+_MD_FOOTER_RE = re.compile(r"\n-{3,}\s*\n\*Exported from.*", re.DOTALL)
+_MD_USER_HEADER = "### 👤 使用者"
+_MD_ASSISTANT_HEADER = "### 🤖 助理"
 
 
 def is_16bit_pcm_wav(path: Path) -> bool:
@@ -124,6 +143,65 @@ def collect_sidecar(source: Path, kind: str) -> tuple[list[dict], list[str]]:
             skipped.append(f"{path.name}（對應的 .txt 是空的）")
             continue
         entries.append({kind: path.name, "text": text})
+    return entries, skipped
+
+
+def _extract_role_text(segment: str, header: str) -> str | None:
+    """從一個 Turn 區塊裡取出指定角色（使用者/助理）標題後面的內文，
+    直到下一個角色標題（不是任意 "### " 子標題，例如助理回覆裡常見的
+    "### 📚 相關詞彙" 這種內容小標題必須留在內文裡，不能被切斷）或區塊結尾
+    為止。找不到該角色標題時回傳 None。
+    """
+    idx = segment.find(header)
+    if idx == -1:
+        return None
+    line_end = segment.find("\n", idx)
+    rest = segment[line_end + 1:] if line_end != -1 else ""
+    next_header = _MD_ROLE_HEADER_RE.search(rest)
+    if next_header:
+        rest = rest[:next_header.start()]
+    text = rest.strip()
+    return text or None
+
+
+def parse_md_chat(text: str) -> list[dict]:
+    """把一份 Voyager 匯出的 Gemini/ChatGPT 對話 Markdown 轉成
+    [{"prompt": ..., "reply": ...}, ...]。
+
+    連續好幾個 Turn 都只有使用者訊息、沒有助理回覆時，先累積這些使用者
+    訊息（用換行接起來），直到出現下一個助理回覆才配對成一組——這對應
+    使用者連續補充問題、助理只回一次的真實對話情境。助理回覆逐字重複
+    （匯出工具的已知 bug）只保留第一次出現。
+    """
+    text = _MD_FOOTER_RE.sub("", text)
+    segments = _MD_TURN_RE.split(text)[1:]
+
+    entries = []
+    seen_replies = set()
+    pending_user: list[str] = []
+    for segment in segments:
+        user_text = _extract_role_text(segment, _MD_USER_HEADER)
+        assistant_text = _extract_role_text(segment, _MD_ASSISTANT_HEADER)
+        if user_text:
+            pending_user.append(user_text)
+        if assistant_text:
+            if pending_user and assistant_text not in seen_replies:
+                entries.append({"prompt": "\n".join(pending_user), "reply": assistant_text})
+                seen_replies.add(assistant_text)
+            pending_user = []
+    return entries
+
+
+def collect_md_chat(source: Path) -> tuple[list[dict], list[str]]:
+    """掃描 source 底下所有 *.md 對話匯出檔，回傳 (entries, skipped_filenames)。"""
+    entries = []
+    skipped = []
+    for path in sorted(source.glob("*.md")):
+        parsed = parse_md_chat(path.read_text(encoding="utf-8"))
+        if not parsed:
+            skipped.append(f"{path.name}（沒有偵測到任何使用者/助理成對內容）")
+            continue
+        entries.extend(parsed)
     return entries, skipped
 
 
@@ -217,7 +295,7 @@ def extract_video_frames(source: Path, out: Path, interval: float = 1.0, image_e
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--mode", required=True,
-                         choices=["pairs", "sidecar-image", "sidecar-audio", "video-frames"])
+                         choices=["pairs", "sidecar-image", "sidecar-audio", "video-frames", "md-chat"])
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True,
                          help="pairs/sidecar-* = 輸出 manifest JSON 路徑；video-frames = 輸出圖片資料夾")
@@ -241,8 +319,10 @@ def main():
         entries, skipped = collect_pairs(args.source)
     elif args.mode == "sidecar-image":
         entries, skipped = collect_sidecar(args.source, "image")
-    else:
+    elif args.mode == "sidecar-audio":
         entries, skipped = collect_sidecar(args.source, "audio")
+    else:
+        entries, skipped = collect_md_chat(args.source)
 
     if not entries:
         print(f"沒有在 {args.source} 底下找到任何可用的檔案。")

@@ -1,0 +1,8 @@
+{
+  "embed_size": 64,
+  "hidden_size": 128,
+  "max_len": 40,
+  "dropout": 0.35,
+  "score_min": 0,
+  "score_max": 5
+}

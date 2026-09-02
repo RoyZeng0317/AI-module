@@ -1,0 +1,5406 @@
+/* Calculator/BMI-Calculator/style.css */
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f7fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #071421, #051018);
+    color: var(--white);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 24px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    flex-direction: column;
+    text-align: center;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+input{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+.small{
+    font-size: 13px;
+    color: var(--muted);
+}
+.result{
+    display: flex;
+    gap: 20px;
+    align-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    justify-content: center;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: #022;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    .controls{
+        flex-direction: column;
+    }
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/BMI-Calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>BMI 計算機</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>BMI計算機</span>
+                <div class="small">手機/桌機皆適用</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">身高(cm):</label>
+                        <input type="number" id="height" placeholder="請輸入您的身高" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="weight">體重(kg):</label>
+                        <input type="number" id="weight" placeholder="請輸入您的體重" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <button class="btn" onclick="calculateBMI()">計算 BMI </button>
+                        <div class="result" id="result"></div>
+                    </div>
+                </div>
+            </div>
+            <footer>&copy; 作者:嚴浩軒</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/BMI-Calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>BMI Calculator</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>BMI Calculator</span>
+                <div class="small">Mobile/Desktop Friendly</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">Height(cm):</label>
+                        <input type="number" id="height" placeholder="Please enter your height" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="weight">Weight(kg):</label>
+                        <input type="number" id="weight" placeholder="Please enter your weight" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <button class="btn" onclick="calculateBMI()">Calculate BMI</button>
+                        <div class="result" id="result"></div>
+                    </div>
+                </div>
+            </div>
+            <footer>&copy; Author: Roy Zhan</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* Calculator/Count-Money-Calculator/styles.css */
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f5fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #0f1724, #051018);
+    color: var(--white);
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: var(--white);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 25px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    flex-direction: column;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+input{
+    font-size: 14px;
+    color: var(--white);
+    background: var(--card);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.result{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.small{
+    font-size: 13px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: var(--black);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button.ghost{
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--white);
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.help{
+    font-size: 13px;
+    color: var(--muted);
+}
+@media(max-width: 768px){
+    .wrap{
+        padding: 12px;
+    }
+    header{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .controls{
+        flex-direction: column;
+    }
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/Count-Money-Calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>數錢計算機</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>數錢計算機</span>
+                <div class="small">手機/桌機皆適用</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="amount">1元</label>
+                        <input type="number" id="nt1" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">5元</label>
+                        <input type="number" id="nt5" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">10元</label>
+                        <input type="number" id="nt10" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">50元</label>
+                        <input type="number" id="nt50" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">100元</label>
+                        <input type="number" id="nt100" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">500元</label>
+                        <input type="number" id="nt500" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">1000元</label>
+                        <input type="number" id="nt1000" placeholder="請輸入數量" autocomplete="off" required>
+                    </div>
+                    <div class="result" id="result"></div>
+                </div>
+                <div class="footer">
+                    <button class="btn" id="calculateBtn" onclick="calculateBtn()">計算</button>
+                    <button class="ghost" id="resetBtn" onclick="resetBtn()">重置</button>
+                    <div class="help">註:請務必輸入每個金額的數量，以便進行計算。</div>
+                </div>
+            </div>
+            <footer>&copy; 作者:嚴浩軒</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/Count-Money-Calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>Money Counter</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>Money Counter</span>
+                <div class="small">Mobile/Desktop Friendly</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="amount">NT$1</label>
+                        <input type="number" id="nt1" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$5</label>
+                        <input type="number" id="nt5" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$10</label>
+                        <input type="number" id="nt10" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$50</label>
+                        <input type="number" id="nt50" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$100</label>
+                        <input type="number" id="nt100" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$500</label>
+                        <input type="number" id="nt500" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="amount">NT$1000</label>
+                        <input type="number" id="nt1000" placeholder="Please enter quantity" autocomplete="off" required>
+                    </div>
+                    <div class="result" id="result"></div>
+                </div>
+                <div class="footer">
+                    <button class="btn" id="calculateBtn" onclick="calculateBtn()">Calculate</button>
+                    <button class="ghost" id="resetBtn" onclick="resetBtn()">Reset</button>
+                    <div class="help">Note: Please enter the quantity for each denomination to calculate the total.</div>
+                </div>
+            </div>
+            <footer>&copy; Author: Roy Zhan</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* Calculator/Currency-Calculator/style.css */
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f7fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #071421, #051018);
+    color: var(--white);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 24px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+input{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+select{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+.band-row{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+.band{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+.swatch{
+    width: 42px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 -4px rgba(0, 0, 0, 0.15);
+}
+.result{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.value{
+    font-size: 28px;
+    font-weight: 700;
+}
+.small{
+    font-size: 13px;
+    color: var(--muted);
+}
+.footer{
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: #022;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button.ghost{
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.help{
+    font-size: 13px;
+    color: var(--muted);
+}
+@media (max-width: 600px) {
+    .controls{
+        flex-direction: column;
+    }
+    .band-row{
+        justify-content: flex-start;
+    }
+}
+.swatch-inline{
+    display: inline-block;
+    width: 14px;
+    height: 12px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/Currency-Calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>貨幣計算器</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>貨幣計算器</span>
+                <div class="small">手機/桌機皆適用</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="amount">金額</label>
+                        <input type="number" id="amount" placeholder="請輸入金額" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="from">請選擇原本貨幣:</label>
+                        <select name="" id="from"></select>
+                    
+                        <label for="to">請選擇換算貨幣:</label>
+                        <select name="" id="to"></select>
+                    </div>
+                    <div class="">
+                        <label for="rate">匯率(1單位「原本貨幣」 = 幾單位「換算貨幣」):</label>
+                        <input type="number" id="rate" step="0.0001" placeholder="Ex:30.5"/>
+                        </div>
+                    <div class="">
+                        <button class="btn" onclick="convert()">換算</button>
+                        <div class="result" id="result"></div>
+                    </div>
+                    <div class="help">
+                        <p>註: 目前匯率需自行搜尋，自動抓取匯率正在開發當中，敬請期待! 造成您的不便，敬請見諒。</p>
+                    </div>
+                </div>
+            </div>
+            <footer>&copy; 作者:嚴浩軒</footer>
+        </div>
+    </body>
+    <script src="script.js"></script>
+</html>
+
+<!-- Calculator/Currency-Calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>Currency Converter</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>Currency Converter</span>
+                <div class="small">Mobile/Desktop Friendly</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" placeholder="Please enter amount" autocomplete="off" required>
+                    </div>
+                    <div class="">
+                        <label for="from">Please select original currency:</label>
+                        <select name="" id="from"></select>
+
+                        <label for="to">Please select target currency:</label>
+                        <select name="" id="to"></select>
+                    </div>
+                    <div class="">
+                        <label for="rate">Exchange Rate (1 unit of "Original Currency" = how many units of "Target Currency"):</label>
+                        <input type="number" id="rate" step="0.0001" placeholder="Ex:30.5"/>
+                        </div>
+                    <div class="">
+                        <button class="btn" onclick="convert()">Convert</button>
+                        <div class="result" id="result"></div>
+                    </div>
+                    <div class="help">
+                        <p>Note: Currently, the exchange rate needs to be searched manually. The automatic fetching of exchange rates is under development. We apologize for the inconvenience.</p>
+                    </div>
+                </div>
+            </div>
+            <footer>&copy; Author: Roy Zhan</footer>
+        </div>
+    </body>
+    <script src="script.js"></script>
+</html>
+
+/* Calculator/Resistance-Calculator/styles.css */
+*{
+    box-sizing: border-box;
+}
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f7fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #071421, #051018);
+    color: var(--white);
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 24px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+select{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+.band-row{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+.band{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+.swatch{
+    width: 42px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 -4px rgba(0, 0, 0, 0.15);
+}
+.result{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.value{
+    font-size: 28px;
+    font-weight: 700;
+}
+.small{
+    font-size: 13px;
+    color: var(--muted);
+}
+.footer{
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: #022;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button.ghost{
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.help{
+    font-size: 13px;
+    color: var(--muted);
+}
+@media (max-width: 600px) {
+    .controls{
+        flex-direction: column;
+    }
+    .band-row{
+        justify-content: flex-start;
+    }
+}
+.swatch-inline{
+    display: inline-block;
+    width: 14px;
+    height: 12px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/Resistance-Calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>電阻計算器</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>電阻計算器</span>
+                <div class="small">4/5 環皆支援 — 手機/桌機皆適用</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="bandCount">色環數</label>
+                        <select name="" id="bandCount">
+                            <option value="4">4環( 2 位數 + 乘冪數 + 誤差值 )</option>
+                            <option value="5">5環( 3 位數 + 乘冪數 + 誤差值 )</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="preset">常用範例</label>
+                        <select name="" id="preset">
+                            <option value="">-- 選擇範例 --</option>
+                            <option value="redvioletbrown">紅紫棕(2.7Ω)</option>
+                            <option value="yellowvioletred">黃紫紅(470Ω)</option>
+                            <option value="bluegraybrown">藍灰棕(1kΩ)</option>
+                            <option value="greenbluebrown">綠藍棕(10kΩ)</option>
+                            <option value="greenbrownblack">綠棕黑(50Ω)</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="">&nbsp;</label><br>
+                        <button class="btn" id="calcBtn">計算</button>
+                    </div>
+                </div>
+                <div class="band-row" id="bandsContainer"></div>
+                <div class="result">
+                    <div class="">
+                        <div class="small">電阻值</div>
+                        <div class="value" id="resValue">-</div>
+                    </div>
+                    <div class="">
+                        <div class="small">誤差</div>
+                        <div class="" id="tolerance">-</div>
+                    </div>
+                    <div class="">
+                        <div class="small">十進位(Ω)</div>
+                        <div class="resOhm" id="resOhm">-</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <button class="ghost" id="copyBtn">複製</button>
+                    <button class="ghost" id="resetBtn">重製</button>
+                    <div class="help">顏色說明：常見色環的數字/乘冪數/誤差值已內建</div>
+                </div>
+            </div>
+            <footer>
+                &copy; 作者:嚴浩軒
+            </footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/Resistance-Calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>Resistance Calculator</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>Resistance Calculator</span>
+                <div class="small">4/5 Band Support — Mobile/Desktop Friendly</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="bandCount">Number of Bands</label>
+                        <select name="" id="bandCount">
+                            <option value="4">4 Bands (2 Digits + Multiplier + Tolerance)</option>
+                            <option value="5">5 Bands (3 Digits + Multiplier + Tolerance)</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="preset">Common Examples</label>
+                        <select name="" id="preset">
+                            <option value="">-- Select Example --</option>
+                            <option value="redvioletbrown">Red Violet Brown (2.7Ω)</option>
+                            <option value="yellowvioletred">Yellow Violet Red (470Ω)</option>
+                            <option value="bluegraybrown">Blue Gray Brown (1kΩ)</option>
+                            <option value="greenbluebrown">Green Blue Brown (10kΩ)</option>
+                            <option value="greenbrownblack">Green Brown Black (50Ω)</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="">&nbsp;</label><br>
+                        <button class="btn" id="calcBtn">Calculate</button>
+                    </div>
+                </div>
+                <div class="band-row" id="bandsContainer"></div>
+                <div class="result">
+                    <div class="">
+                        <div class="small">Resistance Value</div>
+                        <div class="value" id="resValue">-</div>
+                    </div>
+                    <div class="">
+                        <div class="small">Tolerance</div>
+                        <div class="" id="tolerance">-</div>
+                    </div>
+                    <div class="">
+                        <div class="small">Decimal (Ω)</div>
+                        <div class="resOhm" id="resOhm">-</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <button class="ghost" id="copyBtn">Copy</button>
+                    <button class="ghost" id="resetBtn">Reset</button>
+                    <div class="help">Color Code Explanation: Common color band values/multipliers/tolerances are built-in</div>
+                </div>
+            </div>
+            <footer>
+                &copy; Author: Roy Zhan
+            </footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* Calculator/ROC-Year-to-Gregorian-Year-Convert/style.css */
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f7fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #071421, #051018);
+    color: var(--white);
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 24px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    flex-direction: column;
+    text-align: center;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+select{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+input{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: #022;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/ROC-Year-to-Gregorian-Year-Convert/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>民國年與西元年轉換器</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <head>
+                <span>民國年與西元年轉換器</span>
+                <div class="small">手機/桌機皆適用</div>
+            </head>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">請選擇您要變更的年份類型:</label>
+                        <select id="year">
+                            <option value="RTG">民國年轉西元年</option>
+                            <option value="GTR">西元年轉民國年</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="yearInput">請輸入年份:</label>
+                        <input type="number" id="input" placeholder="例如: 110" autocomplete="off">
+                    </div>
+                    <div class="">
+                        <button class="btn" id="convertBtn" onclick="convert()">轉換</button>
+                    </div>
+                    <div class="result" id="result"></div>
+                </div>
+            </div>
+            <footer>&copy; 作者:嚴浩軒</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/ROC-Year-to-Gregorian-Year-Convert/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>ROC Year and Gregorian Year Converter</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <head>
+                <span>ROC Year and Gregorian Year Converter</span>
+                <div class="small">Mobile/Desktop Friendly</div>
+            </head>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">Please select the year type you want to change:</label>
+                        <select id="year">
+                            <option value="RTG">ROC Year to Gregorian Year</option>
+                            <option value="GTR">Gregorian Year to ROC Year</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="yearInput">Please enter the year:</label>
+                        <input type="number" id="input" placeholder="For example: 110" autocomplete="off">
+                    </div>
+                    <div class="">
+                        <button class="btn" id="convertBtn" onclick="convert()">Convert</button>
+                    </div>
+                    <div class="result" id="result"></div>
+                </div>
+            </div>
+            <footer>&copy; Author: Roy Zhan</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* Calculator/styles.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.top-menu {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+}
+
+.top-menu span {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 24px;
+}
+
+.accordion {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.accordion li {
+    position: relative;
+    overflow: hidden;
+    flex: 0 0 160px;
+    border-radius: 16px;
+    opacity: 0.85;
+    cursor: pointer;
+    transition: all 0.3s;
+    height: 200px;
+    border: 1px solid var(--border);
+}
+
+.accordion li img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.accordion li .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    color: #fff;
+    padding: 15px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 10%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    display: flex;
+    align-items: flex-end;
+}
+
+.accordion li .content span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.caption {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    translate: -50%;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    padding: 0 8px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.accordion li:hover {
+    scale: 1.05;
+    z-index: 10;
+    opacity: 1;
+    border-color: var(--accent);
+}
+
+.accordion li:hover .content {
+    opacity: 1;
+    visibility: visible;
+}
+
+footer {
+    color: var(--muted);
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+}
+
+@media (max-width: 600px) {
+    .accordion {
+        gap: 12px;
+    }
+    .accordion li {
+        flex: 0 0 140px;
+        height: 160px;
+    }
+}
+
+<!-- Calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>計算機</title>
+    </head>
+    <body>
+        <div class="top-menu">
+            <span>計算機</span>
+        </div>
+        <div class="content">
+            <ul class="accordion">
+                <li>
+                    <a href="../Resistance-Calculator/tw-zh/index.html"><img src="../img/Resistance Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">電阻計算器</p>
+                </li>
+                <li>
+                    <a href="../Weight-Calculator/tw-zh/index.html"><img src="../img/BMI Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">BMI計算器</p>
+                    
+                </li>
+                <li>
+                    <a href="../weight-calculator/tw-zh/index.html"><img src="../img/Weight Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">重量計算器</p>
+                </li>
+                <li>
+                    <a href="../Currency-Calculator/tw-zh/index.html"><img src="../img/Currency Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">貨幣計算器</p>
+                </li>
+                <li>
+                    <a href="../Count-Money-Calculator/tw-zh/index.html"><img src="../img/Count Money Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">金錢計算器</p>
+                </li>
+                <li>
+                    <a href="../ROC-Year-to-Gregorian-Year-Convert/tw-zh/index.html"><img src="../img/ROC Year and Gregorian Year Converter.png" alt="" height="300px"></a>
+                    <p class="caption">民國年與西元年轉換器</p>
+                </li>
+            </ul>
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+        </footer>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../styles.css">
+        <title>Calculator</title>
+    </head>
+    <body>
+        <div class="top-menu">  
+            <span>Calculator</span>
+        </div>
+        <div class="content">
+            <ul class="accordion">
+                <li>
+                    <a href="../Resistance-Calculator/us-en/index.html"><img src="../img/Resistance Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">Resistance Calculator</p>
+                </li>
+                <li>
+                    <a href="../BMI-Calculator/us-en/index.html"><img src="../img/BMI Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">BMI Calculator</p>
+                </li>
+                <li>
+                    <a href="../weight-calculator/us-en/index.html"><img src="../img/Weight Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">Weight Calculator</p>
+                </li>
+                <li>
+                    <a href="../Currency-Calculator/us-en/index.html"><img src="../img/Currency Calculator.png" alt=""></a>
+                    <p class="caption">Currency Calculator</p>
+                </li>
+                <li>
+                    <a href="../Count-Money-Calculator/us-en/index.html"><img src="../img/Count Money Calculator.png" alt="" height="300px"></a>
+                    <p class="caption">Count Money Calculator</p>
+                </li>
+                <li>
+                    <a href="../ROC-Year-to-Gregorian-Year-Convert/us-en/index.html"><img src="../img/ROC Year and Gregorian Year Converter.png" alt="" height="300px"></a>
+                    <p class="caption">ROC Year to Gregorian Year Converter</p>
+                </li>
+            </ul>
+        </div>
+        <footer>
+            &copy; Author: Roy Zhan
+        </footer>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* Calculator/weight-calculator/style.css */
+:root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa7b2;
+    --accent: #00c0a3;
+    --white: #f5f7fb;
+    --black: #0f1724;
+}
+body{
+    margin: 0;
+    height: 95vh;
+    font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Arial, Helvetica, sans-serif;
+    background: linear-gradient(180deg, #071421, #051018);
+    color: var(--white);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.wrap{
+    width: 100%;
+    max-width: 920px;
+}
+header{
+    display: flex;
+    color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+span{
+    font-size: 24px;
+    margin: 0;
+}
+.card{
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(1, 6, 12, 0.6);
+}
+.controls{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    flex-direction: column;
+    text-align: center;
+}
+label{
+    font-size: 14px;
+    color: var(--muted);
+}
+select{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+input{
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    color: var(--white);
+    min-width: 140px;
+}
+.small{
+    font-size: 13px;
+    color: var(--muted);
+}
+.result{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    justify-content: center;
+}
+button.btn{
+    background: var(--accent);
+    border: none;
+    color: #022;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+    }
+}
+footer{
+    margin: 0;
+    color: var(--muted);
+    text-align: center;
+}
+
+<!-- Calculator/weight-calculator/tw-zh/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>重量計算機</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>重量計算機</span>
+                <div class="small">手機/桌機皆適用</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">請輸入重量</label>
+                        <input type="number" id="weight" placeholder="Ex:500" autocomplete="off" >
+                    </div>
+                    <div class="">
+                        <label for="from">請選擇原始重量</label>
+                        <select name="" id="from"></select>
+                    </div>
+                    <div class="">
+                        <label for="to">請選擇換算重量</label>
+                        <select name="" id="to"></select>
+                    </div>
+                    <div class="">
+                        <button class="btn" onclick="convert()">換算</button>
+                    </div>
+                </div>
+                <div class="result" id="result"></div>
+            </div>
+            <footer>&copy; 作者:嚴浩軒</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+<!-- Calculator/weight-calculator/us-en/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../style.css">
+        <title>Weight Calculator</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <span>Weight Calculator</span>
+                <div class="small">Mobile/Desktop Compatible</div>
+            </header>
+            <div class="card">
+                <div class="controls">
+                    <div class="">
+                        <label for="">Please enter weight</label>
+                        <input type="number" id="weight" placeholder="Ex:500" autocomplete="off" >
+                    </div>
+                    <div class="">
+                        <label for="from">Please select original weight</label>
+                        <select name="" id="from"></select>
+                    </div>
+                    <div class="">
+                        <label for="to">Please select converted weight</label>
+                        <select name="" id="to"></select>
+                    </div>
+                    <div class="">
+                        <button class="btn" onclick="convert()">Convert</button>
+                    </div>
+                </div>
+                <div class="result" id="result"></div>
+                
+            </div>
+            <footer>&copy; Author: Roy Zhan</footer>
+        </div>
+    </body>
+    <script src="../script.js"></script>
+</html>
+
+/* chatbot/index.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--panel);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+}
+
+.container {
+    width: 100%;
+    padding: 0 24px;
+}
+
+nav ul {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.link {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 15px;
+    padding: 0.5rem;
+}
+
+.save {
+    background: #7c3aed;
+    color: white;
+    height: 35px;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.save:hover {
+    opacity: 0.9;
+}
+
+.chat-container {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    margin-top: 80px;
+    margin-bottom: 60px;
+}
+
+.messages {
+    min-height: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.messages .message {
+    margin: 4px 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    max-width: 80%;
+}
+
+.messages .user {
+    background: var(--accent);
+    color: white;
+    text-align: right;
+    margin-left: auto;
+}
+
+.messages .bot {
+    background: var(--panel);
+    color: var(--text);
+    text-align: left;
+    border: 1px solid var(--border);
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: var(--accent);
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+button:hover {
+    background: var(--accent-hover);
+}
+
+footer {
+    background-color: var(--panel);
+    color: var(--muted);
+    text-align: center;
+    padding: 12px 24px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+}
+
+<!-- chatbot/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+        <title>聊天機器人</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <nav>
+            <div class="container">
+                <div class="box">
+                    <div class="menu">
+                        <ul>
+                            <li><a href="login.html"class="link">登入</a></li>
+                            <div class="chat-log" id="chat-log"></div>
+                            <li><button onclick="saveChatLog()" class="save">儲存聊天紀錄成文字檔</button></li>
+                            <li><button onclick="sendEmail()">寄送到email</button></li>
+                            <li><button onclick="clearMessage()">清空內容</button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="chat-container">
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="請輸入您的訊息..."/>
+                <button onclick="sendMessage()">送出</button>
+            </div>
+        </div>
+        <footer>
+            &copy; 作者:嚴浩軒
+        </footer>
+        <script src="chatbot.js"></script>
+    </body>
+</html>
+
+/* chatbot/login.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'poppins', 'arial', '標楷體';
+}
+body{
+    background: #00B2FF;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+}
+.box{
+    background: #fdfdfd;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 30px;
+    border-radius: 25px;
+    box-shadow: 0 0 125px 0 rgba(0, 0, 0 ,0.1),
+                0 30px 50px -45px rgba(0, 0, 0 ,0.5);
+}
+.form-box{
+    width: 450px;
+    margin: 0px 10px;
+}
+.form-box header{
+    font-size: 25px;
+    font-weight: 600;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 12px;
+}
+.form-box form .field{
+    display: flex;
+    margin-bottom: 15px;
+    flex-direction: column;
+}
+.form-box form .input input{
+    height: 45px;
+    width: 100%;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+.btn{
+    height: 45px;
+    background: rgba(75, 70, 180, 0.85);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all .5s;
+    margin-top: 12px;
+    padding: 0px 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+.btn:hover{
+    opacity: 0.85;
+}
+.submit{
+    width: 100%;
+}
+
+<!-- chatbot/login.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="zh-tw" http-equiv="Content-Language"/>
+        <link rel="stylesheet" href="login.css"/>
+        <title>登入</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="box form-box">
+            <header>登入</header>
+            <form action="" method="post">
+                <div class="field input">
+                    <label for="email">帳號</label>
+                    <input type="email" name="email" autocapitalize="off" id="email" required/>
+                </div>
+                <div class="field input">
+                    <label for="password">密碼</label>
+                    <input type="password" name="password" autocapitalize="off" id="password" required/>
+                </div>
+                <div class="field">
+                    <input type="submit" class="btn" name="submit" value="Login" required/>
+                </div>
+                    尚未註冊? <a href="register.html">註冊</a>
+            </form>
+        </div>
+    </div>
+        <script src="login.js"></script>
+    </body>
+</html>
+
+/* chatbot/register.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'poppins', 'arial', '標楷體';
+}
+body{
+    background: #00B2FF;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+}
+.box{
+    background: #fdfdfd;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 30px;
+    border-radius: 25px;
+    box-shadow: 0 0 125px 0 rgba(0, 0, 0 ,0.1),
+                0 30px 50px -45px rgba(0, 0, 0 ,0.5);
+}
+.form-box{
+    width: 450px;
+    margin: 0px 10px;
+}
+.form-box header{
+    font-size: 25px;
+    font-weight: 600;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 12px;
+}
+.form-box form .field{
+    display: flex;
+    margin-bottom: 15px;
+    flex-direction: column;
+}
+.form-box form .input input{
+    height: 45px;
+    width: 100%;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+.btn{
+    height: 45px;
+    background: rgba(75, 70, 180, 0.85);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all .5s;
+    margin-top: 12px;
+    padding: 0px 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+.btn:hover{
+    opacity: 0.85;
+}
+.submit{
+    width: 100%;
+}
+
+<!-- chatbot/register.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="Ie=edge">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+        <link rel="stylesheet" href="register.css">
+        <title>註冊</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="box form-box">
+                <header>註冊</header>
+                <form action="" method="post">
+                <div class="field input">
+                    <label for="username">名字</label>
+                    <input type="text" name="username" autocapitalize="off" id="username" required>
+                </div>
+                <div class="field input">
+                    <label for="email">信箱</label>
+                    <input type="email" name="email" autocapitalize="off" id="email" required>
+                </div>
+                <div class="field input">
+                    <label for="Password">密碼</label>
+                    <input type="password" name="password" autocapitalize="off" id="password" required>
+                </div>
+                <div class="field">
+                    <input type="submit" class="btn" name="submit" value="Login" required>
+                </div>
+                    已經有帳號? <a href="login.html">登入</a>
+              </form>
+            </div>
+        </div>
+    </body>
+</html>
+
+<!-- Chats/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <title>Chats</title>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <span><i class="fa-solid fa-comments"></i> Chats</span>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="user" placeholder="Your Name">
+                <input type="text" id="msg" placeholder="Enter the message">
+                <div class="burn-options">
+                    <label>
+                        <input type="checkbox" id="burnEnabled"> Burn mode
+                    </label>
+                    <select id="brunTime">
+                        <option value="5">5s</option>
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1min</option>
+                        <option value="300">5min</option>
+                    </select>
+                </div>
+                <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</body>
+</html>
+
+/* Chats/style.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+    padding: 16px;
+}
+
+.chat-container {
+    background: var(--panel);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.chat-header {
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.messages {
+    min-height: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--bg);
+    margin: 8px;
+    border-radius: 8px;
+}
+
+.messages .message {
+    margin: 4px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--panel);
+}
+
+.input-container {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.input-container input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    min-width: 100px;
+}
+
+.burn-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.burn-options select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+}
+
+button {
+    padding: 10px 14px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: var(--accent-hover);
+}
+
+<!-- Clock/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>Digital Clock</title>
+    </head>
+    <body>
+
+        <div id="clock" class="clock"></div>
+        <div id="date" class="date"></div>
+
+    </body>
+    <script src="script.js"></script>
+</html>
+
+/* Clock/style.css */
+:root {
+    --bg: #0a0a0a;
+    --text: #fff;
+    --glow: rgba(255, 255, 255, 0.3);
+    --accent: #22d3ee;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+}
+
+.clock {
+    font-size: clamp(3rem, 15vw, 8rem);
+    letter-spacing: 0.1rem;
+    background-color: var(--bg);
+    padding: 20px 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--glow);
+    margin-bottom: 20px;
+    font-weight: 300;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.date {
+    font-size: clamp(2rem, 8vw, 5rem);
+    letter-spacing: 0.1rem;
+    color: var(--accent);
+    font-weight: 300;
+}
+
+@media (max-width: 400px) {
+    .clock {
+        padding: 16px;
+    }
+}
+
+/* Company/Department/Department.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 43px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    pad: 1rem 0rem;
+    background: #1d1d1d;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+.left-menu{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 45px;
+    height: 100%;
+    background: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.left-menu a:hover{
+    background: #555;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+<!-- Company/Department/Department.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta>
+        <link rel="stylesheet" href="Department.css">
+        <title>各部門專區</title>
+    </head>
+    <body>
+        <nav>
+            <header>各部門專區</header>
+            <div class="container">
+                <div class="box form-box">
+                    <div class="menu">
+                        <ul>
+                            <a href="../index.html" class="link">公司首頁</a>
+                            <a href="Department.html" class="link">各部門專區</a>
+                            <a href=""></a>
+                            <a href=""></a>
+                            <a href="../Purchase.html" class="link">請購系統</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="left-menu">
+            <a href="Personnel.html" class="link">人事室</a>
+            <a href="Finance.html" class="link">財務部</a>
+            <a href="Sales.html" class="link">銷售部</a>
+            <a href="PublicRelations.html" class="link">公關部</a>
+            <a href=""></a>            
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="Libary//Home.html" class="link">圖書館</a>
+                <a href="../index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+        <script src="Department.js"></script>
+    </body>
+</html>
+
+/* Company/Department/Finance.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 43px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    pad: 1rem 0rem;
+    background: #333;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/*左側選單*/
+.left-menu{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 43px;
+    height: 100%;
+    background: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.left-menu a:hover{
+    background: #555;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+<!-- Company/Department/Finance.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="UTF-8">
+        <link rel="stylesheet" href="Finance.css">
+        <title>財務部</title>
+    </head>
+    <body>
+        <nav>
+            <header>財務部</header>
+            <div class="container">
+                <div class="menu">
+                    <ul>
+                        <a href="../index.html" class="link">公司首頁</a>
+                        <a href="Department.html" class="link">各部門專區</a>
+                        <a href="../Purchase.html" class="link">請購系統</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="left-menu">
+            <a href="Personnel.html" class="link">人事室</a>
+            <a href="Finance.html" class="link">財務部</a>
+            <a href="Sales.html" class="link">銷售部</a>
+            <a href="PublicRelations.html" class="link">公關部</a>
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="../Libary/Home.html" class="link">圖書館</a>
+                <a href="../Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+    </body>
+</html>
+
+/* Company/Department/Personnel.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 45px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    pad: 1rem 0rem;
+    background: #333;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/*左側選單*/
+.left-menu{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 43px;
+    height: 100%;
+    background: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+}
+.left-menu a:hover{
+    background: #555;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+<!-- Company/Department/Personnel.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="Personnel.css">
+        <title>人事室</title>
+    </head>
+    <body>
+        <nav>
+            <header>人事室</header>
+            <div class="container">
+                <div class="menu">
+                    <ul>
+                        <a href="../index.html" class="link">公司首頁</a>
+                        <a href="Department.html" class="link">各部門專區</a>
+                        <a href="../Purchase.html" class="link">請購系統</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="left-menu">
+            <a href="Personnel.html" class="link">人事室</a>
+            <a href="Finance.html" class="link">財務部</a>
+            <a href="Sales.html" class="link">銷售部</a>
+            <a href="PublicRelations.html" class="link">公關部</a>
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-cotent">
+                <a href="../Libary/Home.html" class="link">圖書館</a>
+                <a href="../Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+    </body>
+</html>
+
+/* Company/Department/PublicRealations.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 43px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    pad: 1rem 0rem;
+    background: #333;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/*左側選單*/
+.left-menu{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 45px;
+    height: 100%;
+    background: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.left-menu a:hover{
+    background: #555;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem; 
+    position: relative;
+}
+
+<!-- Company/Department/PublicRelations.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="UTF-8">
+        <link rel="stylesheet" href="PublicRealations.css">
+        <title>公關部</title>
+    </head>
+    <body>
+        <nav>
+            <header>公關部</header>
+            <div class="container">
+                <div class="menu">
+                    <ul>
+                        <a href="../index.html" class="link">公司首頁</a>
+                        <a href="Department.html" class="link">各部門專區</a>
+                        <a href="../Purchase.html" class="link">請購系統</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="left-menu">
+            <a href="Personnel.html" class="link">人事室</a>
+            <a href="Finance.html" class="link">財務部</a>
+            <a href="Sales.html" class="link">銷售部</a>
+            <a href="PublicRelations.html" class="link">公關部</a>
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="../Libary/Home.html" class="link">圖書館</a>
+                <a href="../Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+
+    </body>
+</html>
+
+/* Company/Department/Sales.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 43px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    pad: 1rem 0rem;
+    background: #333;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/*左側選單*/
+.left-menu{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 45px;
+    height: 100%;
+    background: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.left-menu a:hover{
+    background: #555;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+<!-- Company/Department/Sales.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="UTF-8">
+        <link rel="stylesheet" href="Sales.css">
+        <title>銷售部</title>
+    </head>
+    <body>
+        <nav>
+            <header>銷售部</header>
+            <div class="container">
+                <div class="menu">
+                    <ul>
+                        <a href="../index.html" class="link">公司首頁</a>
+                        <a href="Department.html" class="link">各部門專區</a>
+                        <a href="../Purchase.html" class="link">請購系統</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="left-menu">
+            <a href="Personnel.html" class="link">人事室</a>
+            <a href="Finance.html" class="link">財務部</a>
+            <a href="Sales.html" class="link">銷售部</a>
+            <a href="PublicRelations.html" class="link">公關部</a>
+        </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="../Libary/Home.html" class="link">圖書館</a>
+                <a href="../Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+    </body>
+</html>
+
+/* Company/index.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    background-color: #1d1d1d;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 43px;
+    width: 100%;
+    text-align: center; 
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    pad: 1rem 0rem;
+    background-color: #1d1d1d;
+    color: #fff; 
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.0rem;
+    list-style: none;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative
+}
+
+<!-- Company/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="UTF-8">
+        <meta name="">
+        <link rel="stylesheet" href="index.css">
+        <title>展星股份有限公司網站</title>
+    </head>
+    <body>
+        <nav>
+            <header>展星股份有限公司網站</header>
+            <div class="container">
+                <div class="box form-box">
+                    <div class="menu">
+                        <ul>
+                            <a href="index.html" class="link">公司首頁</a>
+                            <a href="Department/Department.html" class="link">各部門專區</a>
+                            <a href="" class="link"></a>
+                            <a href="" class="link"></a>
+                            <a href="Purchase.html" class="link">請購系統</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="Libary/Home.html" class="link">圖書館</a>
+                <a href="Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+        <script src="index.js"></script>
+    </body>
+</html>
+
+/* Company/Libary/004.css */
+body{
+    background: #FF812E;
+}
+header{
+    font-size: 20px;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    pad: 1rem 0rem;
+    background-color: #1d1d1d;
+    color: aqua;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 1.5rem;
+    position: relative;
+}
+
+<!-- Company/Libary/004.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="004.css">
+		<title>活動公告</title>
+	</head>
+	<body>
+		<nav>
+			<header>展星股份有限公司圖書館系統</header>	
+			<div class="menu">
+				<a href="Home.html" class="link">回首頁</a>
+			</div>
+		</nav>
+			<p>是公司員工?<a href="Login.html">登入</a></p>
+		<div name="box">
+			<p>活動公告:
+				<a>反詐宣導</a>
+			</p>
+			<a href="information.html" class="link">活動資訊</a>
+		</div>
+	</body>
+</html>
+
+/* Company/Libary/Home.css */
+body{
+	background: #29FD55;
+	margin: 0;
+	padding: 0;
+}
+.form-box header{
+	height: 12px;
+	font-size: 25px;
+	font-family: arial, '標楷體';
+	color: white;
+}
+header{
+	font-size: 20px;
+	position: absolute;
+	top: 0;
+	background-color: #1d1d1d;
+	padding: 10px 0;
+	text-align: center;
+}
+.container{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 5rem;
+	background: #1d1d1d;
+	height: 35px;
+	width: 100%;
+}
+nav{
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 45px;
+	pad: 1rem 0rem;
+	background-color: #1d1d1d;
+	color: aqua;
+}
+ul{
+	display: flex;
+	align-items: center;
+	gap: 1.2rem;
+	list-style: none;
+}
+.logo{
+	text-decoration: none;
+	color: #fff;
+	font-size: 15px;
+	padding: 0.5rem;
+	position: relative;
+}
+.link{
+	text-decoration: none;
+	color: #fff;
+	font-size: 15px;
+	padding: 0.5rem;
+	position: relative;
+}
+footer{
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+	padding: 10px 20px;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	font-size: 12px;
+}
+
+<!-- Company/Libary/Home.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="Home.css">
+		<title>展星公司圖書館</title>
+	</head>
+	<body>
+		<nav>
+			<header>展星股份有限公司圖書館系統</header>
+			<div class="container">
+				<div class="box form-box">
+					<div name="menu">
+						<ul>
+							<li><a href="../index.html" class="link">公司首頁</a></li>
+							<li><a href="Search.html" class="link">書籍查詢</a></li>
+							<li><a href="004.html" class="link">公告訊息</a></li>
+							<li><a href="information.html" class="link">活動資訊</a></li>
+							<p>是公司員工?<a href="Login.html" class="link">登入</a>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+		<footer>
+			&copy;作者:嚴浩軒
+			<div class="footer-content">
+				<a href="Home.html" class="link">圖書館</a>
+				<a href="../Restaurant/index.html" class="link">員工餐廳評分系統</a>
+			</div>
+		</footer>
+	</body>
+</html>
+
+/* Company/Libary/information.css */
+body{
+    background: #B5FF24;
+}
+header{
+    font-size: 20px;
+}
+.form-box header{
+    font-size: 20px;
+    font-size: 500;
+    padding-bottom: 12px;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    pad: 1rem 0rem;
+    background-color: #1d1d1d;
+    color: aqua;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 1.5rem;
+    position: relative;
+}
+
+<!-- Company/Libary/information.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="information.css">
+		<title>活動資訊</title>
+	</head>
+	<body>
+		<nav>
+			<header>展星股份有限公司圖書館系統</header>
+				<div name="menu">
+					<a href="Home.html" class="link">回首頁</a>
+				</div>
+			</nav>
+			<p>是公司員工?<a href="Login.html">登入</a></p>
+				<p>活動資訊:
+				</p>
+		</div>
+	</body>
+</html>
+
+/* Company/Libary/Login.css */
+body{
+	background-color: #9287ED;
+}
+.container{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 90vh;
+}
+nav{
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 45px;
+	pad: 1rem 0rem;
+	background-color: #1d1d1d;
+	color: aqua;
+}
+.link{
+	text-decoration: none;
+	color: #4491FF;
+	font-size: 15px;
+	padding: 0.5rem;
+	position: relative;
+}
+p{
+	font-size: 15px;
+}
+.box{
+	background: #fdfdfd;
+	display: flex;
+	flex-direction: column;
+	padding: 25px 25px;
+	border-radius: 20px;
+	box-shadow: 0 0 125px 0 rgba(0, 0, 0, 0.1),
+				0 30px 50px -45px rgba(0, 0, 0, 0.5);
+}
+.form-box{
+	width: 400px;
+	margin: 0px 12px;
+}
+.form-box header{
+	font-size: 20px;
+	font-weight: 500;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 12px;
+}
+.form-box form .field{
+	display: flex;
+	margin-bottom: 15px;
+	flex-direction: column;
+}
+.form-box form .input input{
+	height: 30px;
+	width: 100%;
+	font-size: 15px;
+	padding: 8 5px;
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+.btn{
+	height: 45px;
+	background: rgba(20, 80, 180, 0.5);
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	font-size: 15px;
+	cursor: pointer;
+	transition: all .5s;
+	margin-top: 15px;
+}
+.btn:hover{
+	opacity: 0.85;
+}
+
+<!-- Company/Libary/Login.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="Login.css">
+		<title>登入介面</title>
+	</head>
+	<body>
+		<nav>
+			<div name="menu">
+				<a href="Home.html" class="link">回首頁</a>
+			</div>
+		</nav>
+			<div class="container">
+				<div class="box form-box">
+					<header>登入</header>
+				<form action="process_login.php" method="post">
+						<div class="field input">
+							<label for="email">帳號</label>
+							<input type="text" name="email" autocapitalize="off" id="email" required>
+						</div>
+						<div class="field input">
+							<label for="password">密碼</label>
+							<input type="text" class="password" autocapitalize="off" id="password" required>
+						</div>
+						<div class="field">
+							<input type="submit" class="btn" name="submit" value="登入" required>
+						</div>
+							<p>尚未有帳號?<a href="D:/Program/PC/HTML/Libary/Sign Up.html" class="link">註冊</a></p>
+						</form>
+					</div>
+				</div>		
+		</body>
+	<script src="Home.js"></script>
+</html>
+
+/* Company/Libary/Search.css */
+body{
+	background: pink;
+}
+header{
+	font-size: 20px;
+}
+.container{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 20vh;
+}
+nav{
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 45px;
+	pad: 1rem 0rem;
+	background-color: #1d1d1d;
+	color: aqua;
+}
+.link{
+	text-decoration: none;
+	color: #4491FF;
+	font-size: 15px;
+	padding: 1.5rem;
+	position: relative;
+}
+.form-box{
+	width: 400px;
+	margin: 0px 12px;
+}
+.form-box header{
+	font-size: 20px;
+	font-weight: 500;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 12px;
+}
+.form-box form .field{
+	display: flex;
+	margin-bottom: 15px;
+	flex-direction: column;
+}
+.form-box form .input input{
+	height: 30px;
+	width: 100%;
+	font-size: 15px;
+	padding: 8 5px;
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+.btn{
+	height: 45px;
+	width: 100%;
+	background: rgba(20, 80, 180, 0.5);
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	font-size: 15px;
+	cursor: pointer;
+	transition: all .5s;
+	margin-top: 15px;
+}
+.btn:hover{
+	opacity: 0.85;
+}
+
+<!-- Company/Libary/Search.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="Search.css">
+	</head>
+	<body>
+		<nav>
+			<header>書籍查詢</header>
+			<div class="menu">
+				<a href="Home.html" class="link">回首頁</a>
+			</div>
+		</nav>
+		<div class="container">
+			<div class="box form-box">
+			<form action="" method="post">
+				<div class="field input">
+					<label for="search">請輸入書籍名稱</label>
+					<input type="text" name="search" autocapitalize="off" id="search" required>
+				</div>
+					<div class="field">
+						<input type="submit" class="btn" name="submit" value="搜尋" required>
+					</div>
+				</form>
+			</div>
+		</div>
+	</body>
+	<script src="Search.js"></script>
+</html>
+
+/* Company/Libary/Sign Up.css */
+body{
+	background: orange;
+}
+.container{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 90vh;
+}
+nav{
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 45px;
+	pad: 1rem 0rem;
+	background-color: #1d1d1d;
+	color: aqua;
+}
+.link{
+	text-decoration: none;
+	color: #4491FF;
+	font-size: 15px;
+	padding: 0.5rem;
+	position: relative;
+}
+p{
+	font-size: 15px;
+}
+.box{
+	background: #fdfdfd;
+	display: flex;
+	flex-direction: column;
+	padding: 25px 25px;
+	border-radius: 20px;
+	box-shadow: 0 0 125px 0 rgba(0, 0, 0, 0.1),
+				0 30px 50px -45px rgba(0, 0, 0, 0.5);
+}
+.form-box{
+	width: 400px;
+	margin: 0px 12px;
+}
+.form-box header{
+	font-size: 20px;
+	font-weight: 500;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 12px;
+}
+.form-box form .filed{
+	display: flex;
+	margin-bottom: 15px;
+	flex-direction: column;
+}
+.form-box form .input input{
+	height: 30px;
+	width: 100%;
+	font-size: 15px;
+	padding: 8 5px;
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+.btn{
+	height: 45px;
+	background: rgba(75, 80, 250, 0.4);
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	font-size: 15px;
+	cursor: pointer;
+	transition: all .5s;
+	margin-top: 15px;
+}
+.btn:hover{
+	opacity: 0.52;
+}
+
+<!-- Company/Libary/Sign Up.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compaible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="D:/Program/PC/HTML/Libary/Sign Up.css">
+	</head>
+	<body>
+		<nav>
+			<div name="menu">
+				<a href="D:/Program/PC/HTML/Libary/Home.html" class="link">回首頁</a>
+			</div>
+		</nav>
+			<div class="container">
+				<div class="box form-box">
+					<header>註冊</header>
+				<form action="" method="post">
+					<div class="filed input">
+						<label for="email">帳號</label>
+						<input type="text" name="email" autocapitalize="off" id="email" required>
+					</div>
+					<div class="filed input">	
+						<label for="name">姓名</label>
+						<input type="text" name="name" autocapitalize="off" id="name" required>
+					</div>
+					<div class="filed input">
+						<label for="password">密碼</label>
+						<input type="text" name="name" autocapitalize="off" id="password" required>
+					</div>
+					<div class="filed">
+						<input type="submit" class="btn" name="submit" value="註冊" required>
+					</div>
+						<p>已經有帳號?<a href="D:/Program/PC/HTML/Libary/Login.html" class="link">登入</a></p>
+				</form>
+			</div>
+		</body>
+	<script src="002.js"></script>
+</html>
+
+/* Company/Purchase.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/*置頂列*/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 45px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    pad: 1rem 0rem;
+    background: #1d1d1d;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/*末頁*/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+.content{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #1d1d1d;
+    color: #fff;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: calc(5rem + 7px);
+    font-size: 18px;
+    flex-direction: column;
+}
+.Department-content p{
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.content a{
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    flex-wrap: wrap;
+}
+.content .menu{
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    max-width: 500px;
+}
+.content a:hover{
+    background: #555;
+}
+
+<!-- Company/Purchase.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="Purchase.css">
+        <title>請購系統</title>
+    </head>
+    <body>
+        <nav>   
+            <header>請購系統</header>
+            <div class="container">
+                <div class="box form-box">
+                    <div class="menu">
+                        <ul>
+                            <a href="index.html" class="link">公司首頁</a>
+                            <a href="Department/Department.html" class="link">各部門專區</a>
+                            <a href=""></a>
+                            <a href=""></a>
+                            <a href="Purchase.html" class="link">請購系統</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+            <div class="content">
+                <p>請選擇您的部門</p>
+                <div class="menu">
+                    <a href="#" class="dp-link" data-department="人事室">人事室</a>
+                    <a href="#" class="dp-link" data-department="財務部">財務部</a>
+                    <a href="#" class="dp-link" data-department="銷售部">銷售部</a>
+                    <a href="#" class="dp-link" data-department="公關部">公關部</a>
+                </div>
+            </div>
+            <div class="function">
+                <table>
+                    <tr>
+                        <td>部門</td>
+                        <td id="departmentCall">---</td>
+                        <script>
+                            document.querySelectorAll(".dp-link").forEach(link => {
+                                link.addEventListener("click", function(event){
+                                    event.preventDefault();
+                                    const dpName = this.dataset.department;
+                                    document.getElementById("departmentCall").textContent = dpName;
+                                });
+                            });
+                        </script>
+                        <td>申請日期</td>
+                        <td>
+                            <script>
+                                const now = new Date()
+                                const year = now.getFullYear();
+                                const month = String(now.getMonth() + 1).padStart(2, '0');
+                                const day = String(now.getDate()).padStart(2, '0');
+                                document.write(`${year}-${month}-${day}`);
+                            </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>申請時間</td>
+                        <td id="timeCall">--:--:--
+                            <script>
+                                function upTime(){
+                                    const time = new Date();
+                                    const hours = String(time.getHours()).padStart(2, '0');
+                                    const minutes = String(time.getMinutes()).padStart(2, '0');
+                                    const seconds = String(time.getSeconds()).padStart(2, '0');
+                                    document.getElementById("timeCall").textContent = `${hours}-${minutes}-${seconds}`;
+                                }
+                                upTime();
+                                setInterval(upTime, 1000);
+                            </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>申請內容</td>
+                    </tr>
+                    <tr>
+                        <td id="radioOptions">
+                        </td>
+                        <script>
+                            const dpOptions = {
+                                "人事室": ["員工請假", "在家上班", "人事調動", "入職申請"],
+                                "財務部": ["報銷申請", "預算審批", "薪水發放", "財務報表"],
+                                "銷售部": ["客戶開發", "訂單處理", "業績報告", "市場調查"],
+                                "公關部": ["媒體聯絡", "品牌推廣", "活動策畫", "官方媒體"]
+                            }
+                            function upRadioOptions(department){
+                                const radioContainer = document.getElementById("radioOptions");
+                                radioContainer.innerHTML = "";
+                                
+                                if(dpOptions[department]){
+                                    dpOptions[department].forEach(Option => {
+                                        const radioInput = document.createElement("input");
+                                        radioInput.type = "radio";
+                                        radioInput.name = "apply-content";
+                                        radioInput.value = Option;
+
+                                        const label = document.createElement("label");
+                                        label.textContent = Option;
+                                        label.style.marginRight = "10px";
+
+                                        radioContainer.appendChild(radioInput);
+                                        radioContainer.append(label);
+                                    });
+                                }
+                            }
+                            document.querySelectorAll(".dp-link").forEach(link => {
+                                link.addEventListener("click", function(event){
+                                    event.preventDefault();
+                                    const dpName = this.dataset.department;
+                                    document.getElementById("departmentCall").textContent = dpName;
+                                    upRadioOptions(dpName);
+                                });
+                            });
+                        </script>
+                    </tr>
+                    <tr>
+                        <td id="tbContent"></td>
+                    </tr>
+                </table>
+            </div>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-content">
+                <a href="Libary/Home.html" class="link">圖書館</a>
+                <a href="Restaurant/index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+        <script src="Purchase.js"></script>
+    </body>
+</html>
+
+/* Company/Restaurant/index.css */
+/*內頁*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.form-box header{
+    height: 10px;
+    font-size: 25px;
+}
+/**/
+header{
+    font-size: 24px;
+    position: absolute;
+    top: 0;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+    background: #1d1d1d;
+    height: 45px;
+    width: 100%;
+    text-align: center;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    pad: 1rem 0rem;
+    background: #1d1d1d;
+    color: #fff;
+}
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background-color: #1d1d1d;
+}
+/**/
+footer{
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+}
+.link{
+    text-decoration: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+<!-- Company/Restaurant/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <title>員工餐廳評分系統</title>
+    </head>
+    <body>
+        <nav>
+            <header>員工餐廳評分系統</header>
+            <div class="container">
+                <div class="menu">
+                    <ul>
+                        <a href="../index.html" class="link">公司首頁</a>
+                        <a href="../Department/Department.html" class="link">各部門專區</a>
+                        <a href=""></a>
+                        <a href=""></a>
+                        <a href="../Purchase.html" class="link">請購系統</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <footer>
+            &copy;作者:嚴浩軒
+            <div class="footer-cotent">
+                <a href="../Libary/Home.html" class="link">圖書館</a>
+                <a href="index.html" class="link">員工餐廳評分系統</a>
+            </div>
+        </footer>
+        <script src="index.js"></script>
+    </body>
+</html>
+
+/* Current-Change-Calculator/Current-Change-Calculator.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #06b6d4;
+    --accent-hover: #0891b2;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+header {
+    background: var(--panel);
+    color: var(--text);
+    padding: 16px 24px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+    padding: 24px;
+}
+
+.format-box {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--accent);
+}
+
+.field .button {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    height: 45px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    margin-top: 8px;
+}
+
+.field .button:hover {
+    background: var(--accent-hover);
+}
+
+footer {
+    background: var(--panel);
+    color: var(--muted);
+    text-align: center;
+    padding: 12px 24px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+}
+
+<!-- Current-Change-Calculator/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="" content="">
+        <title>貨幣換算計算機</title>
+        <link rel="stylesheet" href="Current-Change-Calculator.css">
+    </head>
+    <body>
+        <header>貨幣計算機</header>
+        <div class="container">
+            <div class="box format-box">
+                <form action="" method="post">
+                    <label for="name">請輸入您要換算之原始貨幣金額</label>
+                    <input type="text" class="original" required>
+                    <label for="name">請輸入您要換算之換算貨幣金額</label>
+                    <input type="text" class="before" readonly>
+                    <div class="field">
+                        <input type="submit" class="button" name="submit" value="提交" required/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <footer>&copy; 作者:嚴浩軒</footer>
+        <script src="Current-Change-Calculator.js"></script>
+    </body>
+</html>
+
+<!-- Dictionary King/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Dictionary King</title>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <header>Who's the King of the English Dictionary?</header>
+            <ul>
+                <li><a href="../index.html" class="link">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="menu-wrapper">
+            <button class="rules" id="rulesBtn">Rules</button>
+            <ul class="dropdown-rules" id="dropdown-rules">
+                <li>
+                    <span>How to Play:</span>
+                    <p>The screen will show a forbidden word.</p>
+                    <p>Each player must quickly say a new English word that starts with a capital letter.</p>
+                    <p>If someone says the banned word or repeats a word that's already been used, they're eliminated.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="vocabulary">
+            <div class="word" id="word">Press Generate to start</div>
+            <button class="text" id="generateBtn">Generate</button>
+        </div>
+
+        <div class="history" id="history">
+            <button class="history-btn" id="historyBtn">History</button>
+            <div class="history-list" id="history-list"></div>
+        </div>
+    </main>
+
+    <footer>&copy; Writer: Roy Yan</footer>
+    <script src="script.js"></script>
+</body>
+</html>
+
+/* Dictionary King/style.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #a855f7;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+}
+
+.nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+}
+
+.link {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.link:hover {
+    color: var(--text);
+}
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 100px 24px 80px;
+}
+
+.menu-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.rules {
+    font-size: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+    padding: 10px 20px;
+    transition: border-color 0.2s;
+}
+
+.rules:hover {
+    border-color: var(--accent);
+}
+
+.dropdown-rules {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    list-style: none;
+    padding: 16px;
+    margin: 8px 0 0;
+    min-width: 320px;
+    z-index: 100;
+}
+
+.dropdown-rules.show {
+    display: block;
+}
+
+.dropdown-rules span {
+    font-size: 18px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.dropdown-rules p {
+    font-size: 15px;
+    color: var(--muted);
+    margin: 4px 0;
+}
+
+.vocabulary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+    gap: 2rem;
+}
+
+.word {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    padding: 2rem;
+    background: var(--panel);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    min-width: 300px;
+}
+
+.text {
+    font-size: 1.5rem;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 12px 32px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.text:hover {
+    opacity: 0.9;
+}
+
+.history {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 100;
+}
+
+.history-btn {
+    font-size: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+    padding: 10px 20px;
+    transition: border-color 0.2s;
+}
+
+.history-btn:hover {
+    border-color: var(--accent);
+}
+
+.history-list {
+    color: var(--text);
+    font-size: 14px;
+    display: none;
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 200px;
+}
+
+.history-list.show {
+    display: block;
+}
+
+.history-list li {
+    margin: 4px 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+footer {
+    background: var(--panel);
+    color: var(--muted);
+    text-align: center;
+    padding: 12px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+    border-top: 1px solid var(--border);
+}
+
+<!-- en-us/index.html -->
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <title>HTML Website Home</title>
+</head>
+<body>
+    <header id="header">HTML Website Home</header>
+    <nav>
+        <ul>
+            <li><a href="index.html" class="Home" id="home">Home</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="menu-wrapper">
+            <div class="menu-item">
+                <span class="menu-label" id="clock">Clock</span>
+                <ul class="dropdown" id="clock-menu">
+                    <li><a href="../Clock/index.html" class="link" id="Digital-Clock">Digital Clock</a></li>
+                    <li><a href="../The-Unified-Entrance-Exam-Countdown-Clock/index.html" class="link">Unified Entrance Exam Countdown Clock</a></li>
+                    <li><a href="../General-School-Ability-Test-Countdown-Clock/index.html" class="link">General School Ability Test Countdown Clock</a></li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label" id="calculator">Calculator</span>
+                <ul class="dropdown" id="calculator-menu">
+                    <li><a href="../Calculator/us-en/index.html" class="link">Calculator</a></li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label" id="photo">Photo</span>
+                <ul class="dropdown" id="photo-menu">
+                    <li><a href="../Picture%20Auto%20Scorll/Picture%20Auto%20Scroll.html" class="link">Auto Photo Scroll</a></li>
+                    <li><a href="../graduation%20album/Home.html" class="link">Graduation Album</a></li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label" id="English">English</span>
+                <ul class="dropdown" id="english-menu">
+                    <li><a href="https://linugapath.web.app/" class="link">LinguaPath</a></li>
+                    <li><a href="../Vocabulary-Libry/index.html" class="link">Vocabulary Libry</a></li>
+                    <li><a href="../Dictionary%20King/index.html" class="link">Dictionary King</a></li>
+                    <li><a href="../Speak&Check/index.html" class="link">Speak&amp;Check</a></li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label" id="Learning">Learning</span>
+                <ul class="dropdown" id="learning-menu">
+                    <li><a href="https://circuit-lab-3d.web.app/" class="link">Circuit Lab 3D</a></li>
+                    <li><a href="https://exam-bank-manager.web.app/" class="link">Test Bank Manager</a></li>
+                    <li><a href="../Link/index.html" class="link">Link</a></li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label" id="other">Other</span>
+                <ul class="dropdown" id="other-menu">
+                    <li><a href="https://file-share-platfrom.web.app" class="link">File Share</a></li>
+                    <li><a href="../chatbot/index.html" class="link">Chatbot</a></li>
+                    <li><a href="../piano/piano.html" class="link">Piano</a></li>
+                    <li><a href="../Music-Player/index.html" class="link">Music Player</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="language">
+            <div class="menu-item">
+                <span class="menu-label">&#127757;</span>
+                <ul class="dropdown" id="language-menu">
+                    <li><a href="../zh-tw/index.html" class="link">中文</a></li>
+                    <li><a href="index.html" class="link">English</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content">
+            <p id="content-text">These websites are all beta versions.</p>
+            <a href="https://test-exam-db65a.web.app/frontend/index.html#" class="link" id="TSO">TEST Exam Online System</a>
+            <a href="../OOXX/index.html" class="link" id="OOXX">Tic-Tac-Toe</a>
+        </div>
+    </main>
+
+    <div class="chatbot" id="chatbot-icon">
+        <a href="#" id="chatbot-btn"><i class="fa-solid fa-robot"></i></a>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>Chatbot</span>
+            <span class="close-btn" id="closeChat">✕</span>
+        </div>
+        <div class="chat-log" id="chat-log"></div>
+        <div class="chat-input">
+            <input id="msg" type="text" placeholder="Enter your message...">
+            <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <footer id="footer">
+        &copy; Author: <a href="https://royzeng0317.github.io/HTML/Self-Website/us-en/index.html" class="link">Roy Zeng</a><br>
+        Our beta websites are still in active development.<br>
+        They're available now to help us test if everything works as intended.<br>
+        Some features are still missing, and we appreciate your patience and understanding!
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
+
+<!-- English Platform/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="">
+        <title>English platform</title>
+    </head>
+    <body>
+        <div class="profile">
+            <a href="#" onclick="profile()"><img src="img/example.jpg" alt="" height="30px" width="30px"></a>
+        </div>
+        <div class="profile-information">
+            <span>Profile Information</span>
+            <section>
+                <label for="name" >User Name</label>
+                <input type="text" id="name" class="name">
+                <label for="account">Account</label>
+                <input type="email" id="account" class="account">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="password">
+            </section>
+        </div>
+        <div class="contact-us">
+            <span>Contact us</span>
+            <label for="">Email: example@google.com</label>
+            Copyright&copy; 2026 Roy. All Rights Reserved.
+            <div class="society">
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+            </div>
+            Need help?
+        </div>
+        <div class="chat-bot">
+            <img src="" alt="">
+        </div>
+    </body>
+</html>
+
+/* English Platform/style.css */
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    z-index: 100;
+}
+
+.profile img {
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: border-color 0.2s;
+}
+
+.profile img:hover {
+    border-color: var(--accent);
+}
+
+.profile-information {
+    max-width: 400px;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.profile-information span {
+    font-size: 20px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.profile-information label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.profile-information input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+
+.profile-information input:focus {
+    border-color: var(--accent);
+}
+
+.contact-us {
+    max-width: 400px;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-us span {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.contact-us label {
+    color: var(--muted);
+}
+
+.society {
+    display: flex;
+    gap: 12px;
+}
+
+<!-- General-School-Ability-Test-Countdown-Clock/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>學測倒計時</title>
+    </head>
+    <body>
+        <header>學測倒計時</header>
+        <p>學測日期: <span id="targetDate">2026-01-18 00:00:00</span></p>
+        <div class="countdown" id="countdown">載入中...</div>
+    </body>
+    <script src="script.js"></script>
+</html>
+
+/* General-School-Ability-Test-Countdown-Clock/style.css */
+:root {
+    --bg: #0a0a0a;
+    --panel: #1a1a1a;
+    --text: #fff;
+    --accent: #3b82f6;
+    --glow: rgba(59, 130, 246, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+    padding: 24px;
+}
+
+header {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+p {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    color: #94a3b8;
+    margin: 1rem 0;
+}
+
+#countdown {
+    font-size: clamp(3rem, 15vw, 8rem);
+    margin-top: 20px;
+    background: var(--panel);
+    padding: 20px 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--glow);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    font-weight: 300;
+}
+
+<!-- graduation album/Example.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>畢業紀念冊-電子版</title>
+    </head>
+    <body>
+        <div class="flipbook">
+            <div class="hard">
+                <img src="" alt="">
+                <a style="height: 50%;">畢業紀念冊封面</a>
+            </div>
+            <div class="hard">
+                <img src="img/資訊科logo.png" alt="">
+                <a>資訊科-畢業紀念冊</a>
+            </div>
+                <div><img src="img/1000000171.jpg" alt=""></div>
+                <div><img src="img/1000000325.jpg" alt=""></div>
+                <div><img src="img/1000000497.jpg" alt=""></div>
+                <div><img src="img/1000000499.jpg" alt=""></div>
+                <div><img src="img/1000000499.jpg" alt=""></div>
+            <div class="hard">
+                <img src="" alt="">
+                <a style="height: 50%;">畢業紀念冊封面</a>
+            </div>
+        </div>
+
+        <script src="jquery.js"></script>
+        <script src="turn.js"></script>
+        <script>
+            $(".flipbook").turn();
+            </script>
+    </body>
+</html>
+
+<!-- graduation album/Home.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>畢業紀念冊-電子版</title>
+    </head>
+    <body>
+        <nav>
+            <div class="container">
+                <div class="box form-box">
+                    <div class="menu">
+                        <ul>
+                            <a href="index.html" class="link">畢業紀念冊-電子版首頁</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="content">
+            <div class="flipbook">
+                <div class="hard">
+                    <img src="" alt="">
+                    <a style="height: 50%;">畢業紀念冊封面</a>
+                </div>
+                <div class="hard">
+                    <img src="img/資訊科logo.png" alt="">
+                    <a>資訊科-畢業紀念冊</a>
+                </div>
+                    <div><img src="img/1000000171.jpg" alt=""></div>
+                    <div><img src="img/1000000325.jpg" alt=""></div>
+                    <div><img src="img/1000000497.jpg" alt=""></div>
+                    <div><img src="img/1000000499.jpg" alt=""></div>
+                    <div><img src="img/1000001146_Original.JPG" alt=""></div>
+                    <div><img src="img/1697609870039.jpg" alt=""></div>
+                    <div><img src="img/1708157197926.jpg" alt=""></div>
+                    <div><img src="img/20241016_134323.jpg" alt=""></div>
+                    <div><img src="img/20230118_110119.jpg" alt=""></div>
+                    <div><img src="img/20230413_094749.jpg" alt=""></div>
+                    <div><img src="img/20230831_165128.jpg" alt=""></div>
+                    <div><img src="img/20240510_155629.jpg" alt=""></div>
+                    <div><img src="img/20240527_192749.jpg" alt=""></div>
+                    <div><img src="img/20240911_121417.jpg" alt=""></div>
+                    <div><img src="img/20240911_121434.jpg" alt=""></div>
+                    <div><img src="img/20241115_144744.jpg" alt=""></div>
+                    <div><video src="img/80e2d2b7522a47019a8faf579da4d160.mp4" alt="" height="300px" width="300px" controls autoplay muted loop></video></div>
+                    <div><img src="img/classicu 2023-10-18 135703.034.jpg" alt=""></div>
+                    <div><img src="img/IMG_0017.jpg" alt=""></div>
+                    <div><img src="img/IMG_0027 (1).jpg" alt=""></div>
+                    <div><img src="img/IMG_0027.jpg" alt=""></div>
+                    <div><img src="img/IMG_0173.jpg" alt=""></div>
+                    <div><img src="img/IMG_0288.JPG" alt=""></div>
+                    <div><img src="img/IMG_0289.JPG" alt=""></div>
+                    <div><img src="img/IMG_0315 (1).jpg" alt=""></div>
+                    <div><img src="img/IMG_1137.jpg" alt=""></div>
+                    <div><img src="img/IMG_1163.jpg" alt=""></div>
+                    <div><img src="img/IMG_20221019_132402_558.jpg" alt=""></div>
+                    <div><img src="img/IMG_20221209_124854_952.jpg" alt=""></div>
+                    <div><img src="img/IMG_20230105_161816_893.jpg" alt=""></div>
+                    <div><img src="img/IMG_20230223_102012_686.webp" alt=""></div>
+                    <div><img src="img/IMG_20230821_105633_102.webp" alt=""></div>
+                    <div><img src="img/IMG_20231215_085731_223.webp" alt=""></div>
+                    <div><img src="img/IMG_20230105_161816_893.jpg" alt=""></div>
+                    <div><img src="img/IMG_20240526_172018_500.jpg" alt=""></div>
+                    <div><img src="img/IMG_20240605_140607_916.jpg" alt=""></div>
+                    <div><img src="img/IMG_20240617_130736_579.webp" alt=""></div>
+                    <div><img src="img/IMG_20240925_133522_290.webp" alt=""></div>
+                    <div><img src="img/IMG_20240925_152502_073.webp" alt=""></div>
+                    <div><img src="img/IMG_20241114_202055_062.jpg" alt=""></div>
+                    <div><img src="img/IMG_20241119_124703_436.webp" alt=""></div>
+                    <div><img src="img/IMG_20241120_160022_279.webp" alt=""></div>
+                    <div><img src="img/IMG_20250109_095032_893.jpg" alt=""></div>
+                    <div><img src="img/IMG_20250221_204138_585.jpg" alt=""></div>
+                    <div><img src="img/IMG_2168.JPG" alt=""></div>
+                    <div><img src="img/IMG_2679.jpg" alt=""></div>
+                    <div><img src="img/IMG_3042.jpg" alt=""></div>
+                    <div><img src="img/IMG_3131.PNG" alt=""></div>
+                    <div><img src="img/IMG_3280.jpg" alt=""></div>
+                    <div><img src="img/IMG_3487.jpg" alt=""></div>
+                    <div><img src="img/IMG_3489.jpg" alt=""></div>
+                    <div><img src="img/IMG_3496.jpg" alt=""></div>
+                    <div><img src="img/IMG_3508.PNG" alt=""></div>
+                    <div><img src="img/IMG_3519.jpg" alt=""></div>
+                    <div><img src="img/IMG_3535.jpg" alt=""></div>
+                    <div><img src="img/IMG_3609.jpg" alt=""></div>
+                    <div><img src="img/IMG_3641.jpg" alt=""></div>
+                    <div><img src="img/IMG_3664.jpg" alt=""></div>
+                    <div><img src="img/IMG_3731.jpg" alt=""></div>
+                    <div><img src="img/IMG_3760.JPG" alt=""></div>
+                    <div><img src="img/IMG_4409.JPG" alt=""></div>
+                    <div><img src="img/IMG_4498.JPG" alt=""></div>
+                    <div><img src="img/IMG_4500.JPG" alt=""></div>
+                    <div><img src="img/IMG_4613.jpg" alt=""></div>
+                    <div><img src="img/IMG_4614(1).jpg" alt=""></div>
+                    <div><img src="img/IMG_4614.jpg" alt=""></div>
+                    <div><img src="img/IMG_4632.JPG" alt=""></div>
+                    <div><img src="img/IMG_4633.JPG" alt=""></div>
+                    <div><img src="img/IMG_5194.JPG" alt=""></div>
+                    <div><img src="img/IMG_5481.JPG" alt=""></div>
+                    <div><img src="img/IMG_5585.JPG" alt=""></div>
+                    <div><img src="img/IMG_5702.JPG" alt=""></div>
+                    <div><img src="img/IMG_5715.PNG" alt=""></div>
+                    <div><img src="img/IMG_6003.JPG" alt=""></div>
+                    <div><img src="img/IMG_6027.JPG" alt=""></div>
+                    <div><img src="img/IMG_6858.JPG" alt=""></div>
+                    <div><img src="img/IMG_8908.JPG" alt=""></div>
+                    <div><img src="img/IMG_9514.JPG" alt=""></div>
+                    <div><img src="img/instc 2023-10-18 135631.971.jpg" alt=""></div>
+                    <div><img src="img/instc 2023-10-18 135636.168.jpg" alt=""></div>
+                    <div><img src="img/mmexport1673283224414.jpg" alt=""></div>
+                <div class="hard">
+                    <img src="" alt="">
+                    <a style="height: 50%;">畢業紀念冊封面</a>
+                </div>
+            </div>
+        </div>
+        <footer class="link">
+            &copy; 作者: <a href="../Self-Website/My Website.html" class="link" target="_blank">嚴浩軒</a>
+        </footer>
+        <script src="jquery.js"></script>
+        <script src="turn.js"></script>
+        <script>
+            $(".flipbook").turn();
+            </script>
+    </body>
+</html>
+
+/* graduation album/index test.css */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: sans-serif;
+    background-color: powderblue;
+}
+
+.book{
+    position: relative;
+    width: 350px;
+    height: 500px;
+    transition: transform 0.5s;
+}
+.paper{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    perspective: 1500px;
+}
+.font,
+.back{
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform-origin: left;
+    transition: transform 0.5s;
+}
+.front{
+    z-index: 1;
+    backface-visibility: hidden;
+    border-left: 3px solid powderblue;
+}
+.back{
+    z-index: 0;
+}
+.font-content,
+.back-content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flipped .front,
+.flipped .back{
+    transform: rotateY(-180deg);
+}
+
+button{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.5s;
+}
+
+button:focus .next .pervious{
+    outline: none;
+}
+
+.pervious, .next{
+    font-size: 50px;
+    color: gray;
+}
+
+button:hover{
+    color: #636363;
+}
+#p1{
+    z-index: 6;
+}
+
+#p2{
+    z-index: 5;
+}
+
+#p3{
+    z-index: 4;
+}
+
+#p4{
+    z-index: 3;
+}
+#p5{
+    z-index: 2;
+}
+#p6{
+    z-index: 1;
+}
+
+<!-- graduation album/index test.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+        <link rel="stylesheet" href="index test.css">
+        <title>畢業紀念冊翻頁版</title>
+    </head>
+    <body>
+        <button id="previous" onclick="goPreviousPage()">
+            ◀
+            <!-- <i class="fas fa-arrow-circle-left"></i> -->
+        </button>
+            
+        <div id="book" class="book">
+            <!-- paper 1-->
+            <div id="p1" class="paper">
+                <div class="front">
+                    <div id="f1" class="front-content">
+                        <img src="img/20231029_002844.jpg" alt="" height="500px" width="350px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b1" class="back-content">
+                        <img src="img/20231029_002844.jpg" alt="" height="300px" width="350px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 2-->
+            <div id="p2" class="paper">
+                <div class="front">
+                    <div id="f2" class="front-content">
+                        <img src="img/20240515_195700.jpg" alt="" height="350px" width="350px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b2" class="back-content">
+                        <img src="img/20240515_195700.jpg" alt="" height="350px" width="350px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 3-->
+            <div id="p3" class="paper">
+                <div class="front">
+                    <div id="f3" class="front-content">
+                        <img src="img/20240629_175302.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b3" class="back-content">
+                        <img src="img/20240629_175302.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 4-->
+            <div id="p4" class="paper">
+                <div class="front">
+                    <div id="f4" class="front-content">
+                        <img src="img/80e2d2b7522a47019a8faf579da4d160.mp4" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b4" class="back-content">
+                        <img src="img/80e2d2b7522a47019a8faf579da4d160.mp4" alt="" height="300px" width="300px">
+                        </div>
+                    </div>
+                </div>
+            <!-- paper 5-->
+            <div id="p5" class="paper">
+                <div class="front">
+                    <div id="f5" class="front-content">
+                        <img src="img/1000000171.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b5" class="back-content">
+                        <img src="img/1000000171.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 6-->
+            <div id="p6" class="paper">
+                <div class="front">
+                    <div id="f6" class="front-content">
+                        <img src="img/1000000325.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                        <img src="img/1000000325.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+        </div>  
+
+
+        <button id="next" onclick="goNextPage()">
+            ▶
+            <!-- <i class="fas fa-arrow-circle-right"></i> -->
+        </button>
+        <script src="index3.js" defer></script>
+    </body>
+</html>
+
+/* graduation album/index.css */
+body{
+    background: #1d1d1d;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 70px 0 0 0;
+    justify-self: center;
+    align-items: center;
+    position: column;
+    height: 100%;
+}
+.container{
+    padding: 3%;
+}
+/*置頂列*/
+ul{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+}
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    pad: 1rem 0rem;
+    background-color: #1d1d1d;
+    color: #fff;
+}
+.link{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    text-decoration: none;
+    color: #fff;
+}
+.content{
+    height: 75vh;
+    display: flex;
+    align-items: center;
+}
+.box-menu{
+    display: flex;
+    height: 100%;
+    background: orange;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 3rem 3rem 3rem 3rem;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    background-color: #1d1d1d;
+    color: #fff;
+}
+
+<!-- graduation album/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <mete charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="index.css">
+        <title>畢業紀念冊-電子版首頁</title>
+    </head>
+    <body>
+        <nav>
+            <div class="container">
+                <div class="box form-box">
+                    <div class="menu">
+                        <ul>
+                            <a href="../index.html" class="link">畢業紀念冊-電子版首頁</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="content">
+            <div class="box">
+                <div class="box-menu">
+                    <ul>
+                        <a href="Home.html" class="link">資訊科</a>
+                        <a href="" class="link">電子科</a>
+                        <a href="" class="link">電機科</a>
+                        <a href="" class="link">體育班</a>
+                        <a href="" class="link">建築科</a>
+                        <a href="" class="link">測繪科</a>
+                        <a href="" class="link">製圖科</a>
+                        <a href="" class="link">室設科</a>
+                        <a href="" class="link">綜高</a>
+                        <a href="" class="link">應英科</a>
+                        <a href="" class="link">機械科</a>
+                        <a href="" class="link">建機科</a>
+                        <a href="" class="link">餐服科</a>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+    <footer>
+        &copy;作者:嚴浩軒
+    </footer>
+    <script src="script.js"></script>
+</html>
+
+/* graduation album/index3.css */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: sans-serif;
+    background-color: powderblue;
+}
+
+.book{
+    position: relative;
+    width: 350px;
+    height: 500px;
+    transition: transform 0.5s;
+}
+.paper{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    perspective: 1500px;
+}
+.font,
+.back{
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform-origin: left;
+    transition: transform 0.5s;
+}
+.front{
+    z-index: 1;
+    backface-visibility: hidden;
+    border-left: 3px solid powderblue;
+}
+.back{
+    z-index: 0;
+}
+.font-content,
+.back-content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flipped .front,
+.flipped .back{
+    transform: rotateY(-180deg);
+}
+
+button{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.5s;
+    font-size: 15px;
+}
+
+button:focus .next .pervious{
+    outline: none;
+}
+
+.pervious, .next{
+    font-size: 50px;
+    color: gray;
+}
+
+button:hover{
+    color: #636363;
+}
+#p1{
+    z-index: 6;
+}
+
+#p2{
+    z-index: 5;
+}
+
+#p3{
+    z-index: 4;
+}
+
+#p4{
+    z-index: 3;
+}
+#p5{
+    z-index: 2;
+}
+#p6{
+    z-index: 1;
+}
+
+<!-- graduation album/index3.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+        <link rel="stylesheet" href="index3.css">
+        <title>畢業紀念冊翻頁版</title>
+    </head>
+    <body>
+        <button id="previous" onclick="goPreviousPage()">
+            ◀
+            <!-- <i class="fas fa-arrow-circle-left"></i> -->
+        </button>
+            
+        <div id="book" class="book">
+            <!-- paper 1-->
+            <div id="p1" class="paper">
+                <div class="front">
+                    <div id="f1" class="front-content">
+                        <img src="img/20231029_002844.jpg" alt="" height="500px" width="350px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b1" class="back-content">
+                        <img src="img/20231029_002844.jpg" alt="" height="300px" width="350px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 2-->
+            <div id="p2" class="paper">
+                <div class="front">
+                    <div id="f2" class="front-content">
+                        <img src="img/20240515_195700.jpg" alt="" height="350px" width="350px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b2" class="back-content">
+                        <img src="img/20240515_195700.jpg" alt="" height="350px" width="350px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 3-->
+            <div id="p3" class="paper">
+                <div class="front">
+                    <div id="f3" class="front-content">
+                        <img src="img/20240629_175302.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b3" class="back-content">
+                        <img src="img/20240629_175302.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+            <!-- paper 4-->
+            
+            <div id="p4" class="paper">
+                <div class="front">
+                    <div id="f4" class="front-content">
+                        <img src="img/1000000499.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b4" class="back-content">
+                        <img src="img/1000000499.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- paper 5-->
+            
+            <div id="p5" class="paper">
+                <div class="front">
+                    <div id="f5" class="front-content">
+                        <img src="img/1000000171.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                    <div id="b5" class="back-content">
+                        <img src="img/1000000171.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+
+            <!-- paper 6-->
+                         
+            <div id="p6" class="paper">
+                <div class="front">
+                    <div id="f6" class="front-content">
+                        <img src="img/1000000325.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+                <div class="back">
+                        <img src="img/1000000325.jpg" alt="" height="300px" width="300px">
+                    </div>
+                </div>
+            </div>
+        </div>  
+
+        <button id="next" onclick="goNextPage()">
+            ▶
+            <!-- <i class="fas fa-arrow-circle-right"></i> -->
+        </button>
+        <script src="index3.js" defer></script>
+    </body>
+</html>
+
+/* graduation album/index4.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "poppins", sans-serif;
+}
+body{
+    display: grid;
+    place-content: center;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: #f1c40f;
+}
+.flipbook .hard small{
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.page img{
+    width: 70%;
+    object-fit: cover;
+    margin: auto;
+}
+.flipbook .page small{
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+<!-- graduation album/index4.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+        <title>Fliiped Page</title>
+        <link rel="stylesheet" href="index4.css">
+    </head>
+    <body>
+        <div class="hard">graduation photo gallery <small>~RoyZhan</small></div>
+        <div class="hard"></div>
+            <div>
+                <small>Let's look at my computer scince III graduation photo</small>
+            </div>
+            <div>
+                <img src="img/1000000171.jpg" alt="" width="550px" height="500px">
+                <small>輔導處校園安全影片</small>
+            </div>
+            <div>
+                <img src="img/1000000325.jpg" alt="" width="550px" height="500px">
+                <small>課間下課時間1</small>
+            </div>
+            <div>
+                <img src="img/1000000497.jpg" alt="" width="650px" height="500px">
+                <small>龍華科大參訪1</small>
+            </div>
+            <div>
+                <img src="img/1000000499.jpg" alt="" width="650px" height="500px">
+                <small>龍華科大參訪2</small>
+            </div>
+            <div>
+                <img src="img/1000001146_Original.JPG" alt="" width="550px" height="500px">
+                <small>課間下課時間2</small>
+            </div>
+        <div class="hard"></div>
+        <div class="hard">Thank you <small>~RoyZhan</small></div>
+    </body>
+    <script src="jquery.js"></script>
+    <script src="turn.js"></script>
+    <script>
+        $(".flipbook");
+    </script>
+</html>
+
+/* graduation album/style.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "poppins", sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background: black;
+    color: black;
+    text-align: center;
+}
+nav{
+    position: relative;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background: #000;
+}
+.content{
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+.link{
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    list-style: none;
+    background: #000;
+    position: relative;
+    font-size: 18px;
+}
+/*紙張的大小*/
+.flipbook{
+    width: 1000px;
+    height: 700px;
+}
+/*封面背景顏色*/
+.flipbook .hard{
+    background: #fff !important;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+}
+.flipbook .hard a{
+    font-style: italic;
+    font-weight: lighter;
+    opacity: 0.7;
+    font-size: 15px;
+    color: #000;
+}
+.flipbook .page{
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.11);
+}
+.page img{
+    width: 70%;
+    object-fit: cover;
+    margin: auto;
+}
+
+.flipbook .page small{
+    font-size: 14px;
+    margin-bottom: 10px;
+}

@@ -60,10 +60,18 @@ from rich.syntax import Syntax
 from rich.text import Text
 
 from chats import DEFAULT_OUT_DIR, is_code_request, smart_reply_traced, tokenize
+import lib.components.conversation_store as convo_store
 from lib.components.function import read_as_chat_content
 from lib.components.memory_store import CATEGORIES as MEMORY_CATEGORIES
 from lib.components.memory_store import add_memory, delete_memory, format_memories, list_memories
-from lib.components.session_store import clear_session, load_session, record_turn
+from lib.components.session_store import (
+    clear_session,
+    default_export_path,
+    load_session,
+    record_turn,
+    save_chat_export,
+    session_subject,
+)
 
 MODULE = "Nova"  # 應用程式/品牌名稱；聊天時的助理人格名稱仍是 "sinco"（DEFAULT_PERSONA，訓練資料/回覆內容都沒有改）
 CHARACTERS_DIR = TRANNING_DIR / "characters"
@@ -112,7 +120,9 @@ def _character_names() -> list[str]:
     return sorted(names)
 
 
-_BUILTIN_SLASH_COMMANDS = {"help", "clear", "open", "character", "memory", "model", "resume"}
+_BUILTIN_SLASH_COMMANDS = {
+    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations",
+}
 
 
 def _slash_commands() -> list[str]:
@@ -132,6 +142,8 @@ def _arg_suggestions(name: str) -> list[str] | None:
         return MODEL_MODES
     if name == "resume":
         return ["clear"]
+    if name == "conversations":
+        return ["list", "new", "open"]
     return None
 
 
@@ -187,6 +199,8 @@ def print_help(state: dict):
     lines.append("            清除畫面\n")
     lines.append("  /open ", style="bold")
     lines.append("<路徑>      讀取檔案內容並送給模型\n")
+    lines.append("  /preview ", style="bold")
+    lines.append("<路徑>   直接把檔案當 markdown 渲染出來看，不會送進模型\n")
     lines.append("  /model ", style="bold")
     lines.append("<模式>    切換 auto/sinco/code/nvidia（不帶模式＝查看目前模式）\n")
     lines.append("  /character ", style="bold")
@@ -195,6 +209,10 @@ def print_help(state: dict):
     lines.append("            編輯持久記憶（list/add/del，輸入 /memory 查看完整用法）\n")
     lines.append("  /resume ", style="bold")
     lines.append("<clear>   還原電腦重開機/關機前記錄下的對話（不帶引數＝重播；clear＝清除紀錄）\n")
+    lines.append("  /chat ", style="bold")
+    lines.append("<路徑>     把目前記錄的對話下載成 Markdown 檔案（不帶路徑＝存到 output/chats/）\n")
+    lines.append("  /conversations ", style="bold")
+    lines.append("<list|new|open <id>>  多筆對話紀錄，跟 GUI／網頁共用（不帶引數＝list）\n")
     lines.append("  exit / quit", style="bold")
     lines.append("       離開\n")
 
@@ -320,7 +338,7 @@ def run_resume(arg: str, state: dict):
     sub = arg.strip().lower()
     if sub in ("clear", "reset"):
         clear_session()
-        console.print("[dim]已清除記錄下的對話（/resume 之後不會再看到目前這些內容）[/dim]")
+        console.print("[dim]已清除記錄下的對話（下次聊出新內容後，主旨會依新內容重新產生）[/dim]")
         return
 
     entries = load_session()
@@ -328,8 +346,10 @@ def run_resume(arg: str, state: dict):
         console.print("[dim]目前沒有記錄下的對話（還沒聊過，或紀錄已被清除）[/dim]")
         return
 
-    console.print(Panel(f"還原對話紀錄（共 {len(entries)} 輪，最後更新於 {entries[-1]['created_at']}）",
-                         border_style="cyan", expand=False))
+    subject = session_subject(entries)
+    console.print(Panel(
+        f"還原對話紀錄（共 {len(entries)} 輪，主旨：{escape(subject)}，最後更新於 {entries[-1]['created_at']}）",
+        border_style="cyan", expand=False))
     for entry in entries:
         console.print(Text(f"You › {entry['user']}", style="bold green"))
         console.print(Text(f"{entry['persona']} ›", style="bold magenta"))
@@ -340,8 +360,108 @@ def run_resume(arg: str, state: dict):
     state["history"] = history[-RESUME_HISTORY_CAP:]
 
 
+# /chat [路徑]：把 session_store 記錄的對話（跟 /resume 讀的是同一份
+# session.json）下載成 Markdown 檔案。CLI 沒有檔案總管可以跳出存檔視窗，
+# 沒帶路徑就直接存到預設位置 output/chats/chat_<時間戳>.md。
+def run_chat(arg: str):
+    entries = load_session()
+    path = Path(arg).expanduser() if arg else None
+    saved = save_chat_export(entries, path)
+    console.print(f"[dim]已下載對話紀錄：{escape(str(saved))}[/dim]")
+
+
+# /conversations [list | new | open <id>]：conversation_store.py 記錄的
+# 「多筆具名對話」，跟 /resume 的 session_store.py（單一連續 rolling window，
+# 只給斷電還原用）是不同機制——這裡才是永久、可以開多筆的對話紀錄，跟 GUI
+# （command.py 的 CommandPalette._run_conversations）、網頁側邊欄三端寫的是
+# 同一份 memory/conversations.json，彼此互通。
+def run_conversations(arg: str, state: dict):
+    sub, _, rest = arg.partition(" ")
+    sub, rest = sub.strip().lower(), rest.strip()
+
+    if sub in ("", "list"):
+        conversations = convo_store.list_conversations()
+        if not conversations:
+            console.print("[dim]目前沒有任何對話紀錄[/dim]")
+            return
+        console.print(Panel("目前的對話紀錄（GUI/CLI/網頁共用）", border_style="cyan", expand=False))
+        for conv in conversations:
+            mark = "→" if conv["id"] == state["conversation_id"] else " "
+            console.print(f"[dim]{mark} [{conv['id']}] {escape(conv['title'])}（最後更新於 {conv['updated_at']}）[/dim]")
+        return
+
+    if sub == "new":
+        conv = convo_store.create_conversation()
+        state["conversation_id"] = conv["id"]
+        state["history"] = []
+        console.print(f"[dim]已建立新對話 [{conv['id']}][/dim]")
+        return
+
+    if sub == "open":
+        if not rest:
+            console.print("[red]用法：/conversations open <id>（從 /conversations list 取得 id）[/red]")
+            return
+        conv = convo_store.get_conversation(rest)
+        if conv is None:
+            console.print(f"[red]找不到對話 id：{escape(rest)}[/red]")
+            return
+        state["conversation_id"] = conv["id"]
+        messages = conv["messages"]
+        state["history"] = [
+            (messages[i]["content"], messages[i + 1]["content"])
+            for i in range(0, len(messages) - 1, 2)
+            if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant"
+        ][-RESUME_HISTORY_CAP:]
+        console.print(Panel(f"切換到對話 [{conv['id']}]「{escape(conv['title'])}」（共 {len(messages)} 則訊息）",
+                             border_style="cyan", expand=False))
+        for message in messages:
+            if message["role"] == "user":
+                console.print(Text(f"You › {message['content']}", style="bold green"))
+            else:
+                speaker = message.get("persona", state["persona"])
+                console.print(Text(f"{speaker} ›", style="bold magenta"))
+                console.print(Markdown(message["content"]))
+        console.print()
+        return
+
+    console.print(
+        "[dim]用法：\n"
+        "  /conversations             列出所有對話紀錄\n"
+        "  /conversations new         建立新對話\n"
+        "  /conversations open <id>   切換到指定對話[/dim]"
+    )
+
+
+# /preview <路徑>：純粹把檔案內容當 markdown 渲染出來給你看，不會送進 sinco。
+# 跟 /open 是兩件不同的事——/open 是把檔案內容當成問句丟給模型（read_as_chat_content()
+# 還會先把 markdown 標籤剝掉，變成純文字給模型看），sinco 是字元級 seq2seq 對話模型，
+# 沒有「讀懂一份文件再重新排版吐回來」的能力，硬塞進去只會產生答非所問的回覆；
+# 這裡要的只是排版預覽，所以直接用 rich.markdown.Markdown 渲染原始檔案內容，
+# 跟聊天回覆用的是同一顆渲染器（見下面 console.print(Markdown(reply))），畫面風格一致。
+def run_preview(arg: str):
+    if not arg:
+        console.print("[red]用法：/preview <檔案路徑>[/red]")
+        return
+    path = Path(arg).expanduser()
+    if not path.is_file():
+        console.print(f"[red]找不到檔案：{escape(str(path))}[/red]")
+        return
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        console.print(f"[red]讀取失敗：{escape(str(exc))}[/red]")
+        return
+    console.print(Panel(f"預覽：{path.name}", border_style="cyan", expand=False))
+    console.print(Markdown(text))
+    console.print()
+
+
 def ask_model(message: str, state: dict, check_code: bool = False):
-    with console.status("[dim]思考中...[/dim]", spinner="dots"):
+    # 輸入的 token 數在送進模型前就已經知道，所以在「思考中」狀態列上就先顯示，
+    # 不用等模型回覆完成；輸出 token 數要等 smart_reply_traced() 回傳才算得出來
+    # （見下面 out_tokens），這部分還是只能在思考完成後才印出。
+    in_tokens = len(tokenize(message))
+    with console.status(f"[dim]思考中...（輸入約 {in_tokens} 個 token）[/dim]", spinner="dots"):
         try:
             trace, reply = smart_reply_traced(message, out_dir=state["out_dir"], force_mode=state["force_mode"],
                                                history=state["history"])
@@ -356,7 +476,7 @@ def ask_model(message: str, state: dict, check_code: bool = False):
     # sinco 的 tokenizer 是字元級（見 chats.py tokenize()），沒有 BPE/子詞單位，
     # 這裡的「token」就是字元數，跟 Claude 那種子詞 token 不是同一種算法，只是
     # 借用同樣的「輸入+輸出用量」呈現方式，讓你知道這一輪送進/吐出模型的量體。
-    in_tokens, out_tokens = len(tokenize(message)), len(tokenize(reply))
+    out_tokens = len(tokenize(reply))
     token_line = Text(
         f"· 約 {in_tokens + out_tokens} 個 token（輸入 {in_tokens} + 輸出 {out_tokens}，以字元數估算）",
         style="dim",
@@ -378,6 +498,15 @@ def ask_model(message: str, state: dict, check_code: bool = False):
     # 落地到 session.json，讓 /resume 能在電腦意外斷電/關機後還原到這一輪
     # （不是等這支 CLI 正常執行到 exit/quit 那行才存）。
     record_turn(message, reply, persona=state["persona"], mode=state["force_mode"])
+    # 同時落地到 conversation_store.py（跟 GUI、網頁共用同一份
+    # memory/conversations.json）——沒有目前對話就先建一筆，讓「啟動後第一句
+    # 話」自動起算成一筆新對話，不用先手動 /conversations new。
+    if state["conversation_id"] is None:
+        state["conversation_id"] = convo_store.create_conversation()["id"]
+    convo_store.append_message(state["conversation_id"], "user", message,
+                                persona=state["persona"], mode=state["force_mode"])
+    convo_store.append_message(state["conversation_id"], "assistant", reply,
+                                persona=state["persona"], mode=state["force_mode"])
     # 同步累積到記憶體內的 state["history"]，讓同一個 process 內接下來若切到
     # /model nvidia 也能立刻拿到這一輪當上下文，不用先 /resume 才補得回來。
     state["history"].append((message, reply))
@@ -418,6 +547,9 @@ def process_input(text: str, state: dict) -> bool:
         console.print(f"[dim]--- {escape(path.name)} ---[/dim]")
         ask_model(read_as_chat_content(path), state)
         return True
+    if cmd == "preview":
+        run_preview(arg)
+        return True
     if cmd == "character":
         switch_character(arg, state)
         return True
@@ -429,6 +561,12 @@ def process_input(text: str, state: dict) -> bool:
         return True
     if cmd == "resume":
         run_resume(arg, state)
+        return True
+    if cmd == "chat":
+        run_chat(arg)
+        return True
+    if cmd == "conversations":
+        run_conversations(arg, state)
         return True
 
     md_path = COMMAND_DIR / f"{cmd}.md"
@@ -444,7 +582,10 @@ def main():
     parser.add_argument("--character", help="啟動時就切換到指定角色人格")
     args = parser.parse_args()
 
-    state = {"out_dir": DEFAULT_OUT_DIR, "persona": DEFAULT_PERSONA, "force_mode": "auto", "history": []}
+    state = {
+        "out_dir": DEFAULT_OUT_DIR, "persona": DEFAULT_PERSONA, "force_mode": "auto", "history": [],
+        "conversation_id": None,
+    }
     if args.character:
         switch_character(args.character, state)
 

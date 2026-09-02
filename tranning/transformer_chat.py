@@ -83,6 +83,48 @@ from bpe_tokenizer import BPETokenizer, EOS, PAD, SEP
 DEFAULT_PRETRAIN_DIR = Path(__file__).resolve().parent / "gpt_pretrain_runs"
 DEFAULT_FINETUNE_DIR = Path(__file__).resolve().parent / "gpt_chat_runs"
 
+# Rule 06 caps this project's compute budget at a single RTX 4060/5060-class
+# 8GB card that also has to keep running the desktop/OS -- a training run
+# that lets PyTorch's caching allocator claim the *entire* card (observed:
+# 7883/8151MB, ~97%, on a real run) leaves almost no headroom for anything
+# else on the same GPU and risks the whole system, not just this process,
+# destabilizing under an out-of-memory condition. 0.85 caps this process to
+# 85% of total VRAM: PyTorch raises its own clean "CUDA out of memory" error
+# if training actually needs more than that (a controlled, catchable
+# failure), instead of silently starving every other GPU consumer on the
+# machine first.
+DEFAULT_GPU_MEM_FRACTION = 0.85
+
+
+def _resolve_device(device: str | None = None) -> str:
+    """CUDA (NVIDIA) > XPU (Intel Arc, via PyTorch's native `torch.xpu`
+    backend) > CPU. This is what lets a checkpoint trained on today's NVIDIA
+    card also pick up an accelerator automatically on a future machine with
+    an Intel Arc Pro card instead of silently falling back to CPU-only
+    inference there -- `torch.xpu` exists as an attribute on modern PyTorch
+    builds even without any Intel GPU present (confirmed: `hasattr`
+    succeeds, `is_available()` just returns False), so this check is safe to
+    run unconditionally on any machine/build.
+    """
+    if device is not None:
+        return device
+    if torch.cuda.is_available():
+        return "cuda"
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        return "xpu"
+    return "cpu"
+
+
+def _cap_gpu_memory(device: str, fraction: float | None) -> None:
+    # only a CUDA-specific PyTorch API -- no-op on XPU/CPU. Intel's stack
+    # has its own separate memory-management knobs (via
+    # intel_extension_for_pytorch) that would need to be added here if/when
+    # training itself (not just inference) actually runs on Arc hardware;
+    # not done yet since this project's training so far has only ever run
+    # on the NVIDIA card (見 CLAUDE.md Rule 06).
+    if device == "cuda" and fraction is not None:
+        torch.cuda.set_per_process_memory_fraction(fraction)
+
 
 # --- model -------------------------------------------------------------
 
@@ -197,7 +239,8 @@ class GPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None):
+    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None,
+                return_hidden: bool = False):
         B, T = idx.shape
         assert T <= self.block_size, f"sequence length {T} exceeds block_size {self.block_size}"
         pos = torch.arange(T, device=idx.device).unsqueeze(0)
@@ -219,6 +262,10 @@ class GPT(nn.Module):
             # across the whole batch, which is only zero if an entire batch
             # were nothing but padding — never true here.
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=PAD)
+        if return_hidden:
+            # pre-head hidden state (B, T, n_embd), for reward_model.py to
+            # attach a scalar head on top of instead of the vocab logits.
+            return logits, loss, x
         return logits, loss
 
     @torch.no_grad()
@@ -370,7 +417,15 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
         elif train_loss > baseline_loss * 0.7 and epoch >= max(3, epochs // 3):
             warning = "  [warning: train loss still high this far in -- possible underfitting]"
 
-        print(f"[{tag}] epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}{warning}")
+        # flush=True on every print in this loop: a run launched in the
+        # background with stdout redirected to a file is block-buffered by
+        # default, not line-buffered -- a short run (tens of epochs, each
+        # line ~80 chars) can finish entirely before Python's internal
+        # buffer ever fills, leaving the output file empty the whole time
+        # even though training is actively progressing. Forcing a flush
+        # here means progress is visible the moment each epoch finishes,
+        # regardless of how the caller invoked the script.
+        print(f"[{tag}] epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}{warning}", flush=True)
         history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss})
 
         if val_loss < best_val_loss:
@@ -380,7 +435,7 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
         else:
             epochs_without_improvement += 1
             if epochs_without_improvement >= patience:
-                print(f"Early stopping at epoch {epoch} (no val improvement for {patience} epochs)")
+                print(f"Early stopping at epoch {epoch} (no val improvement for {patience} epochs)", flush=True)
                 break
 
     if best_state is not None:
@@ -394,8 +449,9 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
              batch_size: int = 32, block_size: int = 512, n_layer: int = 8, n_embd: int = 384,
              n_head: int = 6, dropout: float = 0.1, lr: float = 3e-4, weight_decay: float = 0.01,
              vocab_size: int = 8000, val_split: float = 0.1, patience: int = 5,
-             device: str | None = None):
-    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION):
+    device = _resolve_device(device)
+    _cap_gpu_memory(device, gpu_mem_fraction)
     text = Path(corpus_path).read_text(encoding="utf-8")
 
     tokenizer = BPETokenizer.train([text], vocab_size=vocab_size)
@@ -445,14 +501,25 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
 def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
              out_dir: Path = DEFAULT_FINETUNE_DIR, epochs: int = 50, batch_size: int = 8,
              lr: float = 1e-4, weight_decay: float = 0.01, dropout: float = 0.1,
-             val_split: float = 0.1, patience: int = 8, device: str | None = None):
-    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+             val_split: float = 0.1, patience: int = 8, val_data_path: Path | None = None,
+             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION):
+    device = _resolve_device(device)
+    _cap_gpu_memory(device, gpu_mem_fraction)
     pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
     random.shuffle(pairs)
-    split = max(1, int(len(pairs) * (1 - val_split)))
-    train_pairs, val_pairs = pairs[:split], pairs[split:]
-    if not val_pairs:
-        val_pairs = train_pairs
+
+    if val_data_path is not None:
+        # caller already split train/val into separate files -- use them
+        # as-is instead of re-splitting data_path with val_split.
+        train_pairs = pairs
+        val_pairs = json.loads(Path(val_data_path).read_text(encoding="utf-8"))
+        if not val_pairs:
+            val_pairs = train_pairs
+    else:
+        split = max(1, int(len(pairs) * (1 - val_split)))
+        train_pairs, val_pairs = pairs[:split], pairs[split:]
+        if not val_pairs:
+            val_pairs = train_pairs
 
     pretrain_dir = Path(pretrain_dir)
     tokenizer = BPETokenizer.load(pretrain_dir)
@@ -493,8 +560,9 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
 _loaded_gpt: dict = {}
 
 
-def _load_gpt(out_dir: Path):
-    key = str(out_dir)
+def _load_gpt(out_dir: Path, device: str | None = None):
+    device = _resolve_device(device)
+    key = (str(out_dir), device)
     if key in _loaded_gpt:
         return _loaded_gpt[key]
 
@@ -507,32 +575,62 @@ def _load_gpt(out_dir: Path):
     config = json.loads(config_path.read_text(encoding="utf-8"))
     model = GPT(tokenizer.vocab_size, config["block_size"], config["n_layer"],
                 config["n_embd"], config["n_head"], config.get("dropout", 0.0))
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+    # map_location=device: loads straight onto whatever accelerator this
+    # machine has (CUDA/XPU/CPU) instead of always landing on CPU first --
+    # a checkpoint trained on one machine's NVIDIA card loads the same way
+    # on a future machine's Intel Arc card, no code change needed there.
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.to(device)
     model.eval()
 
-    loaded = (model, tokenizer, config["block_size"])
+    loaded = (model, tokenizer, config["block_size"], device)
     _loaded_gpt[key] = loaded
     return loaded
 
 
 def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: int = 60,
-          temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9) -> str:
-    """Generate a reply from the fine-tuned GPT checkpoint at out_dir.
+          temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
+          device: str | None = None) -> str:
+    """Generate a reply from the fine-tuned GPT checkpoint at out_dir (expects
+    prompt+<sep>+reply-structured training, i.e. a finetune() output).
 
     Returns a placeholder message (rather than crashing) if no checkpoint
     has been trained yet -- same contract as chats.py's chat_reply().
     """
-    loaded = _load_gpt(Path(out_dir))
+    loaded = _load_gpt(Path(out_dir), device)
     if loaded is None:
         return "Transformer 模型尚未訓練，請先執行 `python transformer_chat.py pretrain --corpus ...`，再執行 `finetune`。"
 
-    model, tokenizer, block_size = loaded
+    model, tokenizer, block_size, device = loaded
     prompt_ids = (tokenizer.encode(message) + [SEP])[-block_size:]
-    idx = torch.tensor([prompt_ids], dtype=torch.long)
+    idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
                           top_k=top_k, top_p=top_p)
     generated = out[0, len(prompt_ids):].tolist()
     return tokenizer.decode(generated) or "..."
+
+
+def complete(prompt: str, out_dir: Path = DEFAULT_PRETRAIN_DIR, max_new_tokens: int = 60,
+             temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
+             device: str | None = None) -> str:
+    """Raw next-token continuation from a pretrain()-only checkpoint -- no
+    <sep>/reply structure, because pretrain() never saw one (that structure
+    is only taught in finetune(), see ChatSFTDataset). This is the right
+    entry point for a checkpoint like gpt_code_pretrain_runs/ that has been
+    pretrained on a code corpus but not yet fine-tuned on prompt/reply pairs:
+    give it the start of some code and it continues it, the same way the
+    manual generation checks in this project's session notes were run.
+    """
+    loaded = _load_gpt(Path(out_dir), device)
+    if loaded is None:
+        return "Transformer 模型尚未訓練，請先執行 `python transformer_chat.py pretrain --corpus ...`。"
+
+    model, tokenizer, block_size, device = loaded
+    prompt_ids = tokenizer.encode(prompt)[-block_size:]
+    idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
+    out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
+                          top_k=top_k, top_p=top_p)
+    return tokenizer.decode(out[0].tolist()) or "..."
 
 
 # --- CLI -------------------------------------------------------------------
@@ -558,9 +656,15 @@ def main():
     p_pre.add_argument("--vocab-size", type=int, default=8000)
     p_pre.add_argument("--val-split", type=float, default=0.1)
     p_pre.add_argument("--patience", type=int, default=5)
+    p_pre.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
+                        help="cap this process to this fraction of total VRAM on CUDA devices "
+                             "(see DEFAULT_GPU_MEM_FRACTION docstring); pass 0/negative to disable the cap")
 
     p_fin = sub.add_parser("finetune", help="supervised fine-tuning on a pairs.json-format dataset")
     p_fin.add_argument("--data", type=Path, required=True)
+    p_fin.add_argument("--val-data", type=Path, default=None,
+                        help="optional separate validation pairs.json; when given, --data is used "
+                             "entirely for training instead of being split by --val-split")
     p_fin.add_argument("--pretrain-dir", type=Path, default=DEFAULT_PRETRAIN_DIR)
     p_fin.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
     p_fin.add_argument("--epochs", type=int, default=50)
@@ -570,6 +674,9 @@ def main():
     p_fin.add_argument("--weight-decay", type=float, default=0.01)
     p_fin.add_argument("--val-split", type=float, default=0.1)
     p_fin.add_argument("--patience", type=int, default=8)
+    p_fin.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
+                        help="cap this process to this fraction of total VRAM on CUDA devices "
+                             "(see DEFAULT_GPU_MEM_FRACTION docstring); pass 0/negative to disable the cap")
 
     p_chat = sub.add_parser("chat", help="REPL against a fine-tuned checkpoint")
     p_chat.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
@@ -578,15 +685,29 @@ def main():
     p_chat.add_argument("--top-k", type=int, default=40)
     p_chat.add_argument("--top-p", type=float, default=0.9)
 
+    p_comp = sub.add_parser("complete", help="raw next-token continuation from a pretrain()-only checkpoint "
+                                              "(no prompt/reply structure -- use this for a code checkpoint "
+                                              "that hasn't been finetune()'d yet)")
+    p_comp.add_argument("--prompt", required=True, help="start of the code/text to continue")
+    p_comp.add_argument("--out-dir", type=Path, default=DEFAULT_PRETRAIN_DIR)
+    p_comp.add_argument("--max-new-tokens", type=int, default=60)
+    p_comp.add_argument("--temperature", type=float, default=0.8)
+    p_comp.add_argument("--top-k", type=int, default=40)
+    p_comp.add_argument("--top-p", type=float, default=0.9)
+
     args = parser.parse_args()
 
     if args.command == "pretrain":
+        gpu_mem_fraction = args.gpu_mem_fraction if args.gpu_mem_fraction > 0 else None
         pretrain(args.corpus, args.out_dir, args.epochs, args.batch_size, args.block_size,
                   args.n_layer, args.n_embd, args.n_head, args.dropout, args.lr,
-                  args.weight_decay, args.vocab_size, args.val_split, args.patience)
+                  args.weight_decay, args.vocab_size, args.val_split, args.patience,
+                  gpu_mem_fraction=gpu_mem_fraction)
     elif args.command == "finetune":
+        gpu_mem_fraction = args.gpu_mem_fraction if args.gpu_mem_fraction > 0 else None
         finetune(args.data, args.pretrain_dir, args.out_dir, args.epochs, args.batch_size,
-                  args.lr, args.weight_decay, args.dropout, args.val_split, args.patience)
+                  args.lr, args.weight_decay, args.dropout, args.val_split, args.patience,
+                  val_data_path=args.val_data, gpu_mem_fraction=gpu_mem_fraction)
     elif args.command == "chat":
         print("Chat with the fine-tuned Transformer model (type 'exit' to quit)")
         while True:
@@ -594,6 +715,9 @@ def main():
             if text.strip().lower() in {"exit", "quit"}:
                 break
             print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p)}")
+    elif args.command == "complete":
+        print(complete(args.prompt, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature, top_k=args.top_k, top_p=args.top_p))
 
 
 if __name__ == "__main__":

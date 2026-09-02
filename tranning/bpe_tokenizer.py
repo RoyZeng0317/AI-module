@@ -30,6 +30,7 @@ else (punctuation, whitespace, symbols) is kept as single-character words
 so it never gets glued to real text.
 """
 
+import heapq
 import json
 import re
 from collections import Counter
@@ -58,15 +59,6 @@ def _word_freqs(texts: list[str]) -> Counter:
     return freqs
 
 
-def _pair_counts(word_symbols: dict[str, tuple[str, ...]], word_freqs: Counter) -> Counter:
-    counts: Counter = Counter()
-    for word, freq in word_freqs.items():
-        symbols = word_symbols[word]
-        for a, b in zip(symbols, symbols[1:]):
-            counts[(a, b)] += freq
-    return counts
-
-
 def _merge_word(symbols: tuple[str, ...], pair: Pair) -> tuple[str, ...]:
     merged = pair[0] + pair[1]
     out = []
@@ -91,11 +83,25 @@ class BPETokenizer:
         self._merge_rank = {pair: i for i, pair in enumerate(merges)}
 
     @classmethod
-    def train(cls, texts: list[str], vocab_size: int, min_pair_freq: int = 2) -> "BPETokenizer":
+    def train(cls, texts: list[str], vocab_size: int, min_pair_freq: int = 2,
+              verbose: bool = True) -> "BPETokenizer":
         """Learn merges from `texts` until either `vocab_size` tokens exist
         or no remaining adjacent pair occurs at least `min_pair_freq` times
         (stops the corpus from being forced to "merge" pure noise once the
         genuinely frequent patterns are exhausted).
+
+        Uses incremental pair-count updates (standard practical BPE trick):
+        recomputing `_pair_counts` over every unique word on every single
+        merge (the original implementation here) is O(vocab_size *
+        unique_words), which is fine for a handful of hand-written example
+        sentences but effectively never finishes on a real multi-MB corpus
+        (verified stuck for ~2h with zero progress on a 12MB Wikipedia
+        starter corpus). Instead, each merge only touches the words that
+        actually contained the merged pair, tracked via `pair_words`, with a
+        lazy-deletion max-heap (`heap`) standing in for a proper priority
+        queue -- stale entries (whose cached count no longer matches
+        `pair_counts`) are simply skipped when popped rather than removed
+        eagerly, which is cheap and keeps the heap correct.
         """
         vocab = dict(SPECIAL_TOKENS)
         word_freqs = _word_freqs(texts)
@@ -105,18 +111,58 @@ class BPETokenizer:
                 if ch not in vocab:
                     vocab[ch] = len(vocab)
 
+        pair_counts: Counter = Counter()
+        pair_words: dict[Pair, set[str]] = {}
+        for w, symbols in word_symbols.items():
+            freq = word_freqs[w]
+            for a, b in zip(symbols, symbols[1:]):
+                pair_counts[(a, b)] += freq
+                pair_words.setdefault((a, b), set()).add(w)
+
+        heap = [(-count, pair) for pair, count in pair_counts.items()]
+        heapq.heapify(heap)
+
         merges: list[Pair] = []
         while len(vocab) < vocab_size:
-            counts = _pair_counts(word_symbols, word_freqs)
-            if not counts:
+            best_pair = None
+            best_count = 0
+            while heap:
+                neg_count, pair = heapq.heappop(heap)
+                if pair_counts.get(pair, 0) == -neg_count and -neg_count > 0:
+                    best_pair, best_count = pair, -neg_count
+                    break
+            if best_pair is None or best_count < min_pair_freq:
                 break
-            best_pair, best_count = counts.most_common(1)[0]
-            if best_count < min_pair_freq:
-                break
+
             merged_token = best_pair[0] + best_pair[1]
-            word_symbols = {w: _merge_word(s, best_pair) for w, s in word_symbols.items()}
             vocab[merged_token] = len(vocab)
             merges.append(best_pair)
+            if verbose and len(merges) % 200 == 0:
+                # flush=True: stdout is block-buffered (not line-buffered) whenever
+                # it's redirected to a file/pipe instead of a real terminal, which
+                # is exactly how background training runs are launched -- without
+                # this, every progress line sits invisible in Python's internal
+                # buffer until the buffer fills or the process exits, so a run that
+                # only prints ~40 short lines total (see transformer_chat.py's
+                # equivalent fix) can finish with zero visible progress the whole
+                # time it was running.
+                print(f"[bpe] merge {len(merges)}  vocab={len(vocab)}/{vocab_size}  "
+                      f"last_pair={best_pair!r} count={best_count}", flush=True)
+
+            for w in pair_words.pop(best_pair, ()):
+                old_symbols = word_symbols[w]
+                freq = word_freqs[w]
+                for a, b in zip(old_symbols, old_symbols[1:]):
+                    pair_counts[(a, b)] -= freq
+                    if pair_counts[(a, b)] <= 0:
+                        del pair_counts[(a, b)]
+
+                new_symbols = _merge_word(old_symbols, best_pair)
+                word_symbols[w] = new_symbols
+                for a, b in zip(new_symbols, new_symbols[1:]):
+                    pair_counts[(a, b)] += freq
+                    pair_words.setdefault((a, b), set()).add(w)
+                    heapq.heappush(heap, (-pair_counts[(a, b)], (a, b)))
 
         return cls(vocab, merges)
 

@@ -183,12 +183,17 @@ def test_knowledge_question_fallback_skips_messages_matching_trained_prompt(tmp_
 
 def test_knowledge_question_fallback_returns_none_without_apology_when_nothing_found(tmp_path, monkeypatch):
     # 跟明講要搜尋的 _SEARCH_PATTERNS 不同：這裡是猜測性的，找不到就安靜地
-    # 退回一般聊天模型，不回一句「抱歉沒找到」。DuckDuckGo 跟中文維基百科都
-    # 要模擬成查無結果，不然 _lookup() 真的會打去 zh.wikipedia.org。
+    # 退回一般聊天模型，不回一句「抱歉沒找到」。DuckDuckGo、中文維基百科、
+    # Google（general_web_search，見 tools.py 的 SERPER_API_KEY 說明）三層
+    # 都要模擬成查無結果，不然 _lookup() 真的會打去對應的網路端點——尤其是
+    # general_web_search()：一旦 lib/.env 真的設定了 SERPER_API_KEY（跟這支
+    # 測試無關的環境狀態），不模擬它就會變成打真實 Google 搜尋，讓這個「三層
+    # 都查無結果」的測試變得不確定（結果依賴當下網路查得到查不到）。
     _reset_last_problem()
     monkeypatch.setattr(tools, "_PAIRS_PATH", _write_pairs(tmp_path, []))
     monkeypatch.setattr(tools, "web_search", lambda subject: None)
-    monkeypatch.setattr(tools, "wikipedia_search", lambda subject: None)
+    monkeypatch.setattr(tools, "wikipedia_search", lambda subject, **kw: None)
+    monkeypatch.setattr(tools, "general_web_search", lambda subject, **kw: None)
 
     assert route_reply("你懂量子力學嗎") is None
 
@@ -197,7 +202,7 @@ def test_lookup_falls_back_to_wikipedia_when_duckduckgo_has_nothing(monkeypatch)
     # 這是修「你會微積分嗎」實際查不到資料那個案例的核心：DuckDuckGo 對中文
     # 詞條常常查無結果（實測「微積分」「台北101」都是），中文維基百科查得到。
     monkeypatch.setattr(tools, "web_search", lambda subject: None)
-    monkeypatch.setattr(tools, "wikipedia_search", lambda subject: f"{subject} 是數學的一個分支。")
+    monkeypatch.setattr(tools, "wikipedia_search", lambda subject, **kw: f"{subject} 是數學的一個分支。")
 
     result, source = tools._lookup("微積分")
 
@@ -209,7 +214,7 @@ def test_knowledge_question_fallback_uses_wikipedia_and_records_its_source(tmp_p
     _reset_last_problem()
     monkeypatch.setattr(tools, "_PAIRS_PATH", _write_pairs(tmp_path, ["hi"]))
     monkeypatch.setattr(tools, "web_search", lambda subject: None)
-    monkeypatch.setattr(tools, "wikipedia_search", lambda subject: f"{subject} 是數學的一個分支。")
+    monkeypatch.setattr(tools, "wikipedia_search", lambda subject, **kw: f"{subject} 是數學的一個分支。")
     saved = {}
     monkeypatch.setattr(tools.auto_learn, "save_candidate", lambda **kw: saved.update(kw))
 
@@ -259,7 +264,7 @@ def test_image_source_returns_none_without_path_after_prefix():
 def test_route_reply_fires_image_recognition(monkeypatch):
     _reset_last_problem()
     called = []
-    monkeypatch.setattr(tools, "recognize_image", lambda source: called.append(source) or "偵測到 1 個物件：貓（信心度 90%）")
+    monkeypatch.setattr(tools, "recognize_image", lambda source, **kw: called.append(source) or "偵測到 1 個物件：貓（信心度 90%）")
 
     reason, reply = route_reply("辨識圖片 C:/photos/cat.jpg")
 
@@ -283,7 +288,7 @@ def test_strip_leading_filler_removes_common_conversational_prefixes():
 
 def test_route_reply_search_pattern_fires_with_leading_filler_prefix(monkeypatch):
     _reset_last_problem()
-    monkeypatch.setattr(tools, "_lookup", lambda subject: (f"{subject} 是一位演員。", "duckduckgo"))
+    monkeypatch.setattr(tools, "_lookup", lambda subject, **kw: (f"{subject} 是一位演員。", "duckduckgo"))
 
     reason, reply = route_reply("那你知道張凌赫嗎?")
 
@@ -299,7 +304,22 @@ def test_route_reply_knowledge_fallback_fires_with_leading_filler_prefix(tmp_pat
     reason, reply = route_reply("那你懂微積分嗎")
 
     assert "微積分" in reason
-    assert reply == "微積分 是數學的一個分支。"
+
+
+# ---------------------------------------------------------------------------
+# "你知道 X 嗎" 的 "嗎" 是必填字——實測回報："你知道三星最新款的手機與手錶?"
+# 這種用西式問號結尾、沒有「嗎」的問法完全比對不到 _SEARCH_PATTERNS，整句掉
+# 回死記式聊天模型硬答一句亂碼（"我是 AI, PI的 P P P AI P AI"）。
+# ---------------------------------------------------------------------------
+
+def test_route_reply_search_pattern_fires_without_trailing_ma(monkeypatch):
+    _reset_last_problem()
+    monkeypatch.setattr(tools, "_lookup", lambda subject, **kw: (f"{subject} 相關資料。", "duckduckgo"))
+
+    reason, reply = route_reply("你知道三星最新款的手機與手錶?")
+
+    assert "三星最新款的手機與手錶" in reason
+    assert reply == "三星最新款的手機與手錶 相關資料。"
 
 
 def test_recognize_image_reports_missing_local_file():
@@ -576,3 +596,83 @@ def test_route_reply_stock_query_reports_failure_without_crashing(monkeypatch):
 
     assert "大盤" in reason
     assert "暫時失敗" in reply
+
+
+# ---------------------------------------------------------------------------
+# 依提問語言（繁體中文／美式英文）輸出——_detect_lang() 是粗略啟發式（含中
+# 文字就當中文，否則含英文字母就當英文），route_reply() 用它決定天氣/圖片/
+# 影片/搜尋這些 sinco 自己組的固定字串要用哪個語言版本。
+# ---------------------------------------------------------------------------
+
+def test_detect_lang_classifies_chinese_english_and_mixed_input():
+    assert tools._detect_lang("台北天氣") == "zh"
+    assert tools._detect_lang("weather in Taipei") == "en"
+    assert tools._detect_lang("Taipei 天氣") == "zh"  # 混雜輸入：含中文字一律當中文
+    assert tools._detect_lang("123") == "zh"  # 兩者都沒有 -> 預設中文
+
+
+def test_route_reply_weather_replies_in_chinese_for_chinese_question(monkeypatch):
+    _reset_last_problem()
+    monkeypatch.setattr(tools, "get_weather", lambda location, lang="zh": f"[{lang}] +27°C")
+
+    reason, reply = route_reply("台北天氣")
+
+    assert reply == "台北 目前天氣：[zh] +27°C"
+
+
+# 注意：_WEATHER_KEYWORD 目前只認中文「天氣」（不像圖片/影片/搜尋句型已經有
+# 對應的英文觸發詞），純英文的天氣提問（"weather in Taipei"）現況根本不會
+# 被判定成天氣請求，所以沒有對應的英文天氣輸出測試——那是觸發句型要不要擴充
+# 英文關鍵字的另一個獨立問題，不在這次「依提問語言輸出既有可觸發路由」的
+# 範圍內。上面 get_weather()/route_reply() 天氣分支已經照 lang 分流，一旦
+# 之後真的加了英文觸發詞，輸出就會自動接上，不需要再改一次。
+
+
+def test_route_reply_video_search_not_found_uses_english_message_for_english_question(monkeypatch):
+    _reset_last_problem()
+    monkeypatch.setattr(tools, "youtube_search", lambda query, **kw: None)
+
+    reason, reply = route_reply("search video xyzxyzxyz nothing here")
+
+    assert "no videos found" in reply.lower()
+
+
+def test_route_reply_search_not_found_uses_english_message_for_english_question(monkeypatch):
+    monkeypatch.setattr(tools, "_lookup", lambda subject, **kw: (None, "duckduckgo"))
+
+    reason, reply = route_reply("search: xyzxyzxyz nothing here")
+
+    assert "no information found" in reply.lower()
+
+
+def test_route_reply_image_recognition_reports_missing_file_in_english():
+    _reset_last_problem()
+    reason, reply = route_reply("recognize image C:/definitely/not/a/real/path/nope.jpg")
+
+    assert "not found" in reply.lower()
+
+
+def test_general_web_search_puts_link_on_its_own_line(monkeypatch):
+    # 連結必須獨立成一行、不跟標題/摘要或括號擠在同一行——括號夾住 URL 時，
+    # 部分終端機/GUI 的自動連結偵測會把括號一併算進網址或在括號處提前截斷，
+    # 點開就只拿到部分網址。這裡驗證 general_web_search() 真的把連結拆到自己
+    # 的一行，且那一行只有網址本身。
+    monkeypatch.setenv("SERPER_API_KEY", "fake-key")
+
+    class _FakeResp:
+        status_code = 200
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"organic": [{"title": "標題", "snippet": "摘要", "link": "https://example.com/page"}]}
+
+    monkeypatch.setattr(tools.requests, "post", lambda *a, **kw: _FakeResp())
+
+    result = tools.general_web_search("測試查詢")
+
+    lines = result.split("\n")
+    assert "https://example.com/page" in lines
+    link_line = lines[lines.index("https://example.com/page")]
+    assert link_line == "https://example.com/page"  # 該行只有網址，沒有括號或其他文字
