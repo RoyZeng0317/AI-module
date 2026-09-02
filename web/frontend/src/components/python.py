@@ -23,7 +23,7 @@ import re as _re
 # `web/backend/app.py` 用同一套 MOUNT_PREFIX 環境變數掛同一個前綴，兩邊
 # 路徑會自動對齊。只有後端跟前端不同主機時才需要把 BACKEND_URL 填成完整
 # 網址（此時就一定是網域根目錄，不會有子路徑問題）。
-BACKEND_URL = ""
+BACKEND_URL = "http://localhost:8000"
 
 
 def _api_url(path):
