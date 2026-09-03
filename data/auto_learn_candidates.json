@@ -70,5 +70,29 @@
     "topic": "編寫python程式語言",
     "source": "general_search",
     "created_at": "2026-08-29T06:55:56+00:00"
+  },
+  {
+    "id": "8a6a2e34",
+    "prompt": "什麼是python?",
+    "reply": "python是一個可以網路爬蟲、資料處理與AI模型訓練等多功能程式語言",
+    "topic": "什麼是python?",
+    "source": "manual_gui",
+    "created_at": "2026-09-03T05:53:05+00:00"
+  },
+  {
+    "id": "779b7014",
+    "prompt": "你會繪製kicad嗎?",
+    "reply": "目前暫時還不會，工程師目前也正在努力當中，敬請期待",
+    "topic": "你會繪製kicad嗎?",
+    "source": "manual_gui",
+    "created_at": "2026-09-03T05:54:40+00:00"
+  },
+  {
+    "id": "79d7082a",
+    "prompt": "你知道blender嗎?",
+    "reply": "知道，blender是一個3D建模軟體，對於3D建模、動畫、渲染、遊戲製作等都有很好的支援，並且是免費且開源的軟體。",
+    "topic": "你知道blender嗎?",
+    "source": "manual_gui",
+    "created_at": "2026-09-03T05:56:04+00:00"
   }
 ]

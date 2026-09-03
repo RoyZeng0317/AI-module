@@ -557,18 +557,16 @@ class CommandPalette:
         self.hide_suggestions()
         self.suggestion_win = tk.Toplevel(self.windows)
         self.suggestion_win.overrideredirect(True)
-        row_height = 20
-        win_height = row_height * len(matches) + 4
-        x = self.message.winfo_rootx()
-        y = self.message.winfo_rooty() - win_height - 4
-        self.suggestion_win.geometry(f"+{x}+{y}")
 
         container = tk.Frame(self.suggestion_win)
         container.pack()
 
         # 綁定時抓區域變數 listbox（一定是實例，不是 Optional），不要在 lambda
         # 裡引用 self.suggestion_listbox，避免型別檢查器誤判它可能是 None
-        listbox = tk.Listbox(container, height=len(matches), width=36, bd=1, relief="solid", exportselection=False)
+        listbox = tk.Listbox(
+            container, height=len(matches), width=44, bd=1, relief="solid",
+            exportselection=False, font=("Segoe UI", 10),
+        )
         listbox.pack(side="left", fill="y")
         for cmd in matches:
             listbox.insert(tk.END, cmd)
@@ -578,12 +576,23 @@ class CommandPalette:
         self._match_paths = match_paths
         if match_paths is not None:
             preview = tk.Text(
-                container, width=64, height=len(matches), bd=1, relief="solid",
-                wrap="none", state="disabled", bg="#1e1e1e", fg="#d4d4d4",
+                container, width=78, height=len(matches), bd=1, relief="solid",
+                wrap="none", state="disabled", bg="#1e1e1e", fg="#d4d4d4", font=("Consolas", 10),
             )
             preview.pack(side="left", fill="both")
             self.preview_text = preview
             self._update_preview(0)  # 一開始沒按過上下鍵，先預覽第一個候選（Tab 也是預設補這個）
+
+        # 選項框改貼齊主視窗右下角（原本貼在輸入框正上方，輸入框離視窗頂端太近
+        # 時建議清單會被切到）；要等上面元件都 pack 完才能用 update_idletasks()
+        # 量出實際尺寸來算右下角要對齊的座標。
+        self.suggestion_win.update_idletasks()
+        win_width = self.suggestion_win.winfo_reqwidth()
+        win_height = self.suggestion_win.winfo_reqheight()
+        margin = 12
+        x = self.windows.winfo_rootx() + self.windows.winfo_width() - win_width - margin
+        y = self.windows.winfo_rooty() + self.windows.winfo_height() - win_height - margin
+        self.suggestion_win.geometry(f"+{x}+{y}")
 
     # 更新指令建議：輸入「/」開頭時建議指令名稱；輸入「/指令 」（帶空格）之後，
     # 如果那個指令在 ARG_SUGGESTIONS 有登記引數選項（目前只有 /model），改成

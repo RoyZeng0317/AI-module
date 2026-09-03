@@ -35,6 +35,9 @@ def _api_url(path):
 HEALTH_URL = _api_url("api/health")
 CHAT_URL = _api_url("api/chat")
 CONVERSATIONS_URL = _api_url("api/conversations")
+NOTIFICATIONS_URL = _api_url("api/notifications")
+NOTIFY_MARK_ALL_READ_URL = _api_url("api/notifications/mark_all_read")
+NOTIFY_POLL_INTERVAL_SEC = 20
 DETECT_INTERVAL_MS = 500
 CAPTURE_WIDTH = 640
 
@@ -173,6 +176,12 @@ ICONS = {
         '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
         ' stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M5 5l14 14M19 5L5 19"/></svg>'
+    ),
+    "bell": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M6 8a6 6 0 0 1 12 0c0 3.5 1 5.5 2 7H4c1-1.5 2-3.5 2-7Z"/>'
+        '<path d="M10 19a2 2 0 0 0 4 0"/></svg>'
     ),
 }
 
@@ -891,7 +900,7 @@ def _start_rename(title_el, conversation_id, current_title):
     input_el.addEventListener("click", create_proxy(lambda e: e.stopPropagation()))
 
 
-def _open_item_menu(item, title_el, conversation_id, current_title):
+def _open_item_menu(item, title_el, conversation_id, current_title, anchor_btn):
     _close_open_menu()
 
     menu = el("div", cls="chat-item-menu")
@@ -914,6 +923,13 @@ def _open_item_menu(item, title_el, conversation_id, current_title):
     menu.appendChild(delete_btn)
 
     item.appendChild(menu)
+    # 選單釘在被點的「更多選項」按鈕旁邊（貼著側邊欄右緣往右彈出），不是整個
+    # 視窗右下角——之前 CSS 寫死 bottom/right 會讓選單跟點的是哪個對話項目
+    # 完全無關。position:fixed 不受 .sidebar 的 overflow-y:auto 裁切影響，
+    # 所以座標用 getBoundingClientRect() 現算即可。
+    rect = anchor_btn.getBoundingClientRect()
+    menu.style.top = f"{rect.top}px"
+    menu.style.left = f"{rect.right + 6}px"
     _state["open_menu"] = menu
     _state["open_menu_id"] = conversation_id
 
@@ -944,18 +960,18 @@ def _render_history_list(conversations):
         def _make_switch_handler(cid):
             return lambda _e: asyncio.ensure_future(switch_conversation(cid))
 
-        def _make_more_handler(it, t_el, cid, title):
+        def _make_more_handler(it, t_el, cid, title, btn):
             def _handler(e):
                 e.stopPropagation()
                 if _state.get("open_menu_id") == cid:
                     _close_open_menu()
                 else:
-                    _open_item_menu(it, t_el, cid, title)
+                    _open_item_menu(it, t_el, cid, title, btn)
             return _handler
 
         item.addEventListener("click", create_proxy(_make_switch_handler(conv["id"])))
         more_btn.addEventListener(
-            "click", create_proxy(_make_more_handler(item, title_el, conv["id"], conv["title"]))
+            "click", create_proxy(_make_more_handler(item, title_el, conv["id"], conv["title"], more_btn))
         )
         item.appendChild(more_btn)
 
@@ -1060,6 +1076,9 @@ def _build_sidebar():
 
     aside.appendChild(history_section)
 
+    # ── 彈性空間：把下面「連線狀態／功能」跟頁尾一起推到底部，貼著頁尾上方 ──
+    aside.appendChild(el("div", cls="sidebar-spacer"))
+
     # ── 連線狀態 ──
     status_section = el("div", cls="sidebar-section")
 
@@ -1084,9 +1103,6 @@ def _build_sidebar():
     tools_section.appendChild(icon_button("learn", "學習", on_click=lambda _: asyncio.ensure_future(_on_learn_click())))
     aside.appendChild(tools_section)
 
-    # ── 彈性空間，把頁尾推到底部 ──
-    aside.appendChild(el("div", cls="sidebar-spacer"))
-
     # ── 頁尾：清除對話 + 設定（模型／物件偵測信心值彙整到設定彈窗）+ 版權 ──
     footer = el("div", cls="sidebar-footer")
 
@@ -1096,6 +1112,13 @@ def _build_sidebar():
     footer.appendChild(icon_button(
         "settings", "設定", on_click=lambda _: toggle_settings_modal(), cls="footer-action", btn_id="settingsBtn"
     ))
+    notify_btn = icon_button(
+        "bell", "通知", on_click=lambda _: toggle_notify_panel(), cls="footer-action", btn_id="notifyBtn"
+    )
+    notify_badge = el("span", cls="notify-badge", id="notifyBadge")
+    notify_btn.appendChild(notify_badge)
+    _dom["notify_badge"] = notify_badge
+    footer.appendChild(notify_btn)
     footer.appendChild(el("div", cls="sidebar-credit", text="© Author: Roy Zeng"))
 
     aside.appendChild(footer)
@@ -1138,6 +1161,60 @@ def toggle_settings_modal():
         box.classList.remove("is-open")
     else:
         box.classList.add("is-open")
+
+
+def toggle_notify_panel():
+    box = _dom["notify_panel"]
+    if box.classList.contains("is-open"):
+        box.classList.remove("is-open")
+    else:
+        box.classList.add("is-open")
+        asyncio.ensure_future(refresh_notifications())
+
+
+def _render_notifications(items):
+    """items 來自 GET /api/notifications（見 notify_store.list_notifications()）：
+    [{"id", "message", "created_at", "read"}, ...]，新到舊排序。"""
+    container = _dom["notify_list"]
+    container.innerHTML = ""
+    if not items:
+        container.appendChild(el("div", cls="notify-empty", text="目前沒有通知"))
+    else:
+        for item in items:
+            cls = "notify-item" if item.get("read") else "notify-item is-unread"
+            container.appendChild(el("div", cls=cls, text=item.get("message", "")))
+
+    unread = sum(1 for item in items if not item.get("read"))
+    badge = _dom["notify_badge"]
+    if unread:
+        badge.textContent = str(unread)
+        badge.style.display = "inline-flex"
+    else:
+        badge.style.display = "none"
+
+
+async def refresh_notifications():
+    try:
+        items = await api_get(NOTIFICATIONS_URL)
+    except Exception as exc:
+        console.error(f"通知讀取失敗：{exc}")
+        return
+    _render_notifications(items)
+
+
+async def _mark_all_read():
+    try:
+        await api_post(NOTIFY_MARK_ALL_READ_URL, {})
+    except Exception as exc:
+        console.error(f"標記已讀失敗：{exc}")
+        return
+    await refresh_notifications()
+
+
+async def _notify_poll_loop():
+    while True:
+        await refresh_notifications()
+        await asyncio.sleep(NOTIFY_POLL_INTERVAL_SEC)
 
 
 def _build_detect_overlay():
@@ -1265,6 +1342,44 @@ def _build_settings_modal():
     return box
 
 
+def _build_notify_panel():
+    """通知面板：admin 端 action.py 的「發送通知」彈窗建立一筆
+    （POST /api/notifications），這裡輪詢 GET 讀出來顯示
+    （見 _notify_poll_loop()），"全部已讀" 呼叫 mark_all_read。"""
+    box = el("div", cls="box", id="notifyPanel")
+
+    panel = el("div", cls="overlay-panel")
+
+    head = el("div", cls="overlay-head")
+    head.appendChild(svg_span(ICONS["bell"].replace('viewBox', 'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox')))
+    ht = el("div")
+    ht.appendChild(el("h2", text="通知"))
+    ht.appendChild(el("p", text="系統與管理員訊息"))
+    head.appendChild(ht)
+    close_btn = el("button", cls="overlay-close", title="關閉", html=ICONS["close"])
+    close_btn.addEventListener("click", create_proxy(lambda _: toggle_notify_panel()))
+    head.appendChild(close_btn)
+    panel.appendChild(head)
+
+    body = el("div", cls="overlay-body")
+
+    mark_btn = el("button", cls="notify-mark-all", text="全部已讀")
+    mark_btn.setAttribute("type", "button")
+    mark_btn.addEventListener("click", create_proxy(lambda _: asyncio.ensure_future(_mark_all_read())))
+    body.appendChild(mark_btn)
+
+    notify_list = el("div", cls="notify-list")
+    _dom["notify_list"] = notify_list
+    body.appendChild(notify_list)
+
+    panel.appendChild(body)
+    box.appendChild(panel)
+    box.addEventListener("click", create_proxy(_close_on_backdrop(box)))
+
+    _dom["notify_panel"] = box
+    return box
+
+
 def _build_chat_card():
     """對話面板：結構/命名對齊 default.html 的
     `.chat-header` / `.chat-messages` / `.chat-input-container` /
@@ -1364,6 +1479,7 @@ def build_ui():
 
     root.appendChild(shell)
     root.appendChild(_build_settings_modal())
+    root.appendChild(_build_notify_panel())
 
     # 物件偵測介面掛在 index.html 既有的 `<div class="box" id="box">` 上，
     # 不是 #root 底下——build_ui() 每次重繪 #root 都不會動到它。
@@ -1377,3 +1493,4 @@ build_ui()
 document.addEventListener("click", create_proxy(lambda _e: _close_open_menu()))
 asyncio.ensure_future(check_health())
 asyncio.ensure_future(_init_conversations())
+asyncio.ensure_future(_notify_poll_loop())

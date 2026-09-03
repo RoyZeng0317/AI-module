@@ -9,6 +9,8 @@ Then open http://localhost:8000/
 
 import os
 import sys
+import time
+from collections import defaultdict
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -49,6 +51,8 @@ from pydantic import BaseModel
 
 import auto_learn
 import conversation_store as convo_store
+import notify_store
+import usage_store
 from chats import smart_reply
 from detector import detect
 from gpu_info import get_gpu_info
@@ -78,6 +82,31 @@ class ChatRequest(BaseModel):
 
 class ConversationRenameRequest(BaseModel):
     title: str
+
+
+class NotificationCreateRequest(BaseModel):
+    message: str
+
+
+# 單一使用者一段時間內能送出的聊天請求數量上限——沒有登入系統可以識別「使用
+# 者」，用來源 IP 當 key 是這個規模的私人專案最簡單可行的做法。狀態存在記憶體
+# 裡（重啟就重置），跟這個專案「單機/私人用」的規模相符，不需要 Redis 之類的
+# 外部儲存。
+CHAT_RATE_LIMIT = 20
+CHAT_RATE_WINDOW_SEC = 60
+_chat_request_log: dict[str, list[float]] = defaultdict(list)
+
+
+def _check_chat_rate_limit(client_ip: str) -> None:
+    now = time.time()
+    log = _chat_request_log[client_ip]
+    log[:] = [t for t in log if now - t < CHAT_RATE_WINDOW_SEC]
+    if len(log) >= CHAT_RATE_LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail=f"請求過於頻繁，請 {CHAT_RATE_WINDOW_SEC} 秒後再試",
+        )
+    log.append(now)
 
 
 app = FastAPI(title="AI-module camera object detection")
@@ -182,6 +211,25 @@ async def delete_conversation_endpoint(conversation_id: str):
     return {"status": "deleted"}
 
 
+# 通知：action.py（admin 端）的「發送通知」彈窗呼叫 POST 寫入一筆，
+# python.py（使用者端）的通知面板輪詢 GET 讀出來顯示。
+@router.get("/api/notifications")
+async def list_notifications_endpoint():
+    return notify_store.list_notifications()
+
+
+@router.post("/api/notifications")
+async def create_notification_endpoint(payload: NotificationCreateRequest):
+    if not payload.message.strip():
+        raise HTTPException(status_code=400, detail="message must not be empty")
+    return notify_store.create_notification(payload.message.strip())
+
+
+@router.post("/api/notifications/mark_all_read")
+async def mark_all_notifications_read_endpoint():
+    return notify_store.mark_all_read()
+
+
 # /memory、/learn 是跟桌面 GUI（command.py 的 CommandPalette._run_memory/
 # _run_learn）、CLI（cli.py 的 run_memory/run_learn）同一套本機、非模型指令，
 # 邏輯搬過來這裡沿用同一份 memory_store.py / auto_learn.py 存檔。在這之前
@@ -261,9 +309,19 @@ def _run_local_command(message: str) -> str | None:
 
 
 @router.post("/api/chat")
-async def chat_endpoint(payload: ChatRequest):
+async def chat_endpoint(payload: ChatRequest, request: Request):
+    client_ip = request.client.host
+    _check_chat_rate_limit(client_ip)
+
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
+
+    if usage_store.get_usage(client_ip) >= usage_store.USAGE_CHAR_LIMIT:
+        window_hours = usage_store.USAGE_WINDOW_SEC // 3600
+        raise HTTPException(
+            status_code=429,
+            detail=f"已達 {window_hours} 小時內的字數使用上限（{usage_store.USAGE_CHAR_LIMIT} 字），請稍後再試",
+        )
 
     conversation_id = payload.conversation_id
     if conversation_id is not None and convo_store.get_conversation(conversation_id) is None:
@@ -275,10 +333,26 @@ async def chat_endpoint(payload: ChatRequest):
     local_reply = _run_local_command(payload.message.strip())
     reply = local_reply if local_reply is not None else smart_reply(payload.message)
 
+    # 用量算輸入+輸出的字元總和，比較貼近實際運算量——sinco 是字元級模型，
+    # 沒有 subword/BPE token 這種單位（見 usage_store.py 開頭說明）。
+    usage_store.add_usage(client_ip, len(payload.message) + len(reply))
+
     if conversation_id is not None:
         convo_store.append_message(conversation_id, "assistant", reply)
 
     return {"reply": reply, "conversation_id": conversation_id}
+
+
+@router.get("/api/usage")
+async def usage_endpoint(request: Request):
+    """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效
+    （例如手動測試，或之後接進 admin 端畫面）。"""
+    used = usage_store.get_usage(request.client.host)
+    return {
+        "chars_used": used,
+        "char_limit": usage_store.USAGE_CHAR_LIMIT,
+        "window_hours": usage_store.USAGE_WINDOW_SEC // 3600,
+    }
 
 
 # 手機瀏覽器（例如三星瀏覽器）沒有桌面 DevTools 的「Disable cache」選項，

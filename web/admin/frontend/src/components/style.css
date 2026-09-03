@@ -279,14 +279,12 @@ input:focus-visible,
 }
 
 .chat-item-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 6px;
-  z-index: 20;
+  position: fixed;
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  min-width: 150px;
-  padding: 4px;
+  min-width: 190px;
+  padding: 6px;
   border-radius: var(--radius-sm);
   background: var(--bg-surface-2);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
@@ -302,16 +300,16 @@ input:focus-visible,
   border: none;
   background: transparent;
   color: var(--text);
-  font-size: 12.5px;
-  padding: 7px 8px;
+  font-size: 16px;
+  padding: 9px 10px;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
 }
 
 .chat-item-menu-item svg {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   stroke: currentColor;
   flex-shrink: 0;
 }
@@ -718,6 +716,34 @@ input:focus-visible,
 
 .settings-field + .settings-field {
   margin-top: 18px;
+}
+
+/* ---------- 發送通知彈窗（見 action.py 的 _build_notify_composer_modal()） ---------- */
+
+.notify-composer-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 13.5px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.notify-composer-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.notify-composer-status {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-faint);
+  min-height: 14px;
 }
 
 /* ---------- camera card ---------- */

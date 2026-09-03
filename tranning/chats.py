@@ -51,6 +51,7 @@ import argparse
 import json
 import random
 import sys
+import time
 from pathlib import Path
 
 import torch
@@ -246,7 +247,23 @@ def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # vocab.json/config.json 跟權重檔永遠一起寫（而非分開）：如果只先寫
+    # vocab.json、權重檔晚點才存，中途任何人（CLI、GUI）讀取這個 checkpoint
+    # 都會因為 embedding 維度對不上而直接 Error(s) in loading state_dict。
+    # 四個檔案綁在同一個函式裡一次寫完，讓 out_dir 隨時只會是「完整的舊
+    # checkpoint」或「完整的新 checkpoint」兩種狀態之一。
+    def save_checkpoint():
+        (out_dir / "vocab.json").write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
+        (out_dir / "config.json").write_text(
+            json.dumps({"embed_size": embed_size, "hidden_size": hidden_size, "max_len": max_len}, indent=2)
+        )
+        torch.save(encoder.state_dict(), out_dir / "encoder.pt")
+        torch.save(decoder.state_dict(), out_dir / "decoder.pt")
+
     history = []
+    start_time = time.time()
+    best_loss = float("inf")
+    params = list(encoder.parameters()) + list(decoder.parameters())
     for epoch in range(1, epochs + 1):
         total_loss, total_tokens = 0.0, 0
         for src, tgt in loader:
@@ -267,27 +284,33 @@ def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
             valid_tokens = int((tgt != PAD).sum().item())
             loss = step_loss / max(valid_tokens, 1)
             loss.backward()
+            # 沒有裁剪時，長時間訓練偶爾會在某個 epoch 梯度暴衝，把已經收斂
+            # 好的權重瞬間打壞，且後面的 epoch 回不去（3000 epochs 那次從
+            # loss 0.65 一路發散到 4.1 就是這樣）——clip 到 max_norm=5 是
+            # RNN 訓練的標準做法，擋掉單步暴衝但不影響正常梯度下降。
+            torch.nn.utils.clip_grad_norm_(params, max_norm=5.0)
             optimizer.step()
             total_loss += step_loss.item()
             total_tokens += valid_tokens
 
         avg_loss = total_loss / max(total_tokens, 1)
-        print(f"epoch {epoch:3d}  loss={avg_loss:.4f}")
+        elapsed = time.time() - start_time
+        eta = elapsed / epoch * (epochs - epoch)
+        # flush=True: 沒有這個，被導向檔案/pipe 時 print 會整批緩衝，
+        # 中途讀檔看到的永遠是空的，要等訓練完全跑完才會一次冒出來
+        # （這次重訓 chat_runs 就是這樣才看不到進度）。
+        is_best = avg_loss < best_loss
+        print(f"epoch {epoch:3d}/{epochs}  loss={avg_loss:.4f}  elapsed={elapsed:.0f}s  eta={eta:.0f}s"
+              f"{'  (best)' if is_best else ''}", flush=True)
         history.append({"epoch": epoch, "loss": avg_loss})
+        if is_best:
+            # 每個 epoch 都存最佳狀態，而不是只存訓練跑完當下那個 epoch：
+            # 上面的梯度裁剪能降低暴衝機率，但沒辦法保證整個訓練過程都不會
+            # 有比較差的尾段——與其事後才發現最後一個 epoch 比中間差，不如
+            # 全程都保留看過的最佳結果。
+            best_loss = avg_loss
+            save_checkpoint()
 
-    # vocab.json/config.json 跟權重檔一起在訓練「結束」後才寫入（而非開頭）：
-    # 舊版在迴圈開始前就先寫 vocab.json，如果重新訓練時字元集有變動（新增了
-    # 訓練資料），out_dir 會有一段長達整個訓練時間的空窗期，vocab.json 已經是
-    # 新的、但 encoder.pt/decoder.pt 還是舊的——這段時間任何人（CLI、GUI）
-    # 讀取這個 checkpoint 都會因為 embedding 維度對不上而直接 Error(s) in
-    # loading state_dict。全部搬到訓練迴圈之後一起寫，讓 out_dir 隨時只會是
-    #「完整的舊 checkpoint」或「完整的新 checkpoint」兩種狀態之一。
-    (out_dir / "vocab.json").write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
-    (out_dir / "config.json").write_text(
-        json.dumps({"embed_size": embed_size, "hidden_size": hidden_size, "max_len": max_len}, indent=2)
-    )
-    torch.save(encoder.state_dict(), out_dir / "encoder.pt")
-    torch.save(decoder.state_dict(), out_dir / "decoder.pt")
     (out_dir / "history.json").write_text(json.dumps(history, indent=2))
     return encoder, decoder, vocab, history
 
@@ -330,6 +353,29 @@ _NOT_TRAINED_MESSAGE = "模型尚未訓練，請先提供對話資料集並執�
 DEFAULT_MC_SAMPLES = 20
 
 
+_REPEAT_MAX_PERIOD, _REPEAT_MIN_CYCLES = 6, 3
+
+
+def _is_repeating(ids: list[int]) -> bool:
+    """True once the tail of `ids` is some short cycle (period 1..6, e.g. a
+    single repeated character or a repeated multi-char unit like ", AI")
+    repeated _REPEAT_MIN_CYCLES times in a row. An undertrained checkpoint's
+    greedy decode has no built-in reason to ever stop repeating itself once
+    it locks onto such a cycle (this is exactly how "我是 AI, AI, AI, AI..."
+    happens) — this is an inference-time safety net, not a fix for the
+    underlying undertraining, so it only fires on genuine loops, not on a
+    legitimately short repeated word.
+    """
+    for period in range(1, _REPEAT_MAX_PERIOD + 1):
+        needed = period * _REPEAT_MIN_CYCLES
+        if len(ids) < needed:
+            continue
+        tail = ids[-needed:]
+        if all(tail[i] == tail[i % period] for i in range(needed)):
+            return True
+    return False
+
+
 def _greedy_decode(encoder: Encoder, decoder: Decoder, src: torch.Tensor,
                     max_len: int, idx2word: dict) -> str:
     """One deterministic-shaped decode pass. Not actually deterministic when
@@ -349,6 +395,8 @@ def _greedy_decode(encoder: Encoder, decoder: Decoder, src: torch.Tensor,
             if next_id == EOS:
                 break
             output_ids.append(next_id)
+            if _is_repeating(output_ids):
+                break
             decoder_input = torch.tensor([[next_id]])
     return "".join(idx2word.get(i, "<unk>") for i in output_ids)
 

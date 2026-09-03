@@ -279,14 +279,12 @@ input:focus-visible,
 }
 
 .chat-item-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 6px;
-  z-index: 20;
+  position: fixed;
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  min-width: 150px;
-  padding: 4px;
+  min-width: 190px;
+  padding: 6px;
   border-radius: var(--radius-sm);
   background: var(--bg-surface-2);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
@@ -302,16 +300,16 @@ input:focus-visible,
   border: none;
   background: transparent;
   color: var(--text);
-  font-size: 12.5px;
-  padding: 7px 8px;
+  font-size: 16px;
+  padding: 9px 10px;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
 }
 
 .chat-item-menu-item svg {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   stroke: currentColor;
   flex-shrink: 0;
 }
@@ -552,6 +550,22 @@ input:focus-visible,
   color: var(--text);
 }
 
+.notify-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .sidebar-credit {
   font-size: 10.5px;
   color: var(--text-faint);
@@ -718,6 +732,54 @@ input:focus-visible,
 
 .settings-field + .settings-field {
   margin-top: 18px;
+}
+
+/* ---------- 通知面板（見 python.py 的 _build_notify_panel()） ---------- */
+
+.notify-mark-all {
+  appearance: none;
+  align-self: flex-end;
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.15s ease;
+}
+
+.notify-mark-all:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.notify-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notify-item {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-soft);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.notify-item.is-unread {
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+}
+
+.notify-empty {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  padding: 8px 2px;
 }
 
 /* ---------- camera card ---------- */

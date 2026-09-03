@@ -19,7 +19,7 @@ import json
 import sys
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path    
 
 if getattr(sys, "frozen", False):
     # PyInstaller onefile (nova.exe, built to live at the project root): see

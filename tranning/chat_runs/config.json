@@ -1,5 +1,5 @@
 {
   "embed_size": 64,
-  "hidden_size": 128,
+  "hidden_size": 256,
   "max_len": 40
 }
