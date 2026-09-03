@@ -255,6 +255,73 @@ def test_image_source_returns_none_without_prefix():
     assert _image_source_if_requested("我喜歡圖片") is None
 
 
+# ---------------------------------------------------------------------------
+# 終端機指令白名單執行（terminal_exec.py，route_reply() 新分支）
+# ---------------------------------------------------------------------------
+
+def test_detect_command_matches_literal_and_alias():
+    assert tools.terminal_exec.detect_command("git status") == "git status"
+    assert tools.terminal_exec.detect_command("執行 git 狀態") == "git status"
+    assert tools.terminal_exec.detect_command("跑一下 dir") == "dir"
+
+
+def test_detect_command_requires_exec_hint_for_non_exact_mentions():
+    # 有別名字（"git 狀態"）出現，但沒有執行意圖詞、也不是完全等於別名本身
+    # -> 不該當成指令執行請求
+    assert tools.terminal_exec.detect_command("我朋友在講 git 狀態的事情") is None
+
+
+def test_looks_like_execution_request_true_without_whitelist_match():
+    assert tools.terminal_exec.looks_like_execution_request("執行 rm -rf /")
+    assert tools.terminal_exec.detect_command("執行 rm -rf /") is None
+
+
+def test_run_command_success_with_safe_whitelist_entry():
+    returncode, stdout, stderr = tools.terminal_exec.run_command("python --version")
+    assert returncode == 0
+    assert "python" in stdout.lower()
+
+
+def test_run_command_handles_timeout(monkeypatch):
+    def raise_timeout(*args, **kwargs):
+        raise tools.terminal_exec.subprocess.TimeoutExpired(cmd="x", timeout=1)
+
+    monkeypatch.setattr(tools.terminal_exec.subprocess, "run", raise_timeout)
+    returncode, _stdout, stderr = tools.terminal_exec.run_command("whoami")
+    assert returncode is None
+    assert "逾時" in stderr
+
+
+def test_run_command_handles_oserror(monkeypatch):
+    def raise_oserror(*args, **kwargs):
+        raise OSError("boom")
+
+    monkeypatch.setattr(tools.terminal_exec.subprocess, "run", raise_oserror)
+    returncode, _stdout, stderr = tools.terminal_exec.run_command("whoami")
+    assert returncode is None
+    assert "boom" in stderr
+
+
+def test_route_reply_fires_whitelisted_command(monkeypatch):
+    monkeypatch.setattr(tools.terminal_exec, "run_command", lambda key: (0, "clean\n", ""))
+    reason, reply = route_reply("執行 git status")
+    assert "git status" in reason
+    assert "clean" in reply
+
+
+def test_route_reply_refuses_non_whitelisted_command(monkeypatch):
+    called = []
+
+    def must_not_run(*args, **kwargs):
+        called.append(args)
+        raise AssertionError("不該真的執行未列入白名單的指令")
+
+    monkeypatch.setattr(tools.terminal_exec.subprocess, "run", must_not_run)
+    reason, reply = route_reply("執行 rm -rf /")
+    assert "白名單" in reply
+    assert called == []
+
+
 def test_image_source_returns_none_without_path_after_prefix():
     from tools import _image_source_if_requested
     assert _image_source_if_requested("辨識圖片") is None

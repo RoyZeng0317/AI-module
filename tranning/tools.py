@@ -22,6 +22,16 @@ URL, decided and formatted by route_reply() itself, same Rule 06 boundary
 as everything else here (the "thinking" is a local model call, not a cloud
 vision API).
 
+The terminal-command routing hands off to terminal_exec.py — a fixed
+whitelist of read-only, non-destructive shell commands (git status/log,
+python --version, pip list, ...). No model, local or otherwise, is involved
+in deciding what actually runs: route_reply() matches the message against
+terminal_exec.detect_command()'s alias table and, on a hit, executes that
+whitelist entry's hardcoded argv. User text only ever selects a dict key; it
+never becomes part of what gets executed, which is what makes "whitelist
+only, no per-call confirmation" a defensible safety story. See
+terminal_exec.py's own docstring for the full reasoning.
+
 route_reply() is a small keyword/regex router, not real language
 understanding — it only catches messages that look like an explicit
 weather/search request (e.g. "台北天氣", "搜尋 X", "你認識 X 嗎"), an
@@ -68,6 +78,7 @@ from bs4 import BeautifulSoup
 import auto_learn
 import calculus_generator
 import calculus_solver
+import terminal_exec
 
 if getattr(sys, "frozen", False):
     # PyInstaller onefile (nova.exe, built to live at the project root): see
@@ -759,6 +770,34 @@ def route_reply(message: str) -> tuple[str, str] | None:
             lang, f"抱歉，沒有找到「{video_query}」的相關影片。", f'Sorry, no videos found for "{video_query}".'
         )
         return reason, (result or not_found)
+
+    command_key = terminal_exec.detect_command(message)
+    if command_key is not None:
+        argv, _timeout = terminal_exec.WHITELISTED_COMMANDS[command_key]
+        cmd_display = " ".join(argv)
+        reason = (f'偵測到指令執行請求，比對到白名單指令「{command_key}」'
+                   f'（固定內建指令，非使用者輸入直接執行），實際執行 `{cmd_display}`')
+        returncode, stdout, stderr = terminal_exec.run_command(command_key)
+        if returncode is None:
+            return reason, _bilingual(lang, f"指令執行失敗：{stderr}", f"Command execution failed: {stderr}")
+        body = stdout.strip() or _bilingual(lang, "（沒有任何輸出）", "(no output)")
+        reply = f"```\n{body}\n```"
+        if returncode != 0:
+            reply += "\n" + _bilingual(lang, f"（結束碼 {returncode}，指令可能執行失敗）",
+                                        f"(exit code {returncode}, the command may have failed)")
+        if stderr.strip():
+            reply += f"\n{_bilingual(lang, '錯誤輸出', 'stderr')}：\n```\n{stderr.strip()}\n```"
+        return reason, reply
+
+    if terminal_exec.looks_like_execution_request(message):
+        reason = "偵測到指令執行請求，但沒有比對到白名單裡的任何指令"
+        available = "、".join(sorted(terminal_exec.WHITELISTED_COMMANDS))
+        reply = _bilingual(
+            lang,
+            f"這個指令不在白名單內，基於安全考量已拒絕執行。目前可用的白名單指令：{available}。",
+            f"That command isn't whitelisted, so it was refused for safety. Available commands: {available}.",
+        )
+        return reason, reply
 
     if _is_solve_last_request(message):
         if _last_calculus_problem is None:
