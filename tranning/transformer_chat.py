@@ -95,6 +95,13 @@ DEFAULT_FINETUNE_DIR = Path(__file__).resolve().parent / "gpt_chat_runs"
 # machine first.
 DEFAULT_GPU_MEM_FRACTION = 0.85
 
+# to-do #17's repetition-loop fix (see GPT.generate()'s docstring): 1.2 is
+# the value Keskar et al. 2019 (CTRL) report as a good default across
+# domains, applied here at the reply()/complete() layer (not baked into
+# generate()'s own default, which stays 1.0/off so the raw primitive is
+# unaffected by this project's specific tuning choice).
+DEFAULT_REPETITION_PENALTY = 1.2
+
 
 def _resolve_device(device: str | None = None) -> str:
     """CUDA (NVIDIA) > XPU (Intel Arc, via PyTorch's native `torch.xpu`
@@ -270,19 +277,39 @@ class GPT(nn.Module):
 
     @torch.no_grad()
     def generate(self, idx: torch.Tensor, max_new_tokens: int, temperature: float = 0.8,
-                 top_k: int | None = 40, top_p: float | None = 0.9) -> torch.Tensor:
+                 top_k: int | None = 40, top_p: float | None = 0.9,
+                 repetition_penalty: float = 1.0) -> torch.Tensor:
         """Autoregressive sampling: temperature + top-k + top-p (nucleus),
         not chat_reply()'s pure greedy argmax. Greedy decoding from a
         language model collapses into repetition loops far more readily
         than a seq2seq memorization model does; sampling from a restricted
         candidate set is what lets replies vary and read more naturally,
         which is the whole point of moving off the GRU model.
+
+        `repetition_penalty` (CTRL-style, Keskar et al. 2019; 1.0 = off, no
+        behaviour change) tackles a *different* failure mode than
+        temperature/top-k/top-p: to-do #17 observed the fine-tuned model
+        occasionally degenerate into "看看看看看看…" (the same token repeated
+        to the output cap) even with restricted-candidate-set sampling
+        already on — sampling still keeps re-picking a token once it
+        dominates the distribution. This directly discounts every token
+        already present anywhere in the sequence so far (prompt + generated)
+        before top-k/top-p narrows the candidate set, so a token that's
+        already appeared has to fight harder to get picked again.
         """
         self.eval()
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.block_size:]
             logits, _ = self(idx_cond)
             logits = logits[:, -1, :] / max(temperature, 1e-6)
+
+            if repetition_penalty != 1.0:
+                for b in range(idx.size(0)):
+                    seen = torch.unique(idx[b])
+                    seen_logits = logits[b, seen]
+                    logits[b, seen] = torch.where(
+                        seen_logits > 0, seen_logits / repetition_penalty, seen_logits * repetition_penalty
+                    )
 
             if top_k is not None:
                 v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
@@ -499,9 +526,9 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
 # --- stage 2: fine-tuning -------------------------------------------------
 
 def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
-             out_dir: Path = DEFAULT_FINETUNE_DIR, epochs: int = 50, batch_size: int = 8,
+             out_dir: Path = DEFAULT_FINETUNE_DIR, epochs: int = 300, batch_size: int = 8,
              lr: float = 1e-4, weight_decay: float = 0.01, dropout: float = 0.1,
-             val_split: float = 0.1, patience: int = 8, val_data_path: Path | None = None,
+             val_split: float = 0.1, patience: int = 30, val_data_path: Path | None = None,
              device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION):
     device = _resolve_device(device)
     _cap_gpu_memory(device, gpu_mem_fraction)
@@ -590,6 +617,7 @@ def _load_gpt(out_dir: Path, device: str | None = None):
 
 def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: int = 60,
           temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
+          repetition_penalty: float = DEFAULT_REPETITION_PENALTY,
           device: str | None = None) -> str:
     """Generate a reply from the fine-tuned GPT checkpoint at out_dir (expects
     prompt+<sep>+reply-structured training, i.e. a finetune() output).
@@ -605,13 +633,14 @@ def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: in
     prompt_ids = (tokenizer.encode(message) + [SEP])[-block_size:]
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
-                          top_k=top_k, top_p=top_p)
+                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
     generated = out[0, len(prompt_ids):].tolist()
     return tokenizer.decode(generated) or "..."
 
 
 def complete(prompt: str, out_dir: Path = DEFAULT_PRETRAIN_DIR, max_new_tokens: int = 60,
              temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
+             repetition_penalty: float = DEFAULT_REPETITION_PENALTY,
              device: str | None = None) -> str:
     """Raw next-token continuation from a pretrain()-only checkpoint -- no
     <sep>/reply structure, because pretrain() never saw one (that structure
@@ -629,7 +658,7 @@ def complete(prompt: str, out_dir: Path = DEFAULT_PRETRAIN_DIR, max_new_tokens: 
     prompt_ids = tokenizer.encode(prompt)[-block_size:]
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
-                          top_k=top_k, top_p=top_p)
+                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
     return tokenizer.decode(out[0].tolist()) or "..."
 
 
@@ -667,13 +696,18 @@ def main():
                              "entirely for training instead of being split by --val-split")
     p_fin.add_argument("--pretrain-dir", type=Path, default=DEFAULT_PRETRAIN_DIR)
     p_fin.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
-    p_fin.add_argument("--epochs", type=int, default=50)
+    # to-do #17's other untried lever: prior runs early-stopped at epoch
+    # 12-13 (val loss only ~3.5) versus chats.py's GRU running 1500-2000
+    # epochs to near-zero loss on the same data/pairs.json -- raised the cap
+    # and the early-stopping patience so a run can actually get much closer
+    # to that before giving up, instead of stopping this early by default.
+    p_fin.add_argument("--epochs", type=int, default=300)
     p_fin.add_argument("--batch-size", type=int, default=8)
     p_fin.add_argument("--dropout", type=float, default=0.1)
     p_fin.add_argument("--lr", type=float, default=1e-4)
     p_fin.add_argument("--weight-decay", type=float, default=0.01)
     p_fin.add_argument("--val-split", type=float, default=0.1)
-    p_fin.add_argument("--patience", type=int, default=8)
+    p_fin.add_argument("--patience", type=int, default=30)
     p_fin.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
                         help="cap this process to this fraction of total VRAM on CUDA devices "
                              "(see DEFAULT_GPU_MEM_FRACTION docstring); pass 0/negative to disable the cap")
@@ -684,6 +718,9 @@ def main():
     p_chat.add_argument("--temperature", type=float, default=0.8)
     p_chat.add_argument("--top-k", type=int, default=40)
     p_chat.add_argument("--top-p", type=float, default=0.9)
+    p_chat.add_argument("--repetition-penalty", type=float, default=DEFAULT_REPETITION_PENALTY,
+                        help="to-do #17: >1.0 discounts tokens already generated to break repetition "
+                             "loops (e.g. \"看看看看...\"); 1.0 disables it")
 
     p_comp = sub.add_parser("complete", help="raw next-token continuation from a pretrain()-only checkpoint "
                                               "(no prompt/reply structure -- use this for a code checkpoint "
@@ -694,6 +731,8 @@ def main():
     p_comp.add_argument("--temperature", type=float, default=0.8)
     p_comp.add_argument("--top-k", type=int, default=40)
     p_comp.add_argument("--top-p", type=float, default=0.9)
+    p_comp.add_argument("--repetition-penalty", type=float, default=DEFAULT_REPETITION_PENALTY,
+                        help="see `chat`'s --repetition-penalty")
 
     args = parser.parse_args()
 
@@ -714,10 +753,11 @@ def main():
             text = input("You: ")
             if text.strip().lower() in {"exit", "quit"}:
                 break
-            print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p)}")
+            print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p, repetition_penalty=args.repetition_penalty)}")
     elif args.command == "complete":
         print(complete(args.prompt, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens,
-                        temperature=args.temperature, top_k=args.top_k, top_p=args.top_p))
+                        temperature=args.temperature, top_k=args.top_k, top_p=args.top_p,
+                        repetition_penalty=args.repetition_penalty))
 
 
 if __name__ == "__main__":
