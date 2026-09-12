@@ -31,6 +31,215 @@
 
 20. `tranning/tools.py` 第 94 行 `_SEARCH_PATTERNS`（見 to-do #15 同一批「知識詢問句型」規則）— 你回報問「你知道三星最新款的手機與手錶?」（西式問號結尾，沒有「嗎」），完全沒有比對到搜尋句型，整句掉回死記式 GRU 聊天模型（`chat_runs` checkpoint，見 to-do #12 記錄的天花板），硬拼出「我是 AI, PI的 P P P AI P AI」這種不成句的亂碼——不是「沒有上網能力」這件事本身的問題（那是 Rule 06 刻意設計），而是本來就該走 `_lookup()` 網路查詢路由的句子，卻被漏接掉回最不適合的死記模型。根因：`^你(?:認識|知道)\s*(.+?)\s*嗎[!?？]*$` 這條規則把「嗎」寫成必要字元（不是 `(?:嗎)?` 這種可省略寫法），只吃「你知道 X 嗎」，吃不到「你知道 X?」這種只用問號、口語上省略「嗎」的問法——跟 to-do #15 修的「開頭語氣詞前綴」是同一批規則、不同位置的同類疏漏（那次漏開頭，這次漏句尾）。**2026-08-25 已修正**：把該行改成 `^你(?:認識|知道)\s*(.+?)\s*(?:嗎)?[!?？]*$`，「嗎」變成可省略，兩種問法都能命中同一條規則、指到同一個 `_lookup()`。新增回歸測試 `test_route_reply_search_pattern_fires_without_trailing_ma`（`tranning/test_tools.py`），monkeypatch `_lookup()` 直接驗證這句話會被正確路由並帶出被抓到的主題字串；`pytest tranning/test_tools.py` 48 項全過（原本 47 項都沒被改壞）。另外用 `chats.smart_reply_traced()` 端對端重跑一次原句，確認不再落到 GRU 聊天模型，而是正確顯示「比對到搜尋句型，查詢主題「三星最新款的手機與手錶」」並嘗試真的查網路（這台機器這次查詢沒有查到結果，屬於資料源本身查無資料，不是路由邏輯的問題）。
 
+21. `tranning/MentalHealth/test_action.py` 第 10 行 — 這次要幫 `action.py`（`data/mental.csv` 情緒傾向分數模型）的 `predict_emotion()` 加 MC Dropout 信心度，先跑既有測試確認沒改壞東西時發現：`from web.admin.frontend.src.components.action import ...` 這行 import 路徑是錯的，跟 `tranning/MentalHealth/action.py` 完全對不上——`web/admin/frontend/src/components/action.py` 是另一支同名但完全無關的檔案（PyScript 寫的網頁前端元件，處理 fetch/Google 登入，沒有 `SCORE_MAX`/`predict_emotion`/`train` 這些名字），研判是複製別的測試檔案時路徑沒改對。這個錯誤匯入讓整份 `test_action.py` 在 pytest collect 階段就 `ModuleNotFoundError`，兩項測試從頭到尾沒被執行過，`action.py`（含這次要接進 `chats.py` trace 的訓練成果）等於完全沒有自動化測試在保護。同時發現 `.venv` 沒裝 `scikit-learn`（`action.py` 模組層級 `from sklearn.model_selection import train_test_split`），是第 1／8／10／18 條同一類「環境缺套件」問題的重演，這次連單純呼叫 `predict_emotion()` 做推論（不需要真的訓練）都會被這行卡住。**2026-09-10 已修正**：import 改成 `from action import ...`；`.venv` 補裝 `scikit-learn`（連帶裝入 `scipy`/`joblib`/`threadpoolctl`）。`pytest tranning/MentalHealth/test_action.py` 2 項全過；另外用既有的 `tranning/MentalHealth/emotion_runs/` checkpoint（2026-09-02 訓練，`generalization_report.json` 顯示 64 筆held-out 測試 MAE=0.321、四捨五入命中率 79.7%）實際跑 `predict_emotion()` 驗證推論路徑本身也正常。
+
+22. `tranning/transformer_chat.py`（見 [[project_transformer_emotion_retrain]] 2026-09-10 已上線的 Transformer 聊天模型）— 你回報對 sinco 輸入「我今天心情不好」，回覆「太好了，是什麼開心的事呢？每一刻都在想你說出這麼大的事。」，完全文不對題（把負面情緒當成正面情緒回應）。查 `data/pairs.json` 確認訓練資料本身沒問題：「我心情不好」→「怎麼了,想聊聊嗎」、「我今天心情不好，想要你抱抱。」→「來，過來，我抱你，什麼都先別想，有我在。」都是正確標註，不是資料標錯。實際對同一句「我今天心情不好」連續取樣 8 次重現：3/8（37.5%）開頭直接接到「太好了，是什麼開心的事」這個對應「我很開心」/「我今天心情很好」的正面模板（負面情緒與正面情緒兩個 prompt 只差「不」一個字，模型把「不好」的否定詞忽略掉了），其餘幾句雖然沒有極性錯誤但陸續出現語意不連貫/文法破碎（例如「好，是我每個人的都在想什麼時候能趕忙碌你找我聊聊」）；反過來測「我今天心情很好」也观察到同一種漂移（「太好了，是什麼開心的事呢。那就是想把哪個感覺放在懷煩的人心上，這份壓力著在大自然下...」）。**根因**：這是 [[project_transformer_emotion_retrain]] 2026-09-10 update #3 已經記錄在案、承認過的容量天花板——17M 參數規模的 from-scratch Transformer 對「不好」這種否定詞的區辨能力不夠穩定，容易跟形似的正面句型混淆，且較長的自由生成後段本來就會漂移不連貫，不是新問題，是既有已知限制第一次被實測量化出具體失敗率（37.5%）。**尚未修正**：不是資料錯誤、也不是簡單的 decoding 參數問題（那一輪已經在 update #3 修過重複迴圈），真的要動的話是「加更多含否定詞對比的資料再微調」或「換更大的模型」這兩個選項，兩者都涉及 GPU 訓練時間，依 [[feedback_no_unattended_long_training]] 先問過你的意向再動手，這次先只記錄現況。
+
+23. `tranning/schmitt_trigger_train.py`（新功能：擴充模型讓 PCB 設計能力涵蓋史密特觸發電路，你要求「跑五次訓練，訓練出錯誤要總結出錯誤點在哪並修正，第五次還是錯誤就要輸出到 ErrorLog 當中」，見 to_do_list.md #29）— 手上完全沒有史密特觸發電路的真實訓練資料，先寫 `tranning/data/schmitt_trigger_gen.py` 用座標運算（不是手打 S-expression）產生 5 種電阻值變化的運算放大器版 + 1 種 74HC14 邏輯閘版共 6 種唯一電路、18 筆中文設計需求↔KiCad S-expression 問答對，每筆生成後直接餵給既有的 `tranning/circuit_rule_check.py`（to-do #23 的從零 ERC）驗證零 error 才收錄，資料本身沒有結構性錯誤。訓練骨架重用 `transformer_chat.py` 既有的 GPT/pretrain/finetune（零新模型程式碼），跑了 5 次真實訓練，每次都是真的錯誤+真的修正，不是重複同一件事：第1次（block_size=2048、reply=完整檔案含 lib_symbols、60/80 epoch）train_loss 停在 0.87、val loss 都還在下降就結束，生成結果括號數對不上（208 開/257 閉），明顯是文件還沒學會怎麼收尾；第2次想拉長 epoch 數重跑時發現 `main()` 的 argparse 預設值（60/80）忘記跟著 `train()` 函式本身的新預設值（150/400）一起改，一個很單純的程式碼疏漏，導致第2次其實只用舊的低 epoch 數又跑了一次，已修正 CLI 預設值；第3次（修正後真的跑 150/400，實際 early stop 在 74/189）train_loss 降到 0.50，但就算改用近乎貪婪解碼（temperature=0.05, top_k=1）+ 拉高 repetition_penalty=1.8 做診斷探測，生成結果從一開始的幾個 token 順序就是錯的，確認是真的欠擬合（underfitting），不是取樣隨機性的問題——根因判斷是 reply 目標文字裡 lib_symbols 樣板（每筆幾乎逐字元相同）佔了近半篇幅（約 1700 BPE token 中的一半），模型的容量/訓練訊號被拿去死背這段從不變化的樣板；第4次把 SFT 目標改成只生成「本體」（放置的元件/導線/標籤，lib_symbols 改成 `wrap_kicad()` 事後用程式接回去，不用模型生成），目標長度砍半（約 750 token），順勢把模型加大（n_layer 4→6, n_embd 128→192, block_size 2048→1024），結果反而更差：18 筆裡隨機切 15% 驗證集，剛好把少數類別（3 筆 74HC14 版本）不成比例地切進驗證集，val_loss 幾乎立刻打平在 1.30（比第3次的 0.66 還差），patience=40 正確地提早停止，但生成結果仍然無法解析（`list index out of range`）；第5次改成 `finetune(..., val_data_path=PAIRS_PATH)`，讓全部 18 筆同時當訓練集與驗證集（沿用 `transformer_chat.pretrain()` 本來就有的「資料太小時拿訓練集當驗證集」慣例，因為這個資料規模下「近乎全部背起來」本來就是目標，不是要考泛化），這次終於收斂良好：train_loss 0.16、val_loss 0.10（epoch 156 提早停止）。**但生成結果第五次仍然失敗**：對訓練集內的提示「幫我設計一個史密特觸發電路，R1 用 10k，R2 用 100k」，本體文字 70 個開括號只對到 69 個閉括號——實際比對發現 R1 的 `(symbol ...)` 區塊少了一個收尾的 `)`，直接接到下一個 OpAmp 的 `(symbol ...)`，且 OpAmp 那個元件的 Reference 屬性被錯誤填成鄰近區塊的 "R2"（應為 "U1"）；換成完全貪婪解碼（temperature≈0, top_k=1）在同一份 checkpoint 上重測，括號數不對稱的狀況還略微更差（71 開/69 閉），排除是取樣參數的問題。**尚未修正**：18 筆資料、6 種唯一電路本體（每份約 700-900 BPE token、深度巢狀括號結構）對這顆從零訓練、6 層/192 維的小型 Transformer 來說，train_loss 卡在 0.16 這個水準，還沒到 `chats.py` GRU 在 28 筆資料上能做到的 0.0001 那種近乎精確背誦的程度，多巢狀括號要做到「完全平衡」看起來需要更多/更多樣的訓練範例，或是更大的模型／更長的訓練時間，這已經超出本次「5 次訓練」授權範圍，依 [[feedback_no_unattended_long_training]] 不在同一份資料/架構上繼續重跑第 6 次，先誠實記錄現況，是否要投入更多資料標註或 GPU 時間由你決定。產物：`tranning/data/schmitt_trigger_gen.py`（產生器+ERC 自我驗證）、`tranning/schmitt_trigger_train.py`（train/design 指令）、`tranning/test_schmitt_trigger_train.py`（5 項測試，`pytest tranning/test_schmitt_trigger_train.py tranning/test_circuit_rule_check.py tranning/test_kicad_dataset_convert.py tranning/test_transformer_chat.py` 27 項全過，涵蓋資料產生器/ERC 整合，不含大規模真實訓練，那部分靠這次手動 5 次真實跑驗證）、`data/schmitt_trigger_pairs.json`、`tranning/data/schmitt_trigger_corpus.txt`、checkpoint 在 `tranning/schmitt_pretrain_runs/`／`tranning/schmitt_chat_runs/`。
+
+24. `tranning/calculus_solver.py` — 你問 sinco「x^2+1, x 微分後是多少?」，回覆的是一般聊天模型的答案，完全沒進到微積分邏輯。查 `parse_and_solve()` 的 `_DERIVATIVE_PATTERNS`：四個既有 pattern 都是 `$` 錨定固定句型（「XXX 的微分／導數」「微分: XXX」「derivative of XXX」「d/dx(XXX)」），你這句「XXX, x 微分後是多少?」既不是「的微分」結尾，句尾又多了問號，四個 pattern 全部沒對上，`parse_and_solve()` 依文件說明的設計（看不懂就回 None，不用猜的）回傳 None，`tools.py` 的 `route_reply()` 因此判定不是微積分請求，掉回一般聊天模型接手，但聊天模型完全沒學過微積分，才會答不出來——不是模型算錯，是句型沒被規則認出來，根本没進到 sympy 那一步。**2026-09-11 已修正**：(a) `parse_and_solve()` 一開始先 `text.rstrip("?？!！。")` 去掉句尾標點，四個既有 pattern 不用重寫也能吃到「XXX 的微分？」這類問句；(b) `_DERIVATIVE_PATTERNS` 新增一條 `^(.+?)\s*(?:[,，]\s*(?:對\s*)?x\s*)?微分後(?:是多少|為何|等於多少)?$`，涵蓋口語問法「EXPR[, x] 微分後是多少」。驗證：`tranning/test_calculus_solver.py` 新增 `test_derivative_spoken_suffix_with_trailing_question_mark` 直接餵你原句，斷言 `sympy` 微分結果一致；`pytest tranning/test_calculus_solver.py` 18 項全過；CLI 手動跑 `python tranning/calculus_solver.py "x^2+1, x 微分後是多少?"` 正確回傳 f'(x) = 2x 的完整解題過程。
+
+25. `tranning/calculus_generator.py`（新功能，非錯誤修正——你要求微積分模型「更進階」，見
+    `C:\Users\roy\.claude\plans\spicy-swimming-sunset.md` Phase 1）— 原本
+    `_explain_term_derivative()`/`_explain_term_antideriv()` 只認 3 種「純項」
+    (`is_polynomial`、`c*sin(kx)`/`c*cos(kx)`、`c*exp(kx)`，inner 必須是線性 `k*x`)，
+    乘積(`x*sin(x)`)、商(`x/(x+1)`)、非線性合成(`sin(x^2)`)一律 fallback 成無規則
+    名稱的「直接微分（sympy 計算）」句子——答案一直是對的(sp.diff/sp.integrate 本身
+    能處理任意初等函數)，只是詳解步驟不像人教的。**已擴充**：新增
+    `_fraction_parts_if_quotient()`(用 `sp.fraction()` 抓真正 x 相關的分母，判斷順序
+    在乘積律之前，避免 `x/(x+1)` 的內部 Mul 表示法(`x, (x+1)**-1`)被誤判成乘積)、
+    `_product_parts_if_product_rule()`(Mul 且恰好 2 個含 x 因子)、`_match_pure_outer()`
+    (推廣舊的 `_is_pure_trig`/`_is_pure_exp`，inner 不再限制線性——線性 inner 沿用
+    舊有措辭不變，非線性 inner 才用新的「令 u=...」鏈鎖律措辭，向後相容)三個結構判斷
+    式，`_explain_term_derivative()` 判斷順序：冪法則→商法則→乘積律→鏈鎖律(含推廣)→
+    fallback。積分側新增 `_match_u_substitution()` 辨識「係數×inner'(x)×f(inner(x))」
+    的湊微分(u代換)形式(例如 `x*sin(x^2)`)，能辨識時給「令 u=...」步驟，辨識不到時
+    (例如 `x*sin(x)` 需要分部積分，這模組不處理)維持原本 fallback，不硬套規則。quiz
+    出題端新增 `_term_product`/`_term_chain`(微分)、`_term_u_sub_for_integral`(積分)
+    三個 term builder 加進抽樣池，讓「出一題微積分」也會出到這些新題型，不是只有
+    使用者自己打合成算式才吃得到。過程中發現一個副作用：`_term_chain`/
+    `_term_u_sub_for_integral` 一開始讓 `exp` 的 inner 也能加常數(例如 `exp(x^2+2)`)，
+    但 `explain_derivative()`/`explain_integral()` 開頭的 `sp.expand()` 預設會把
+    `exp(a+b)` 拆成 `exp(a)*exp(b)`，導致印出「3exp(2)exp(x^2)」這種多一個常數指數
+    因子的怪異格式(數學上沒錯，但不像課本寫法)——`sin`/`cos` 沒有這個 expand 行為，
+    已修正成只有 `sin`/`cos` 的 inner 才加常數、`exp` 的 inner 維持純 `x^n`。驗證：
+    新增/改寫 `test_calculus_generator.py`(乘積律/商法則/非線性鏈鎖律/線性鏈鎖律措辭
+    不變/三因子以上 fallback/湊微分辨識成功與正確拒絕`x*sin(x)`/quiz builder 有出現
+    新規則共 9 項)、`test_calculus_solver.py`(自由輸入 `"x*sin(x) 的微分"`、
+    `"sin(x^2) 的微分"` 2 項)，`pytest tranning/test_calculus_generator.py
+    tranning/test_calculus_solver.py tranning/test_tools.py` 108 項全過；另外寫一段
+    腳本跑 300 個 seed 的 `generate_problem(topic="derivative")` 掃過 `exp(`後面接數字
+    這種格式，確認 0 筆殘留。CLI 手動跑 `x*sin(x) 的微分`／`x/(x+1) 的微分`／
+    `sin(x^2) 的微分`／`x*sin(x^2) 的積分` 詳解格式正常可讀。**尚未做的路線圖**(見
+    plan 檔 Phase 2-4，需要你逐階段確認才會做)：更多函數類型(log/sqrt/反三角/雙曲)、
+    高階微分與泰勒展開、多變數微積分(偏微分/梯度)——多變數那塊要新增第二個符號，
+    改動面最大，規劃獨立一輪 session 處理。
+
+26. `tranning/calculus_generator.py` + `tranning/calculus_solver.py`（新功能，非錯誤修正
+    ——接續第 25 條 Phase 1，你確認繼續做 Phase 2：更多函數類型，見
+    `C:\Users\roy\.claude\plans\spicy-swimming-sunset.md` 路線圖）— 原本
+    `calculus_solver.py` 只能解析 sin/cos/tan/exp/ln/log/sqrt，`calculus_generator.py`
+    的「純項」辨識(`_match_pure_outer`，Phase 1 新增)也只認 sin/cos/exp 三種，log/sqrt
+    雖然能解析但沒有課本公式步驟，一律 fallback 成無規則名稱的「直接微分（sympy 計算）」；
+    反三角(arcsin/arccos/arctan)、雙曲(sinh/cosh/tanh)完全不能解析。**已擴充**：(a)
+    `calculus_solver.py` 的 `_LOCAL_DICT` 加入 `asin`/`arcsin`、`acos`/`arccos`、
+    `atan`/`arctan`(兩種拼法都接受)、`sinh`/`cosh`/`tanh`；(b) `calculus_generator.py`
+    的 `_match_pure_outer()` 辨識函數清單從 3 個(sin/cos/exp)擴充到 11 個(新增
+    log/sqrt/asin/acos/atan/sinh/cosh/tanh)，`_explain_term_derivative()` 新增
+    `_DERIVATIVE_FORMULA_LABELS` 對照表，給這 8 個新函數線性 inner 時對應的課本公式
+    措辭(例如 `(ln x)' = 1/x`)，非線性 inner 沿用 Phase 1 已建好的通用「令 u=...」鏈鎖律
+    措辭(不用重寫，`_match_pure_outer` 本來就是通用的)；sin/cos/exp 原本的措辭完全沒動
+    (用 `elif name == "exp"` 保留舊分支，只有新函數才走新的 dict 對照分支)。(c) 積分側
+    只挑 3 個「反導函數是乾淨一行公式」的新函數(sqrt/sinh/cosh)加 `_ANTIDERIV_FORMULA_LABELS`
+    直接公式措辭，並擴充 `_match_u_substitution()` 的可辨識函數清單納入這 3 個，讓
+    `x*sqrt(x^2+1)` 這類湊微分也認得；log/arcsin/arccos/arctan/tanh 的反導函數需要分部
+    積分(例如 `∫ln(x)dx = x·ln(x)-x`)，不是乾淨公式，刻意不勉強套用規則名稱，維持
+    fallback(答案仍正確，只是沒有規則名稱)。(d) `_fmt()` 新增 sympy 函數名稱→中文課本
+    慣用寫法的顯示轉換(`log`→`ln`、`asin`→`arcsin`、`acos`→`arccos`、`atan`→`arctan`、
+    `sqrt`→`√`)，過程中發現一個一致性 bug 順手修掉：鏈鎖律 fallback 措辭與湊微分措辭
+    原本直接把 `_match_pure_outer()`/`_match_u_substitution()` 回傳的原始比對名稱(例如
+    `"log"`)塞進句子，導致同一行內算式本身顯示成 `ln(x^2+1)`、規則名稱卻印成
+    `log(u)`，兩種寫法混用——新增 `_DISPLAY_NAME` 對照表統一這兩處的顯示名稱。(e) quiz
+    出題端新增 `_term_more_functions`(微分)、`_term_more_functions_for_integral`(積分
+    直接公式)兩個 term builder，並把 `_term_u_sub_for_integral` 的候選函數也從
+    sin/cos/exp 擴充到含 sqrt/sinh/cosh。驗證：新增/擴充
+    `tranning/test_calculus_generator.py`(8 個新函數線性 inner 公式措辭+正確性的
+    parametrize 測試、非線性 inner 鏈鎖律措辭含正確顯示名稱、`_fmt` 顯示名稱轉換、
+    sqrt/sinh/cosh 積分公式、sqrt 湊微分、log/asin 積分刻意 fallback、quiz builder 兩項
+    smoke test 共 9 項新測試)、`tranning/test_calculus_solver.py`(8 個新函數自由輸入
+    parametrize 測試 + sqrt 積分共 2 項)，`pytest tranning/test_calculus_generator.py
+    tranning/test_calculus_solver.py tranning/test_tools.py` 133 項全過；另外寫腳本跑
+    derivative/integral 各 400 個 seed，逐一用 `sp.diff`/`sp.integrate` 重新驗算答案，
+    0 筆不一致。CLI 手動跑 `log(x)`/`sqrt(x)`/`arcsin(x)`/`sinh(2x)` 的微分、
+    `sqrt(x)`/`x*sqrt(x^2+1)` 的積分，詳解格式正常、顯示名稱(ln/√/arcsin)一致。**尚未做
+    的路線圖**(見 plan 檔 Phase 3-4，需你逐階段確認才會做)：高階微分與泰勒展開、多變數
+    微積分(偏微分/梯度，需要新增第二個符號，改動面最大)。
+
+27. `tranning/calculus_generator.py` + `tranning/calculus_solver.py`（新功能，非錯誤修正
+    ——接續第 25、26 條，你確認繼續做 Phase 3：高階微分 + 泰勒/馬克勞林展開，見
+    `C:\Users\roy\.claude\plans\spicy-swimming-sunset.md` 路線圖）— 原本完全沒有二階
+    以上導數、也沒有級數展開的功能。**新增**：(a) `calculus_generator.py` 新增
+    `explain_nth_derivative(expr, n)`：對 `explain_derivative()` 重複套用 n 次(每次把
+    上一階的結果當輸入再算一次)，每一階完整保留 `explain_derivative()` 原本的逐項規則
+    說明(前綴 `[第 k 階]`)，不是把每階壓縮成一行「再微分一次」——這樣 Phase 1/2 已經
+    做好的乘積律/商法則/鏈鎖律/8 種新函數公式，在高階微分的每一階都自動可以用到，
+    不用重寫規則邏輯。(b) 新增 `explain_taylor_series(expr, point, order)`：逐階計算
+    `f^(k)(point)/k!` 係數(直接用 `sp.diff(expr, x, k).subs(x, point)`，不是呼叫
+    `sp.series()`，因為這裡只需要單點的導數值而非完整符號導函數)，`point=0` 時
+    `topic_zh` 顯示「馬克勞林級數」，其餘顯示「泰勒級數」。(c) `calculus_solver.py`
+    新增中文序數解析(`_CN_DIGITS`，一~十)+ 4 組新句型：「EXPR 的[第]N階導數/微分」
+    (中文序數或阿拉伯數字皆可)、`d^n/dx^n(EXPR)` 記法、「EXPR 在 x=a 展開到[第]n階
+    [的]泰勒級數」、「EXPR 的[第]n階馬克勞林展開/級數」。驗證：新增
+    `test_calculus_generator.py`(7 項：反覆微分正確性、step 數量隨階數增加、n<1 拒絕、
+    泰勒展開對照 `sp.series()`、point=0 標記馬克勞林、負階數拒絕)、
+    `test_calculus_solver.py`(5 項：中文序數/阿拉伯數字/d^n-dx^n 三種二三階導數句型、
+    非零點泰勒展開、馬克勞林展開)，`pytest tranning/test_calculus_generator.py
+    tranning/test_calculus_solver.py tranning/test_tools.py` 144 項全過；另外寫腳本對
+    7 個函數各測 1-3 階導數、6 組泰勒/馬克勞林案例，逐一對照 `sp.diff`/`sp.series`
+    驗算，全部一致。CLI 手動跑 `sin(x) 的三階導數`、`d^2/dx^2(x^3+2x)`、
+    `exp(x) 在 x=0 展開到第4階泰勒級數`、`sin(x) 的5階馬克勞林展開`，輸出格式與數值
+    正確。**刻意不做的範圍**：這兩個新功能只接在 `calculus_solver.py` 的自由輸入解題
+    路徑，沒有接進 `generate_problem()`/`GENERATORS` 的「出一題微積分」隨機出題流程
+    (也沒有對應加 `tools.py` 的關鍵字路由)——效益評估後認為使用者的核心需求是「能解
+    使用者自己打的進階算式」，出題端的擴充範圍較大(需要新 quiz topic、新 term builder、
+    新 tools.py 路由)且非本次確認的路線圖項目，先不做，之後若需要再另外確認。**尚未做
+    的路線圖**(見 plan 檔 Phase 4，需你確認才會做)：多變數微積分(偏微分/梯度)，需要
+    新增第二個符號，改動面最大，規劃獨立一輪 session 處理。
+
+28. `tranning/calculus_generator.py` + `tranning/calculus_solver.py`（新功能，非錯誤修正
+    ——接續第 25、26、27 條，你確認做完 Phase 4：多變數微積分(偏微分/梯度)，見
+    `C:\Users\roy\.claude\plans\spicy-swimming-sunset.md` 路線圖，至此四階段全部完成）—
+    原本整個模組只有單一符號 `x = sp.symbols("x")`，`calculus_solver.py` 的
+    `_parse_expr_text()` 明確拒絕任何 `free_symbols` 不是 `{x}` 子集的算式，完全不支援
+    偏微分/梯度。**新增**：(a) `calculus_generator.py` 新增模組級第二符號
+    `y = sp.symbols("y")`，以及 `explain_partial_derivative(expr, var)`、
+    `explain_gradient(expr)` 兩個函式。這兩個函式**刻意是獨立、自成一體的實作，沒有
+    重構 Phase 1-3 既有的 `_explain_term_derivative()` 系列函式**(那些函式從頭到尾寫死
+    綁定模組級 `x`，例如 `_WILD_C = sp.Wild("c", exclude=[x])`、`term.is_polynomial(x)`、
+    `sp.diff(term, x)`——要讓它們改成支援任意變數，需要把 Phase 1-3 每一個規則判斷式都
+    加一個 `var` 參數並全面重新驗證，風險與工作量都遠超這一階段範圍，plan 檔規劃階段就
+    已經決定不這麼做)；新函式只借用 `sp.diff(expr, var)` 本身(sympy 本來就會把「不是
+    要微分的那個符號」自動視為常數，不需要額外邏輯)，配上自己寫的、比 Phase 1-3 簡單
+    的說明文字(「將 {other} 視為常數」+ 逐項結果)。`_fmt()` 的「blanket `*` 移除對單一
+    符號安全」這個既有假設在雙變數下依然成立：`x*y` 移除 `*` 變成 `xy`，這正是常見的
+    並列相乘慣例(跟 `3x` 代表 `3*x` 是同一種慣例)，只有在模組真的會生出一個字面上叫
+    `"xy"` 的符號時才會產生歧義，這個模組不會這樣做。(b) `calculus_solver.py` 新增獨立
+    的 `_LOCAL_DICT_XY`/`_parse_expr_text_xy()`(允許 x 和/或 y，不動原本只認 x 的
+    `_LOCAL_DICT`/`_parse_expr_text()`)，加 4 組新句型：「EXPR 對 x/y [的]偏微分」、
+    `∂/∂x(EXPR)`/`∂/∂y(EXPR)` 記法(刻意只認 `∂` 不認 `d`，避免跟既有
+    `d/dx(EXPR)` 單變數記法衝突而誤路由)、「EXPR 的梯度」、`gradient of EXPR`。驗證：
+    新增 `test_calculus_generator.py`(6 項：偏微分數值正確性、常數措辭正確性、拒絕非
+    x/y 變數、拒絕額外自由符號、梯度正確性、純 x 表達式的退化梯度)、
+    `test_calculus_solver.py`(4 項：中文句型、∂記法、**`d/dx` 仍正確走原本單變數路徑
+    的回歸防護測試**、梯度句型)，`pytest tranning/test_calculus_generator.py
+    tranning/test_calculus_solver.py tranning/test_tools.py
+    tranning/test_logic_reasoning_generator.py tranning/test_word_problem_generator.py`
+    373 項全過(含另外兩支重用 `calculus_generator.format_problem()`/`format_question()`
+    的模組，確認新增的 `y` 符號沒有連帶影響)；另外寫腳本對 8 組雙變數算式各驗證
+    ∂/∂x、∂/∂y、梯度，全部對照 `sp.diff` 一致。CLI 手動跑「x^2\*y+y^3 對 x 的偏微分」、
+    `∂/∂y(x^2*y)`、「x^2\*y+y^3 的梯度」、`d/dx(sin(x))`(確認仍回傳
+    `topic=derivative` 而非誤入新的 `partial_derivative` 路徑)，全部正確。至此微積分
+    模組四階段路線圖(合成函數/更多函數類型/高階微分+泰勒/多變數)全部完成，plan 檔
+    可視為結案。
+
+29. `tranning/data/schmitt_trigger_gen.py` + `tranning/schmitt_trigger_train.py`（延續第 23 條，
+    你要求「模型還要會史密特電路等 OPA 多項電子電路知識，上網搜尋，訓練可到五小時，錯誤修到
+    第五次才寫 ErrorLog」，見 to_do_list.md #29 2026-09-11/12 追加記錄，這裡補完整的錯誤/修正
+    脈絡）— 第 23 條記錄的 5 次舊嘗試最後卡在「18 筆/6 種電路，train_loss 只能到 0.16，生成
+    結果括號數對不上」。這次先上網查證（見來源）反相/非反相放大器增益公式與比較器接法，
+    `schmitt_trigger_gen.py` 新增 3 種拓樸（`build_inverting_amp`/`build_noninverting_amp`/
+    `build_comparator`），語料擴到 54 筆/18 種電路，全部先過 `circuit_rule_check.py` 零 error
+    才收錄。`.venv` 這次確認是 GPU 版 `torch 2.13.0+cu126`（`torch.cuda.is_available()=True`），
+    訓練速度比舊的 CPU 環境快非常多。**錯誤 1**（第1次訓練後稽核發現）：「反相放大器」/
+    「非反相放大器」提示詞只差一個「非」字，模型常把兩種拓樸的接線搞混（近乎貪婪解碼下 100%
+    重現，非取樣隨機性）。**已修正**：非反相放大器提示詞改用更標準的「同相放大器」（查證過
+    確實是常見中文電子學教材用詞），從根源避開這組最小差異字對。**錯誤 2**（同一次稽核發現）：
+    74HC14 史密特反相器被生成成 `lib_id "Sinco:R"`（座標剛好跟正確元件重疊，`circuit_rule_check`
+    抓不到，但元件類型是錯的）。第2次重訓後錯誤1、2 都消失（18/18 電路 ERC 全過、74HC14 那個
+    也逐字元比對成功），但逐字元比對 18 種電路才發現**錯誤 3、也是最根本的問題**：電路「結構」
+    18/18 正確，但電路「數值」（使用者要求的 R1/R2 阻值）**只有 1/18 是對的**——模型會生成一個
+    看起來合理但答非所問的阻值組合，根因是這顆 6 層/192 維的小模型沒學會「把提示詞裡的數字原樣
+    複製到電路裡」，記的是一個籠統但錯誤的數值關聯，不是真的在做複製。**已修正**（架構性修法，
+    非調參）：比照 `wrap_kicad()` 把不變的 lib_symbols 交給程式而非模型的同一個思路，
+    `build_corpus()` 讓每個電路的 R1/R2 一律用字面佔位符（`PLACEHOLDER_R1`/`PLACEHOLDER_R2`），
+    訓練目標從「記住 18 種帶數值的電路」簡化成「記住 5 種帶佔位符的樣板」；新增
+    `schmitt_trigger_train.fill_values()`，生成完後用正規表示式直接從使用者原始提示詞解析出
+    R1/R2 代入，不再信任模型生數字。第3次重訓後端對端稽核全部 54 筆訓練提示詞：**54/54 結構
+    通過 ERC、54/54 數值完全正確**，額外用 4 句訓練集以外的提示詞（全新數值組合、全新措辭）
+    壓力測試：3/4 正確（含完全沒看過的 33k/330k、1k/10k 數值組合，證明是樣板+代入機制而非
+    硬背），1/4 因為「R1 是 10k」這種未收錄的助詞使 `fill_values()` 的正規表示式沒抓到值，已
+    順手擴充正規表示式涵蓋「是/為/設為」等常見說法。**錯誤 4**：接著新增第 6 種拓樸
+    `build_voltage_follower()`（電壓隨耦器，查證中文教材確認用詞），第4次重訓後結構正確率從
+    100% 退步到 91%（52/57），數值代入仍是滿分（57/57，證明架構性修法本身穩固，退步只發生在
+    結構生成端）。查訓練曲線確認 val_loss 在 400 個 epoch 裡有 258 個卡在同一數值，是真的收斂
+    到頂而非訓練不夠久（先查證再判斷，不用猜的）——判定是模型容量在加到第 6 種拓樸後到頂，
+    這是這次自己主動加的範圍（不是你原始要求的必要項目），選擇**撤回**而非賭最後的訓練名額，
+    退回驗證過 100% 正確的 5 拓樸版本。**錯誤 5**（第5次重訓，用完全相同的 5 拓樸設定重跑做
+    確認）：結果沒有重現第3次的 100%，反而是 47/54（87%）ERC 通過（數值代入仍 54/54 滿分），
+    7 個失敗全是 `floating_pin`、且集中在 R1=10k（全語料庫裡最常重複出現、最模糊的一個值）——
+    用同一份 checkpoint 連續生成 3 次確認是這個 checkpoint 本身的問題、不是取樣隨機性。查
+    `transformer_chat.py` 全文確認 `pretrain()`/`finetune()` 完全沒有設定任何 random seed，
+    每次 `train()` 都是全新隨機初始化/洗牌，這足以解釋「相同資料、相同超參數，兩次訓練結果
+    品質不同」——第3次是運氣好抽到一個好的初始化，第5次沒有。**累計已達你設定的 5 次錯誤
+    上限，依指示停止訓練、寫入本條，不再進行第 6 次重訓**。**目前狀態老實記錄**：現在存在
+    `tranning/schmitt_chat_runs/`／`tranning/schmitt_pretrain_runs/` 的 checkpoint 是第5次
+    的結果（47/54 結構正確、54/54 數值正確），不是第3次那個曾經達到的 100%/100%——第3次的
+    checkpoint 在第4、5次重訓時已被覆蓋，沒有另外備份。**架構本身已證明可行**（第3次真實達到
+    過 54/54/54/54），真正欠缺的是訓練可重現性；下次要繼續的話，建議先在 `transformer_chat.py`
+    的 `pretrain()`/`finetune()` 加對 `torch.manual_seed()`/`random.seed()` 的顯式控制，讓同一
+    組資料/超參數的訓練結果可重現，才不會每次重訓都要看運氣，這是程式碼本身的缺口，不是資料
+    或超參數的問題。**驗證**：`pytest tranning/test_schmitt_trigger_train.py
+    tranning/test_circuit_rule_check.py tranning/test_transformer_chat.py
+    tranning/test_kicad_dataset_convert.py` 29 項全過（含新增的 `fill_values()` 2 項測試）；
+    產物：`tranning/data/schmitt_trigger_gen.py`（新增 `build_inverting_amp`/
+    `build_noninverting_amp`/`build_comparator`/`build_voltage_follower`，後者未收錄進
+    `build_corpus()`，函式保留供之後重新加入）、`tranning/schmitt_trigger_train.py`（新增
+    `fill_values()`）、`data/schmitt_trigger_pairs.json`、`tranning/data/schmitt_trigger_corpus.txt`。
+    來源：[circuitdigest.com 反相/非反相放大器增益公式](https://circuitdigest.com/tutorial/inverting-operational-amplifier-op-amp)、
+    [electronics-tutorials.ws 比較器接法](https://www.electronics-tutorials.ws/opamp/op-amp-comparator.html)、
+    [enroo.com 同相放大器教材](http://www.enroo.com/support/category1/dpjrmzs/76245016.html)、
+    [opentech.com.tw 反相/非反相放大器及電壓隨耦器教學講義](https://www.opentech.com.tw/try/lcuaj2025512110108/zwo3wpz7uu2025512110108.pdf)。
+
 ## 修正日誌
 1. `tranning/chats.py`（原 `frontend/src/components/chats.py`；你已把整個 components 資料夾獨立拉出來改名為 `tranning/`，之後聊天模型相關檔案都在這裡，`chat_runs/` checkpoint 也一起搬過去了）— 2026-07-25：把 `data/pairs.json` 從 4 筆佔位資料擴充到 28 筆，涵蓋身份自介、打招呼、道別、道謝、閒聊等類別，身份類回覆固定用英文原名「sinco」（未翻譯）。訓練驗證：`--epochs 50`（預設值）在這個資料量下明顯不夠，幾乎所有 prompt 收斂到同一句回覆（loss 卡在 2.7~3.8 沒降下去）；拉到 `--epochs 1500` 後 loss 降到 0.0011，對 10 句抽測（含「你是誰」「你是 ChatGPT 嗎」「hi」「謝謝」等）全部對到正確且不同的回覆，無互相混淆。**結論**：資料筆數增加時，需要的 epoch 數要跟著往上調，不是固定值；目前 28 筆規模下模型仍是死記式 Q&A（把每一句完整背下來），還不具備「類似問法舉一反三」的泛化能力，要有真正聊天感需要資料量遠大於 28 筆。
 2. `tranning/transformer_chat.py`（見 to-do #12）— 兩個值得記住、以後可能還會遇到的通用結論：(a) 從零刻的深層 Transformer（decoder-only，多層殘差疊加）如果只用一般的 `nn.Linear` 預設初始化，未訓練模型的 loss 會遠高於理論基準線 `ln(vocab_size)`（實測 8 層、vocab_size=8000 時，一般初始化 loss=94.9，理論基準線只有 9.0），層數越深問題越明顯——判斷「這是初始化問題還是訓練資料/架構真的有問題」的快速檢驗法：拿一個全新建構、完全沒訓練過的模型跑一次 forward，loss 應該要落在 `ln(vocab_size)` 附近，如果差很多，先查初始化，不要急著懷疑資料或加大模型。修法是 GPT-2 論文的標準做法：每個殘差分支的輸出投影（attention 的 `proj`、MLP 最後一層）用 `std=0.02/sqrt(2*n_layer)` 縮小初始化。(b) `bpe_tokenizer.py` 的 BPE 訓練是教科書式的樸素實作（每次 merge 都重新掃過整個語料算 pair 頻率），複雜度約 `O(merge 次數 × 語料長度)`，22.5 萬字語料、vocab_size=8000（約 5000 次 merge）實測跑了 212 秒——這個量級可以接受，但如果之後語料量級再放大 10 倍以上，這支未優化的樸素版可能會變得太慢，屆時需要換成「只更新受影響的 pair 計數」的增量版寫法，而不是每次都整個語料重算。
