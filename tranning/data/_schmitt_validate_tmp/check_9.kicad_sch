@@ -1,0 +1,38 @@
+(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
+(lib_symbols
+    (symbol "Sinco:R"
+        (property "Reference" "R" (at 0 -3 0))
+        (symbol "R_1_1"
+            (pin passive line (at -2.54 0 0) (length 2.54) (number "1"))
+            (pin passive line (at 2.54 0 0) (length 2.54) (number "2"))
+        )
+    )
+    (symbol "Sinco:OpAmp"
+        (property "Reference" "U" (at 0 -3 0))
+        (symbol "OpAmp_1_1"
+            (pin input line (at -2.54 1.27 180) (length 2.54) (number "1"))
+            (pin input line (at -2.54 -1.27 180) (length 2.54) (number "2"))
+            (pin output line (at 2.54 0 0) (length 2.54) (number "3"))
+            (pin power_in line (at 0 2.54 90) (length 2.54) (number "4"))
+            (pin power_in line (at 0 -2.54 270) (length 2.54) (number "5"))
+        )
+    )
+    (symbol "Sinco:SchmittInverter"
+        (property "Reference" "U" (at 0 -3 0))
+        (symbol "SchmittInverter_1_1"
+            (pin input line (at -2.54 0 180) (length 2.54) (number "1"))
+            (pin output line (at 2.54 0 0) (length 2.54) (number "2"))
+            (pin power_in line (at 0 2.54 90) (length 2.54) (number "14"))
+            (pin power_in line (at 0 -2.54 270) (length 2.54) (number "7"))
+        )
+    )
+    (symbol "power:GND"
+        (power)
+        (symbol "GND_0_1" (pin power_in line (at 0 0 90) (length 0) (number "1")))
+    )
+    (symbol "power:VCC"
+        (power)
+        (symbol "VCC_0_1" (pin power_in line (at 0 0 90) (length 0) (number "1")))
+    )
+)
+ (symbol (lib_id "Sinco:R") (at 100.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001")(property "Reference" "R1" (at 100.0 96.0 0)) (property "Value" "4.7k" (at 100.0 98.0 0)))(symbol (lib_id "Sinco:R") (at 104.91999999999999 98.73 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002")(property "Reference" "R2" (at 104.91999999999999 94.73 0)) (property "Value" "100k" (at 104.91999999999999 96.73 0)))(symbol (lib_id "Sinco:OpAmp") (at 110.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003")(property "Reference" "U1" (at 110.0 96.0 0)) (property "Value" "LM358" (at 110.0 98.0 0)))(symbol (lib_id "power:GND") (at 107.46 101.27 90) (unit 1) (uuid "00000000-0000-0000-0000-000000000004")(property "Reference" "#PWR01" (at 107.46 97.27 0)) )(symbol (lib_id "power:GND") (at 110.0 97.46 90) (unit 1) (uuid "00000000-0000-0000-0000-000000000005")(property "Reference" "#PWR02" (at 110.0 93.46 0)) )(symbol (lib_id "power:VCC") (at 110.0 102.54 90) (unit 1) (uuid "00000000-0000-0000-0000-000000000006")(property "Reference" "#PWR03" (at 110.0 98.54 0)) )(wire (pts (xy 95.0 100.0) (xy 97.46 100.0)))(wire (pts (xy 102.54 100.0) (xy 107.46 98.73)))(wire (pts (xy 102.37999999999998 98.73) (xy 112.54 100.0)))(wire (pts (xy 112.54 100.0) (xy 115.0 100.0)))(junction (at 107.46 98.73))(label "VIN" (at 95.0 100.0 0))(label "VOUT" (at 115.0 100.0 0)))

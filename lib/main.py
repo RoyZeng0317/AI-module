@@ -20,6 +20,7 @@ if not __package__:
 from lib import GUI as gui
 from lib.components.camera import CameraPanel
 from lib.components.command import CommandPalette
+from lib.components.pcb_inspection import PCBInspectionPanel
 from lib.components.conversation import Conversation, is_recording, start_recording, stop_recording
 
 # 語音波形動畫（麥克風即時音量 / AI 回覆中的假脈動）屬於商業邏輯，畫面本身
@@ -58,6 +59,7 @@ def animate_responding():
 conversation = Conversation(gui.windows, gui.chat_display, on_ask_start=animate_responding)
 palette = CommandPalette(gui.windows, gui.message, gui.chat_display, conversation)
 camera_panel = CameraPanel(gui.windows)
+pcb_panel = PCBInspectionPanel(gui.windows)
 
 
 # 提交按鈕
@@ -124,6 +126,7 @@ voice_button = gui.make_claude_icon_button(gui.input_frame, "mic", voice)
 voice_button.pack(side="left", padx=(2, 0), pady=9)
 
 gui.make_claude_icon_button(gui.input_frame, "camera", camera_panel.open).pack(side="left", padx=(2, 0), pady=9)
+gui.make_claude_icon_button(gui.input_frame, "pcb", pcb_panel.open).pack(side="left", padx=(2, 0), pady=9)
 
 gui.send_button.bind("<Button-1>", lambda e: on_submit())
 gui.send_button.pack(side="right", padx=(4, 10), pady=9)

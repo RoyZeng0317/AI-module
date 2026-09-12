@@ -1,0 +1,52 @@
+[
+  {
+    "context": {"prompt": "你會電子學嗎?", "reply": "電子學 是物理學的分支學科。該學科研究課題包括電子、電子裝置、電子電路等，利用包括「有源器件」（例如真空管、二極管、晶體管、集成電路）和与之相关的「無源器件」等電子元件，來構成電路的互連技術。"},
+    "prompt": "繁體中文回答剛剛的問題",
+    "reply": "電子學 是物理學的分支學科。該學科研究課題包括電子、電子裝置、電子電路等，利用包括「有源器件」（例如真空管、二極管、晶體管、集成電路）和与之相关的「無源器件」等電子元件，來構成電路的互連技術。"
+  },
+  {
+    "context": {"prompt": "What is Python?", "reply": "Python is a high-level programming language known for its readability."},
+    "prompt": "用中文再說一次",
+    "reply": "Python 是一種高階程式語言，以易讀著稱。"
+  },
+  {
+    "context": {"prompt": "你是誰", "reply": "我是 sinco,AI-module 專案自己訓練出來的聊天模型"},
+    "prompt": "再詳細一點",
+    "reply": "我是 sinco，一個字元級的 seq2seq 模型，完全在本機從零訓練，沒有呼叫任何外部 AI API"
+  },
+  {
+    "context": {"prompt": "你可以做什麼", "reply": "我可以幫你編寫程式、生產圖片、資料查詢等功能"},
+    "prompt": "還有呢",
+    "reply": "除此之外我還能做語音辨識跟角色對話功能"
+  },
+  {
+    "context": {"prompt": "寫一個氣泡排序法", "reply": "def bubble_sort(arr):\n    for i in range(len(arr)):\n        for j in range(len(arr)-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr"},
+    "prompt": "改用英文註解",
+    "reply": "def bubble_sort(arr):\n    # sort the array in ascending order\n    for i in range(len(arr)):\n        for j in range(len(arr)-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr"
+  },
+  {
+    "context": {"prompt": "台北天氣如何", "reply": "台北現在是晴天，氣溫 28 度"},
+    "prompt": "那明天呢",
+    "reply": "抱歉，我目前只能查詢即時天氣，沒辦法提供明天的預測"
+  },
+  {
+    "context": {"prompt": "你叫什麼名字", "reply": "我叫 sinco"},
+    "prompt": "不是這個意思，我是問這個專案叫什麼",
+    "reply": "這個專案叫 AI-module"
+  },
+  {
+    "context": {"prompt": "你會電子學嗎?", "reply": "電子學 是物理學的分支學科。該學科研究課題包括電子、電子裝置、電子電路等。"},
+    "prompt": "可以舉個例子嗎",
+    "reply": "舉例來說，手機裡的電路板、二極管、電晶體都是電子學應用的實際例子"
+  },
+  {
+    "context": {"prompt": "你可以做什麼", "reply": "我可以幫你編寫程式、生產圖片、資料查詢等功能"},
+    "prompt": "剛剛說的資料查詢是指什麼",
+    "reply": "資料查詢是指天氣、搜尋等即時資訊，我會直接查最新資料回答你，不是憑記憶亂猜"
+  },
+  {
+    "context": {"prompt": "hi", "reply": "hi, 有什麼可以幫你？"},
+    "prompt": "英文回答",
+    "reply": "Hi, how can I help you?"
+  }
+]

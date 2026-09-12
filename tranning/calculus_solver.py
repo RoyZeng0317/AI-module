@@ -18,13 +18,17 @@ patterns, whether the step wording is a detailed textbook rule or a generic
 
 Supported expression syntax (parsed via sympy.parsing.sympy_parser with
 implicit multiplication, so "3x^2" and "3*x**2" both work): "^" or "**" for
-powers, "sin"/"cos"/"tan"/"exp"/"ln"/"log"/"sqrt", "pi", "e". Only
-single-variable expressions in x are supported.
+powers, "sin"/"cos"/"tan"/"exp"/"ln"/"log"/"sqrt",
+"asin"|"arcsin"/"acos"|"arccos"/"atan"|"arctan"/"sinh"/"cosh"/"tanh", "pi",
+"e". Only single-variable expressions in x are supported.
 
 Usage:
     python calculus_solver.py "3x^2 + 5x 的微分"
     python calculus_solver.py "integral of x^2 from 0 to 1"
     python calculus_solver.py "lim(x->0) sin(x)/x"
+    python calculus_solver.py "sin(x) 的三階導數"
+    python calculus_solver.py "exp(x) 在 x=0 展開到第4階泰勒級數"
+    python calculus_solver.py "sin(x) 的5階馬克勞林展開"
 """
 
 import argparse
@@ -46,6 +50,11 @@ _LOCAL_DICT = {
     "x": x, "e": sp.E, "pi": sp.pi,
     "sin": sp.sin, "cos": sp.cos, "tan": sp.tan,
     "exp": sp.exp, "ln": sp.log, "log": sp.log, "sqrt": sp.sqrt,
+    # Phase 2 "more function types": inverse trig + hyperbolic, both spellings
+    "asin": sp.asin, "arcsin": sp.asin,
+    "acos": sp.acos, "arccos": sp.acos,
+    "atan": sp.atan, "arctan": sp.atan,
+    "sinh": sp.sinh, "cosh": sp.cosh, "tanh": sp.tanh,
 }
 
 
@@ -69,6 +78,27 @@ def _parse_expr_text(text: str):
         return None
     if not expr.free_symbols <= {x}:
         return None  # only single-variable-x expressions are supported
+    return expr
+
+
+# Phase 4: multivariable (x, y) parsing — kept entirely separate from
+# _LOCAL_DICT/_parse_expr_text above (only used by the partial-derivative/
+# gradient patterns below) so the single-variable path's "only x" guarantee
+# is untouched; this one allows x and/or y instead.
+_LOCAL_DICT_XY = dict(_LOCAL_DICT, y=cg.y)
+
+
+def _parse_expr_text_xy(text: str):
+    text = text.strip()
+    if not text:
+        return None
+    normalized = text.replace("^", "**")
+    try:
+        expr = parse_expr(normalized, local_dict=_LOCAL_DICT_XY, transformations=_TRANSFORMATIONS)
+    except (SyntaxError, TypeError, ValueError, sp.SympifyError):
+        return None
+    if not expr.free_symbols <= {x, cg.y}:
+        return None  # only x/y expressions are supported
     return expr
 
 
@@ -119,7 +149,86 @@ _DERIVATIVE_PATTERNS = [
     re.compile(r"^(?:微分|導數|differentiate)\s*[:：]?\s*(.+)$", re.IGNORECASE),
     re.compile(r"^derivative of\s*(.+)$", re.IGNORECASE),
     re.compile(r"^d/dx\s*[\(\[]?\s*(.+?)\s*[\)\]]?$", re.IGNORECASE),
+    # 口語問句："EXPR[, x] 微分後是多少" — variable name前面偶爾會重複提一次
+    # (逗號或空白隔開)，跟其他 pattern 一樣用 \s* 吃掉，不特別解析成獨立變數。
+    re.compile(r"^(.+?)\s*(?:[,，]\s*(?:對\s*)?x\s*)?微分後(?:是多少|為何|等於多少)?$"),
 ]
+
+
+# Phase 3: higher-order derivatives + Taylor/Maclaurin series. Chinese
+# ordinals up to 十 (ten) are common in spoken phrasing ("二階導數"); Arabic
+# digits also accepted for anything beyond that.
+_CN_DIGITS = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
+
+
+def _parse_order_text(text: str) -> int | None:
+    text = text.strip()
+    if text.isdigit():
+        return int(text)
+    return _CN_DIGITS.get(text)
+
+
+# 中文句型「EXPR 的N階導數」expr 在前、order 在後；d^n/dx^n 記法反過來，
+# order 在前、expr 在後 —— group 順序不同，分成兩份清單而不是共用一份。
+_NTH_DERIVATIVE_CHINESE_PATTERNS = [
+    re.compile(r"^(.+?)\s*的第?\s*([一二三四五六七八九十]|\d+)\s*階(?:導數|微分)$"),
+]
+_NTH_DERIVATIVE_DDX_PATTERNS = [
+    re.compile(r"^d\^(\d+)/dx\^\d+\s*[\(\[]?\s*(.+?)\s*[\)\]]?$", re.IGNORECASE),
+]
+_TAYLOR_PATTERNS = [
+    re.compile(r"^(.+?)\s*在\s*x\s*=\s*(-?\d+)\s*展開到第?\s*(\d+)\s*階(?:的)?泰勒級數$"),
+]
+_MACLAURIN_PATTERNS = [
+    re.compile(r"^(.+?)\s*的第?\s*(\d+)\s*階馬克勞林(?:展開|級數)$"),
+]
+
+
+def _solve_nth_derivative(expr, n):
+    try:
+        return cg.explain_nth_derivative(expr, n)
+    except ValueError as exc:
+        raise SolveError(str(exc)) from exc
+
+
+def _solve_taylor_series(expr, point, order):
+    try:
+        return cg.explain_taylor_series(expr, point, order)
+    except (ValueError, TypeError, ZeroDivisionError) as exc:
+        raise SolveError(str(exc)) from exc
+
+
+# Phase 4: multivariable (x, y) — partial derivative / gradient. "EXPR 對 x
+# 的偏微分" has expr first, var second; "∂/∂x(EXPR)" notation is reversed.
+_PARTIAL_DERIVATIVE_CHINESE_PATTERNS = [
+    re.compile(r"^(.+?)\s*對\s*([xy])\s*(?:的)?偏微分$"),
+]
+_PARTIAL_DERIVATIVE_NOTATION_PATTERNS = [
+    # "∂/∂x" only, never a bare "d/dx" — that notation is already claimed by
+    # the single-variable _DERIVATIVE_PATTERNS below (d/dx(sin(x)) etc.) and
+    # must keep going through explain_derivative(), not this Phase 4 path.
+    re.compile(r"^∂/∂([xy])\s*[\(\[]?\s*(.+?)\s*[\)\]]?$"),
+]
+_GRADIENT_PATTERNS = [
+    re.compile(r"^(.+?)\s*的梯度$"),
+    re.compile(r"^gradient of\s*(.+)$", re.IGNORECASE),
+]
+
+_VAR_BY_LETTER = {"x": x, "y": cg.y}
+
+
+def _solve_partial_derivative(expr, var):
+    try:
+        return cg.explain_partial_derivative(expr, var)
+    except ValueError as exc:
+        raise SolveError(str(exc)) from exc
+
+
+def _solve_gradient(expr):
+    try:
+        return cg.explain_gradient(expr)
+    except ValueError as exc:
+        raise SolveError(str(exc)) from exc
 
 
 def _solve_integral(expr, bounds):
@@ -141,6 +250,8 @@ def parse_and_solve(text: str) -> dict | None:
     text = text.strip()
     if not text:
         return None
+    # 句尾問號/驚嘆號/句號跟算式無關，先去掉再比對，所有 pattern 都是 $ 結尾錨定。
+    text = text.rstrip("?？!！。")
 
     for pattern in _LIMIT_POINT_FIRST_PATTERNS:
         m = pattern.match(text)
@@ -159,6 +270,70 @@ def parse_and_solve(text: str) -> dict | None:
         point = _parse_limit_point(m.group(2))
         if point is not None and expr is not None:
             return cg.explain_limit(expr, point)
+
+    for pattern in _NTH_DERIVATIVE_CHINESE_PATTERNS:
+        m = pattern.match(text)
+        if not m:
+            continue
+        expr_text, order_text = m.groups()
+        expr = _parse_expr_text(expr_text)
+        n = _parse_order_text(order_text)
+        if expr is not None and n is not None:
+            return _solve_nth_derivative(expr, n)
+
+    for pattern in _NTH_DERIVATIVE_DDX_PATTERNS:  # order comes first here
+        m = pattern.match(text)
+        if not m:
+            continue
+        order_text, expr_text = m.groups()
+        expr = _parse_expr_text(expr_text)
+        n = _parse_order_text(order_text)
+        if expr is not None and n is not None:
+            return _solve_nth_derivative(expr, n)
+
+    for pattern in _TAYLOR_PATTERNS:
+        m = pattern.match(text)
+        if not m:
+            continue
+        expr_text, point_text, order_text = m.groups()
+        expr = _parse_expr_text(expr_text)
+        if expr is not None:
+            return _solve_taylor_series(expr, int(point_text), int(order_text))
+
+    for pattern in _MACLAURIN_PATTERNS:
+        m = pattern.match(text)
+        if not m:
+            continue
+        expr_text, order_text = m.groups()
+        expr = _parse_expr_text(expr_text)
+        if expr is not None:
+            return _solve_taylor_series(expr, 0, int(order_text))
+
+    for pattern in _PARTIAL_DERIVATIVE_CHINESE_PATTERNS:
+        m = pattern.match(text)
+        if not m:
+            continue
+        expr_text, var_letter = m.groups()
+        expr = _parse_expr_text_xy(expr_text)
+        if expr is not None:
+            return _solve_partial_derivative(expr, _VAR_BY_LETTER[var_letter])
+
+    for pattern in _PARTIAL_DERIVATIVE_NOTATION_PATTERNS:  # var comes first here
+        m = pattern.match(text)
+        if not m:
+            continue
+        var_letter, expr_text = m.groups()
+        expr = _parse_expr_text_xy(expr_text)
+        if expr is not None:
+            return _solve_partial_derivative(expr, _VAR_BY_LETTER[var_letter])
+
+    for pattern in _GRADIENT_PATTERNS:
+        m = pattern.match(text)
+        if not m:
+            continue
+        expr = _parse_expr_text_xy(m.group(1))
+        if expr is not None:
+            return _solve_gradient(expr)
 
     for pattern in _INTEGRAL_DEFINITE_BOUNDS_FIRST_PATTERNS:
         m = pattern.match(text)

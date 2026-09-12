@@ -1,7 +1,8 @@
-"""usage_store.py — 字元用量的持久化紀錄與上限判斷。沒有登入系統可以識別
-「使用者」，用來源 IP 當 key，跟 app.py 既有的 _check_chat_rate_limit()
-是同一套身分判斷邏輯，但兩者擋的事情不同：那邊擋「短時間內連續轟炸」
-（60 秒內幾次請求），這裡擋「一段時間內累計用掉太多字」（24 小時內幾個字）。
+"""usage_store.py — 字元用量的持久化紀錄與上限判斷。key 由 app.py 的
+_resolve_client_id() 決定：有 Google 登入就用帳號識別（"google:<uid>"），
+沒有就退回來源 IP，跟 app.py 既有的 _check_chat_rate_limit() 是同一套身分
+判斷邏輯，但兩者擋的事情不同：那邊擋「短時間內連續轟炸」（60 秒內幾次請求），
+這裡擋「一段時間內累計用掉太多字」（24 小時內幾個字）。
 
 寫法比照 conversation_store.py / notify_store.py：同一份 JSON 檔、
 _resolve_path() 讓測試可以指定暫存路徑而不動到真正的使用者資料。

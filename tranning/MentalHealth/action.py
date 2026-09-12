@@ -70,7 +70,10 @@ _PROJECT_ROOT = _TRANNING_DIR.parent                    # AI-module 專案根目
 if str(_TRANNING_DIR) not in sys.path:
     sys.path.insert(0, str(_TRANNING_DIR))
 
+from bayesian_utils import majority_vote, mc_dropout_mode  # noqa: E402
 from train_utils import EarlyStopper, accuracy_gap_warning, plateau_scheduler, save_checkpoint  # noqa: E402
+
+DEFAULT_MC_SAMPLES = 20
 
 DEFAULT_CSV = _PROJECT_ROOT / "data" / "mental.csv"
 DEFAULT_OUT_DIR = _MODULE_DIR / "emotion_runs"
@@ -342,27 +345,42 @@ def _load(out_dir: Path):
     return loaded
 
 
-def predict_emotion(text: str, out_dir: Path = DEFAULT_OUT_DIR) -> dict:
+def predict_emotion(text: str, out_dir: Path = DEFAULT_OUT_DIR, mc_samples: int = DEFAULT_MC_SAMPLES) -> dict:
+    """`mc_confidence` (added 2026-09-10): same MC Dropout idea chats.py's
+    mc_chat_reply() already uses for chat replies, adapted to this bounded-
+    regression head — `mc_samples` stochastic forward passes (dropout left
+    on, bayesian_utils.mc_dropout_mode) each rounded to the same 0-5 integer
+    label the eval-mode prediction below uses, then majority_vote()'d. High
+    agreement across samples means the model is consistently landing on the
+    same label despite the random dropout masks; low agreement is an honest
+    "not sure" signal, most likely for text unlike anything in mental.csv's
+    423 rows or landing near a label boundary (e.g. predicted 2.4 vs 2.6).
+    """
     loaded = _load(Path(out_dir))
     if loaded is None:
         return {
-            "text": text, "score": None, "label": None, "label_name": None,
+            "text": text, "score": None, "label": None, "label_name": None, "mc_confidence": None,
             "status": "模型尚未訓練，請先執行 `python action.py --epochs ...` 進行訓練。",
         }
 
     model, vocab, config = loaded
     input_ids = torch.tensor([encode(text, vocab, config["max_len"])])
-    with torch.no_grad():
-        pred_norm = model(input_ids).item()
-
     score_max = config.get("score_max", SCORE_MAX)
     score_min = config.get("score_min", SCORE_MIN)
+
+    with torch.no_grad():
+        pred_norm = model(input_ids).item()
     score = pred_norm * score_max
     label = int(round(min(max(score, score_min), score_max)))
 
+    with mc_dropout_mode(model), torch.no_grad():
+        votes = [int(round(min(max(model(input_ids).item() * score_max, score_min), score_max)))
+                 for _ in range(mc_samples)]
+    _, mc_confidence = majority_vote(votes)
+
     return {
         "text": text, "score": round(score, 2), "label": label,
-        "label_name": LABEL_NAMES.get(label, str(label)), "status": None,
+        "label_name": LABEL_NAMES.get(label, str(label)), "mc_confidence": mc_confidence, "status": None,
     }
 
 

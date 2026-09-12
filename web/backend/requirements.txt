@@ -1,7 +1,7 @@
 fastapi>=0.110
 uvicorn[standard]>=0.30
 python-multipart>=0.0.9
-ultralytics>=8.3  # 8.3+ adds YOLO11 support (detector.py's MODEL_NAME="yolo11n.pt")
+ultralytics>=8.4  # 8.4+ adds YOLO26 support (detector.py's MODEL_NAME="yolo26n.pt")
 opencv-python-headless>=4.8
 numpy>=1.24
 pytest>=8.0
@@ -9,3 +9,5 @@ httpx>=0.27
 torch>=2.0
 requests>=2.31
 beautifulsoup4>=4.12
+google-auth>=2.30  # 驗證前端 Google Identity Services 發的 Google ID token，見 auth.py
+schemdraw>=0.19  # tranning/circuit_schemdraw_render.py：偵測結果畫成原理圖

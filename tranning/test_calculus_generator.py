@@ -11,13 +11,19 @@ import pytest
 import sympy as sp
 
 from calculus_generator import (
+    _DERIVATIVE_FORMULA_LABELS,
     explain_derivative,
+    explain_gradient,
     explain_integral,
     explain_limit,
+    explain_nth_derivative,
+    explain_partial_derivative,
+    explain_taylor_series,
     format_problem,
     format_question,
     generate_problem,
     x,
+    y,
 )
 
 
@@ -131,8 +137,41 @@ def test_explain_derivative_on_hand_written_expression():
     assert problem["answer"] == "f'(x) = 6x + 5"
 
 
-def test_explain_derivative_falls_back_generically_for_a_product_of_two_factors():
-    expr = x * sp.sin(x)  # not one of the three known single-term patterns
+def test_explain_derivative_product_rule():
+    expr = x * sp.sin(x)
+    problem = explain_derivative(expr)
+    assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
+    assert "乘積律" in problem["steps"][0]
+
+
+def test_explain_derivative_quotient_rule():
+    expr = x / (x + 1)
+    problem = explain_derivative(expr)
+    assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
+    assert "商法則" in problem["steps"][0]
+
+
+def test_explain_derivative_chain_rule_nonlinear_inner():
+    expr = sp.sin(x**2 + 1)
+    problem = explain_derivative(expr)
+    assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
+    assert "鏈鎖法則" in problem["steps"][0]
+    assert "u=" in problem["steps"][0]
+
+
+def test_explain_derivative_chain_rule_linear_inner_wording_unchanged():
+    # existing quiz term builders (_term_trig/_term_exp) only ever produce a
+    # linear inner (c*x) — that wording must stay exactly as before, only
+    # the *nonlinear*-inner case above gets the new generalized phrasing.
+    expr = 3 * sp.sin(2 * x)
+    problem = explain_derivative(expr)
+    assert problem["steps"][0] == "對 3sin(2x) 用鏈鎖法則微分 sin(cx)：(3sin(2x))' = 6cos(2x)"
+
+
+def test_explain_derivative_falls_back_generically_for_three_factor_product():
+    # three x-dependent factors is beyond the two-factor product rule this
+    # module attempts — the answer is still exact (sympy), wording falls back
+    expr = sp.sin(x) * sp.cos(x) * sp.exp(x)
     problem = explain_derivative(expr)
     assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
     assert "sympy 計算" in problem["steps"][0]
@@ -183,3 +222,233 @@ def test_explain_limit_at_infinity():
     problem = explain_limit(expr, sp.oo)
     assert problem["value"] == 3
     assert "∞" in problem["question"]
+
+
+def test_explain_integral_u_substitution():
+    expr = x * sp.sin(x**2)
+    problem = explain_integral(expr)
+    assert sp.simplify(sp.diff(problem["antideriv"], x) - expr) == 0
+    assert "湊微分" in problem["steps"][0]
+
+
+def test_explain_integral_u_substitution_declines_when_ratio_still_has_x():
+    # x*sin(x) looks superficially similar to x*sin(x**2) but isn't a valid
+    # u-substitution (needs integration by parts instead) — must fall back,
+    # not produce a bogus "u-substitution" step with the wrong math.
+    expr = x * sp.sin(x)
+    problem = explain_integral(expr)
+    assert sp.simplify(sp.diff(problem["antideriv"], x) - expr) == 0
+    assert "湊微分" not in problem["steps"][0]
+
+
+def test_quiz_derivative_term_builders_include_product_and_chain():
+    seen_product = seen_chain = False
+    for seed in range(60):
+        problem = generate_problem(topic="derivative", seed=seed)
+        for step in problem["steps"]:
+            if "乘積律" in step:
+                seen_product = True
+            if "鏈鎖法則，令 u=" in step:
+                seen_chain = True
+    assert seen_product and seen_chain
+
+
+def test_quiz_integral_term_builder_includes_u_substitution():
+    seen = False
+    for seed in range(60):
+        problem = generate_problem(topic="integral", seed=seed)
+        for step in problem["steps"]:
+            if "湊微分" in step:
+                seen = True
+    assert seen
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: more function types (log/sqrt/反三角/雙曲)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "expr,formula_hint",
+    [
+        (sp.log(x), "(ln x)'"),
+        (sp.sqrt(x), "(√x)'"),
+        (sp.asin(x), "(arcsin x)'"),
+        (sp.acos(x), "(arccos x)'"),
+        (sp.atan(x), "(arctan x)'"),
+        (sp.sinh(2 * x), "(sinh x)'"),
+        (sp.cosh(3 * x), "(cosh x)'"),
+        (sp.tanh(x), "(tanh x)'"),
+    ],
+)
+def test_explain_derivative_more_function_types_linear_inner(expr, formula_hint):
+    problem = explain_derivative(expr)
+    assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
+    assert formula_hint in problem["steps"][0]
+
+
+def test_explain_derivative_more_function_type_nonlinear_inner_uses_chain_wording():
+    expr = sp.log(x**2 + 1)
+    problem = explain_derivative(expr)
+    assert sp.simplify(problem["deriv"] - sp.diff(expr, x)) == 0
+    assert "鏈鎖法則，令 u=" in problem["steps"][0]
+    assert "ln(u)" in problem["steps"][0]  # display name, not sympy's raw "log"
+
+
+def test_fmt_renames_sympy_function_names_to_chinese_textbook_spelling():
+    problem = explain_derivative(sp.sqrt(x))
+    assert "sqrt(" not in problem["question"]
+    assert "√(" in problem["question"]
+    problem = explain_derivative(sp.log(x))
+    assert "log(" not in problem["question"]
+    assert "ln(" in problem["question"]
+
+
+def test_explain_integral_sqrt_formula():
+    problem = explain_integral(sp.sqrt(x))
+    assert sp.simplify(sp.diff(problem["antideriv"], x) - sp.sqrt(x)) == 0
+    assert "√x dx" in problem["steps"][0]
+
+
+def test_explain_integral_sinh_cosh_formula():
+    for expr, hint in [(sp.sinh(2 * x), "sinh x dx"), (sp.cosh(3 * x), "cosh x dx")]:
+        problem = explain_integral(expr)
+        assert sp.simplify(sp.diff(problem["antideriv"], x) - expr) == 0
+        assert hint in problem["steps"][0]
+
+
+def test_explain_integral_sqrt_u_substitution():
+    expr = x * sp.sqrt(x**2 + 1)
+    problem = explain_integral(expr)
+    assert sp.simplify(sp.diff(problem["antideriv"], x) - expr) == 0
+    assert "湊微分" in problem["steps"][0]
+
+
+def test_explain_derivative_log_asin_still_fall_back_for_integral():
+    # log/asin/acos/atan/tanh's antiderivatives need integration by parts,
+    # not a clean substitution — this module intentionally doesn't claim a
+    # named formula for those; the answer is still exact (sympy), wording
+    # just falls back to the generic line, same as any other unrecognized
+    # integral shape.
+    problem = explain_integral(sp.log(x))
+    assert sp.simplify(sp.diff(problem["antideriv"], x) - sp.log(x)) == 0
+    assert "sympy 計算" in problem["steps"][0]
+
+
+def test_quiz_derivative_term_builders_include_more_function_types():
+    seen = False
+    for seed in range(60):
+        problem = generate_problem(topic="derivative", seed=seed)
+        for step in problem["steps"]:
+            if any(label in step for label in _DERIVATIVE_FORMULA_LABELS.values()):
+                seen = True
+    assert seen
+
+
+def test_quiz_integral_term_builder_includes_more_function_types():
+    seen = False
+    for seed in range(60):
+        problem = generate_problem(topic="integral", seed=seed)
+        for step in problem["steps"]:
+            if "√x dx" in step or "sinh x dx" in step or "cosh x dx" in step:
+                seen = True
+    assert seen
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: higher-order derivatives + Taylor/Maclaurin series
+# ---------------------------------------------------------------------------
+
+def test_explain_nth_derivative_matches_repeated_sympy_diff():
+    expr = sp.sin(x)
+    for n in range(1, 5):
+        problem = explain_nth_derivative(expr, n)
+        assert sp.simplify(problem["deriv"] - sp.diff(expr, x, n)) == 0
+        assert problem["order"] == n
+        assert f"f^({n})(x)" in problem["answer"]
+
+
+def test_explain_nth_derivative_step_count_scales_with_order():
+    # each order reuses explain_derivative()'s own step list in full — a
+    # multi-term function's 2nd derivative should have more step lines than
+    # its 1st, not a fixed "1 line per order" summary.
+    expr = x**4 + 3 * x**2
+    p1 = explain_nth_derivative(expr, 1)
+    p2 = explain_nth_derivative(expr, 2)
+    assert len(p2["steps"]) > len(p1["steps"])
+    assert all(step.startswith("[第 1 階]") for step in p1["steps"])
+    assert any(step.startswith("[第 2 階]") for step in p2["steps"])
+
+
+def test_explain_nth_derivative_rejects_non_positive_order():
+    with pytest.raises(ValueError):
+        explain_nth_derivative(x**2, 0)
+    with pytest.raises(ValueError):
+        explain_nth_derivative(x**2, -1)
+
+
+def test_explain_taylor_series_matches_sympy_series():
+    for expr, point, order in [
+        (sp.exp(x), 0, 4),
+        (sp.sin(x), 0, 5),
+        (sp.log(x), 1, 3),
+        (x**3 - 2 * x, 0, 3),
+    ]:
+        problem = explain_taylor_series(expr, point, order)
+        expected = sp.series(expr, x, point, order + 1).removeO()
+        assert sp.expand(problem["series"] - expected) == 0
+        assert len(problem["steps"]) == order + 1
+
+
+def test_explain_taylor_series_point_zero_is_labeled_maclaurin():
+    problem = explain_taylor_series(sp.exp(x), 0, 2)
+    assert problem["topic_zh"] == "馬克勞林級數"
+    problem = explain_taylor_series(sp.exp(x), 1, 2)
+    assert problem["topic_zh"] == "泰勒級數"
+
+
+def test_explain_taylor_series_rejects_negative_order():
+    with pytest.raises(ValueError):
+        explain_taylor_series(sp.sin(x), 0, -1)
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: multivariable calculus (partial derivatives / gradient)
+# ---------------------------------------------------------------------------
+
+def test_explain_partial_derivative_matches_sympy_diff():
+    expr = x**2 * y + y**3
+    px = explain_partial_derivative(expr, x)
+    assert px["deriv"] == sp.diff(expr, x)
+    py = explain_partial_derivative(expr, y)
+    assert py["deriv"] == sp.diff(expr, y)
+
+
+def test_explain_partial_derivative_holds_other_var_constant():
+    px = explain_partial_derivative(x**2 * y, x)
+    assert "y" in px["steps"][0] and "常數" in px["steps"][0]
+    py = explain_partial_derivative(x**2 * y, y)
+    assert "x" in py["steps"][0] and "常數" in py["steps"][0]
+
+
+def test_explain_partial_derivative_rejects_wrong_variable():
+    with pytest.raises(ValueError):
+        explain_partial_derivative(x**2, sp.symbols("z"))
+
+
+def test_explain_partial_derivative_rejects_extra_free_symbols():
+    z = sp.symbols("z")
+    with pytest.raises(ValueError):
+        explain_partial_derivative(x * z, x)
+
+
+def test_explain_gradient_matches_sympy_diff():
+    expr = sp.sin(x * y) + x**3
+    grad = explain_gradient(expr)
+    assert grad["gradient"] == (sp.diff(expr, x), sp.diff(expr, y))
+    assert "∇f" in grad["answer"]
+
+
+def test_explain_gradient_single_variable_expression_still_works():
+    # a purely-x expression is still a valid (degenerate) 2-variable function
+    grad = explain_gradient(x**2)
+    assert grad["gradient"] == (2 * x, 0)

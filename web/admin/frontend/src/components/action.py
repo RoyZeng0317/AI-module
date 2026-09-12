@@ -231,8 +231,16 @@ def icon_button(icon_key, label, on_click=None, btn_id=None, cls="nav-item", **e
 # API 呼叫
 # ═══════════════════════════════════════════════════════════════
 
+def _auth_headers():
+    """有 Google 登入的 id token 就帶 Authorization header，讓後端的
+    _resolve_client_id() 用帳號識別；沒登入回傳空 dict，行為跟登入功能加入
+    前完全一樣（不強制要求登入才能用）。"""
+    token = _state.get("id_token")
+    return {"Authorization": f"Bearer {token}"} if token else {}
+
+
 async def api_get(url):
-    resp = await window.fetch(url)
+    resp = await window.fetch(url, _js_opts({"headers": _auth_headers()}))
     # resp.json() 回傳的是包著 JS 物件的 JsProxy，不是 Python dict——JsProxy
     # 沒有 .get()（除非包的是 JS Map），呼叫 data.get(...) 會直接
     # AttributeError: get。.to_py() 遞迴轉成真正的 Python dict/list，下面
@@ -259,7 +267,7 @@ def _js_opts(opts):
 async def api_post(url, body):
     resp = await window.fetch(url, _js_opts({
         "method": "POST",
-        "headers": {"Content-Type": "application/json"},
+        "headers": {"Content-Type": "application/json", **_auth_headers()},
         "body": _json.dumps(body),
     }))
     data = (await resp.json()).to_py()
@@ -271,7 +279,7 @@ async def api_post(url, body):
 async def api_patch(url, body):
     resp = await window.fetch(url, _js_opts({
         "method": "PATCH",
-        "headers": {"Content-Type": "application/json"},
+        "headers": {"Content-Type": "application/json", **_auth_headers()},
         "body": _json.dumps(body),
     }))
     data = (await resp.json()).to_py()
@@ -281,7 +289,7 @@ async def api_patch(url, body):
 
 
 async def api_delete(url):
-    resp = await window.fetch(url, _js_opts({"method": "DELETE"}))
+    resp = await window.fetch(url, _js_opts({"method": "DELETE", "headers": _auth_headers()}))
     data = (await resp.json()).to_py()
     if not resp.ok:
         raise Exception(data.get("detail", f"HTTP {resp.status}"))
@@ -438,6 +446,8 @@ _state = {
     "conversation_id": None,
     "open_menu": None,
     "open_menu_id": None,
+    "user": None,
+    "id_token": None,
 }
 
 # DOM 引用（build_ui 時填入）
@@ -499,6 +509,56 @@ async def check_gpu():
         pill.setAttribute("data-state", "down")
         text.textContent = "顯卡查詢失敗"
         console.error(f"GPU info check failed: {exc}")
+
+
+# ═══════════════════════════════════════════════════════════════
+# Google 登入（Google Identity Services，橋接函式見 google-auth-init.js，
+# 不再依賴 Firebase）
+# ═══════════════════════════════════════════════════════════════
+
+def _update_account_pill():
+    """登入用的是 Google 官方畫出來的按鈕（google_btn，可靠地跳出帳號選擇
+    視窗），account_pill 只在已登入時顯示（顯示帳號名稱＋點一下登出）——兩個
+    元素互斥顯示，不是同一顆按鈕換文字。"""
+    pill = _dom.get("account_pill")
+    text = _dom.get("account_text")
+    google_btn = _dom.get("google_btn")
+    if pill is None:
+        return
+    user = _state["user"]
+    if user:
+        pill.style.display = ""
+        pill.setAttribute("data-state", "ok")
+        pill.setAttribute("title", "點一下登出")
+        text.textContent = user.get("name") or user.get("email") or "已登入"
+        if google_btn is not None:
+            google_btn.style.display = "none"
+    else:
+        pill.style.display = "none"
+        if google_btn is not None:
+            google_btn.style.display = ""
+
+
+async def _refresh_id_token():
+    _state["id_token"] = await window.sincoGetIdToken()
+
+
+def _on_auth_changed(user):
+    """google-auth-init.js 的登入狀態回呼——JS 傳回來的物件要 .to_py() 才會
+    變成真正的 Python dict（同一個道理見 api_get() 的說明）。"""
+    _state["user"] = user.to_py() if user else None
+    if _state["user"]:
+        asyncio.ensure_future(_refresh_id_token())
+    else:
+        _state["id_token"] = None
+    _update_account_pill()
+
+
+async def _on_account_click():
+    """account_pill 只在已登入時顯示，所以這裡只處理登出——登入動線走的是
+    google_btn（Google 官方按鈕，由 GIS 自己接管點擊事件）。"""
+    if _state["user"]:
+        await window.sincoSignOut()
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1141,6 +1201,25 @@ def _build_sidebar():
     _dom["gpu_text"] = gpu_text
     status_section.appendChild(gpu_pill)
 
+    # 未登入時顯示 Google 官方畫出來的按鈕（google_btn，見下面 build_ui()
+    # 之後呼叫的 window.sincoRenderGoogleButton()）；已登入時換成 account_pill
+    # 顯示帳號名稱，點一下登出——兩者互斥顯示，見 _update_account_pill()。
+    google_btn = el("div", id="googleSignInBtn")
+    _dom["google_btn"] = google_btn
+    status_section.appendChild(google_btn)
+
+    account_pill = el("div", cls="status-pill", id="accountPill")
+    account_pill.style.display = "none"
+    account_pill.setAttribute("data-state", "down")
+    account_pill.setAttribute("title", "使用 Google 登入")
+    account_pill.appendChild(el("span", cls="status-dot"))
+    account_text = el("span", id="accountText", text="使用 Google 登入")
+    account_pill.appendChild(account_text)
+    account_pill.addEventListener("click", create_proxy(lambda _: asyncio.ensure_future(_on_account_click())))
+    _dom["account_pill"] = account_pill
+    _dom["account_text"] = account_text
+    status_section.appendChild(account_pill)
+
     aside.appendChild(status_section)
 
     # ── 功能導覽：角色／記憶／學習 ──
@@ -1517,6 +1596,8 @@ def build_ui():
 # ═══════════════════════════════════════════════════════════════
 build_ui()
 document.addEventListener("click", create_proxy(lambda _e: _close_open_menu()))
+window.sincoRenderGoogleButton("googleSignInBtn")
+window.sincoOnAuthChanged(create_proxy(_on_auth_changed))
 asyncio.ensure_future(check_health())
 asyncio.ensure_future(check_gpu())
 asyncio.ensure_future(_init_conversations())

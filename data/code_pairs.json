@@ -278,5 +278,197 @@
   {
     "prompt": "寫一個簡單的 decrator 範例",
     "reply": "import time\n\ndef timer(func):\n    def wrapper(*args, **kwargs):\n        start = time.time()\n        result = func(*args, **kwargs)\n        print(f\"執行時間：{time.time() - start:.4f} 秒\")\n        return result\n    return wrapper"
+  },
+  {
+    "prompt": "用 Arduino 寫一個點燈與按鈕輸入的程式",
+    "reply": "const int LED_PIN = 13;\nconst int BUTTON_PIN = 2;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 Arduino 的點燈與按鈕輸入程式",
+    "reply": "const int LED_PIN = 13;\nconst int BUTTON_PIN = 2;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "我要一個 Arduino 的點燈與按鈕輸入程式碼",
+    "reply": "const int LED_PIN = 13;\nconst int BUTTON_PIN = 2;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "用 Arduino 寫一個PWM 呼吸燈的程式",
+    "reply": "const int LED_PIN = 9;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    analogWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "幫我寫一段 Arduino 的PWM 呼吸燈程式",
+    "reply": "const int LED_PIN = 9;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    analogWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "我要一個 Arduino 的PWM 呼吸燈程式碼",
+    "reply": "const int LED_PIN = 9;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    analogWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "用 Arduino 寫一個序列埠印出訊息的程式",
+    "reply": "void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from Arduino\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 Arduino 的序列埠印出訊息程式",
+    "reply": "void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from Arduino\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "我要一個 Arduino 的序列埠印出訊息程式碼",
+    "reply": "void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from Arduino\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "用 Arduino 寫一個讀取 I2C 感測器數值的程式",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 Arduino 的讀取 I2C 感測器數值程式",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "我要一個 Arduino 的讀取 I2C 感測器數值程式碼",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "用 ESP32 寫一個點燈與按鈕輸入的程式",
+    "reply": "const int LED_PIN = 2;\nconst int BUTTON_PIN = 4;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 ESP32 的點燈與按鈕輸入程式",
+    "reply": "const int LED_PIN = 2;\nconst int BUTTON_PIN = 4;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "我要一個 ESP32 的點燈與按鈕輸入程式碼",
+    "reply": "const int LED_PIN = 2;\nconst int BUTTON_PIN = 4;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}"
+  },
+  {
+    "prompt": "用 ESP32 寫一個PWM 呼吸燈的程式",
+    "reply": "const int LED_PIN = 5;\n\nvoid setup() {\n  ledcAttach(LED_PIN, 5000, 8);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    ledcWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "幫我寫一段 ESP32 的PWM 呼吸燈程式",
+    "reply": "const int LED_PIN = 5;\n\nvoid setup() {\n  ledcAttach(LED_PIN, 5000, 8);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    ledcWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "我要一個 ESP32 的PWM 呼吸燈程式碼",
+    "reply": "const int LED_PIN = 5;\n\nvoid setup() {\n  ledcAttach(LED_PIN, 5000, 8);\n}\n\nvoid loop() {\n  for (int duty = 0; duty <= 255; duty++) {\n    ledcWrite(LED_PIN, duty);\n    delay(10);\n  }\n}"
+  },
+  {
+    "prompt": "用 ESP32 寫一個序列埠印出訊息的程式",
+    "reply": "void setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from ESP32\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 ESP32 的序列埠印出訊息程式",
+    "reply": "void setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from ESP32\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "我要一個 ESP32 的序列埠印出訊息程式碼",
+    "reply": "void setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Serial.println(\"Hello from ESP32\");\n  delay(1000);\n}"
+  },
+  {
+    "prompt": "用 ESP32 寫一個讀取 I2C 感測器數值的程式",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 ESP32 的讀取 I2C 感測器數值程式",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "我要一個 ESP32 的讀取 I2C 感測器數值程式碼",
+    "reply": "#include <Wire.h>\n\nconst int SENSOR_ADDR = 0x48;\n\nvoid setup() {\n  Wire.begin();\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  Wire.requestFrom(SENSOR_ADDR, 2);\n  if (Wire.available() >= 2) {\n    int value = (Wire.read() << 8) | Wire.read();\n    Serial.println(value);\n  }\n  delay(500);\n}"
+  },
+  {
+    "prompt": "用 樹莓派 Pico 寫一個點燈與按鈕輸入的程式",
+    "reply": "from machine import Pin\nimport time\n\nled = Pin(25, Pin.OUT)\nbutton = Pin(14, Pin.IN, Pin.PULL_UP)\n\nwhile True:\n    led.value(0 if button.value() else 1)\n    time.sleep(0.05)"
+  },
+  {
+    "prompt": "幫我寫一段 樹莓派 Pico 的點燈與按鈕輸入程式",
+    "reply": "from machine import Pin\nimport time\n\nled = Pin(25, Pin.OUT)\nbutton = Pin(14, Pin.IN, Pin.PULL_UP)\n\nwhile True:\n    led.value(0 if button.value() else 1)\n    time.sleep(0.05)"
+  },
+  {
+    "prompt": "我要一個 樹莓派 Pico 的點燈與按鈕輸入程式碼",
+    "reply": "from machine import Pin\nimport time\n\nled = Pin(25, Pin.OUT)\nbutton = Pin(14, Pin.IN, Pin.PULL_UP)\n\nwhile True:\n    led.value(0 if button.value() else 1)\n    time.sleep(0.05)"
+  },
+  {
+    "prompt": "用 樹莓派 Pico 寫一個PWM 呼吸燈的程式",
+    "reply": "from machine import Pin, PWM\nimport time\n\npwm = PWM(Pin(15))\npwm.freq(1000)\n\nwhile True:\n    for duty in range(0, 65535, 1024):\n        pwm.duty_u16(duty)\n        time.sleep(0.01)"
+  },
+  {
+    "prompt": "幫我寫一段 樹莓派 Pico 的PWM 呼吸燈程式",
+    "reply": "from machine import Pin, PWM\nimport time\n\npwm = PWM(Pin(15))\npwm.freq(1000)\n\nwhile True:\n    for duty in range(0, 65535, 1024):\n        pwm.duty_u16(duty)\n        time.sleep(0.01)"
+  },
+  {
+    "prompt": "我要一個 樹莓派 Pico 的PWM 呼吸燈程式碼",
+    "reply": "from machine import Pin, PWM\nimport time\n\npwm = PWM(Pin(15))\npwm.freq(1000)\n\nwhile True:\n    for duty in range(0, 65535, 1024):\n        pwm.duty_u16(duty)\n        time.sleep(0.01)"
+  },
+  {
+    "prompt": "用 樹莓派 Pico 寫一個序列埠印出訊息的程式",
+    "reply": "from machine import UART, Pin\nimport time\n\nuart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))\n\nwhile True:\n    uart.write(\"Hello from Pico\\n\")\n    time.sleep(1)"
+  },
+  {
+    "prompt": "幫我寫一段 樹莓派 Pico 的序列埠印出訊息程式",
+    "reply": "from machine import UART, Pin\nimport time\n\nuart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))\n\nwhile True:\n    uart.write(\"Hello from Pico\\n\")\n    time.sleep(1)"
+  },
+  {
+    "prompt": "我要一個 樹莓派 Pico 的序列埠印出訊息程式碼",
+    "reply": "from machine import UART, Pin\nimport time\n\nuart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))\n\nwhile True:\n    uart.write(\"Hello from Pico\\n\")\n    time.sleep(1)"
+  },
+  {
+    "prompt": "用 樹莓派 Pico 寫一個讀取 I2C 感測器數值的程式",
+    "reply": "from machine import I2C, Pin\n\ni2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=400000)\ndata = i2c.readfrom(0x48, 2)\nvalue = (data[0] << 8) | data[1]\nprint(value)"
+  },
+  {
+    "prompt": "幫我寫一段 樹莓派 Pico 的讀取 I2C 感測器數值程式",
+    "reply": "from machine import I2C, Pin\n\ni2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=400000)\ndata = i2c.readfrom(0x48, 2)\nvalue = (data[0] << 8) | data[1]\nprint(value)"
+  },
+  {
+    "prompt": "我要一個 樹莓派 Pico 的讀取 I2C 感測器數值程式碼",
+    "reply": "from machine import I2C, Pin\n\ni2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=400000)\ndata = i2c.readfrom(0x48, 2)\nvalue = (data[0] << 8) | data[1]\nprint(value)"
+  },
+  {
+    "prompt": "用 STM32 寫一個點燈與按鈕輸入（假設 GPIO 已經初始化好）的程式",
+    "reply": "if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);\n} else {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 STM32 的點燈與按鈕輸入（假設 GPIO 已經初始化好）程式",
+    "reply": "if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);\n} else {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);\n}"
+  },
+  {
+    "prompt": "我要一個 STM32 的點燈與按鈕輸入（假設 GPIO 已經初始化好）程式碼",
+    "reply": "if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);\n} else {\n    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);\n}"
+  },
+  {
+    "prompt": "用 STM32 寫一個PWM 呼吸燈（假設 htim2 的 channel 1 已經設定成 PWM）的程式",
+    "reply": "HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);\nfor (uint16_t duty = 0; duty <= 999; duty++) {\n    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);\n    HAL_Delay(2);\n}"
+  },
+  {
+    "prompt": "幫我寫一段 STM32 的PWM 呼吸燈（假設 htim2 的 channel 1 已經設定成 PWM）程式",
+    "reply": "HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);\nfor (uint16_t duty = 0; duty <= 999; duty++) {\n    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);\n    HAL_Delay(2);\n}"
+  },
+  {
+    "prompt": "我要一個 STM32 的PWM 呼吸燈（假設 htim2 的 channel 1 已經設定成 PWM）程式碼",
+    "reply": "HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);\nfor (uint16_t duty = 0; duty <= 999; duty++) {\n    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);\n    HAL_Delay(2);\n}"
+  },
+  {
+    "prompt": "用 STM32 寫一個序列埠印出訊息（假設 huart2 已經設定好）的程式",
+    "reply": "char msg[] = \"Hello from STM32\\r\\n\";\nHAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);\nHAL_Delay(1000);"
+  },
+  {
+    "prompt": "幫我寫一段 STM32 的序列埠印出訊息（假設 huart2 已經設定好）程式",
+    "reply": "char msg[] = \"Hello from STM32\\r\\n\";\nHAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);\nHAL_Delay(1000);"
+  },
+  {
+    "prompt": "我要一個 STM32 的序列埠印出訊息（假設 huart2 已經設定好）程式碼",
+    "reply": "char msg[] = \"Hello from STM32\\r\\n\";\nHAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);\nHAL_Delay(1000);"
+  },
+  {
+    "prompt": "用 STM32 寫一個讀取 I2C 感測器數值（假設 hi2c1 已經設定好）的程式",
+    "reply": "uint8_t data[2];\nHAL_I2C_Master_Receive(&hi2c1, (0x48 << 1), data, 2, HAL_MAX_DELAY);\nint16_t value = (data[0] << 8) | data[1];"
+  },
+  {
+    "prompt": "幫我寫一段 STM32 的讀取 I2C 感測器數值（假設 hi2c1 已經設定好）程式",
+    "reply": "uint8_t data[2];\nHAL_I2C_Master_Receive(&hi2c1, (0x48 << 1), data, 2, HAL_MAX_DELAY);\nint16_t value = (data[0] << 8) | data[1];"
+  },
+  {
+    "prompt": "我要一個 STM32 的讀取 I2C 感測器數值（假設 hi2c1 已經設定好）程式碼",
+    "reply": "uint8_t data[2];\nHAL_I2C_Master_Receive(&hi2c1, (0x48 << 1), data, 2, HAL_MAX_DELAY);\nint16_t value = (data[0] << 8) | data[1];"
   }
 ]

@@ -52,7 +52,11 @@ _COMMAND_ALIASES: dict[str, str] = {
     "列出測試": "pytest --collect-only", "測試清單": "pytest --collect-only",
 }
 
-_EXEC_REQUEST_HINTS = ("執行", "跑一下", "跑", "下指令", "指令", "run", "execute")
+# 單一「跑」字故意不放進來：「跑步」「夜跑」「慢跑」這類跟運動/情緒陪伴
+# 相關的句子會被子字串比對誤判成「跑一下 xxx」的指令執行請求（2026-09-10
+# 從 data/pairs_emotion_draft.json 的訓練句「今天早起去跑步」被 route_reply()
+# 攔截才發現）——「跑一下」已經涵蓋原本想抓的口語說法，不需要再放寬到單字。
+_EXEC_REQUEST_HINTS = ("執行", "跑一下", "下指令", "指令", "run", "execute")
 
 
 def detect_command(message: str) -> str | None:

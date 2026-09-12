@@ -1,0 +1,10 @@
+{
+  "epoch": 3000,
+  "epochs": 3000,
+  "percent": 100.0,
+  "loss": 3.9077759148579423,
+  "best_loss": 0.505883393912041,
+  "elapsed_seconds": 9717.6,
+  "eta_seconds": 0.0,
+  "done": true
+}

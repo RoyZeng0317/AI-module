@@ -7,9 +7,13 @@ prompt/reply pairs.
 """
 
 import json
+import random
 
 import chats
-from chats import chat_reply, is_code_request, mc_chat_reply, smart_reply_traced, train
+from chats import (
+    ChatPairsDataset, build_vocab, chat_reply, encode, inject_typos, is_code_request,
+    mc_chat_reply, smart_reply_traced, train,
+)
 
 
 def _make_synthetic_pairs():
@@ -77,17 +81,21 @@ def test_mc_chat_reply_after_training_returns_reply_and_confidence(tmp_path):
     assert 0.0 <= confidence <= 1.0
 
 
-def test_smart_reply_traced_includes_confidence_for_model_path(tmp_path):
-    data_path = tmp_path / "pairs.json"
-    data_path.write_text(json.dumps(_make_synthetic_pairs()), encoding="utf-8")
-    out_dir = tmp_path / "runs"
+def test_smart_reply_traced_general_chat_uses_transformer(monkeypatch):
+    """2026-09-10: the general-chat branch now calls transformer_chat.reply()
+    instead of chats.py's own GRU chat_reply()/mc_chat_reply() (see the
+    "wired into production" note at the top of transformer_chat.py) -- no
+    MC Dropout confidence number for this path anymore, so the old
+    "信心度" assertion no longer applies; monkeypatched the same way the
+    nvidia-mode tests fake out _nvidia_reply, so this doesn't need a real
+    checkpoint on disk.
+    """
+    monkeypatch.setattr(chats.transformer_chat, "reply", lambda message: f"echo: {message}")
 
-    train(data_path=data_path, out_dir=out_dir, epochs=2, batch_size=4,
-          embed_size=16, hidden_size=32, lr=1e-2, max_len=12, teacher_forcing_ratio=0.5)
+    trace, reply = smart_reply_traced("hello")
 
-    trace, reply = smart_reply_traced("hello", out_dir=out_dir)
-    assert "信心度" in trace
-    assert isinstance(reply, str)
+    assert "Transformer" in trace
+    assert reply == "echo: hello"
 
 
 def test_smart_reply_traced_force_mode_overrides_auto_routing(tmp_path):
@@ -158,3 +166,51 @@ def test_smart_reply_traced_nvidia_mode_forwards_history(monkeypatch, tmp_path):
     smart_reply_traced("再說一次", out_dir=tmp_path / "unused", force_mode="nvidia", history=history)
 
     assert seen["history"] == history
+
+
+def test_inject_typos_zero_rate_returns_original_text():
+    assert inject_typos("你好嗎", 0.0, ["A", "B"]) == "你好嗎"
+
+
+def test_inject_typos_empty_char_pool_returns_original_text():
+    assert inject_typos("你好嗎", 1.0, []) == "你好嗎"
+
+
+def test_inject_typos_full_rate_changes_text():
+    random.seed(0)
+    pool = list("你好嗎哈囉世界abcdefg")
+    original = "你好嗎最近過得如何"
+    mutated = inject_typos(original, 1.0, pool)
+    assert mutated != original
+
+
+def test_chat_pairs_dataset_zero_typo_prob_keeps_prompt_unchanged():
+    pairs = [{"prompt": "你好嗎", "reply": "我很好"}]
+    vocab = build_vocab(pairs)
+    dataset = ChatPairsDataset(pairs, vocab, max_len=10, typo_prob=0.0)
+
+    expected_src = encode("你好嗎", vocab, 10)
+    for _ in range(20):
+        src, tgt = dataset[0]
+        assert src.tolist() == expected_src
+        assert tgt.tolist() == encode("我很好", vocab, 10)
+
+
+def test_chat_pairs_dataset_typo_prob_augments_prompt_not_reply():
+    """typo_prob=1.0 保證每次 __getitem__ 都會對 prompt 做增強、reply 完全
+    不受影響——這是這次新增的「只噪化輸入、不動目標」設計要驗證的核心行為。
+    """
+    random.seed(0)
+    pairs = [{"prompt": "你今天過得怎麼樣呢", "reply": "我很好，謝謝關心"}]
+    vocab = build_vocab(pairs)
+    char_pool = [tok for tok in vocab if tok not in chats.SPECIAL_TOKENS]
+    dataset = ChatPairsDataset(pairs, vocab, max_len=20, typo_prob=1.0, typo_char_pool=char_pool)
+
+    expected_tgt = encode("我很好，謝謝關心", vocab, 20)
+    src_variants = set()
+    for _ in range(20):
+        src, tgt = dataset[0]
+        assert tgt.tolist() == expected_tgt
+        src_variants.add(tuple(src.tolist()))
+
+    assert len(src_variants) > 1  # 每次抽到不同的錯字版本，不是同一個固定結果

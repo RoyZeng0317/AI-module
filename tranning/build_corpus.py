@@ -134,6 +134,18 @@ DEFAULT_TITLES = [
     "萊特兄弟", "電燈", "蒸汽機", "內燃機", "網際網路協定",
     "冰島", "埃及", "土耳其", "南非", "肯亞",
     "秘魯", "阿根廷", "紐西蘭", "芬蘭", "挪威",
+    # --- 2026-09-10 第三輪擴充：情緒陪伴類對話（見 to_do_list，sinco 現有
+    # chat_runs 對「我愛的人不愛我」「他愛我嗎」這類句子答非所問）主題性地
+    # 補心理學/情緒/人際關係詞彙，跟前兩輪求泛用多樣性不同，這批刻意集中在
+    # 一個主題，目的是讓 pretrain 語料裡多一些情緒/心理相關的中文詞彙統計，
+    # 之後 finetune 用的 data/pairs_emotion_draft.json 才有詞彙基礎可以接上。
+    "情緒管理", "心理諮商", "正念", "冥想", "同理心",
+    "人際關係", "溝通技巧", "自我照顧", "壓力管理", "心理健康",
+    "焦慮症", "自尊", "心理韌性", "依附理論", "孤獨感",
+    "悲傷", "愛情", "婚姻", "友誼", "家庭關係",
+    "親子關係", "職場壓力", "情緒智商", "心理治療", "認知行為療法",
+    "正向心理學", "創傷後壓力症候群", "成癮", "飲食失調", "兒童發展",
+    "老年學", "教育心理學", "人格心理學", "發展心理學", "悲傷輔導",
 ]
 
 
@@ -162,9 +174,22 @@ def fetch_article(title: str, retries: int = 3) -> str | None:
     return None
 
 
-def build_corpus(titles: list[str], out_path: Path, delay: float = 1.5) -> dict[str, bool]:
+def build_corpus(titles: list[str], out_path: Path, delay: float = 1.5, append: bool = False) -> dict[str, bool]:
+    """`append=True` (added 2026-09-10 for topic-list expansion rounds):
+    reads out_path's existing text first and keeps it as the leading chunk,
+    so `--titles` can be given only the *new* topics for this round instead
+    of re-fetching everything DEFAULT_TITLES has ever had — re-fetching all
+    440+ existing titles just to add a few dozen new ones would cost
+    another ~15+ minutes and hit Wikipedia's anonymous rate limit for no
+    reason, since the previously-fetched text hasn't changed. Default stays
+    False (full overwrite) so existing callers/behaviour are unaffected.
+    """
     results: dict[str, bool] = {}
     chunks: list[str] = []
+    if append and Path(out_path).exists():
+        existing_text = Path(out_path).read_text(encoding="utf-8").strip()
+        if existing_text:
+            chunks.append(existing_text)
     for i, title in enumerate(titles):
         if i > 0:
             time.sleep(delay)  # be a polite anonymous API client, not just a retry-on-429 one
@@ -192,9 +217,12 @@ def main():
     parser = argparse.ArgumentParser(description="Fetch a small starter text corpus from Chinese Wikipedia")
     parser.add_argument("--out", type=Path, default=Path(__file__).resolve().parent.parent / "data" / "corpus_zh_starter.txt")
     parser.add_argument("--titles", nargs="*", default=DEFAULT_TITLES)
+    parser.add_argument("--append", action="store_true",
+                         help="keep --out's existing text and only fetch the given --titles, "
+                              "instead of overwriting with just this run's titles")
     args = parser.parse_args()
 
-    results = build_corpus(args.titles, args.out)
+    results = build_corpus(args.titles, args.out, append=args.append)
     ok = sum(results.values())
     print(f"\n{ok}/{len(results)} articles fetched -> {args.out}")
 

@@ -55,11 +55,20 @@ gap suggests overfitting or when train loss stays high too long (see
 _run_epochs()). Augmentation-by-flipping doesn't apply to text the way it
 does to images/signs, so there is no equivalent knob here.
 
-Deliberately NOT wired into tools.py/smart_reply()/home_screen.py yet:
-chats.py's GRU checkpoint keeps serving the live chat UI until a Transformer
-checkpoint trained on a real corpus is actually validated to reply better
-than the (currently working, if narrow) GRU baseline. Swapping the live
-model over is a separate, deliberate step once that's true.
+2026-09-10 wired into production: chats.py's smart_reply_traced() general-
+chat branch now calls this module's reply() instead of chats.py's own GRU
+chat_reply()/mc_chat_reply() — the "swap once actually validated better"
+step this docstring used to say hadn't happened yet. Validated by comparing
+the same set of emotional-support test messages across both models after
+retraining on the expanded data/pairs.json (589 pairs, see
+data/pairs_emotion_draft.json) with a repetition_penalty fix, a lower
+finetune lr/higher weight_decay, and 3x oversampling the original 297
+pairs so identity/capability answers ("你是誰"/"你可以做什麼") didn't get
+diluted by the larger emotion-support set. chats.py's GRU functions
+(chat_reply()/mc_chat_reply(), including their MC Dropout confidence
+mechanism) are unchanged and still callable directly — they're just no
+longer smart_reply_traced()'s default path. sinco-code (CODE_OUT_DIR)
+still uses the GRU; this swap only covers general chat.
 
 Usage:
     python transformer_chat.py pretrain --corpus path/to/corpus.txt --epochs 20
@@ -269,20 +278,44 @@ class GPT(nn.Module):
         return logits, loss
 
     @torch.no_grad()
-    def generate(self, idx: torch.Tensor, max_new_tokens: int, temperature: float = 0.8,
-                 top_k: int | None = 40, top_p: float | None = 0.9) -> torch.Tensor:
+    def generate(self, idx: torch.Tensor, max_new_tokens: int, temperature: float = 0.7,
+                 top_k: int | None = 30, top_p: float | None = 0.85,
+                 repetition_penalty: float = 1.3) -> torch.Tensor:
         """Autoregressive sampling: temperature + top-k + top-p (nucleus),
         not chat_reply()'s pure greedy argmax. Greedy decoding from a
         language model collapses into repetition loops far more readily
         than a seq2seq memorization model does; sampling from a restricted
         candidate set is what lets replies vary and read more naturally,
         which is the whole point of moving off the GRU model.
+
+        repetition_penalty (added 2026-09-10, CTRL-style): logits of any
+        token already present in `idx` (prompt + everything generated so
+        far this call) are pushed toward zero probability before
+        temperature/top-k/top-p -- positive logits divided by the penalty,
+        negative logits multiplied by it, so the push is always *away*
+        from being picked again regardless of sign. 1.0 disables it
+        (previous behaviour). Added after live testing on the finetuned
+        checkpoint showed short prompts ("謝謝", "你是誰") degenerating into
+        "謝謝謝謝謝謝..."-style loops even at low temperature -- lowering
+        temperature alone didn't fix it because the loop-causing token can
+        still be the top candidate every step; penalizing tokens already
+        used breaks the cycle instead of just narrowing the sampling pool.
         """
         self.eval()
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.block_size:]
             logits, _ = self(idx_cond)
-            logits = logits[:, -1, :] / max(temperature, 1e-6)
+            logits = logits[:, -1, :]
+
+            if repetition_penalty != 1.0:
+                for b in range(logits.size(0)):
+                    seen = idx[b].unique()
+                    seen_logits = logits[b, seen]
+                    logits[b, seen] = torch.where(
+                        seen_logits > 0, seen_logits / repetition_penalty, seen_logits * repetition_penalty
+                    )
+
+            logits = logits / max(temperature, 1e-6)
 
             if top_k is not None:
                 v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
@@ -589,8 +622,8 @@ def _load_gpt(out_dir: Path, device: str | None = None):
 
 
 def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: int = 60,
-          temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
-          device: str | None = None) -> str:
+          temperature: float = 0.7, top_k: int = 30, top_p: float = 0.85,
+          repetition_penalty: float = 1.3, device: str | None = None) -> str:
     """Generate a reply from the fine-tuned GPT checkpoint at out_dir (expects
     prompt+<sep>+reply-structured training, i.e. a finetune() output).
 
@@ -605,14 +638,14 @@ def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: in
     prompt_ids = (tokenizer.encode(message) + [SEP])[-block_size:]
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
-                          top_k=top_k, top_p=top_p)
+                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
     generated = out[0, len(prompt_ids):].tolist()
     return tokenizer.decode(generated) or "..."
 
 
 def complete(prompt: str, out_dir: Path = DEFAULT_PRETRAIN_DIR, max_new_tokens: int = 60,
-             temperature: float = 0.8, top_k: int = 40, top_p: float = 0.9,
-             device: str | None = None) -> str:
+             temperature: float = 0.7, top_k: int = 30, top_p: float = 0.85,
+             repetition_penalty: float = 1.3, device: str | None = None) -> str:
     """Raw next-token continuation from a pretrain()-only checkpoint -- no
     <sep>/reply structure, because pretrain() never saw one (that structure
     is only taught in finetune(), see ChatSFTDataset). This is the right
@@ -629,7 +662,7 @@ def complete(prompt: str, out_dir: Path = DEFAULT_PRETRAIN_DIR, max_new_tokens: 
     prompt_ids = tokenizer.encode(prompt)[-block_size:]
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
-                          top_k=top_k, top_p=top_p)
+                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
     return tokenizer.decode(out[0].tolist()) or "..."
 
 
@@ -681,9 +714,10 @@ def main():
     p_chat = sub.add_parser("chat", help="REPL against a fine-tuned checkpoint")
     p_chat.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
     p_chat.add_argument("--max-new-tokens", type=int, default=60)
-    p_chat.add_argument("--temperature", type=float, default=0.8)
-    p_chat.add_argument("--top-k", type=int, default=40)
-    p_chat.add_argument("--top-p", type=float, default=0.9)
+    p_chat.add_argument("--temperature", type=float, default=0.7)
+    p_chat.add_argument("--top-k", type=int, default=30)
+    p_chat.add_argument("--top-p", type=float, default=0.85)
+    p_chat.add_argument("--repetition-penalty", type=float, default=1.3)
 
     p_comp = sub.add_parser("complete", help="raw next-token continuation from a pretrain()-only checkpoint "
                                               "(no prompt/reply structure -- use this for a code checkpoint "
@@ -691,9 +725,10 @@ def main():
     p_comp.add_argument("--prompt", required=True, help="start of the code/text to continue")
     p_comp.add_argument("--out-dir", type=Path, default=DEFAULT_PRETRAIN_DIR)
     p_comp.add_argument("--max-new-tokens", type=int, default=60)
-    p_comp.add_argument("--temperature", type=float, default=0.8)
-    p_comp.add_argument("--top-k", type=int, default=40)
-    p_comp.add_argument("--top-p", type=float, default=0.9)
+    p_comp.add_argument("--temperature", type=float, default=0.7)
+    p_comp.add_argument("--top-k", type=int, default=30)
+    p_comp.add_argument("--top-p", type=float, default=0.85)
+    p_comp.add_argument("--repetition-penalty", type=float, default=1.3)
 
     args = parser.parse_args()
 
@@ -714,10 +749,11 @@ def main():
             text = input("You: ")
             if text.strip().lower() in {"exit", "quit"}:
                 break
-            print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p)}")
+            print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p, repetition_penalty=args.repetition_penalty)}")
     elif args.command == "complete":
         print(complete(args.prompt, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens,
-                        temperature=args.temperature, top_k=args.top_k, top_p=args.top_p))
+                        temperature=args.temperature, top_k=args.top_k, top_p=args.top_p,
+                        repetition_penalty=args.repetition_penalty))
 
 
 if __name__ == "__main__":

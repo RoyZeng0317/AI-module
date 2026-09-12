@@ -7,7 +7,7 @@ predict_emotion() 推論路徑能跑完整個流程不崩潰。
 
 import json
 
-from web.admin.frontend.src.components.action import SCORE_MAX, SCORE_MIN, predict_emotion, train
+from action import SCORE_MAX, SCORE_MIN, predict_emotion, train
 
 
 def _make_synthetic_rows():
@@ -52,10 +52,11 @@ def test_training_and_predict_run_end_to_end(tmp_path, monkeypatch):
         assert SCORE_MIN <= row["predicted_score"] <= SCORE_MAX
         assert SCORE_MIN <= row["predicted_label"] <= SCORE_MAX
 
-    result = predict_emotion("今天心情很糟糕", out_dir=out_dir)
+    result = predict_emotion("今天心情很糟糕", out_dir=out_dir, mc_samples=5)
     assert result["status"] is None
     assert SCORE_MIN <= result["label"] <= SCORE_MAX
     assert SCORE_MIN <= result["score"] <= SCORE_MAX
+    assert 0.0 <= result["mc_confidence"] <= 1.0
 
 
 def test_predict_without_checkpoint_returns_placeholder(tmp_path):
@@ -64,3 +65,4 @@ def test_predict_without_checkpoint_returns_placeholder(tmp_path):
     assert "尚未訓練" in result["status"]
     assert result["label"] is None
     assert result["score"] is None
+    assert result["mc_confidence"] is None

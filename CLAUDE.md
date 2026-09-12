@@ -56,6 +56,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 手動切換用的 NVIDIA 雲端模型（需要環境變數 `NVIDIA_API_KEY`，讀取 `lib/.env`），只有
 使用者手動選擇該模式才會被呼叫；預設（`auto`/`sinco`/`code`）三種模式完全不碰外部 API。
 
+**`lib/img.py` 是「訓練邏輯留在 tranning/、lib/ 只放前端殼」這條既定分工的刻意例外**
+（2026-09-12 你明確選擇直接寫進 lib/img.py，不是誤放）：文字生圖／修圖的 CVAE 訓練與
+推論程式碼都直接寫在 `lib/img.py`，重用 `tranning/imagegen/draw.py` 的 `Encoder`/
+`Decoder`/`vae_loss`（動態 `sys.path.insert` 後 `import draw`，跟 `lib/components/
+conversation.py` import `chats`/`speech_to_text` 同一套慣例），沒有另外搬進
+`tranning/imagegen/`。之後如果新增其他「訓練邏輯」性質的檔案，預設仍照舊規矩放
+`tranning/`，除非你再次明確要求例外。
+
 ### sinco 核心模型（`tranning/`）
 
 字元級 seq2seq（GRU encoder + Luong attention GRU decoder），兩個獨立 checkpoint 不能混
@@ -64,7 +72,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 （`tranning/tools.py`：天氣/DuckDuckGo，純資料 API 不是 AI）→ 程式碼模型 → 聊天模型。
 其餘 `tranning/*.py`（`transformer_chat.py`、`character_model.py`、`RNN.py`、`CNN.py`、
 `OCR.py`、`speech_to_text.py`、`road_sign_train.py`…）是同一顆「全部自己從零訓練」原則
-下的各種模型/骨架，多數還在等真實資料集（見 to_do_list.md 逐項狀態）。
+下的各種模型/骨架，多數還在等真實資料集（見 to_do_list.md 逐項狀態）。`tranning/imagegen/
+draw.py` 是無條件式生圖 VAE（給圖片資料夾學畫類似風格，不吃文字）；`lib/img.py`（見上
+一節的分工例外）在它的架構上加文字條件，做文字生圖與修圖兩個骨架，同樣還在等真實
+圖片資料集（見 to_do_list.md #31）。`lib/img.py` 的第三個功能「模糊變清晰」
+（`DeblurNet`／`train_deblur()`／`deblur()`）不用 `draw.py` 的 Encoder/Decoder（那個
+128 維 latent 瓶頸會把銳化任務需要的細節壓沒），改用有 skip connection 的小型 U-Net，
+且**不需要另外準備配對資料集**——給任何一個清晰圖片資料夾，訓練時自動隨機高斯模糊
+合成模糊/清晰配對；也可以另外給 `[{"blurry":...,"sharp":...}]` manifest 用真實模糊照片
+（見 to_do_list.md #32）。
 
 ### 目錄現況（⚠️ 與 README.MD 描述不同步，以此為準）
 
@@ -90,9 +106,20 @@ python -m lib.main
 python lib/components/cli.py
 python lib/components/cli.py --character 周柯宇
 
+# 文字生圖／修圖骨架（尚無真實資料集，見 to_do_list.md #31）
+python lib/img.py --train-t2i captions.json --epochs 100
+python lib/img.py --train-edit edits.json --epochs 100
+python lib/img.py --generate "a red circle" "a blue square"
+python lib/img.py --edit before.png "make it blue"
+
+# 模糊變清晰（只需要一個清晰圖片資料夾，自動合成模糊配對，見 to_do_list.md #32）
+python lib/img.py --train-deblur path/to/sharp_photos/ --epochs 100
+python lib/img.py --deblur blurry.jpg
+
 # 跑測試（各元件分開跑，彼此 requirements 不共用；沒有集中的 pytest.ini/conftest.py）
 pytest tranning/
 pytest lib/components/
+pytest lib/test_img.py
 pytest web/backend/tests/
 pytest shape-vision/tests/
 

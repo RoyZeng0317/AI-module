@@ -4,7 +4,7 @@ endpoint that the browser posts webcam frames to.
 Run:
     cd backend && python app.py
     # or: uvicorn app:app --reload --port 8000   (from inside backend/)
-Then open http://localhost:8000/
+Then open http://localhost:8080/
 """
 
 import os
@@ -53,6 +53,7 @@ import auto_learn
 import conversation_store as convo_store
 import notify_store
 import usage_store
+from auth import verify_id_token
 from chats import smart_reply
 from detector import detect
 from gpu_info import get_gpu_info
@@ -62,7 +63,7 @@ from memory_store import add_memory, delete_memory, format_memories, list_memori
 # Only these files are served. frontend/src/ (.env, component sources beyond
 # these three) and frontend/data/ (basic_data.sql) must never be reachable
 # over HTTP.
-PUBLIC_FILES = {"index.html", "style.css", "action.py", "script.js"}
+PUBLIC_FILES = {"index.html", "style.css", "action.py", "script.js", "google-auth-init.js"}
 
 # 部署到子路徑後面（例如 Tailscale Serve 的 `--set-path=/AI-Module`）時，
 # 反向代理原樣把完整路徑轉過來，後端這邊的路由也要掛在同一個前綴下才會對得
@@ -88,10 +89,18 @@ class NotificationCreateRequest(BaseModel):
     message: str
 
 
-# 單一使用者一段時間內能送出的聊天請求數量上限——沒有登入系統可以識別「使用
-# 者」，用來源 IP 當 key 是這個規模的私人專案最簡單可行的做法。狀態存在記憶體
-# 裡（重啟就重置），跟這個專案「單機/私人用」的規模相符，不需要 Redis 之類的
-# 外部儲存。
+def _resolve_client_id(request: Request) -> str:
+    """有帶 Google 登入的 Authorization header 就用帳號識別（"google:<uid>"），
+    沒有（或驗證失敗）就退回連線 IP——舊的、不帶 token 的呼叫端行為不變。"""
+    claims = verify_id_token(request.headers.get("authorization"))
+    if claims:
+        return f"google:{claims['sub']}"
+    return request.client.host
+
+
+# 單一使用者一段時間內能送出的聊天請求數量上限。key 優先用 Google 帳號識別
+# （見 _resolve_client_id），沒登入才退回來源 IP。狀態存在記憶體裡（重啟就重
+# 置），跟這個專案「單機/私人用」的規模相符，不需要 Redis 之類的外部儲存。
 CHAT_RATE_LIMIT = 20
 CHAT_RATE_WINDOW_SEC = 60
 _chat_request_log: dict[str, list[float]] = defaultdict(list)
@@ -310,13 +319,13 @@ def _run_local_command(message: str) -> str | None:
 
 @router.post("/api/chat")
 async def chat_endpoint(payload: ChatRequest, request: Request):
-    client_ip = request.client.host
-    _check_chat_rate_limit(client_ip)
+    client_id = _resolve_client_id(request)
+    _check_chat_rate_limit(client_id)
 
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
 
-    if usage_store.get_usage(client_ip) >= usage_store.USAGE_CHAR_LIMIT:
+    if usage_store.get_usage(client_id) >= usage_store.USAGE_CHAR_LIMIT:
         window_hours = usage_store.USAGE_WINDOW_SEC // 3600
         raise HTTPException(
             status_code=429,
@@ -335,7 +344,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
 
     # 用量算輸入+輸出的字元總和，比較貼近實際運算量——sinco 是字元級模型，
     # 沒有 subword/BPE token 這種單位（見 usage_store.py 開頭說明）。
-    usage_store.add_usage(client_ip, len(payload.message) + len(reply))
+    usage_store.add_usage(client_id, len(payload.message) + len(reply))
 
     if conversation_id is not None:
         convo_store.append_message(conversation_id, "assistant", reply)
@@ -347,7 +356,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
 async def usage_endpoint(request: Request):
     """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效
     （例如手動測試，或之後接進 admin 端畫面）。"""
-    used = usage_store.get_usage(request.client.host)
+    used = usage_store.get_usage(_resolve_client_id(request))
     return {
         "chars_used": used,
         "char_limit": usage_store.USAGE_CHAR_LIMIT,
@@ -388,4 +397,4 @@ if __name__ == "__main__":
     import uvicorn
     # Cloud Run (and most container platforms) inject the port to listen on
     # via $PORT; default to 8000 for local dev where it's unset.
-    uvicorn.run(app, host="localhost", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run(app, host="localhost", port=int(os.environ.get("PORT", 8080)))

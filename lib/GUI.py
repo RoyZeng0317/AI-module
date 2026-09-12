@@ -127,6 +127,11 @@ def make_claude_icon_button(parent, icon_type, command, size=34, icon_color=None
         elif t == "stop":  # 錄音中：停止方塊
             canvas.create_rectangle(cx - 4, cy - 4, cx + 4, cy + 4, fill=color, outline="", tags="icon")
 
+        elif t == "pcb":  # PCB 檢查：晶片方框 + 四邊接腳
+            canvas.create_rectangle(cx - 4, cy - 4, cx + 4, cy + 4, outline=color, width=1.5, tags="icon")
+            for dx, dy in ((-7, -2), (-7, 2), (7, -2), (7, 2)):
+                canvas.create_line(cx + dx, cy + dy, cx + dx * 0.6, cy + dy, fill=color, width=1.5, tags="icon")
+
     # 滑鼠 Hover 效果 (浮現圓形灰底)
     def on_enter(e):
         canvas.delete("bg")

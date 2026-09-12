@@ -45,6 +45,35 @@ def test_source_and_data_dirs_not_exposed():
         assert r.status_code == 404, f"{path} should not be servable, got {r.status_code}"
 
 
+def test_resolve_client_id_uses_google_uid_when_token_valid():
+    with patch("web.backend.app.verify_id_token", return_value={"sub": "abc123"}):
+        r = client.get("/api/usage", headers={"Authorization": "Bearer whatever"})
+    assert r.status_code == 200
+
+
+def test_chat_and_usage_share_client_id_from_verified_token(tmp_path, monkeypatch):
+    # 有效 token 時，/api/chat 累計的用量要能被同一個帳號的 /api/usage 讀到
+    # ——代表兩個端點確實共用 _resolve_client_id() 算出的同一把 key（"google:<uid>"），
+    # 而不是各自退回不同的 IP。
+    monkeypatch.setattr("web.backend.app.usage_store.USAGE_PATH", tmp_path / "usage.json")
+    headers = {"Authorization": "Bearer whatever"}
+    with patch("web.backend.app.verify_id_token", return_value={"sub": "uid-1"}):
+        with patch("web.backend.app.smart_reply", return_value="hi"):
+            client.post("/api/chat", json={"message": "hello"}, headers=headers)
+        usage = client.get("/api/usage", headers=headers).json()
+    assert usage["chars_used"] == len("hello") + len("hi")
+
+
+def test_chat_endpoint_falls_back_to_ip_without_token(tmp_path, monkeypatch):
+    # Authorization header 沒帶、或驗證失敗，行為要跟改動前完全一樣——不能
+    # 逼著沒更新的舊呼叫端（或這次還沒串接登入的另一份前端）先登入才能用。
+    monkeypatch.setattr("web.backend.app.usage_store.USAGE_PATH", tmp_path / "usage.json")
+    with patch("web.backend.app.verify_id_token", return_value=None):
+        with patch("web.backend.app.smart_reply", return_value="hi"):
+            r = client.post("/api/chat", json={"message": "hello"})
+    assert r.status_code == 200
+
+
 def test_chat_endpoint_rejects_empty_message():
     r = client.post("/api/chat", json={"message": ""})
     assert r.status_code == 400

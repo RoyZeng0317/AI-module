@@ -1,5 +1,5 @@
 """Live data lookups for sinco — weather + stock + web search (+ single-page
-fetch) + calculus + image + video.
+fetch) + calculus + math word problems + logic reasoning + image + video.
 
 The weather/stock/search lookups call plain data APIs (wttr.in for weather,
 TWSE's public MIS quote API for the TAIEX index, DuckDuckGo's Instant Answer
@@ -13,6 +13,19 @@ idea applied to calculus_generator.py/calculus_solver.py instead of a web
 API — real sympy computation, not a model, decided and formatted by
 route_reply() itself. See those two modules' docstrings for why that's
 inside Rule 06's boundary and how the actual math works.
+
+Math word problems (word_problem_generator.py) and logic reasoning
+(logic_reasoning_generator.py) reuse the exact same "出題 -> 解題" quiz
+shape and the same _last_quiz_problem reveal state as calculus, just with
+plain Python arithmetic / rule evaluation instead of sympy as the "always
+correct" backend — see those two modules' docstrings for why sinco's chat
+models were deliberately NOT trained on these as Q&A pairs (CLAUDE.md
+to-do #10 already found that approach only teaches memorization, not
+generalization). There is no free-form solver for these two the way
+calculus_solver.py parses arbitrary typed expressions — natural-language
+word problems don't have calculus's rigid, unambiguous syntax, so a regex
+extractor here would risk silently mis-parsing a problem and stating a
+wrong answer with false confidence; only the "出題" quiz flow is offered.
 
 The image routing (recognize_image()) reuses web/backend/detector.py's
 local, self-trained-or-transfer-learned YOLO model (the same one
@@ -78,7 +91,9 @@ from bs4 import BeautifulSoup
 import auto_learn
 import calculus_generator
 import calculus_solver
+import logic_reasoning_generator
 import terminal_exec
+import word_problem_generator
 
 if getattr(sys, "frozen", False):
     # PyInstaller onefile (nova.exe, built to live at the project root): see
@@ -177,11 +192,12 @@ def _is_known_trained_prompt(message: str) -> bool:
     normalized = message.strip().lower()
     return any(p.get("prompt", "").strip().lower() == normalized for p in pairs)
 
-# --- calculus: quiz request ("出一題微積分") -------------------------------
-# needs BOTH a "quiz me" verb and a topic keyword, same two-part shape as
-# the weather/search patterns above (a bare mention of "微積分" with no
-# request verb, e.g. "我要交微積分作業", should NOT fire).
-_CALCULUS_REQUEST_HINTS = (
+# --- quiz: "出一題..." request verbs shared by calculus / math word problem
+# / logic reasoning topic detectors below — needs BOTH one of these verbs
+# AND a subject-matter keyword, same two-part shape as the weather/search
+# patterns above (a bare mention of "微積分"/"數學"/"邏輯" with no request
+# verb, e.g. "我要交微積分作業", should NOT fire).
+_QUIZ_REQUEST_HINTS = (
     "出一題", "出題", "來一題", "考我", "給我一題", "出个题",
     "quiz me", "give me a problem", "practice",
 )
@@ -197,18 +213,41 @@ _CALCULUS_TOPIC_KEYWORDS = (
     ("積分", "integral"), ("integral", "integral"), ("integrate", "integral"),
 )
 
-# --- calculus: reveal the previously posed quiz question ("解題") ---------
+# 數學應用題：同 calculus 的「先查子主題關鍵字，再查通用詞」順序與理由
+_MATH_WORD_PROBLEM_TOPIC_KEYWORDS = (
+    ("單位換算", "unit_conversion"), ("換算", "unit_conversion"), ("unit conversion", "unit_conversion"),
+    ("比例", "ratio"), ("百分比", "ratio"), ("折扣", "ratio"), ("打折", "ratio"), ("單價", "ratio"),
+    ("percentage", "ratio"), ("ratio", "ratio"), ("discount", "ratio"),
+    ("加減乘除", "arithmetic"), ("四則運算", "arithmetic"), ("加減法", "arithmetic"), ("乘除法", "arithmetic"),
+    ("arithmetic", "arithmetic"),
+)
+_MATH_WORD_PROBLEM_GENERIC_HINTS = ("應用題", "數學題", "數學", "math problem", "math")
+
+# 邏輯推理：同上，子主題優先於通用詞
+_LOGIC_TOPIC_KEYWORDS = (
+    ("空間", "spatial"), ("方位", "spatial"), ("spatial", "spatial"),
+    ("演繹", "deduction"), ("三段論", "deduction"), ("deduction", "deduction"),
+    ("比較", "comparison"), ("排序", "comparison"), ("comparison", "comparison"),
+)
+_LOGIC_GENERIC_HINTS = ("邏輯", "推理", "logic", "reasoning")
+
+# --- calculus / math / logic: reveal the previously posed quiz ("解題") ---
 _SOLVE_LAST_HINTS = {
     "解題", "解答案", "公佈答案", "看答案", "揭曉答案", "解答",
     "show answer", "reveal answer", "solve it",
 }
 
-# module-level "last quiz question" cache: this is a single-user desktop
-# app (one Tk process, no concurrent sessions), so a plain module global is
-# enough state to support "出題 -> 解題" as two separate chat turns without
-# threading a session object through chats.py's otherwise-stateless
+# module-level "last quiz question" cache — shared by all three quiz domains
+# (calculus / math word problem / logic reasoning) so a single "解題" reply
+# always reveals whichever one was posed most recently, regardless of which
+# generator produced it (all three return the same
+# {"topic_zh","question","steps","answer"} shape, see calculus_generator's
+# format_problem()). This is a single-user desktop app (one Tk process, no
+# concurrent sessions), so a plain module global is enough state to support
+# "出題 -> 解題" as two separate chat turns without threading a session
+# object through chats.py's otherwise-stateless
 # smart_reply_traced()/route_reply() call chain.
-_last_calculus_problem: dict | None = None
+_last_quiz_problem: dict | None = None
 
 
 def _calculus_topic_if_requested(message: str) -> str | None:
@@ -219,12 +258,63 @@ def _calculus_topic_if_requested(message: str) -> str | None:
     picks one at call time).
     """
     text = message.strip().lower()
-    if not any(hint in text for hint in _CALCULUS_REQUEST_HINTS):
+    if not any(hint in text for hint in _QUIZ_REQUEST_HINTS):
         return None
 
     remaining = text.replace("微積分", "").replace("calculus", "")
     mentioned_generic = remaining != text
     for keyword, topic in _CALCULUS_TOPIC_KEYWORDS:
+        if keyword in remaining:
+            return topic
+    return "random" if mentioned_generic else None
+
+
+def _math_word_problem_topic_if_requested(message: str) -> str | None:
+    """Same shape as _calculus_topic_if_requested() but for
+    word_problem_generator.py's topics ("arithmetic"/"unit_conversion"/
+    "ratio"/"random")."""
+    text = message.strip().lower()
+    if not any(hint in text for hint in _QUIZ_REQUEST_HINTS):
+        return None
+
+    remaining = text
+    for generic in _MATH_WORD_PROBLEM_GENERIC_HINTS:
+        remaining = remaining.replace(generic, "")
+    mentioned_generic = remaining != text
+    for keyword, topic in _MATH_WORD_PROBLEM_TOPIC_KEYWORDS:
+        if keyword in remaining:
+            return topic
+    return "random" if mentioned_generic else None
+
+
+def _quiz_domain_label(topic: str) -> str:
+    """Map a generated problem's "topic" key back to which of the three
+    generator modules produced it, for building a heading that actually
+    names the right subject (format_question()/format_problem() default to
+    calculus-flavoured wording — see calculus_generator.py's docstring on
+    those two functions — which is wrong for the other two domains)."""
+    if topic in calculus_generator.GENERATORS:
+        return "微積分"
+    if topic in word_problem_generator.GENERATORS:
+        return "數學應用題"
+    if topic in logic_reasoning_generator.GENERATORS:
+        return "邏輯推理"
+    return "題目"  # should be unreachable — every generator's topic is one of the above
+
+
+def _logic_topic_if_requested(message: str) -> str | None:
+    """Same shape as _calculus_topic_if_requested() but for
+    logic_reasoning_generator.py's topics ("spatial"/"deduction"/
+    "comparison"/"random")."""
+    text = message.strip().lower()
+    if not any(hint in text for hint in _QUIZ_REQUEST_HINTS):
+        return None
+
+    remaining = text
+    for generic in _LOGIC_GENERIC_HINTS:
+        remaining = remaining.replace(generic, "")
+    mentioned_generic = remaining != text
+    for keyword, topic in _LOGIC_TOPIC_KEYWORDS:
         if keyword in remaining:
             return topic
     return "random" if mentioned_generic else None
@@ -726,7 +816,7 @@ def route_reply(message: str) -> tuple[str, str] | None:
     generic label — still just reporting what really happened, not a
     fabricated reasoning chain.
     """
-    global _last_calculus_problem
+    global _last_quiz_problem
 
     message = message.strip()
     if not message:
@@ -800,21 +890,45 @@ def route_reply(message: str) -> tuple[str, str] | None:
         return reason, reply
 
     if _is_solve_last_request(message):
-        if _last_calculus_problem is None:
+        if _last_quiz_problem is None:
             reason = "偵測到「解題」請求，但目前沒有已出的題目"
-            return reason, "目前還沒有出過題目，請先輸入「出一題微積分」之類的指令。"
-        reason = f'偵測到「解題」請求，公佈上一題答案，主題「{_last_calculus_problem["topic_zh"]}」'
-        return reason, calculus_generator.format_problem(_last_calculus_problem)
+            return reason, "目前還沒有出過題目，請先輸入「出一題微積分／數學／邏輯」之類的指令。"
+        reason = f'偵測到「解題」請求，公佈上一題答案，主題「{_last_quiz_problem["topic_zh"]}」'
+        heading = f'sinco {_quiz_domain_label(_last_quiz_problem["topic"])}出題：{_last_quiz_problem["topic_zh"]}'
+        return reason, calculus_generator.format_problem(_last_quiz_problem, heading=heading)
 
     calculus_topic = _calculus_topic_if_requested(message)
     if calculus_topic is not None:
         problem = calculus_generator.generate_problem(topic=calculus_topic)
-        _last_calculus_problem = problem
+        _last_quiz_problem = problem
         reason = (
             f'偵測到出題請求，主題「{problem["topic_zh"]}」，'
             f'呼叫 calculus_generator 即時運算產生新題目（sympy，非模型記憶）'
         )
-        return reason, calculus_generator.format_question(problem)
+        heading = f'sinco 微積分出題：{problem["topic_zh"]}'
+        return reason, calculus_generator.format_question(problem, heading=heading)
+
+    math_topic = _math_word_problem_topic_if_requested(message)
+    if math_topic is not None:
+        problem = word_problem_generator.generate_problem(topic=math_topic)
+        _last_quiz_problem = problem
+        reason = (
+            f'偵測到數學應用題出題請求，主題「{problem["topic_zh"]}」，'
+            f'呼叫 word_problem_generator 即時運算產生新題目（純 Python 算術，非模型記憶）'
+        )
+        heading = f'sinco 數學應用題出題：{problem["topic_zh"]}'
+        return reason, calculus_generator.format_question(problem, heading=heading)
+
+    logic_topic = _logic_topic_if_requested(message)
+    if logic_topic is not None:
+        problem = logic_reasoning_generator.generate_problem(topic=logic_topic)
+        _last_quiz_problem = problem
+        reason = (
+            f'偵測到邏輯推理出題請求，主題「{problem["topic_zh"]}」，'
+            f'呼叫 logic_reasoning_generator 即時規則推理產生新題目（決定性規則評估，非模型記憶）'
+        )
+        heading = f'sinco 邏輯推理出題：{problem["topic_zh"]}'
+        return reason, calculus_generator.format_question(problem, heading=heading)
 
     try:
         solved = calculus_solver.parse_and_solve(message)
@@ -826,7 +940,7 @@ def route_reply(message: str) -> tuple[str, str] | None:
             f"I understood the problem, but sinco (sympy) couldn't find a closed-form solution: {exc}. Try a different one.",
         )
     if solved is not None:
-        _last_calculus_problem = solved
+        _last_quiz_problem = solved
         reason = f'偵測到自由輸入的解題請求，主題「{solved["topic_zh"]}」，呼叫 calculus_solver 解析並用 sympy 計算'
         return reason, calculus_generator.format_problem(solved, heading=f"sinco 解題：{solved['topic_zh']}")
 
