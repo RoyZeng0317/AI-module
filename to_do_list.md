@@ -251,3 +251,24 @@
     **GOOGLE_CLIENT_ID 目前是佔位字串**：`google-auth-init.js`（兩份）＋`auth.py` 三個地方現在都寫著 `"PUT_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com"`，你需要自己去 Google Cloud Console（可以用 Firebase 已經建好的同一個 `sincoai` GCP 專案）「API 和服務→憑證→建立憑證→OAuth 用戶端 ID→應用程式類型選 Web application」申請一組，把已核准的 JavaScript 來源網址（例如本機測試的 `http://localhost:8080`，之後有正式部署網址也要加進去）填好，申請完把同一組 Client ID 貼到這三個地方，三個地方**必須完全一致**，貼錯或漏改一個就會驗證失敗。
 
     **驗證方式與範圍**：`python -m py_compile` 確認 `python.py`／`action.py`／`auth.py`／`app.py` 語法沒錯；`pytest web/backend/tests/test_auth.py web/backend/tests/test_app.py` 20 項全過。**尚未驗證（老實列出來，也是這次沒打勾的原因）**：Client ID 還沒填真的值，完全沒辦法端對端測試「點 Google 按鈕→跳出帳號選擇→登入成功→後端認得這個帳號」這條真實流程，等你申請好 Client ID、填進三個地方之後需要你自己開瀏覽器測一次，我再依你回報的結果補這條記錄。
+
+34. [] 「幫我處理模型會寫英文的能力，涵蓋到會C2的能力」— 2026-09-13：先用 `AskUserQuestion` 問清楚兩個決定，你選：(a) 功能方向＝**兩者都要**——出題+批改的決定性生成器，加上擴充 `data/pairs.json` 重訓 GRU；(b) C2 涵蓋面＝**進階文法結構、學術詞彙與慣用語、篇章寫作**三項全選。
+
+    問清楚前先評估可行性：C2 是 CEFR 最高等級（假設語氣/倒裝句/分詞構句/分裂句、學術詞彙、長篇寫作），`chats.py` 是字元級 GRU 記憶式模型（to-do #12/#16/#24 已反覆驗證：訓練資料量再怎麼加，這個架構的天花板就是「精準記憶＋近似泛化」，無法真正「生成」從未見過的 C2 水準英文文章），硬要訓練 GRU 去生成 C2 作文只會重演 to-do #14 那次「I'm good, thanks fore」的破碎英文。所以比照微積分/數學應用題/邏輯推理（to-do #10/#18/#30）的既有模式——**決定性生成器**，不訓練模型死背。
+
+    新增 `tranning/english_writing.py`：三個主題共用 `calculus_generator.py` 建立的 `{"topic","topic_zh","question","steps","answer"}` 題目格式，讓 `tools.py` 既有的「出題→解題」管線（`_last_quiz_problem` 共用狀態）原封不動就能接上，變成第四個出題領域：
+    - **grammar**（進階文法結構）：假設語氣／倒裝句／分詞構句／關係子句／分裂句五種子類型，各 3-5 題手動撰寫並逐題驗證過文法正確性的「改寫前→改寫後」句對＋規則說明。**刻意不隨機生成全新句子**——calculus_generator 能保證隨機組出的算式答案正確是因為有 sympy 這個「文法引擎」可以驗證任意輸入，英文沒有對應的「文法正確性引擎」，硬要隨機拼湊新句子只是把 sinco 自己模型會產生破碎英文的風險換一顆生成器繼續發生。改用「題庫＋`rng.choice`隨機抽選」（跟 `calculus_generator._LIMIT_GENERATORS` 從 4 個手寫極限子題型中隨機挑一個同一種設計哲學），隨機的只有「這次抽到哪一題」，不是英文文字本身。
+    - **vocabulary**（學術詞彙與慣用語）：學術詞彙／搭配詞／慣用語三類填空題，各 5-6 題，題目帶中文提示，答案用正規化後（大小寫/標點無關）exact-match 比對（允許多個同義答案）。
+    - **essay**（篇章寫作）：3 種短文/書信寫作題（社群媒體利弊、遠距工作優缺點、正式道歉信），各帶字數範圍與「至少要用到的進階結構」（轉折語/條件句/正式書信格式），附一篇範文。
+    
+    新增 `check_answer(problem, user_text)`：使用者自己打出答案後做**規則式批改**（非模型評分）——grammar 用正規表達式檢查有沒有出現該子類型要求的文法結構標記；vocabulary 用正規化後 exact-match；essay 只檢查「字數是否落在範圍內」跟「是否包含至少一個要求的標記」這種客觀項目，**明確告知使用者這不是內容/論述品質評分**——sinco 沒有能力像真人老師一樣評價一篇文章寫得好不好，這跟 `calculus_solver.py` 遇到求不出封閉解時老實丟 `SolveError` 而不是亂猜答案是同一種誠實態度。`tools.py` 新增對應路由：`_english_writing_topic_if_requested()`（出題，同 calculus/math/logic 的「動詞+主題關鍵字」兩段式判斷）、`_writing_submission_if_requested()`＋新的「批改」/「check my answer」句型（跟「解題」不同，這是使用者自己交答案，不是揭曉 sinco 的參考答案）。
+
+    **測試**：`tranning/test_english_writing.py`（19 項）比照 `test_calculus_generator.py` 的精神——不是只測「跑起來不會噴例外」，而是逐一驗證題庫裡**每一筆項目自己的正確答案都能通過自己的 checker**（這個過程中真的抓到兩個題庫本身的錯誤：(1) 搭配詞/慣用語的中文提示原本直接寫出英文答案本身，例如「pay attention to（注意，不是 give attention）」的提示裡就把答案 "pay" 洩漏在題目文字裡，被 `test_question_never_leaks_answer_or_steps` 抓到，改成純中文語意提示不重複英文答案；(2) 三篇範文的字數原本都低於題目要求的最低字數（72/73/55 字對上要求的 80/100/60 字），被 `test_every_sample_answer_passes_its_own_word_count_and_marker_checks` 抓到，補寫內容到落在範圍內）。`tranning/test_tools_english_writing.py`（17 項）比照 `test_tools_math_logic.py`，涵蓋出題/解題/批改三段路由＋批改在沒有進行中題目或答錯時的訊息。`pytest tranning/` 全部通過（扣除這台機器本來就缺 torch/numpy/pandas/sklearn/PIL/fitz/cv2/dotenv 等套件、collect 階段就失敗的既有已知缺口，見 ErrorLog；這次額外裝了 sympy/requests/beautifulsoup4/torch/numpy/pandas/scikit-learn 才能跑，跟 CLAUDE.md 記錄的「這台機器裝的套件跟正式環境不完全一樣」現況一致）。
+
+    另外擴充 `data/pairs.json`（589→601 筆，比照 to-do #14/#24 的程式化檢查慣例：逐筆確認沒有超過 `chats.py` 的 `MAX_LEN=40` 可用上限、沒有跟既有 prompt 重複、也沒有被 `tools.py` 的 `route_reply()` 任何 regex/關鍵字攔截——過程中真的抓到兩筆英文候選句因為本身就會命中新加的英文寫作出題句型或字數超標，改寫後才收錄），新增介紹「出一題英文文法／詞彙／作文」「批改：」這幾個新指令的問答，以及幾句 what-level-is-C2 之類的簡短中英夾雜對話。
+
+    **老實說明沒有重訓 GRU checkpoint 的原因**：這次是在雲端沙盒環境（非你平常那台 RTX 4060 機器）進行，`tranning/chat_runs/config.json` 顯示既有 checkpoint 是 `hidden_size=256`、`progress.json` 顯示上一輪足足跑了 3000 epoch／9718 秒（約 2.7 小時，在你的 GPU 上）。這台沙盒沒有 GPU（`torch.cuda.is_available()=False`），實測同樣的 601 筆資料、`hidden_size=256`：CPU 上跑 5 個 epoch 花了 69 秒，換算 3000 epoch 需要約 11.5 小時——用縮短 epoch 數（例如跑 300 epoch）換取這次能跑完，會產出一個收斂程度遠不如現有 checkpoint 的半成品（現有 checkpoint best_loss 0.505，是 3000 epoch 硬背出來的精準記憶），拿去覆蓋掉現有能正常運作的 checkpoint，等於讓所有其他 589 筆既有訓練資料的回覆精準度一起變差，是倒退而不是進步。所以**這次刻意不動 `tranning/chat_runs/` 底下的權重檔**，只更新了 `data/pairs.json` 本身（已加進這次 commit，你的機器上就有新資料可以訓練）。你在自己的 RTX 4060 機器上執行以下指令就能重訓出真正收斂的新 checkpoint（跟過去每一輪的做法一致）：
+    ```
+    python chats.py --data ../data/pairs.json --epochs 3000 --hidden-size 256
+    ```
+    **這次真正解決「C2 英文能力」的核心其實是 `english_writing.py`**，這部分不依賴 GRU checkpoint、聊天視窗馬上就能用（打「出一題英文文法」「出一題作文」「批改：...」），不需要等你重訓；GRU 那 12 筆新資料只是讓 sinco 的一般聊天多認得幾句「介紹這個新功能」的招呼語，不是這次的重點功能。

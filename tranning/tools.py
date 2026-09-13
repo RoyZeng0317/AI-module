@@ -27,6 +27,16 @@ word problems don't have calculus's rigid, unambiguous syntax, so a regex
 extractor here would risk silently mis-parsing a problem and stating a
 wrong answer with false confidence; only the "出題" quiz flow is offered.
 
+English writing practice (english_writing.py) is a fourth "出題 -> 解題"
+domain sharing the same _last_quiz_problem state (grammar/vocabulary/essay
+CEFR B2-C2 practice), plus one extra step the other three don't have:
+"批改"/"check my answer" grades the user's OWN submitted answer against the
+posed question with a rule-based (non-model) checker — see
+english_writing.py's docstring for why it's an item bank rather than
+free-generated English, and why essay grading is scoped to objective
+checklist items (word count, required structural marker) rather than
+judging argument quality.
+
 The image routing (recognize_image()) reuses web/backend/detector.py's
 local, self-trained-or-transfer-learned YOLO model (the same one
 app/components/camera.py already points at live camera frames) — this file
@@ -91,6 +101,7 @@ from bs4 import BeautifulSoup
 import auto_learn
 import calculus_generator
 import calculus_solver
+import english_writing
 import logic_reasoning_generator
 import terminal_exec
 import word_problem_generator
@@ -231,16 +242,59 @@ _LOGIC_TOPIC_KEYWORDS = (
 )
 _LOGIC_GENERIC_HINTS = ("邏輯", "推理", "logic", "reasoning")
 
-# --- calculus / math / logic: reveal the previously posed quiz ("解題") ---
+# 英文寫作：同上，子主題優先於通用詞。通用詞刻意只放「英文寫作」/「英文」
+# （不是「文法」/「作文」這些具體子主題關鍵字本身），否則先把「英文」從
+# 「英文文法」裡挖掉會連子主題關鍵字一起清空，永遠比對不到 grammar/vocabulary
+# ——跟 calculus 先處理「微積分」整體再比對「積分」子字串是同一種順序考量。
+_ENGLISH_WRITING_TOPIC_KEYWORDS = (
+    ("倒裝", "grammar"), ("假設語氣", "grammar"), ("分詞構句", "grammar"), ("關係子句", "grammar"),
+    ("分裂句", "grammar"), ("強調句", "grammar"), ("文法", "grammar"),
+    ("inversion", "grammar"), ("subjunctive", "grammar"), ("participle", "grammar"),
+    ("relative clause", "grammar"), ("cleft", "grammar"), ("grammar", "grammar"),
+    ("學術詞彙", "vocabulary"), ("搭配詞", "vocabulary"), ("慣用語", "vocabulary"), ("詞彙", "vocabulary"),
+    ("collocation", "vocabulary"), ("idiom", "vocabulary"), ("vocabulary", "vocabulary"),
+    ("作文", "essay"), ("寫作", "essay"), ("essay", "essay"), ("writing", "essay"),
+)
+_ENGLISH_WRITING_GENERIC_HINTS = ("英文寫作", "英文", "english writing", "english")
+
+# --- calculus / math / logic / english_writing: reveal the previously posed
+# quiz ("解題") ---------------------------------------------------------
 _SOLVE_LAST_HINTS = {
     "解題", "解答案", "公佈答案", "看答案", "揭曉答案", "解答",
     "show answer", "reveal answer", "solve it",
 }
 
-# module-level "last quiz question" cache — shared by all three quiz domains
-# (calculus / math word problem / logic reasoning) so a single "解題" reply
-# always reveals whichever one was posed most recently, regardless of which
-# generator produced it (all three return the same
+# --- english_writing only: grade the user's OWN submitted answer ("批改") --
+# 跟 "解題"（公佈 sinco 自己的參考答案）不同，這裡是使用者自己打出答案，
+# 交給 english_writing.check_answer() 做規則式（非模型）批改。最長的前綴
+# 排最前面比對，避免「批改」這個最短前綴搶先吃掉「批改我的答案」這種更長
+# 的句子（跟 _video_query_if_requested() 處理 hint 詞的長度排序是同一個
+# 理由）。
+_WRITING_CHECK_PREFIXES = (
+    "批改我的答案", "批改我的作文", "批改：", "批改:", "批改",
+    "check my writing", "check my answer", "grade my answer",
+)
+
+
+def _writing_submission_if_requested(message: str) -> str | None:
+    """None unless `message` starts with a "批改"/"check my answer" prefix —
+    returns the submitted answer text after the prefix (colon/space
+    stripped), or "" if the prefix matched with nothing after it (caller
+    asks the user to include their answer rather than silently treating an
+    empty submission as wrong).
+    """
+    text = message.strip()
+    lower = text.lower()
+    for prefix in sorted(_WRITING_CHECK_PREFIXES, key=len, reverse=True):
+        if lower.startswith(prefix.lower()):
+            return text[len(prefix):].strip(" :：\n")
+    return None
+
+
+# module-level "last quiz question" cache — shared by all four quiz domains
+# (calculus / math word problem / logic reasoning / english_writing) so a
+# single "解題" reply always reveals whichever one was posed most recently,
+# regardless of which generator produced it (all four return the same
 # {"topic_zh","question","steps","answer"} shape, see calculus_generator's
 # format_problem()). This is a single-user desktop app (one Tk process, no
 # concurrent sessions), so a plain module global is enough state to support
@@ -288,18 +342,37 @@ def _math_word_problem_topic_if_requested(message: str) -> str | None:
 
 
 def _quiz_domain_label(topic: str) -> str:
-    """Map a generated problem's "topic" key back to which of the three
+    """Map a generated problem's "topic" key back to which of the four
     generator modules produced it, for building a heading that actually
     names the right subject (format_question()/format_problem() default to
     calculus-flavoured wording — see calculus_generator.py's docstring on
-    those two functions — which is wrong for the other two domains)."""
+    those two functions — which is wrong for the other three domains)."""
     if topic in calculus_generator.GENERATORS:
         return "微積分"
     if topic in word_problem_generator.GENERATORS:
         return "數學應用題"
     if topic in logic_reasoning_generator.GENERATORS:
         return "邏輯推理"
+    if topic in english_writing.GENERATORS:
+        return "英文寫作"
     return "題目"  # should be unreachable — every generator's topic is one of the above
+
+
+def _english_writing_topic_if_requested(message: str) -> str | None:
+    """Same shape as _calculus_topic_if_requested() but for
+    english_writing.py's topics ("grammar"/"vocabulary"/"essay"/"random")."""
+    text = message.strip().lower()
+    if not any(hint in text for hint in _QUIZ_REQUEST_HINTS):
+        return None
+
+    remaining = text
+    for generic in _ENGLISH_WRITING_GENERIC_HINTS:
+        remaining = remaining.replace(generic, "")
+    mentioned_generic = remaining != text
+    for keyword, topic in _ENGLISH_WRITING_TOPIC_KEYWORDS:
+        if keyword in remaining:
+            return topic
+    return "random" if mentioned_generic else None
 
 
 def _logic_topic_if_requested(message: str) -> str | None:
@@ -892,10 +965,32 @@ def route_reply(message: str) -> tuple[str, str] | None:
     if _is_solve_last_request(message):
         if _last_quiz_problem is None:
             reason = "偵測到「解題」請求，但目前沒有已出的題目"
-            return reason, "目前還沒有出過題目，請先輸入「出一題微積分／數學／邏輯」之類的指令。"
+            return reason, "目前還沒有出過題目，請先輸入「出一題微積分／數學／邏輯／英文」之類的指令。"
         reason = f'偵測到「解題」請求，公佈上一題答案，主題「{_last_quiz_problem["topic_zh"]}」'
         heading = f'sinco {_quiz_domain_label(_last_quiz_problem["topic"])}出題：{_last_quiz_problem["topic_zh"]}'
         return reason, calculus_generator.format_problem(_last_quiz_problem, heading=heading)
+
+    writing_submission = _writing_submission_if_requested(message)
+    if writing_submission is not None:
+        if _last_quiz_problem is None or _last_quiz_problem.get("topic") not in english_writing.GENERATORS:
+            reason = "偵測到批改請求，但目前沒有正在進行的英文寫作題目"
+            return reason, _bilingual(
+                lang,
+                "目前沒有正在進行的英文寫作題目，請先輸入「出一題英文文法／詞彙／作文」。",
+                'There is no English-writing question in progress. Try "quiz me on grammar/vocabulary/essay" first.',
+            )
+        if not writing_submission:
+            reason = "偵測到批改請求，但沒有附上要批改的答案內容"
+            return reason, _bilingual(
+                lang, "請在「批改：」後面附上你的答案內容。",
+                'Please include your answer text after "check my answer:".',
+            )
+        result = english_writing.check_answer(_last_quiz_problem, writing_submission)
+        reason = (
+            f'偵測到批改請求，主題「{_last_quiz_problem["topic_zh"]}」，'
+            f'呼叫 english_writing 規則式檢查使用者提交的答案（非模型評分）'
+        )
+        return reason, english_writing.format_feedback(result)
 
     calculus_topic = _calculus_topic_if_requested(message)
     if calculus_topic is not None:
@@ -928,6 +1023,17 @@ def route_reply(message: str) -> tuple[str, str] | None:
             f'呼叫 logic_reasoning_generator 即時規則推理產生新題目（決定性規則評估，非模型記憶）'
         )
         heading = f'sinco 邏輯推理出題：{problem["topic_zh"]}'
+        return reason, calculus_generator.format_question(problem, heading=heading)
+
+    english_writing_topic = _english_writing_topic_if_requested(message)
+    if english_writing_topic is not None:
+        problem = english_writing.generate_problem(topic=english_writing_topic)
+        _last_quiz_problem = problem
+        reason = (
+            f'偵測到英文寫作出題請求，主題「{problem["topic_zh"]}」，'
+            f'呼叫 english_writing 產生題目（規則式題庫，非模型記憶）'
+        )
+        heading = f'sinco 英文寫作出題：{problem["topic_zh"]}'
         return reason, calculus_generator.format_question(problem, heading=heading)
 
     try:

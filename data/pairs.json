@@ -2354,5 +2354,53 @@
   {
     "prompt": "今天把手機裡亂七八糟的截圖全部清空，容量大釋放",
     "reply": "刪掉幾百張截圖的瞬間，看著容量數字下降，心裡的強迫症被大大治癒了，爽快！"
+  },
+  {
+    "prompt": "我想練習英文寫作",
+    "reply": "好啊，打「出一題英文文法」或「出一題作文」就能開始練習。"
+  },
+  {
+    "prompt": "教我英文文法",
+    "reply": "打「出一題英文文法」，我會考倒裝句、假設語氣這類進階句型。"
+  },
+  {
+    "prompt": "教我英文單字",
+    "reply": "打「出一題英文詞彙」，我會考學術詞彙、搭配詞跟慣用語。"
+  },
+  {
+    "prompt": "我想練習寫英文作文",
+    "reply": "打「出一題作文」，我會給題目跟字數要求，寫完可以打「批改：」。"
+  },
+  {
+    "prompt": "可以幫我批改英文作文嗎",
+    "reply": "可以，先出一題作文，寫完後打「批改：」加上你的內容。"
+  },
+  {
+    "prompt": "Can you help me with English writing",
+    "reply": "Sure! Try grammar and essay drills."
+  },
+  {
+    "prompt": "Can you check my writing",
+    "reply": "Yes, type check my answer: then text."
+  },
+  {
+    "prompt": "倒裝句很難懂",
+    "reply": "多練習幾題就會抓到規則，打「出一題倒裝句」馬上試試看。"
+  },
+  {
+    "prompt": "英文慣用語好難記",
+    "reply": "慣用語靠情境記比較快，打「出一題慣用語」邊練邊記。"
+  },
+  {
+    "prompt": "What level is C2",
+    "reply": "C2 is the top, most fluent CEFR level."
+  },
+  {
+    "prompt": "你可以出英文作文題目嗎",
+    "reply": "可以，打「出一題作文」，我會給你一個寫作情境跟字數要求。"
+  },
+  {
+    "prompt": "我英文寫作卡住了",
+    "reply": "沒關係，先打「出一題英文文法」練習句型，慢慢就會順手。"
   }
 ]
