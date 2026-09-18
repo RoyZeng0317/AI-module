@@ -8,7 +8,7 @@ tranning/test_embedding_model.py).
 
 from pathlib import Path
 
-import lib.RAG as rag
+import lib.RAG.RAG as rag
 from embedding_model import train
 
 

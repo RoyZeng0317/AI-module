@@ -9,5 +9,4 @@ httpx>=0.27
 torch>=2.0
 requests>=2.31
 beautifulsoup4>=4.12
-google-auth>=2.30  # 驗證前端 Google Identity Services 發的 Google ID token，見 auth.py
 schemdraw>=0.19  # tranning/circuit_schemdraw_render.py：偵測結果畫成原理圖

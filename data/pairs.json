@@ -2354,5 +2354,85 @@
   {
     "prompt": "今天把手機裡亂七八糟的截圖全部清空，容量大釋放",
     "reply": "刪掉幾百張截圖的瞬間，看著容量數字下降，心裡的強迫症被大大治癒了，爽快！"
+  },
+  {
+    "prompt": "how can i sound more fluent",
+    "reply": "Master collocations, not just grammar"
+  },
+  {
+    "prompt": "give me a synonym for happy",
+    "reply": "Try elated or overjoyed instead"
+  },
+  {
+    "prompt": "what does it mean to procrastinate",
+    "reply": "To delay tasks despite the cost"
+  },
+  {
+    "prompt": "correct this: i am agree with you",
+    "reply": "Say I agree with you, no am needed"
+  },
+  {
+    "prompt": "is my english good enough for c2",
+    "reply": "Nuance matters more than raw range"
+  },
+  {
+    "prompt": "i feel so bored, cheer me up",
+    "reply": "Let's shake things up, tell me a story"
+  },
+  {
+    "prompt": "explain the idiom bite the bullet",
+    "reply": "It means to face a hard task bravely"
+  },
+  {
+    "prompt": "how can i sound less awkward",
+    "reply": "Vary openers, not just word choice"
+  },
+  {
+    "prompt": "give me a c2 word for good",
+    "reply": "Try exemplary or commendable instead"
+  },
+  {
+    "prompt": "i keep making the same mistakes",
+    "reply": "That's falling into old habits again"
+  },
+  {
+    "prompt": "help me polish my writing",
+    "reply": "Trim filler words, make each line count"
+  },
+  {
+    "prompt": "what's a fancy word for tired",
+    "reply": "Try exhausted, drained, or worn out"
+  },
+  {
+    "prompt": "i want to write like a native",
+    "reply": "Read widely, then imitate the rhythm"
+  },
+  {
+    "prompt": "give me an idiom about giving up",
+    "reply": "Throw in the towel means to give up"
+  },
+  {
+    "prompt": "how do i avoid sounding stiff",
+    "reply": "Use contractions and natural rhythm"
+  },
+  {
+    "prompt": "what's the nuance between big and huge",
+    "reply": "Huge carries far more weight than big"
+  },
+  {
+    "prompt": "teach me a c2 phrasal verb",
+    "reply": "Try gloss over, to ignore casually"
+  },
+  {
+    "prompt": "i want native-level small talk",
+    "reply": "Ask open questions, then really listen"
+  },
+  {
+    "prompt": "give me an eloquent way to disagree",
+    "reply": "I see your point, though I'd differ"
+  },
+  {
+    "prompt": "what's a subtle way to say no",
+    "reply": "That won't be feasible for me, sorry"
   }
 ]

@@ -45,33 +45,15 @@ def test_source_and_data_dirs_not_exposed():
         assert r.status_code == 404, f"{path} should not be servable, got {r.status_code}"
 
 
-def test_resolve_client_id_uses_google_uid_when_token_valid():
-    with patch("web.backend.app.verify_id_token", return_value={"sub": "abc123"}):
-        r = client.get("/api/usage", headers={"Authorization": "Bearer whatever"})
-    assert r.status_code == 200
-
-
-def test_chat_and_usage_share_client_id_from_verified_token(tmp_path, monkeypatch):
-    # 有效 token 時，/api/chat 累計的用量要能被同一個帳號的 /api/usage 讀到
-    # ——代表兩個端點確實共用 _resolve_client_id() 算出的同一把 key（"google:<uid>"），
-    # 而不是各自退回不同的 IP。
+def test_chat_and_usage_share_client_id(tmp_path, monkeypatch):
+    # /api/chat 累計的用量要能被 /api/usage 讀到——代表兩個端點確實共用
+    # _resolve_client_id() 算出的同一把 key（連線 IP）。
     monkeypatch.setattr("web.backend.app.usage_store.USAGE_PATH", tmp_path / "usage.json")
-    headers = {"Authorization": "Bearer whatever"}
-    with patch("web.backend.app.verify_id_token", return_value={"sub": "uid-1"}):
-        with patch("web.backend.app.smart_reply", return_value="hi"):
-            client.post("/api/chat", json={"message": "hello"}, headers=headers)
-        usage = client.get("/api/usage", headers=headers).json()
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "hi")):
+        client.post("/api/chat", json={"message": "hello"})
+    usage = client.get("/api/usage").json()
     assert usage["chars_used"] == len("hello") + len("hi")
-
-
-def test_chat_endpoint_falls_back_to_ip_without_token(tmp_path, monkeypatch):
-    # Authorization header 沒帶、或驗證失敗，行為要跟改動前完全一樣——不能
-    # 逼著沒更新的舊呼叫端（或這次還沒串接登入的另一份前端）先登入才能用。
-    monkeypatch.setattr("web.backend.app.usage_store.USAGE_PATH", tmp_path / "usage.json")
-    with patch("web.backend.app.verify_id_token", return_value=None):
-        with patch("web.backend.app.smart_reply", return_value="hi"):
-            r = client.post("/api/chat", json={"message": "hello"})
-    assert r.status_code == 200
 
 
 def test_chat_endpoint_rejects_empty_message():
@@ -79,10 +61,13 @@ def test_chat_endpoint_rejects_empty_message():
     assert r.status_code == 400
 
 
-def test_chat_endpoint_returns_reply_from_self_built_model():
-    with patch("web.backend.app.smart_reply", return_value="hi there") as mock_smart_reply:
+def test_chat_endpoint_returns_reply_from_self_built_model(tmp_path, monkeypatch):
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "hi there")) as mock_smart_reply:
         r = client.post("/api/chat", json={"message": "hello"})
-    mock_smart_reply.assert_called_once_with("hello")
+    mock_smart_reply.assert_called_once_with(
+        "hello", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None
+    )
     assert r.status_code == 200
     assert r.json() == {"reply": "hi there", "conversation_id": None}
 
@@ -91,9 +76,10 @@ def test_chat_endpoint_without_conversation_id_does_not_persist(tmp_path, monkey
     # 舊的呼叫方式（沒帶 conversation_id）要維持無狀態行為——不能因為新增
     # 了對話紀錄功能，就逼著沒更新的呼叫端也得先建立一筆對話才能用 /api/chat。
     monkeypatch.setattr("web.backend.app.convo_store.CONVERSATIONS_PATH", tmp_path / "conversations.json")
-    with patch("web.backend.app.smart_reply", return_value="hi there"):
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "hi there")):
         client.post("/api/chat", json={"message": "hello"})
-    assert app_module.convo_store.list_conversations() == []
+    assert app_module.convo_store.list_conversations("testclient") == []
 
 
 def test_chat_endpoint_rejects_unknown_conversation_id():
@@ -103,15 +89,14 @@ def test_chat_endpoint_rejects_unknown_conversation_id():
 
 def test_conversation_lifecycle_create_chat_get_delete(tmp_path, monkeypatch):
     monkeypatch.setattr("web.backend.app.convo_store.CONVERSATIONS_PATH", tmp_path / "conversations.json")
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
 
     created = client.post("/api/conversations").json()
     conv_id = created["id"]
     assert created["title"] == "新對話"
 
-    with patch("web.backend.app.smart_reply", return_value="嗨，我是 sinco"):
-        chat_resp = client.post(
-            "/api/chat", json={"message": "你好", "conversation_id": conv_id}
-        )
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "嗨，我是 sinco")):
+        chat_resp = client.post("/api/chat", json={"message": "你好", "conversation_id": conv_id})
     assert chat_resp.status_code == 200
     assert chat_resp.json() == {"reply": "嗨，我是 sinco", "conversation_id": conv_id}
 
@@ -130,6 +115,76 @@ def test_conversation_lifecycle_create_chat_get_delete(tmp_path, monkeypatch):
 
     assert client.delete(f"/api/conversations/{conv_id}").status_code == 200
     assert client.get(f"/api/conversations/{conv_id}").status_code == 404
+
+
+def test_commands_endpoint_lists_cli_equivalent_commands():
+    data = client.get("/api/commands").json()
+    for name in ("help", "clear", "open", "preview", "character", "memory",
+                 "model", "resume", "chat", "conversations", "learn"):
+        assert name in data["commands"]
+    assert data["arg_suggestions"]["model"] == app_module.MODEL_MODES
+    assert data["arg_suggestions"]["memory"] == ["list", "add", "del"]
+    assert data["model_modes"] == app_module.MODEL_MODES
+
+
+def test_chat_endpoint_open_command_feeds_file_content_to_model(tmp_path, monkeypatch):
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
+    sample = tmp_path / "note.txt"
+    sample.write_text("檔案內容", encoding="utf-8")
+
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "讀到了")) as mock_smart_reply:
+        r = client.post("/api/chat", json={"message": f"/open {sample}"})
+    assert r.status_code == 200
+    assert r.json()["reply"] == "讀到了"
+    mock_smart_reply.assert_called_once_with(
+        "檔案內容", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None
+    )
+
+
+def test_chat_endpoint_open_command_missing_file_does_not_call_model():
+    with patch("web.backend.app.smart_reply_traced") as mock_smart_reply:
+        r = client.post("/api/chat", json={"message": "/open no-such-file.txt"})
+    mock_smart_reply.assert_not_called()
+    assert "找不到檔案" in r.json()["reply"]
+
+
+def test_chat_endpoint_preview_command_returns_raw_file_without_calling_model(tmp_path):
+    sample = tmp_path / "note.md"
+    sample.write_text("# 標題", encoding="utf-8")
+    with patch("web.backend.app.smart_reply_traced") as mock_smart_reply:
+        r = client.post("/api/chat", json={"message": f"/preview {sample}"})
+    mock_smart_reply.assert_not_called()
+    assert "# 標題" in r.json()["reply"]
+
+
+def test_chat_endpoint_resume_command_round_trips_session_store(tmp_path, monkeypatch):
+    monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
+    empty = client.post("/api/chat", json={"message": "/resume"}).json()
+    assert "目前沒有記錄下的對話" in empty["reply"]
+
+    app_module.session_store.record_turn("你好", "嗨", persona="sinco", mode="auto")
+    replay = client.post("/api/chat", json={"message": "/resume"}).json()
+    assert "你好" in replay["reply"] and "嗨" in replay["reply"]
+
+    cleared = client.post("/api/chat", json={"message": "/resume clear"}).json()
+    assert "已清除" in cleared["reply"]
+    assert app_module.session_store.load_session() == []
+
+
+def test_chat_endpoint_frontend_only_command_is_not_sent_to_model():
+    # /model、/character、/clear、/chat、/conversations、/help 由前端直接
+    # 處理，不會打進模型——直接呼叫 API 的情況下也不能被誤送進 smart_reply_traced()。
+    with patch("web.backend.app.smart_reply_traced") as mock_smart_reply:
+        r = client.post("/api/chat", json={"message": "/model nvidia"})
+    mock_smart_reply.assert_not_called()
+    assert "前端介面" in r.json()["reply"]
+
+
+def test_chat_endpoint_unknown_command_is_not_sent_to_model():
+    with patch("web.backend.app.smart_reply_traced") as mock_smart_reply:
+        r = client.post("/api/chat", json={"message": "/not-a-real-command"})
+    mock_smart_reply.assert_not_called()
+    assert "未知指令" in r.json()["reply"]
 
 
 def test_conversation_endpoints_404_for_unknown_id():

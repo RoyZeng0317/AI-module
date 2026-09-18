@@ -181,6 +181,13 @@ input:focus-visible,
   box-shadow: 0 8px 20px -8px rgba(217, 119, 87, 0.65);
 }
 
+.btn-new-chat:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .history-list {
   display: flex;
   flex-direction: column;
@@ -846,6 +853,34 @@ input:focus-visible,
   color: var(--text);
 }
 
+/* 匯出 Markdown 按鈕（見 action.py 的 export_conversation_markdown()） */
+.btn-export-md {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg-surface-2);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-export-md svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+.btn-export-md:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 .chat-messages {
   flex: 1;
   display: flex;
@@ -907,6 +942,42 @@ input:focus-visible,
 
 .message-bubble.is-pending {
   color: var(--text-faint);
+}
+
+/* 複製 Markdown 原始碼按鈕（見 action.py 的 _build_message_element()/
+   _copy_markdown()）——預設隱形，滑鼠移到整則助理訊息上才浮現，避免每則
+   回覆都常駐一顆小按鈕擠壓閱讀空間 */
+.msg-copy-btn {
+  appearance: none;
+  align-self: flex-start;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.msg-copy-btn svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+}
+
+.assistant-message:hover .msg-copy-btn {
+  opacity: 1;
+}
+
+.msg-copy-btn:hover {
+  color: var(--text);
+  background: var(--bg-surface-2);
 }
 
 /* markdown 預覽（action.py 的 render_markdown()）渲染出來的區塊元素，
@@ -986,7 +1057,32 @@ input:focus-visible,
 /* 輸入框：對齊 default.html 的 #chat-form 膠囊造型（textarea 疊右下角
    送出鍵，而不是舊版「一行 input + 旁邊方形按鈕」的橫排列） */
 .chat-input-container {
+  position: relative;
   margin-top: 14px;
+}
+
+/* 斜線指令自動完成選單，跟 .chat-item-menu 共用外觀（.chat-item-menu-item
+   一樣的列樣式），只是改成貼著輸入框正上方、固定寬度撐滿輸入框，不是釘在
+   滑鼠點擊位置——比照 lib/components/cli.py 的 SlashCommandCompleter。 */
+.cmd-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.cmd-menu-item.active {
+  background: var(--bg-surface-3, rgba(255, 255, 255, 0.08));
+  outline: 1px solid var(--accent);
+}
+
+.cmd-menu-item .cmd-menu-hint {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-size: 11.5px;
 }
 
 #chatForm {

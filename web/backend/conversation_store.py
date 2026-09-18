@@ -17,11 +17,15 @@ web/render.yaml、web/Dockerfile）容器映像檔只會複製 web/backend、web
 「專案根目錄下的 memory/ 資料夾」這個同一個實體路徑，本機開發時兩邊讀寫的就是
 同一個 conversations.json，效果上等於共用同一份紀錄，讓桌面 GUI／CLI／網頁三端
 不管從哪邊聊天，「對話紀錄」看到的都是同一份資料。改動任何一邊的 schema 要記得
-同步改另一邊。
+同步改另一邊——除了下面這個「owner」欄位：桌面 GUI／CLI 沒有這個多使用者隔離的
+概念，這個欄位是網頁端專用的刻意例外，不用同步過去。
 
 一筆對話存成：
 {
     "id": "8 碼 hex",
+    "owner": str（呼叫端的連線 IP，見 app.py 的 _resolve_client_id()；只有
+                  網頁端會寫入，桌面 GUI／CLI 那份
+                  lib/components/conversation_store.py 沒有這個欄位),
     "title": str（預設 "新對話"，收到第一則使用者訊息後自動改成訊息開頭）,
     "created_at": ISO8601,
     "updated_at": ISO8601,
@@ -29,6 +33,10 @@ web/render.yaml、web/Dockerfile）容器映像檔只會複製 web/backend、web
                   "persona": str（選填，只有 GUI/CLI 會帶）,
                   "mode": str（選填，只有 GUI/CLI 會帶）}]
 }
+
+除了 create_conversation() 之外，其餘讀寫函式都要求呼叫端帶入 owner，且只有
+owner 相符的對話才會被回傳／修改／刪除——避免不同呼叫端用猜到的 8 碼 id 讀到
+或動到別人的對話。
 """
 
 import json
@@ -94,16 +102,18 @@ def _summary(conv: dict) -> dict:
     }
 
 
-def list_conversations(path: Path | None = None) -> list[dict]:
-    """回傳所有對話的摘要（不含訊息內容），依最後更新時間新到舊排序。"""
-    conversations = _load(path)
+def list_conversations(owner: str, path: Path | None = None) -> list[dict]:
+    """回傳指定 owner 名下所有對話的摘要（不含訊息內容），依最後更新時間新到
+    舊排序——每個 Google 帳號只看得到自己的對話。"""
+    conversations = [c for c in _load(path) if c.get("owner") == owner]
     conversations.sort(key=lambda c: c["updated_at"], reverse=True)
     return [_summary(c) for c in conversations]
 
 
-def create_conversation(path: Path | None = None) -> dict:
+def create_conversation(owner: str, path: Path | None = None) -> dict:
     conv = {
         "id": uuid.uuid4().hex[:8],
+        "owner": owner,
         "title": DEFAULT_TITLE,
         "created_at": _now(),
         "updated_at": _now(),
@@ -115,23 +125,27 @@ def create_conversation(path: Path | None = None) -> dict:
     return conv
 
 
-def get_conversation(conversation_id: str, path: Path | None = None) -> dict | None:
-    return _find(_load(path), conversation_id)
+def get_conversation(conversation_id: str, owner: str, path: Path | None = None) -> dict | None:
+    conv = _find(_load(path), conversation_id)
+    if conv is None or conv.get("owner") != owner:
+        return None
+    return conv
 
 
-def delete_conversation(conversation_id: str, path: Path | None = None) -> bool:
+def delete_conversation(conversation_id: str, owner: str, path: Path | None = None) -> bool:
     conversations = _load(path)
-    remaining = [c for c in conversations if c["id"] != conversation_id]
-    if len(remaining) == len(conversations):
+    conv = _find(conversations, conversation_id)
+    if conv is None or conv.get("owner") != owner:
         return False
-    _save(remaining, path)
+    conversations.remove(conv)
+    _save(conversations, path)
     return True
 
 
-def rename_conversation(conversation_id: str, title: str, path: Path | None = None) -> dict | None:
+def rename_conversation(conversation_id: str, title: str, owner: str, path: Path | None = None) -> dict | None:
     conversations = _load(path)
     conv = _find(conversations, conversation_id)
-    if conv is None:
+    if conv is None or conv.get("owner") != owner:
         return None
     conv["title"] = title.strip() or DEFAULT_TITLE
     conv["updated_at"] = _now()
@@ -139,11 +153,11 @@ def rename_conversation(conversation_id: str, title: str, path: Path | None = No
     return conv
 
 
-def clear_messages(conversation_id: str, path: Path | None = None) -> dict | None:
+def clear_messages(conversation_id: str, owner: str, path: Path | None = None) -> dict | None:
     """清空一筆對話的訊息內容，但保留這個對話 id/在側邊欄清單中的位置。"""
     conversations = _load(path)
     conv = _find(conversations, conversation_id)
-    if conv is None:
+    if conv is None or conv.get("owner") != owner:
         return None
     conv["messages"] = []
     conv["title"] = DEFAULT_TITLE

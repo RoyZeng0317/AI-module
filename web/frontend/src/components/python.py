@@ -5,7 +5,7 @@
 """
 
 from pyscript import document, window
-from js import console, WebSocket, Object
+from js import console, WebSocket, Object, Blob
 from js import URL as _JsURL
 from pyodide.ffi import create_proxy, to_js
 import asyncio
@@ -182,6 +182,17 @@ ICONS = {
         ' stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M6 8a6 6 0 0 1 12 0c0 3.5 1 5.5 2 7H4c1-1.5 2-3.5 2-7Z"/>'
         '<path d="M10 19a2 2 0 0 0 4 0"/></svg>'
+    ),
+    "download": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>'
+    ),
+    "copy": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<rect x="9" y="9" width="11" height="11" rx="1.5"/>'
+        '<path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
     ),
 }
 
@@ -506,14 +517,42 @@ async def _refresh_id_token():
     _state["id_token"] = await window.sincoGetIdToken()
 
 
+def _render_login_required():
+    """對話紀錄功能只開放給 Google 登入的使用者（後端 _require_owner()
+    沒登入一律 401）——未登入／登出時側邊欄清單顯示提示文字、「新增對話」
+    按鈕停用、主畫面清空。純聊天本身不受影響，見 send_chat() 的
+    logged_in 判斷：沒登入一樣能聊天，只是不會存進對話紀錄。"""
+    history_list = _dom.get("history_list")
+    if history_list is not None:
+        history_list.innerHTML = ""
+        history_list.appendChild(el("div", cls="history-empty", text="請先使用 Google 登入才能使用對話紀錄"))
+    new_chat_btn = _dom.get("new_chat_btn")
+    if new_chat_btn is not None:
+        new_chat_btn.disabled = True
+    _state["conversation_id"] = None
+    _render_messages([])
+
+
+async def _after_login():
+    """先把 id token 換到手（_init_conversations() 底下的 fetch_conversations()
+    需要帶 Authorization header 才能通過後端的登入檢查），再開放「新增對話」
+    按鈕、載入這個帳號自己的對話紀錄清單。"""
+    await _refresh_id_token()
+    new_chat_btn = _dom.get("new_chat_btn")
+    if new_chat_btn is not None:
+        new_chat_btn.disabled = False
+    await _init_conversations()
+
+
 def _on_auth_changed(user):
     """google-auth-init.js 的登入狀態回呼——JS 傳回來的物件要 .to_py() 才會
     變成真正的 Python dict（同一個道理見 api_get() 的說明）。"""
     _state["user"] = user.to_py() if user else None
     if _state["user"]:
-        asyncio.ensure_future(_refresh_id_token())
+        asyncio.ensure_future(_after_login())
     else:
         _state["id_token"] = None
+        _render_login_required()
     _update_account_pill()
 
 
@@ -760,20 +799,52 @@ def _draw_detections(data, ctx, overlay, results_el):
 # 對話
 # ═══════════════════════════════════════════════════════════════
 
+def _copy_markdown(raw_text, btn):
+    """把一則回覆的原始 Markdown 文字（沒經過 render_markdown() 轉成 HTML
+    的版本）複製到剪貼簿，按鈕短暫顯示 ✓ 當作回饋。"""
+    async def _go():
+        try:
+            await window.navigator.clipboard.writeText(raw_text)
+        except Exception as exc:
+            console.error(f"複製 Markdown 失敗：{exc}")
+            return
+        original_html = btn.innerHTML
+        btn.innerHTML = "✓"
+        await asyncio.sleep(1.2)
+        btn.innerHTML = original_html
+    asyncio.ensure_future(_go())
+
+
 def _build_message_element(role, content):
     """組出一則訊息的 DOM，結構對齊 default.html 的
     `.message.{role}-message > .message-bubble`（外層負責左右靠齊，
     內層才是真正的氣泡/文字），不是自創的 `.chat-message` 扁平結構。
     `_append_chat()`（送出當下即時附加一則）跟 `_render_messages()`
     （切換對話時整批重繪歷史訊息）共用這支，兩邊的氣泡樣式才不會走鐘。
+
+    助理回覆的原始 Markdown 文字存在 `bubble` 的 `data-raw-md` 屬性上（不是
+    直接綁死在複製按鈕的 closure 裡）——`send_chat()` 收到真正的回覆後會
+    直接更新這個屬性，複製按鈕的 handler 每次點擊當下才讀取，這樣「先建立
+    pending 泡泡、之後才填入真正內容」的情境也能複製到最新文字，不會停留在
+    建立當下的 "…" 佔位字。
     """
     wrapper = el("div", cls=f"message {role}-message")
     bubble = el("div", cls="message-bubble")
     if role == "assistant":
         bubble.innerHTML = render_markdown(content)
+        bubble.setAttribute("data-raw-md", content)
+        wrapper.appendChild(bubble)
+        copy_btn = el("button", cls="msg-copy-btn", title="複製 Markdown 原始碼", html=ICONS["copy"])
+        copy_btn.setAttribute("type", "button")
+
+        def _on_copy(_e, b=bubble, btn=copy_btn):
+            _copy_markdown(b.getAttribute("data-raw-md") or "", btn)
+
+        copy_btn.addEventListener("click", create_proxy(_on_copy))
+        wrapper.appendChild(copy_btn)
     else:
         bubble.textContent = content
-    wrapper.appendChild(bubble)
+        wrapper.appendChild(bubble)
     return wrapper, bubble
 
 
@@ -812,12 +883,16 @@ def _render_messages(messages):
 async def send_chat(text):
     if not text.strip():
         return
-    if _state.get("conversation_id") is None:
-        # 保底：正常流程下 _init_conversations() 已經在頁面載入時建好/選好
+    # 對話紀錄只開放給登入的使用者（後端 _require_owner() 沒登入一律
+    # 401）——沒登入時 conversation_id 一律不帶，訊息只會即時顯示在畫面
+    # 上，不會嘗試建立/寫入對話紀錄，純聊天本身照樣可以用。
+    logged_in = _state.get("user") is not None
+    if logged_in and _state.get("conversation_id") is None:
+        # 保底：正常流程下 _init_conversations() 已經在登入完成時建好/選好
         # 一筆對話，只有初始化失敗或發生競態時才會落到這裡，避免送出按鈕
         # 因為沒有 conversation_id 而整個沒反應。
         await new_conversation()
-    conversation_id = _state["conversation_id"]
+    conversation_id = _state.get("conversation_id") if logged_in else None
 
     _dom["chat_input"].value = ""
     _dom["chat_input"].style.height = "auto"
@@ -828,8 +903,10 @@ async def send_chat(text):
     try:
         data = await api_post(CHAT_URL, {"message": text, "conversation_id": conversation_id})
         pending.innerHTML = render_markdown(data["reply"])
+        pending.setAttribute("data-raw-md", data["reply"])
         pending.classList.remove("is-pending")
-        await refresh_history_list()
+        if logged_in:
+            await refresh_history_list()
     except Exception as exc:
         pending.textContent = f"錯誤：{exc}"
     finally:
@@ -1064,6 +1141,60 @@ async def clear_chat():
 
 
 # ═══════════════════════════════════════════════════════════════
+# 匯出 Markdown（直接讀目前畫面上的 chat_log DOM，不是重新呼叫後端 API——
+# 沒登入、conversation_id 是 None 時一樣能匯出當下畫面看到的對話）
+# ═══════════════════════════════════════════════════════════════
+
+def _download_text_file(filename, text):
+    blob = Blob.new(to_js([text]), _js_opts({"type": "text/markdown;charset=utf-8"}))
+    url = _JsURL.createObjectURL(blob)
+    anchor = el("a")
+    anchor.href = url
+    anchor.setAttribute("download", filename)
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    _JsURL.revokeObjectURL(url)
+
+
+def _build_markdown_from_chat_log():
+    """使用者訊息讀 bubble.textContent，助理回覆讀 bubble 的 "data-raw-md"
+    屬性（_build_message_element() 設定的原始 Markdown，不是 render_markdown()
+    轉出來的 HTML）——這樣匯出的檔案裡程式碼區塊/表格語法才不會被拆散。"""
+    chat_log = _dom["chat_log"]
+    title = _dom["chat_title"].textContent or "對話"
+    lines = [f"# {title}", ""]
+    children = chat_log.children
+    for i in range(children.length):
+        node = children.item(i)
+        cls = str(node.className)
+        if "user-message" in cls:
+            role_label = "使用者"
+        elif "assistant-message" in cls:
+            role_label = "AI"
+        else:
+            continue
+        bubble = node.querySelector(".message-bubble")
+        if bubble is None:
+            continue
+        raw = bubble.getAttribute("data-raw-md")
+        text = raw if raw else str(bubble.textContent)
+        lines.append(f"### {role_label}")
+        lines.append("")
+        lines.append(text)
+        lines.append("")
+    return "\n".join(lines)
+
+
+def export_conversation_markdown():
+    chat_log = _dom.get("chat_log")
+    if chat_log is None or chat_log.querySelector(".message") is None:
+        return
+    title = _dom["chat_title"].textContent or "對話"
+    _download_text_file(f"{title}.md", _build_markdown_from_chat_log())
+
+
+# ═══════════════════════════════════════════════════════════════
 # 功能列按鈕處理
 # ═══════════════════════════════════════════════════════════════
 
@@ -1128,6 +1259,10 @@ def _build_sidebar():
     )))
     new_chat_btn.appendChild(el("span", text="新增對話"))
     new_chat_btn.addEventListener("click", create_proxy(lambda _: asyncio.ensure_future(new_conversation())))
+    # 對話紀錄只開放給登入的使用者，預設先停用，登入完成後由 _after_login()
+    # 打開（見 _render_login_required()／_after_login()）。
+    new_chat_btn.disabled = True
+    _dom["new_chat_btn"] = new_chat_btn
     history_section.appendChild(new_chat_btn)
 
     history_list = el("div", cls="history-list", id="historyList")
@@ -1475,6 +1610,14 @@ def _build_chat_card():
     _dom["chat_title"] = title_el
     title_info.appendChild(title_el)
     header.appendChild(title_info)
+
+    export_btn = el("button", cls="btn-export-md", id="exportMdBtn", title="把目前這則對話匯出成 Markdown 檔案")
+    export_btn.setAttribute("type", "button")
+    export_btn.appendChild(svg_span(ICONS["download"]))
+    export_btn.appendChild(el("span", text="匯出 Markdown"))
+    export_btn.addEventListener("click", create_proxy(lambda _: export_conversation_markdown()))
+    header.appendChild(export_btn)
+
     panel.appendChild(header)
 
     chat_log = el("div", cls="chat-messages", id="chatLog")
@@ -1572,6 +1715,9 @@ build_ui()
 document.addEventListener("click", create_proxy(lambda _e: _close_open_menu()))
 window.sincoRenderGoogleButton("googleSignInBtn")
 window.sincoOnAuthChanged(create_proxy(_on_auth_changed))
+# 對話紀錄只開放給登入的使用者——頁面載入時先當作未登入狀態渲染，真正登入
+# 完成（含 auto_select 自動登入）由 _on_auth_changed() 觸發 _after_login()
+# 才去載入這個帳號的對話紀錄，不在這裡直接呼叫 _init_conversations()。
+_render_login_required()
 asyncio.ensure_future(check_health())
-asyncio.ensure_future(_init_conversations())
 asyncio.ensure_future(_notify_poll_loop())

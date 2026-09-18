@@ -7,6 +7,7 @@ Run:
 Then open http://localhost:8080/
 """
 
+import json
 import os
 import sys
 import time
@@ -21,15 +22,40 @@ BACKEND_DIR = Path(__file__).resolve().parent
 # 不是這支後端要服務的對象，兩者不能混用。
 FRONTEND_DIR = BACKEND_DIR.parent / "admin" / "frontend" / "src" / "components"
 TRAINING_DIR = BACKEND_DIR.parent.parent / "tranning"
+PROJECT_ROOT_DIR = BACKEND_DIR.parent.parent
+# 斜線指令比照 lib/components/cli.py：角色卡跟共用 checkpoint 目錄、
+# app/command/*.md 提示詞指令的來源路徑跟 CLI/GUI 完全一樣。
+CHARACTERS_DIR = TRAINING_DIR / "characters"
+CHARACTER_CHAT_DIR = CHARACTERS_DIR / "character_chat_runs"
+COMMAND_DIR = PROJECT_ROOT_DIR / "app" / "command"
+DEFAULT_PERSONA = "sinco"
+# /model 的合法值，跟 CLI（cli.py 的 MODEL_MODES／MODEL_LABELS）同一套選項。
+MODEL_MODES = ["auto", "sinco", "code", "nvidia"]
+MODEL_LABELS = {
+    "auto": "自動判斷（預設，程式碼問句自動轉去 code 模型）",
+    "sinco": "一般聊天模型（強制，即使問句看起來像程式碼）",
+    "code": "程式碼模型（強制，即使問句看起來不像程式碼）",
+    "nvidia": "NVIDIA 雲端模型（外部 API，非本專案自訓練，需自行設定環境變數 NVIDIA_API_KEY）",
+}
+# /model nvidia 帶多輪上下文時最多回溯幾輪，跟 CLI 的 RESUME_HISTORY_CAP
+# 同一個數字。
+RESUME_HISTORY_CAP = 20
 # memory_store.py：/memory 指令共用的持久記憶儲存（見下方 chat_endpoint 對
 # "/memory"、"/learn" 的本機攔截），跟桌面 GUI（command.py）、CLI（cli.py）
 # 用的是同一支模組、同一份 memory/memory.json，不是各端各自一份。
 COMPONENTS_DIR = BACKEND_DIR.parent.parent / "lib" / "components"
 
-sys.path.insert(0, str(BACKEND_DIR))
 sys.path.insert(0, str(TRAINING_DIR))
 sys.path.insert(0, str(FRONTEND_DIR))
 sys.path.insert(0, str(COMPONENTS_DIR))
+# BACKEND_DIR 最後插入、排在 sys.path[0]——COMPONENTS_DIR 底下也有一支
+# conversation_store.py（桌面 GUI/CLI 版，沒有 owner 欄位），插入順序原本
+# 讓它排在 BACKEND_DIR 前面，導致 `import conversation_store` 一直載到
+# lib/components 那份、不是這支後端自己維護的 web/backend/conversation_store.py
+# （這兩份 API 過去刻意保持同步所以沒被發現）。這次新增對話紀錄的 owner
+# 隔離只加在 web/backend 這份，必須先修好這個排序，不然新功能會直接呼叫
+# 到沒有 owner 參數的舊函式而整個炸掉（TypeError）。
+sys.path.insert(0, str(BACKEND_DIR))
 
 from typing import Optional
 
@@ -52,10 +78,15 @@ from pydantic import BaseModel
 import auto_learn
 import conversation_store as convo_store
 import notify_store
+# session_store.py 沒有 web 專屬的 schema 差異（不像 conversation_store.py
+# 多了 owner 欄位），直接吃 lib/components 那份共用檔案——/resume、/chat
+# 兩個指令讀寫的是跟桌面 GUI／CLI 同一份 memory/session.json，不分來源，
+# 這是使用者明確選擇的行為（比照 CLI）。
+import session_store
 import usage_store
-from auth import verify_id_token
-from chats import smart_reply
+from chats import DEFAULT_OUT_DIR, smart_reply_traced
 from detector import detect
+from function import read_as_chat_content
 from gpu_info import get_gpu_info
 from memory_store import CATEGORIES as MEMORY_CATEGORIES
 from memory_store import add_memory, delete_memory, format_memories, list_memories
@@ -63,7 +94,7 @@ from memory_store import add_memory, delete_memory, format_memories, list_memori
 # Only these files are served. frontend/src/ (.env, component sources beyond
 # these three) and frontend/data/ (basic_data.sql) must never be reachable
 # over HTTP.
-PUBLIC_FILES = {"index.html", "style.css", "action.py", "script.js", "google-auth-init.js"}
+PUBLIC_FILES = {"index.html", "style.css", "action.py", "script.js"}
 
 # 部署到子路徑後面（例如 Tailscale Serve 的 `--set-path=/AI-Module`）時，
 # 反向代理原樣把完整路徑轉過來，後端這邊的路由也要掛在同一個前綴下才會對得
@@ -79,6 +110,12 @@ class ChatRequest(BaseModel):
     # action.py 側邊欄「對話紀錄」這條新流程才會帶 id 進來，直接呼叫這支
     # API 的舊用法/其他呼叫端不會被逼著配合這個新功能。
     conversation_id: Optional[str] = None
+    # /model、/character 選完之後由前端記住（跟 CLI 的 state["force_mode"]／
+    # state["persona"] 是同一個構想，只是狀態放在瀏覽器分頁裡，不是後端某個
+    # process），之後每次送訊息都帶著這兩個欄位，後端純粹照著用，不另外維護
+    # per-client 的伺服器端狀態。預設值＝沒選過時的原本行為，完全不變。
+    force_mode: str = "auto"
+    persona: str = DEFAULT_PERSONA
 
 
 class ConversationRenameRequest(BaseModel):
@@ -90,11 +127,7 @@ class NotificationCreateRequest(BaseModel):
 
 
 def _resolve_client_id(request: Request) -> str:
-    """有帶 Google 登入的 Authorization header 就用帳號識別（"google:<uid>"），
-    沒有（或驗證失敗）就退回連線 IP——舊的、不帶 token 的呼叫端行為不變。"""
-    claims = verify_id_token(request.headers.get("authorization"))
-    if claims:
-        return f"google:{claims['sub']}"
+    """用連線 IP 識別呼叫端，聊天/對話紀錄/用量限制共用同一個 key。"""
     return request.client.host
 
 
@@ -116,6 +149,65 @@ def _check_chat_rate_limit(client_ip: str) -> None:
             detail=f"請求過於頻繁，請 {CHAT_RATE_WINDOW_SEC} 秒後再試",
         )
     log.append(now)
+
+
+# ═══════════════════════════════════════════════════════════════
+# 斜線指令自動完成——跟 lib/components/cli.py 的 SlashCommandCompleter／
+# _slash_commands()／_arg_suggestions() 同一套構想：這裡只負責「有哪些指令、
+# 每個指令可以建議什麼引數值」這份清單資料本身（給前端 GET /api/commands
+# 抓去畫 Tab／上下鍵選單），實際「打完指令會發生什麼事」分成兩邊——
+# /model、/character、/clear、/chat、/conversations、/help 這幾個不需要模型
+# 或伺服器端檔案的，前端 action.py 直接處理（不送到後端）；/open、/preview、
+# /memory、/learn、/resume 跟 app/command/*.md 提示詞指令才會真的打
+# /api/chat（見下面 _run_local_command()）。
+# ═══════════════════════════════════════════════════════════════
+
+_BUILTIN_SLASH_COMMANDS = {
+    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "learn",
+}
+
+
+def _character_names() -> list[str]:
+    """人物卡的 name 清單，來自 character_model.py --build 產生的
+    tranning/characters/*.json——跟 cli.py 的 _character_names() 讀的是同一批
+    檔案。"""
+    if not CHARACTERS_DIR.exists():
+        return []
+    names = []
+    for path in CHARACTERS_DIR.glob("*.json"):
+        try:
+            card = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if card.get("name"):
+            names.append(card["name"])
+    return sorted(names)
+
+
+def _markdown_commands() -> list[str]:
+    if not COMMAND_DIR.exists():
+        return []
+    return sorted(p.stem for p in COMMAND_DIR.glob("*.md"))
+
+
+def _slash_commands() -> list[str]:
+    return sorted(_BUILTIN_SLASH_COMMANDS | set(_markdown_commands()))
+
+
+def _arg_suggestions(name: str) -> list[str] | None:
+    if name == "character":
+        return _character_names()
+    if name == "memory":
+        return ["list", "add", "del"]
+    if name == "learn":
+        return ["list", "approve", "reject"]
+    if name == "model":
+        return MODEL_MODES
+    if name == "resume":
+        return ["clear"]
+    if name == "conversations":
+        return ["list", "new", "open"]
+    return None
 
 
 app = FastAPI(title="AI-module camera object detection")
@@ -150,6 +242,19 @@ async def gpu_info_endpoint():
     return get_gpu_info()
 
 
+@router.get("/api/commands")
+async def commands_endpoint():
+    """前端斜線指令自動完成的資料來源（打 "/" 跳清單、打「/指令 」後再跳
+    引數選項），一次抓齊，不用每敲一個字就打一次 API。"""
+    commands = _slash_commands()
+    return {
+        "commands": commands,
+        "arg_suggestions": {name: _arg_suggestions(name) for name in commands if _arg_suggestions(name)},
+        "model_modes": MODEL_MODES,
+        "model_labels": MODEL_LABELS,
+    }
+
+
 @router.post("/api/detect")
 async def detect_frame(frame: UploadFile = File(...), conf: float = 0.35):
     data = await frame.read()
@@ -180,42 +285,42 @@ async def detect_stream(ws: WebSocket, conf: float = 0.35):
 
 
 @router.get("/api/conversations")
-async def list_conversations_endpoint():
-    return convo_store.list_conversations()
+async def list_conversations_endpoint(request: Request):
+    return convo_store.list_conversations(_resolve_client_id(request))
 
 
 @router.post("/api/conversations")
-async def create_conversation_endpoint():
-    return convo_store.create_conversation()
+async def create_conversation_endpoint(request: Request):
+    return convo_store.create_conversation(_resolve_client_id(request))
 
 
 @router.get("/api/conversations/{conversation_id}")
-async def get_conversation_endpoint(conversation_id: str):
-    conv = convo_store.get_conversation(conversation_id)
+async def get_conversation_endpoint(conversation_id: str, request: Request):
+    conv = convo_store.get_conversation(conversation_id, _resolve_client_id(request))
     if conv is None:
         raise HTTPException(status_code=404, detail="conversation not found")
     return conv
 
 
 @router.patch("/api/conversations/{conversation_id}")
-async def rename_conversation_endpoint(conversation_id: str, payload: ConversationRenameRequest):
-    conv = convo_store.rename_conversation(conversation_id, payload.title)
+async def rename_conversation_endpoint(conversation_id: str, payload: ConversationRenameRequest, request: Request):
+    conv = convo_store.rename_conversation(conversation_id, payload.title, _resolve_client_id(request))
     if conv is None:
         raise HTTPException(status_code=404, detail="conversation not found")
     return conv
 
 
 @router.post("/api/conversations/{conversation_id}/clear")
-async def clear_conversation_endpoint(conversation_id: str):
-    conv = convo_store.clear_messages(conversation_id)
+async def clear_conversation_endpoint(conversation_id: str, request: Request):
+    conv = convo_store.clear_messages(conversation_id, _resolve_client_id(request))
     if conv is None:
         raise HTTPException(status_code=404, detail="conversation not found")
     return conv
 
 
 @router.delete("/api/conversations/{conversation_id}")
-async def delete_conversation_endpoint(conversation_id: str):
-    if not convo_store.delete_conversation(conversation_id):
+async def delete_conversation_endpoint(conversation_id: str, request: Request):
+    if not convo_store.delete_conversation(conversation_id, _resolve_client_id(request)):
         raise HTTPException(status_code=404, detail="conversation not found")
     return {"status": "deleted"}
 
@@ -303,18 +408,103 @@ def _run_learn_command(arg: str) -> str:
     )
 
 
-def _run_local_command(message: str) -> str | None:
-    """message 是本機指令（/memory、/learn）就回傳結果文字，否則回傳 None
-    交給呼叫端繼續走 smart_reply()。"""
+def _run_resume_command(arg: str) -> str:
+    """/resume [clear]：跟 lib/components/cli.py 的 run_resume() 讀寫同一份
+    memory/session.json（不分 GUI／CLI／web，見上面 import session_store 的
+    說明）。只是「唸出來給你看」，不會重新送進 smart_reply_traced()，所以
+    這裡不呼叫任何模型，也不會另外寫回 session_store（純檢視動作）。"""
+    sub = arg.strip().lower()
+    if sub in ("clear", "reset"):
+        session_store.clear_session()
+        return "已清除記錄下的對話（下次聊出新內容後，主旨會依新內容重新產生）"
+
+    entries = session_store.load_session()
+    if not entries:
+        return "目前沒有記錄下的對話（還沒聊過，或紀錄已被清除）"
+
+    subject = session_store.session_subject(entries)
+    lines = [f"還原對話紀錄（共 {len(entries)} 輪，主旨：{subject}，最後更新於 {entries[-1]['created_at']}）", ""]
+    for entry in entries:
+        lines.append(f"你：{entry['user']}")
+        lines.append(f"{entry['persona']}：{entry['reply']}")
+        lines.append("")
+    return "\n".join(lines).rstrip()
+
+
+def _run_local_command(message: str) -> tuple[str, str] | None:
+    """回傳 ("reply", 文字) 代表這個指令有自己的固定回覆，不經過模型；回傳
+    ("ask", 文字) 代表要把「文字」這個替換過的內容送進 smart_reply_traced()
+    當成問句（/open、app/command/*.md 提示詞指令）；回傳 None 代表不是本機
+    指令，維持原本直接把使用者輸入送給模型的行為。
+
+    /model、/character、/clear、/chat、/conversations、/help 這幾個 CLI
+    也有的斜線指令，web 版刻意留在前端（action.py）直接處理、不會送到這裡：
+    它們要嘛只是切換前端自己保存的 state（模式／人格，隨 ChatRequest.force_mode
+    /persona 帶來即可，不需要往返這支函式），要嘛已經有現成的前端函式可以
+    直接呼叫（清空畫面、匯出 Markdown、切換/新增對話紀錄），不需要打
+    /api/chat。萬一還是有人直接呼叫 API 送這幾個名字上來，下面最後那個
+    「未知指令」分支會接住，不會被誤送進模型當一般句子。
+    """
     if not message.startswith("/"):
         return None
     name, _, arg = message[1:].partition(" ")
     name, arg = name.strip().lower(), arg.strip()
+
     if name == "memory":
-        return _run_memory_command(arg)
+        return "reply", _run_memory_command(arg)
     if name == "learn":
-        return _run_learn_command(arg)
-    return None
+        return "reply", _run_learn_command(arg)
+    if name == "resume":
+        return "reply", _run_resume_command(arg)
+
+    if name == "open":
+        if not arg:
+            return "reply", "用法：/open <伺服器上的檔案路徑>"
+        path = Path(arg).expanduser()
+        if not path.is_file():
+            return "reply", f"找不到檔案：{path}"
+        return "ask", read_as_chat_content(path)
+
+    if name == "preview":
+        if not arg:
+            return "reply", "用法：/preview <伺服器上的檔案路徑>"
+        path = Path(arg).expanduser()
+        if not path.is_file():
+            return "reply", f"找不到檔案：{path}"
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError as exc:
+            return "reply", f"讀取失敗：{exc}"
+        return "reply", f"--- {path.name} ---\n\n{text}"
+
+    md_path = COMMAND_DIR / f"{name}.md"
+    if md_path.exists():
+        return "ask", read_as_chat_content(md_path)
+
+    if name in _BUILTIN_SLASH_COMMANDS:
+        return "reply", f"/{name} 由前端介面直接處理，不會呼叫後端（如果你是直接呼叫 API，請改用前端畫面操作）"
+
+    return "reply", f"未知指令：/{name}（輸入 /help 查看可用指令）"
+
+
+def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[tuple[str, str]]:
+    """/model nvidia 是唯一會吃多輪歷史的模式（見 chats.smart_reply_traced()
+    的 history 參數說明），history 直接從這個對話已經存下來的訊息現算，不用
+    像 CLI 那樣另外在記憶體維護一份 state["history"]——重新整理分頁、換一台
+    裝置都還讀得到同一份，且 CLI 那份的建立時機（process 存活期間）在瀏覽器
+    分頁這種隨時可能重整的環境下不夠可靠。"""
+    if conversation_id is None:
+        return []
+    conv = convo_store.get_conversation(conversation_id, client_id)
+    if conv is None:
+        return []
+    messages = conv["messages"]
+    pairs = [
+        (messages[i]["content"], messages[i + 1]["content"])
+        for i in range(0, len(messages) - 1, 2)
+        if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant"
+    ]
+    return pairs[-RESUME_HISTORY_CAP:]
 
 
 @router.post("/api/chat")
@@ -333,14 +523,35 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
         )
 
     conversation_id = payload.conversation_id
-    if conversation_id is not None and convo_store.get_conversation(conversation_id) is None:
-        raise HTTPException(status_code=404, detail="conversation not found")
+    if conversation_id is not None:
+        # 帶 conversation_id 上來就代表呼叫端要把這則訊息存進紀錄，必須先驗證
+        # 這筆對話真的屬於目前這個呼叫端（用 IP 識別），不能讓別的呼叫端對
+        # 別人的對話寫入訊息。沒帶 conversation_id 的舊式無狀態呼叫不受影響。
+        if convo_store.get_conversation(conversation_id, client_id) is None:
+            raise HTTPException(status_code=404, detail="conversation not found")
 
     if conversation_id is not None:
         convo_store.append_message(conversation_id, "user", payload.message)
 
-    local_reply = _run_local_command(payload.message.strip())
-    reply = local_reply if local_reply is not None else smart_reply(payload.message)
+    persona = payload.persona.strip() or DEFAULT_PERSONA
+    force_mode = payload.force_mode if payload.force_mode in MODEL_MODES else "auto"
+    # 目前只有一個共用的 character_chat_runs（見 CLAUDE.md to-do #14），還沒
+    # 做到「一個角色各自獨立聊天 checkpoint」——跟 cli.py 的 switch_character()
+    # 同一個現況，sinco/預設人格才用 chat_runs，其餘角色一律共用同一個目錄。
+    out_dir = DEFAULT_OUT_DIR if persona.lower() in ("sinco", "default", "reset") else CHARACTER_CHAT_DIR
+
+    outcome = _run_local_command(payload.message.strip())
+    if outcome is not None and outcome[0] == "reply":
+        reply = outcome[1]
+    else:
+        model_message = outcome[1] if outcome is not None else payload.message
+        history = _build_nvidia_history(conversation_id, client_id) if force_mode == "nvidia" else None
+        _, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history)
+        # /open、app/command/*.md 提示詞指令這兩種才會真的問模型，比照 CLI
+        # 的 ask_model()：只有「真的問過模型」的這一輪才落地到 session.json，
+        # /memory、/learn、/resume 這種純本機指令不記錄（跟 CLI 行為一致，
+        # 避免 /resume 重播畫面混進一堆指令雜訊）。
+        session_store.record_turn(model_message, reply, persona=persona, mode=force_mode)
 
     # 用量算輸入+輸出的字元總和，比較貼近實際運算量——sinco 是字元級模型，
     # 沒有 subword/BPE token 這種單位（見 usage_store.py 開頭說明）。

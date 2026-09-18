@@ -5,7 +5,7 @@
 """
 
 from pyscript import document, window
-from js import console, WebSocket, Object
+from js import console, WebSocket, Object, Blob
 from js import URL as _JsURL
 from pyodide.ffi import create_proxy, to_js
 import asyncio
@@ -37,6 +37,7 @@ CHAT_URL = _api_url("api/chat")
 GPU_INFO_URL = _api_url("api/gpu_info")
 CONVERSATIONS_URL = _api_url("api/conversations")
 NOTIFY_URL = _api_url("api/notifications")
+COMMANDS_URL = _api_url("api/commands")
 DETECT_INTERVAL_MS = 500
 CAPTURE_WIDTH = 640
 
@@ -182,6 +183,17 @@ ICONS = {
         '<path d="M6 8a6 6 0 0 1 12 0c0 3.5 1 5.5 2 7H4c1-1.5 2-3.5 2-7Z"/>'
         '<path d="M10 19a2 2 0 0 0 4 0"/></svg>'
     ),
+    "download": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>'
+    ),
+    "copy": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<rect x="9" y="9" width="11" height="11" rx="1.5"/>'
+        '<path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
+    ),
 }
 
 # ═══════════════════════════════════════════════════════════════
@@ -231,16 +243,8 @@ def icon_button(icon_key, label, on_click=None, btn_id=None, cls="nav-item", **e
 # API 呼叫
 # ═══════════════════════════════════════════════════════════════
 
-def _auth_headers():
-    """有 Google 登入的 id token 就帶 Authorization header，讓後端的
-    _resolve_client_id() 用帳號識別；沒登入回傳空 dict，行為跟登入功能加入
-    前完全一樣（不強制要求登入才能用）。"""
-    token = _state.get("id_token")
-    return {"Authorization": f"Bearer {token}"} if token else {}
-
-
 async def api_get(url):
-    resp = await window.fetch(url, _js_opts({"headers": _auth_headers()}))
+    resp = await window.fetch(url, _js_opts({}))
     # resp.json() 回傳的是包著 JS 物件的 JsProxy，不是 Python dict——JsProxy
     # 沒有 .get()（除非包的是 JS Map），呼叫 data.get(...) 會直接
     # AttributeError: get。.to_py() 遞迴轉成真正的 Python dict/list，下面
@@ -267,7 +271,7 @@ def _js_opts(opts):
 async def api_post(url, body):
     resp = await window.fetch(url, _js_opts({
         "method": "POST",
-        "headers": {"Content-Type": "application/json", **_auth_headers()},
+        "headers": {"Content-Type": "application/json"},
         "body": _json.dumps(body),
     }))
     data = (await resp.json()).to_py()
@@ -279,7 +283,7 @@ async def api_post(url, body):
 async def api_patch(url, body):
     resp = await window.fetch(url, _js_opts({
         "method": "PATCH",
-        "headers": {"Content-Type": "application/json", **_auth_headers()},
+        "headers": {"Content-Type": "application/json"},
         "body": _json.dumps(body),
     }))
     data = (await resp.json()).to_py()
@@ -289,7 +293,7 @@ async def api_patch(url, body):
 
 
 async def api_delete(url):
-    resp = await window.fetch(url, _js_opts({"method": "DELETE", "headers": _auth_headers()}))
+    resp = await window.fetch(url, _js_opts({"method": "DELETE"}))
     data = (await resp.json()).to_py()
     if not resp.ok:
         raise Exception(data.get("detail", f"HTTP {resp.status}"))
@@ -439,15 +443,23 @@ _state = {
     "stream": None,
     "loop_handle": None,
     "in_flight": False,
-    "current_model": "sinco",
+    # "auto"／"sinco" 是同一套 /model 選項（見 CLAUDE.md 需求 #03：/model
+    # 預設值維持一般模型的自動判斷），跟後端 ChatRequest.force_mode 的預設值
+    # 一致——這兩個欄位以前只是裝飾用的下拉選單，現在才真的隨每則訊息送給
+    # /api/chat（見 send_chat()），所以預設值要跟後端對齊，不能沿用舊的
+    # "sinco" 常駐強制模式。
+    "current_model": "auto",
+    "persona": "sinco",
+    "commands": None,  # GET /api/commands 抓回來的指令清單，見 _load_commands()
     "ws": None,
     "ws_ready": False,
     "last_send_ts": None,
     "conversation_id": None,
     "open_menu": None,
     "open_menu_id": None,
-    "user": None,
-    "id_token": None,
+    "cmd_menu_options": [],
+    "cmd_menu_index": -1,
+    "cmd_menu_kind": None,  # "name"（指令名稱清單）或 "arg"（引數建議清單）
 }
 
 # DOM 引用（build_ui 時填入）
@@ -509,56 +521,6 @@ async def check_gpu():
         pill.setAttribute("data-state", "down")
         text.textContent = "顯卡查詢失敗"
         console.error(f"GPU info check failed: {exc}")
-
-
-# ═══════════════════════════════════════════════════════════════
-# Google 登入（Google Identity Services，橋接函式見 google-auth-init.js，
-# 不再依賴 Firebase）
-# ═══════════════════════════════════════════════════════════════
-
-def _update_account_pill():
-    """登入用的是 Google 官方畫出來的按鈕（google_btn，可靠地跳出帳號選擇
-    視窗），account_pill 只在已登入時顯示（顯示帳號名稱＋點一下登出）——兩個
-    元素互斥顯示，不是同一顆按鈕換文字。"""
-    pill = _dom.get("account_pill")
-    text = _dom.get("account_text")
-    google_btn = _dom.get("google_btn")
-    if pill is None:
-        return
-    user = _state["user"]
-    if user:
-        pill.style.display = ""
-        pill.setAttribute("data-state", "ok")
-        pill.setAttribute("title", "點一下登出")
-        text.textContent = user.get("name") or user.get("email") or "已登入"
-        if google_btn is not None:
-            google_btn.style.display = "none"
-    else:
-        pill.style.display = "none"
-        if google_btn is not None:
-            google_btn.style.display = ""
-
-
-async def _refresh_id_token():
-    _state["id_token"] = await window.sincoGetIdToken()
-
-
-def _on_auth_changed(user):
-    """google-auth-init.js 的登入狀態回呼——JS 傳回來的物件要 .to_py() 才會
-    變成真正的 Python dict（同一個道理見 api_get() 的說明）。"""
-    _state["user"] = user.to_py() if user else None
-    if _state["user"]:
-        asyncio.ensure_future(_refresh_id_token())
-    else:
-        _state["id_token"] = None
-    _update_account_pill()
-
-
-async def _on_account_click():
-    """account_pill 只在已登入時顯示，所以這裡只處理登出——登入動線走的是
-    google_btn（Google 官方按鈕，由 GIS 自己接管點擊事件）。"""
-    if _state["user"]:
-        await window.sincoSignOut()
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -797,20 +759,52 @@ def _draw_detections(data, ctx, overlay, results_el):
 # 對話
 # ═══════════════════════════════════════════════════════════════
 
+def _copy_markdown(raw_text, btn):
+    """把一則回覆的原始 Markdown 文字（沒經過 render_markdown() 轉成 HTML
+    的版本）複製到剪貼簿，按鈕短暫顯示 ✓ 當作回饋。"""
+    async def _go():
+        try:
+            await window.navigator.clipboard.writeText(raw_text)
+        except Exception as exc:
+            console.error(f"複製 Markdown 失敗：{exc}")
+            return
+        original_html = btn.innerHTML
+        btn.innerHTML = "✓"
+        await asyncio.sleep(1.2)
+        btn.innerHTML = original_html
+    asyncio.ensure_future(_go())
+
+
 def _build_message_element(role, content):
     """組出一則訊息的 DOM，結構對齊 default.html 的
     `.message.{role}-message > .message-bubble`（外層負責左右靠齊，
     內層才是真正的氣泡/文字），不是自創的 `.chat-message` 扁平結構。
     `_append_chat()`（送出當下即時附加一則）跟 `_render_messages()`
     （切換對話時整批重繪歷史訊息）共用這支，兩邊的氣泡樣式才不會走鐘。
+
+    助理回覆的原始 Markdown 文字存在 `bubble` 的 `data-raw-md` 屬性上（不是
+    直接綁死在複製按鈕的 closure 裡）——`send_chat()` 收到真正的回覆後會
+    直接更新這個屬性，複製按鈕的 handler 每次點擊當下才讀取，這樣「先建立
+    pending 泡泡、之後才填入真正內容」的情境也能複製到最新文字，不會停留在
+    建立當下的 "…" 佔位字。
     """
     wrapper = el("div", cls=f"message {role}-message")
     bubble = el("div", cls="message-bubble")
     if role == "assistant":
         bubble.innerHTML = render_markdown(content)
+        bubble.setAttribute("data-raw-md", content)
+        wrapper.appendChild(bubble)
+        copy_btn = el("button", cls="msg-copy-btn", title="複製 Markdown 原始碼", html=ICONS["copy"])
+        copy_btn.setAttribute("type", "button")
+
+        def _on_copy(_e, b=bubble, btn=copy_btn):
+            _copy_markdown(b.getAttribute("data-raw-md") or "", btn)
+
+        copy_btn.addEventListener("click", create_proxy(_on_copy))
+        wrapper.appendChild(copy_btn)
     else:
         bubble.textContent = content
-    wrapper.appendChild(bubble)
+        wrapper.appendChild(bubble)
     return wrapper, bubble
 
 
@@ -847,14 +841,31 @@ def _render_messages(messages):
 
 
 async def send_chat(text):
-    if not text.strip():
+    text = text.strip()
+    if not text:
         return
+    _close_command_menu()
+
+    if text.startswith("/"):
+        name, _, arg = text[1:].partition(" ")
+        name, arg = name.strip().lower(), arg.strip()
+        if name in _FRONTEND_ONLY_COMMANDS:
+            _dom["chat_input"].value = ""
+            _dom["chat_input"].style.height = "auto"
+            handled, reply = await _run_frontend_command(name, arg)
+            if handled:
+                if reply is not None:
+                    _append_chat("user", text)
+                    _append_chat("assistant", reply)
+                _dom["chat_input"].focus()
+                return
+
     if _state.get("conversation_id") is None:
         # 保底：正常流程下 _init_conversations() 已經在頁面載入時建好/選好
         # 一筆對話，只有初始化失敗或發生競態時才會落到這裡，避免送出按鈕
         # 因為沒有 conversation_id 而整個沒反應。
         await new_conversation()
-    conversation_id = _state["conversation_id"]
+    conversation_id = _state.get("conversation_id")
 
     _dom["chat_input"].value = ""
     _dom["chat_input"].style.height = "auto"
@@ -863,8 +874,14 @@ async def send_chat(text):
     pending = _append_chat("assistant", "…", pending=True)
 
     try:
-        data = await api_post(CHAT_URL, {"message": text, "conversation_id": conversation_id})
+        data = await api_post(CHAT_URL, {
+            "message": text,
+            "conversation_id": conversation_id,
+            "force_mode": _state["current_model"],
+            "persona": _state["persona"],
+        })
         pending.innerHTML = render_markdown(data["reply"])
+        pending.setAttribute("data-raw-md", data["reply"])
         pending.classList.remove("is-pending")
         await refresh_history_list()
     except Exception as exc:
@@ -1101,19 +1118,367 @@ async def clear_chat():
 
 
 # ═══════════════════════════════════════════════════════════════
+# 匯出 Markdown（直接讀目前畫面上的 chat_log DOM，不是重新呼叫後端 API——
+# 沒登入、conversation_id 是 None 時一樣能匯出當下畫面看到的對話）
+# ═══════════════════════════════════════════════════════════════
+
+def _download_text_file(filename, text):
+    blob = Blob.new(to_js([text]), _js_opts({"type": "text/markdown;charset=utf-8"}))
+    url = _JsURL.createObjectURL(blob)
+    anchor = el("a")
+    anchor.href = url
+    anchor.setAttribute("download", filename)
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    _JsURL.revokeObjectURL(url)
+
+
+def _build_markdown_from_chat_log():
+    """使用者訊息讀 bubble.textContent，助理回覆讀 bubble 的 "data-raw-md"
+    屬性（_build_message_element() 設定的原始 Markdown，不是 render_markdown()
+    轉出來的 HTML）——這樣匯出的檔案裡程式碼區塊/表格語法才不會被拆散。"""
+    chat_log = _dom["chat_log"]
+    title = _dom["chat_title"].textContent or "對話"
+    lines = [f"# {title}", ""]
+    children = chat_log.children
+    for i in range(children.length):
+        node = children.item(i)
+        cls = str(node.className)
+        if "user-message" in cls:
+            role_label = "使用者"
+        elif "assistant-message" in cls:
+            role_label = "AI"
+        else:
+            continue
+        bubble = node.querySelector(".message-bubble")
+        if bubble is None:
+            continue
+        raw = bubble.getAttribute("data-raw-md")
+        text = raw if raw else str(bubble.textContent)
+        lines.append(f"### {role_label}")
+        lines.append("")
+        lines.append(text)
+        lines.append("")
+    return "\n".join(lines)
+
+
+def export_conversation_markdown():
+    chat_log = _dom.get("chat_log")
+    if chat_log is None or chat_log.querySelector(".message") is None:
+        return
+    title = _dom["chat_title"].textContent or "對話"
+    _download_text_file(f"{title}.md", _build_markdown_from_chat_log())
+
+
+# ═══════════════════════════════════════════════════════════════
+# 斜線指令——比照 lib/components/cli.py 的指令集（CLAUDE.md「指令規則」）。
+# /model、/character、/clear、/chat、/conversations、/help 這幾個不需要模型
+# 或伺服器端檔案就能完成，直接在這個分頁裡處理、完全不打 /api/chat：
+# /model、/character 只是切換這個分頁自己保存的 _state（跟 CLI 的
+# state["force_mode"]／state["persona"] 同一個構想，只是活在瀏覽器分頁裡，
+# 之後每則訊息隨 send_chat() 一起送給後端，見下面）；/clear、/chat、
+# /conversations 都已經有現成的函式可以直接呼叫。其餘（/open、/preview、
+# /memory、/learn、/resume、app/command/*.md 提示詞指令）沒有前端能自己
+# 生出來的資料（伺服器端檔案、跨端共用的 session.json），維持送到後端
+# （見 web/backend/app.py 的 _run_local_command()）。
+# ═══════════════════════════════════════════════════════════════
+
+_FRONTEND_ONLY_COMMANDS = {"model", "character", "clear", "chat", "conversations", "help"}
+
+
+def _model_modes():
+    return ((_state.get("commands") or {}).get("model_modes")) or ["auto", "sinco", "code", "nvidia"]
+
+
+def _model_labels():
+    return ((_state.get("commands") or {}).get("model_labels")) or {}
+
+
+def _character_names():
+    return (((_state.get("commands") or {}).get("arg_suggestions")) or {}).get("character") or []
+
+
+async def _load_commands():
+    """開頁就先抓一次 /api/commands，快取進 _state["commands"]——斜線指令
+    自動完成（見下面 _cmd_menu_options_for()）跟 /model、/character、/help
+    都要用到這份清單，不用每打一個字就打一次 API。"""
+    try:
+        _state["commands"] = await api_get(COMMANDS_URL)
+    except Exception as exc:
+        console.error(f"load commands failed: {exc}")
+
+
+def _set_model(mode):
+    _state["current_model"] = mode
+    badge = _dom.get("model_badge")
+    if badge:
+        badge.textContent = mode
+    select = _dom.get("model_select")
+    if select:
+        select.value = mode
+
+
+def _run_model_command(arg):
+    modes = _model_modes()
+    labels = _model_labels()
+    if not arg:
+        current = _state["current_model"]
+        options = "\n".join(f"- {m}：{labels.get(m, m)}" for m in modes)
+        return f"目前模式：{current}（{labels.get(current, current)}）\n{options}"
+    mode = arg.lower()
+    if mode not in modes:
+        return f"未知模式：{arg}（可用：{'、'.join(modes)}）"
+    _set_model(mode)
+    return f"已切換模式：{mode}（{labels.get(mode, mode)}）"
+
+
+def _run_character_command(arg):
+    name = arg.strip()
+    if not name:
+        current = _state["persona"]
+        names = _character_names()
+        text = f"目前人格：{current}"
+        if names:
+            text += f"\n可用角色：{'、'.join(names)}（用 /character <名稱> 切換，/character sinco 切回預設）"
+        return text
+    if name.lower() in ("sinco", "default", "reset"):
+        _state["persona"] = "sinco"
+        return "已切換回預設人格：sinco"
+    names = _character_names()
+    matched = next((n for n in names if n.lower() == name.lower()), None) \
+        or next((n for n in names if name.lower() in n.lower()), None)
+    if matched is None:
+        if names:
+            return f"找不到角色「{name}」。可用角色：{'、'.join(names)}"
+        return f"找不到角色「{name}」。tranning/characters/ 底下還沒有任何角色卡（用 character_model.py --build 建立）。"
+    _state["persona"] = matched
+    return f"已切換人格：{matched}"
+
+
+def _run_clear_command():
+    """比照 CLI 的 /clear：只清掉目前畫面上顯示的內容，不會動到後端存的
+    對話紀錄（跟側邊欄「清除對話」按鈕的 clear_chat() 不是同一件事，那個
+    會真的清空/覆寫伺服器端的訊息）。"""
+    _render_messages([])
+    return None
+
+
+async def _run_chat_command():
+    export_conversation_markdown()
+    return "已下載目前對話為 Markdown 檔案。"
+
+
+async def _run_conversations_command(arg):
+    sub, _, rest = arg.partition(" ")
+    sub, rest = sub.strip().lower(), rest.strip()
+
+    if sub in ("", "list"):
+        conversations = await fetch_conversations()
+        if not conversations:
+            return "目前沒有任何對話紀錄"
+        current_id = _state.get("conversation_id")
+        lines = ["目前的對話紀錄（桌面 GUI／CLI／網頁共用）"]
+        for conv in conversations:
+            mark = "→" if conv["id"] == current_id else " "
+            lines.append(f"{mark} [{conv['id']}] {conv['title']}（最後更新於 {conv['updated_at']}）")
+        return "\n".join(lines)
+
+    if sub == "new":
+        await new_conversation()
+        return f"已建立新對話 [{_state['conversation_id']}]"
+
+    if sub == "open":
+        if not rest:
+            return "用法：/conversations open <id>（從 /conversations list 取得 id）"
+        conversations = await fetch_conversations()
+        if not any(c["id"] == rest for c in conversations):
+            return f"找不到對話 id：{rest}"
+        await switch_conversation(rest)
+        return None  # switch_conversation() 已經把整批訊息畫出來了，不用再多印一則確認
+
+    return (
+        "用法：\n"
+        "/conversations             列出所有對話紀錄\n"
+        "/conversations new         建立新對話\n"
+        "/conversations open <id>   切換到指定對話"
+    )
+
+
+def _run_help_command():
+    all_commands = (_state.get("commands") or {}).get("commands") or []
+    known_backend = {"open", "preview", "memory", "learn", "resume"}
+    extra = sorted(set(all_commands) - _FRONTEND_ONLY_COMMANDS - known_backend)
+    lines = [
+        "內建指令",
+        "/help             顯示這個說明",
+        "/clear            清除目前畫面上的對話（不會刪除已存的對話紀錄）",
+        "/open <路徑>      讀取伺服器上的檔案內容並送給模型",
+        "/preview <路徑>   直接把檔案當 markdown 渲染出來看，不會送進模型",
+        f"/model <模式>     切換 {'/'.join(_model_modes())}（不帶模式＝查看目前模式）",
+        "/character <名稱> 切換角色人格（不帶名稱＝查看目前人格與可選清單）",
+        "/memory           編輯持久記憶（list/add/del，輸入 /memory 查看完整用法）",
+        "/learn            管理待審核的學習候選（list/approve/reject）",
+        "/resume <clear>   還原重開機/關機前記錄下的對話（不帶引數＝重播；clear＝清除紀錄）",
+        "/chat             把目前畫面上的對話下載成 Markdown 檔案",
+        "/conversations <list|new|open <id>>  多筆對話紀錄，跟桌面 GUI／CLI 共用",
+    ]
+    if extra:
+        lines.append("")
+        lines.append("提示詞指令（app/command/*.md）")
+        lines.extend(f"/{name}" for name in extra)
+    lines.append("")
+    lines.append(f"目前人格：{_state['persona']} ｜ 目前模式：{_state['current_model']}")
+    return "\n".join(lines)
+
+
+async def _run_frontend_command(name, arg):
+    """name 是前端可以獨立處理的指令就回傳 (True, 回覆文字或 None)，不是
+    就回傳 (False, None) 交給 send_chat() 照原本流程打 /api/chat。"""
+    if name == "model":
+        return True, _run_model_command(arg)
+    if name == "character":
+        return True, _run_character_command(arg)
+    if name == "clear":
+        return True, _run_clear_command()
+    if name == "chat":
+        return True, await _run_chat_command()
+    if name == "conversations":
+        return True, await _run_conversations_command(arg)
+    if name == "help":
+        return True, _run_help_command()
+    return False, None
+
+
+# ── 打 "/" 跳出的自動完成選單：Tab／上下鍵操作，跟 lib/components/cli.py 的
+#    SlashCommandCompleter、lib/components/command.py 的 CommandPalette 同一
+#    套構想（CLAUDE.md「指令規則」#02）──
+
+def _cmd_menu_options_for(text):
+    """text 是目前輸入框內容（已確認以 "/" 開頭）。回傳 (kind, options)：
+    kind="name" 時 options 是指令名稱候選；kind="arg" 時是引數候選；都沒有
+    建議就回傳 (None, [])。"""
+    commands = _state.get("commands") or {}
+    body = text[1:]
+    if " " in body:
+        name, _, partial_arg = body.partition(" ")
+        options = (commands.get("arg_suggestions") or {}).get(name.strip().lower())
+        if not options:
+            return None, []
+        return "arg", [o for o in options if o.lower().startswith(partial_arg.lower())]
+    query = body.lower()
+    options = [c for c in (commands.get("commands") or []) if c.lower().startswith(query)]
+    return "name", options
+
+
+def _close_command_menu():
+    menu = _dom.get("cmd_menu")
+    if menu is not None:
+        menu.hidden = True
+        menu.innerHTML = ""
+    _state["cmd_menu_options"] = []
+    _state["cmd_menu_index"] = -1
+    _state["cmd_menu_kind"] = None
+
+
+def _highlight_command_menu_item(index):
+    menu = _dom.get("cmd_menu")
+    if menu is None:
+        return
+    children = menu.children
+    for i in range(children.length):
+        children.item(i).classList.toggle("active", i == index)
+    _state["cmd_menu_index"] = index
+
+
+def _apply_command_menu_selection(index):
+    options = _state.get("cmd_menu_options") or []
+    if not (0 <= index < len(options)):
+        return
+    kind = _state.get("cmd_menu_kind")
+    option = options[index]
+    chat_input = _dom["chat_input"]
+    if kind == "name":
+        chat_input.value = f"/{option} "
+    else:
+        name, _, _partial = chat_input.value[1:].partition(" ")
+        chat_input.value = f"/{name} {option}"
+    chat_input.focus()
+    # .value 改完遊標預設留在原位置、不會自動跳到字串結尾，不補這行會讓
+    # 使用者接著打字時內容插在字串中間。
+    length = len(chat_input.value)
+    chat_input.setSelectionRange(length, length)
+    if kind == "name":
+        # 選完指令名稱只是打完「/指令 」，緊接著再跳一次選單看該指令的引數
+        # 建議（例如 /model → 跳出 auto/sinco/code/nvidia）。
+        _update_command_menu()
+    else:
+        # 選完引數已經是一句完整的指令，準備好給使用者直接按 Enter 送出，
+        # 不用再跳選單。
+        _close_command_menu()
+
+
+def _make_command_pick_handler(index):
+    def _handler(e):
+        e.preventDefault()
+        _apply_command_menu_selection(index)
+    return _handler
+
+
+def _render_command_menu(kind, options):
+    menu = _dom.get("cmd_menu")
+    if menu is None:
+        return
+    menu.innerHTML = ""
+    for i, option in enumerate(options):
+        item = el("button", cls="chat-item-menu-item cmd-menu-item")
+        item.setAttribute("type", "button")
+        if kind == "name":
+            item.innerHTML = f"<span>/{option}</span>"
+        else:
+            item.innerHTML = f'<span>{option}</span><span class="cmd-menu-hint">引數</span>'
+        if i == 0:
+            item.classList.add("active")
+        # mousedown（不是 click）先攔下：chat_input 的 blur 會在 click 事件
+        # 觸發前先關掉選單，用 mousedown + preventDefault 讓輸入框不會先失焦。
+        item.addEventListener("mousedown", create_proxy(_make_command_pick_handler(i)))
+        menu.appendChild(item)
+    menu.hidden = False
+    _state["cmd_menu_options"] = options
+    _state["cmd_menu_index"] = 0
+    _state["cmd_menu_kind"] = kind
+
+
+def _update_command_menu():
+    text = _dom["chat_input"].value
+    if not text.startswith("/") or "\n" in text:
+        _close_command_menu()
+        return
+    kind, options = _cmd_menu_options_for(text)
+    if not options:
+        _close_command_menu()
+        return
+    _render_command_menu(kind, options)
+
+
+def _move_command_menu_selection(delta):
+    options = _state.get("cmd_menu_options") or []
+    if not options:
+        return
+    index = (_state.get("cmd_menu_index", 0) + delta) % len(options)
+    _highlight_command_menu_item(index)
+
+
+# ═══════════════════════════════════════════════════════════════
 # 功能列按鈕處理
 # ═══════════════════════════════════════════════════════════════
 
 def _on_model_change(event):
-    model = event.target.value
-    _state["current_model"] = model
-    badge = _dom.get("model_badge")
-    if badge:
-        badge.textContent = model
+    _set_model(event.target.value)
 
 
 def _on_character_click():
-    _append_chat("assistant", "角色選擇功能需要搭配後端 /character 指令使用，請先在桌面版或 CLI 中設定角色。")
+    _append_chat("assistant", _run_character_command(""))
 
 
 async def _on_memory_click():
@@ -1165,6 +1530,7 @@ def _build_sidebar():
     )))
     new_chat_btn.appendChild(el("span", text="新增對話"))
     new_chat_btn.addEventListener("click", create_proxy(lambda _: asyncio.ensure_future(new_conversation())))
+    _dom["new_chat_btn"] = new_chat_btn
     history_section.appendChild(new_chat_btn)
 
     history_list = el("div", cls="history-list", id="historyList")
@@ -1200,25 +1566,6 @@ def _build_sidebar():
     _dom["gpu_pill"] = gpu_pill
     _dom["gpu_text"] = gpu_text
     status_section.appendChild(gpu_pill)
-
-    # 未登入時顯示 Google 官方畫出來的按鈕（google_btn，見下面 build_ui()
-    # 之後呼叫的 window.sincoRenderGoogleButton()）；已登入時換成 account_pill
-    # 顯示帳號名稱，點一下登出——兩者互斥顯示，見 _update_account_pill()。
-    google_btn = el("div", id="googleSignInBtn")
-    _dom["google_btn"] = google_btn
-    status_section.appendChild(google_btn)
-
-    account_pill = el("div", cls="status-pill", id="accountPill")
-    account_pill.style.display = "none"
-    account_pill.setAttribute("data-state", "down")
-    account_pill.setAttribute("title", "使用 Google 登入")
-    account_pill.appendChild(el("span", cls="status-dot"))
-    account_text = el("span", id="accountText", text="使用 Google 登入")
-    account_pill.appendChild(account_text)
-    account_pill.addEventListener("click", create_proxy(lambda _: asyncio.ensure_future(_on_account_click())))
-    _dom["account_pill"] = account_pill
-    _dom["account_text"] = account_text
-    status_section.appendChild(account_pill)
 
     aside.appendChild(status_section)
 
@@ -1400,14 +1747,15 @@ def _build_settings_modal():
     model_wrap = el("div", cls="model-select")
     model_wrap.appendChild(svg_span(ICONS["model"].replace('viewBox', 'style="width:15px;height:15px;stroke:var(--accent);flex-shrink:0" viewBox')))
     select = el("select", id="modelSelect")
-    for val in ("auto", "sinco", "code", "nvidia"):
+    for val in _model_modes():
         opt = el("option", value=val, text=val)
-        if val == "sinco":
+        if val == _state["current_model"]:
             opt.selected = True
         select.appendChild(opt)
     select.addEventListener("change", create_proxy(_on_model_change))
     model_wrap.appendChild(select)
-    badge = el("span", cls="model-badge", id="modelBadge", text="sinco")
+    _dom["model_select"] = select
+    badge = el("span", cls="model-badge", id="modelBadge", text=_state["current_model"])
     model_wrap.appendChild(badge)
     _dom["model_badge"] = badge
     model_section.appendChild(model_wrap)
@@ -1501,6 +1849,14 @@ def _build_chat_card():
     _dom["chat_title"] = title_el
     title_info.appendChild(title_el)
     header.appendChild(title_info)
+
+    export_btn = el("button", cls="btn-export-md", id="exportMdBtn", title="把目前這則對話匯出成 Markdown 檔案")
+    export_btn.setAttribute("type", "button")
+    export_btn.appendChild(svg_span(ICONS["download"]))
+    export_btn.appendChild(el("span", text="匯出 Markdown"))
+    export_btn.addEventListener("click", create_proxy(lambda _: export_conversation_markdown()))
+    header.appendChild(export_btn)
+
     panel.appendChild(header)
 
     chat_log = el("div", cls="chat-messages", id="chatLog")
@@ -1511,10 +1867,19 @@ def _build_chat_card():
     panel.appendChild(chat_log)
 
     footer = el("footer", cls="chat-input-container")
+
+    # 斜線指令自動完成選單，貼在輸入框正上方（CSS 見 .cmd-menu），預設隱藏
+    # ——跟 lib/components/cli.py 的 SlashCommandCompleter 同一套構想，見上面
+    # 「斜線指令」那個區塊的 _update_command_menu() 等函式。
+    cmd_menu = el("div", cls="chat-item-menu cmd-menu", id="cmdMenu")
+    cmd_menu.hidden = True
+    _dom["cmd_menu"] = cmd_menu
+    footer.appendChild(cmd_menu)
+
     form = el("form", id="chatForm")
 
     chat_input = el("textarea", id="chatInput")
-    chat_input.setAttribute("placeholder", "輸入訊息…（Shift + Enter 換行）")
+    chat_input.setAttribute("placeholder", "輸入訊息…（Shift + Enter 換行，「/」跳出指令選單）")
     chat_input.setAttribute("rows", "1")
     _dom["chat_input"] = chat_input
 
@@ -1523,6 +1888,7 @@ def _build_chat_card():
         # 後」該有的高度，不然只會單調往上長、刪字時高度不會跟著縮回去。
         chat_input.style.height = "auto"
         chat_input.style.height = f"{min(chat_input.scrollHeight, 160)}px"
+        _update_command_menu()
 
     def _submit_current():
         text = chat_input.value.strip()
@@ -1530,14 +1896,41 @@ def _build_chat_card():
             asyncio.ensure_future(send_chat(text))
 
     def _on_keydown(e):
+        menu_open = not cmd_menu.hidden
+        if menu_open:
+            if e.key == "ArrowDown":
+                e.preventDefault()
+                _move_command_menu_selection(1)
+                return
+            if e.key == "ArrowUp":
+                e.preventDefault()
+                _move_command_menu_selection(-1)
+                return
+            if e.key in ("Tab", "Enter") and not e.shiftKey:
+                e.preventDefault()
+                _apply_command_menu_selection(_state.get("cmd_menu_index", 0))
+                return
+            if e.key == "Escape":
+                e.preventDefault()
+                _close_command_menu()
+                return
         # Enter 送出、Shift+Enter 換行，對齊 default.html 輸入框的提示文字；
         # 換行是 textarea 預設行為，只有「送出」這個情境需要攔截。
         if e.key == "Enter" and not e.shiftKey:
             e.preventDefault()
             _submit_current()
 
+    def _on_blur(_e):
+        # 延遲關閉：選單項目的選取是掛在 mousedown（見 _render_command_menu()
+        # 的說明），這裡照理不會搶在它前面關掉選單，多留一點緩衝純粹保險。
+        async def _delayed_close():
+            await asyncio.sleep(0.15)
+            _close_command_menu()
+        asyncio.ensure_future(_delayed_close())
+
     chat_input.addEventListener("input", create_proxy(_autosize))
     chat_input.addEventListener("keydown", create_proxy(_on_keydown))
+    chat_input.addEventListener("blur", create_proxy(_on_blur))
     form.appendChild(chat_input)
 
     input_footer = el("div", cls="input-footer")
@@ -1596,8 +1989,7 @@ def build_ui():
 # ═══════════════════════════════════════════════════════════════
 build_ui()
 document.addEventListener("click", create_proxy(lambda _e: _close_open_menu()))
-window.sincoRenderGoogleButton("googleSignInBtn")
-window.sincoOnAuthChanged(create_proxy(_on_auth_changed))
+asyncio.ensure_future(_load_commands())
+asyncio.ensure_future(_init_conversations())
 asyncio.ensure_future(check_health())
 asyncio.ensure_future(check_gpu())
-asyncio.ensure_future(_init_conversations())

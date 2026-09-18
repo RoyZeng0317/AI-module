@@ -43,11 +43,20 @@ def action():
     js_mod.WebSocket = MagicMock()
     js_mod.URL = MagicMock()
     js_mod.Promise = MagicMock()
+    # Object/Blob：action.py 頂部 `from js import ... Object, Blob` 需要這兩個
+    # 名字在 js 模組上存在才能 import 成功——這支測試只在意 render_markdown()
+    # 這個純邏輯函式，沒有真的用到 Object/Blob，MagicMock 只是讓 import 過關。
+    js_mod.Object = MagicMock()
+    js_mod.Blob = MagicMock()
     sys.modules["js"] = js_mod
 
     pyodide_mod = types.ModuleType("pyodide")
     pyodide_ffi_mod = types.ModuleType("pyodide.ffi")
     pyodide_ffi_mod.create_once_callable = lambda fn: fn
+    # create_proxy/to_js：action.py 頂部 import 需要的名字，這支測試不會真的
+    # 呼叫到（沒有事件迴圈/DOM），給最小可用的假實作讓 import 過關即可。
+    pyodide_ffi_mod.create_proxy = lambda fn: fn
+    pyodide_ffi_mod.to_js = lambda obj, **kw: obj
     sys.modules["pyodide"] = pyodide_mod
     sys.modules["pyodide.ffi"] = pyodide_ffi_mod
 
