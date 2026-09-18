@@ -1,7 +1,7 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:pip",
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.defaultInterpreterPath": "C:\\Users\\Roy\\AppData\\Roaming\\mamba\\envs\\yolo_track\\python.exe",
     "python.REPL.enableREPLSmartSend": false,
     "remote.portsAttributes": {
         "8000": {

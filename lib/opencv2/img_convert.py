@@ -1,4 +1,4 @@
-# pip install imutils
+# pip install imutils   
 import imutils, cv2, os
 
 path = os.path.join(os.path.dirname(__file__), "koala.jpg")
