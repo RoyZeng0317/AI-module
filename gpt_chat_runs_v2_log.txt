@@ -1,0 +1,21 @@
+[finetune] epoch   1  train_loss=5.1981  val_loss=4.4475
+[finetune] epoch   2  train_loss=4.1291  val_loss=4.1358
+[finetune] epoch   3  train_loss=3.6531  val_loss=4.0168
+[finetune] epoch   4  train_loss=3.2973  val_loss=3.9409
+[finetune] epoch   5  train_loss=2.9490  val_loss=3.8972  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   5  checkpoint saved
+[finetune] epoch   6  train_loss=2.6701  val_loss=3.8957  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   7  train_loss=2.4471  val_loss=3.8526  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   8  train_loss=2.2003  val_loss=3.8787  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   9  train_loss=1.9968  val_loss=3.8909  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  10  train_loss=1.8077  val_loss=3.8881  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  10  checkpoint saved
+[finetune] epoch  11  train_loss=1.5628  val_loss=3.9109  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  12  train_loss=1.4535  val_loss=3.9148  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  13  train_loss=1.3500  val_loss=3.9431  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  14  train_loss=1.2477  val_loss=3.9612  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  15  train_loss=1.2075  val_loss=3.9680  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  15  checkpoint saved
+[finetune] epoch  16  train_loss=1.1662  val_loss=3.9779  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch  17  train_loss=1.1125  val_loss=3.9823  [warning: val loss well above train loss -- possible overfitting]
+Early stopping at epoch 17 (no val improvement for 10 epochs)

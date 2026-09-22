@@ -34,10 +34,19 @@ road_sign_train.py, adapted to detection):
       training and prints the final train/val loss gap so a human can
       catch overfitting even when patience hasn't tripped yet.
 
+Recognizing a specific chip (e.g. "atmega328p") by sight, not just the
+generic "ic" class, would need real labeled photos of that exact part --
+none exist yet, same honest gap as the rest of this class list. Until then,
+a specific-package class like "ic_dip28" (any DIP-28 chip, package shape
+only, not the exact part) is the closest this detector can promise; pair it
+with circuit_ic_generator.py/ic_library.py's known pinouts for whatever a
+human confirms the detected chip actually is, rather than pretending the
+detector itself can read a part number off a photo.
+
 Usage:
     # dataset already laid out as <dir>/images/{train,val}, labels/{train,val}
     python circuit_diagram_train.py --dataset-dir path/to/dataset --classes \
-        resistor capacitor inductor diode ic transistor battery switch led wire_junction
+        resistor capacitor inductor diode ic ic_dip28 transistor battery switch led wire_junction
 
     # or point straight at an existing Ultralytics data.yaml
     python circuit_diagram_train.py --data path/to/data.yaml --epochs 50 --freeze 0

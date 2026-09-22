@@ -403,7 +403,8 @@ class ChatSFTDataset(Dataset):
 
 def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
                  optimizer: torch.optim.Optimizer, scheduler, epochs: int, patience: int,
-                 device: str, tag: str, baseline_loss: float) -> list[dict]:
+                 device: str, tag: str, baseline_loss: float,
+                 checkpoint_every: int = 0, save_checkpoint=None) -> list[dict]:
     """`baseline_loss` is ln(vocab_size) -- the loss an untrained model
     with a uniform random output distribution would score. Unlike OCR.py's
     CTC loss (where the warning thresholds this loop's structure was copied
@@ -413,6 +414,20 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
     constant -- a run with vocab_size=20000 has a ~30% higher baseline than
     one with vocab_size=8000 for reasons that have nothing to do with
     under/overfitting.
+
+    `checkpoint_every`/`save_checkpoint` (both default off, fully backward
+    compatible): if set, `save_checkpoint(model, history)` is called every
+    `checkpoint_every` epochs using the epoch's CURRENT weights (not
+    necessarily the best-val_loss ones -- this is a "don't lose 2 hours of
+    progress if the process dies" safety net, see to_do_list.md #37 /
+    ErrorLog #32, not a replacement for the final best-weights save that
+    already happens after this function returns). The caller (pretrain()/
+    finetune()) writes it in the exact same tokenizer/config/model.pt/
+    history.json layout the final output uses, to a `checkpoint/`
+    subdirectory -- so resuming after an interruption needs no separate
+    "resume" code path at all: just point a fresh finetune() call's
+    `--pretrain-dir` at that checkpoint directory and run the remaining
+    epochs, reusing the loading logic finetune() already has.
     """
     best_val_loss = float("inf")
     best_state = None
@@ -461,6 +476,10 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
         print(f"[{tag}] epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}{warning}", flush=True)
         history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss})
 
+        if save_checkpoint is not None and checkpoint_every > 0 and epoch % checkpoint_every == 0:
+            save_checkpoint(model, history)
+            print(f"[{tag}] epoch {epoch:3d}  checkpoint saved", flush=True)
+
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -482,7 +501,8 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
              batch_size: int = 32, block_size: int = 512, n_layer: int = 8, n_embd: int = 384,
              n_head: int = 6, dropout: float = 0.1, lr: float = 3e-4, weight_decay: float = 0.01,
              vocab_size: int = 8000, val_split: float = 0.1, patience: int = 5,
-             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION):
+             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION,
+             checkpoint_every: int = 0):
     device = _resolve_device(device)
     _cap_gpu_memory(device, gpu_mem_fraction)
     text = Path(corpus_path).read_text(encoding="utf-8")
@@ -507,10 +527,23 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    config = {
+        "block_size": block_size, "n_layer": n_layer, "n_embd": n_embd,
+        "n_head": n_head, "dropout": dropout,
+    }
+
+    def save_checkpoint(ckpt_model, ckpt_history):
+        ckpt_dir = out_dir / "checkpoint"
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        tokenizer.save(ckpt_dir)
+        (ckpt_dir / "config.json").write_text(json.dumps(config, indent=2))
+        torch.save(ckpt_model.state_dict(), ckpt_dir / "model.pt")
+        (ckpt_dir / "history.json").write_text(json.dumps(ckpt_history, indent=2))
 
     history = _run_epochs(model, train_loader, val_loader, optimizer, scheduler,
                            epochs, patience, device, tag="pretrain",
-                           baseline_loss=math.log(tokenizer.vocab_size))
+                           baseline_loss=math.log(tokenizer.vocab_size),
+                           checkpoint_every=checkpoint_every, save_checkpoint=save_checkpoint)
 
     # tokenizer/config/weights all written together *after* training finishes
     # (see chats.py train()'s identical fix) — writing the tokenizer first and
@@ -519,10 +552,6 @@ def pretrain(corpus_path: Path, out_dir: Path = DEFAULT_PRETRAIN_DIR, epochs: in
     # concurrent reader (e.g. a chat REPL pointed at this checkpoint) with a
     # tensor-shape mismatch instead of just seeing the old, still-good model.
     tokenizer.save(out_dir)
-    config = {
-        "block_size": block_size, "n_layer": n_layer, "n_embd": n_embd,
-        "n_head": n_head, "dropout": dropout,
-    }
     (out_dir / "config.json").write_text(json.dumps(config, indent=2))
     torch.save(model.state_dict(), out_dir / "model.pt")
     (out_dir / "history.json").write_text(json.dumps(history, indent=2))
@@ -535,7 +564,8 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
              out_dir: Path = DEFAULT_FINETUNE_DIR, epochs: int = 50, batch_size: int = 8,
              lr: float = 1e-4, weight_decay: float = 0.01, dropout: float = 0.1,
              val_split: float = 0.1, patience: int = 8, val_data_path: Path | None = None,
-             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION):
+             device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION,
+             checkpoint_every: int = 0):
     device = _resolve_device(device)
     _cap_gpu_memory(device, gpu_mem_fraction)
     pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
@@ -573,16 +603,26 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    saved_config = dict(config, dropout=dropout)
+
+    def save_checkpoint(ckpt_model, ckpt_history):
+        ckpt_dir = out_dir / "checkpoint"
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        tokenizer.save(ckpt_dir)
+        (ckpt_dir / "config.json").write_text(json.dumps(saved_config, indent=2))
+        torch.save(ckpt_model.state_dict(), ckpt_dir / "model.pt")
+        (ckpt_dir / "history.json").write_text(json.dumps(ckpt_history, indent=2))
 
     history = _run_epochs(model, train_loader, val_loader, optimizer, scheduler,
                            epochs, patience, device, tag="finetune",
-                           baseline_loss=math.log(tokenizer.vocab_size))
+                           baseline_loss=math.log(tokenizer.vocab_size),
+                           checkpoint_every=checkpoint_every, save_checkpoint=save_checkpoint)
 
     # see pretrain()'s identical comment: tokenizer/config/weights written
     # together after training finishes, not before, so out_dir never sits in
     # a mismatched half-written state for the whole training run.
     tokenizer.save(out_dir)
-    (out_dir / "config.json").write_text(json.dumps(dict(config, dropout=dropout), indent=2))
+    (out_dir / "config.json").write_text(json.dumps(saved_config, indent=2))
     torch.save(model.state_dict(), out_dir / "model.pt")
     (out_dir / "history.json").write_text(json.dumps(history, indent=2))
     return model, tokenizer, history
@@ -692,6 +732,9 @@ def main():
     p_pre.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
                         help="cap this process to this fraction of total VRAM on CUDA devices "
                              "(see DEFAULT_GPU_MEM_FRACTION docstring); pass 0/negative to disable the cap")
+    p_pre.add_argument("--checkpoint-every", type=int, default=0,
+                        help="also save weights to <out-dir>/checkpoint/ every N epochs (0 = off); "
+                             "resume an interrupted run with --pretrain-dir/--out-dir pointed at it")
 
     p_fin = sub.add_parser("finetune", help="supervised fine-tuning on a pairs.json-format dataset")
     p_fin.add_argument("--data", type=Path, required=True)
@@ -710,6 +753,9 @@ def main():
     p_fin.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
                         help="cap this process to this fraction of total VRAM on CUDA devices "
                              "(see DEFAULT_GPU_MEM_FRACTION docstring); pass 0/negative to disable the cap")
+    p_fin.add_argument("--checkpoint-every", type=int, default=0,
+                        help="also save weights to <out-dir>/checkpoint/ every N epochs (0 = off); "
+                             "resume an interrupted run with --pretrain-dir pointed at it")
 
     p_chat = sub.add_parser("chat", help="REPL against a fine-tuned checkpoint")
     p_chat.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
@@ -737,12 +783,13 @@ def main():
         pretrain(args.corpus, args.out_dir, args.epochs, args.batch_size, args.block_size,
                   args.n_layer, args.n_embd, args.n_head, args.dropout, args.lr,
                   args.weight_decay, args.vocab_size, args.val_split, args.patience,
-                  gpu_mem_fraction=gpu_mem_fraction)
+                  gpu_mem_fraction=gpu_mem_fraction, checkpoint_every=args.checkpoint_every)
     elif args.command == "finetune":
         gpu_mem_fraction = args.gpu_mem_fraction if args.gpu_mem_fraction > 0 else None
         finetune(args.data, args.pretrain_dir, args.out_dir, args.epochs, args.batch_size,
                   args.lr, args.weight_decay, args.dropout, args.val_split, args.patience,
-                  val_data_path=args.val_data, gpu_mem_fraction=gpu_mem_fraction)
+                  val_data_path=args.val_data, gpu_mem_fraction=gpu_mem_fraction,
+                  checkpoint_every=args.checkpoint_every)
     elif args.command == "chat":
         print("Chat with the fine-tuned Transformer model (type 'exit' to quit)")
         while True:

@@ -103,6 +103,55 @@ def test_complete_without_checkpoint_returns_placeholder(tmp_path):
     assert "尚未訓練" in result
 
 
+def test_finetune_checkpoint_every_writes_resumable_mid_run_checkpoint(tmp_path):
+    """to_do_list.md #37 / ErrorLog #32: a long finetune killed mid-run had
+    no checkpoint to resume from, only the final (never-written) weights.
+    checkpoint_every writes the same tokenizer/config/model.pt/history.json
+    layout finetune()'s own final output uses, to <out_dir>/checkpoint/, so
+    resuming needs no separate code path -- just point a new finetune() call's
+    pretrain_dir at it."""
+    corpus_path = tmp_path / "corpus.txt"
+    corpus_path.write_text(_make_synthetic_corpus(), encoding="utf-8")
+    pretrain_dir = tmp_path / "pretrain_runs"
+    pretrain(corpus_path=corpus_path, out_dir=pretrain_dir, epochs=1, val_split=0.2,
+              patience=5, **_TINY_MODEL_KWARGS)
+
+    data_path = tmp_path / "pairs.json"
+    data_path.write_text(json.dumps(_make_synthetic_pairs()), encoding="utf-8")
+    finetune_dir = tmp_path / "finetune_runs"
+
+    finetune(data_path=data_path, pretrain_dir=pretrain_dir, out_dir=finetune_dir,
+              epochs=4, batch_size=4, val_split=0.2, patience=100, checkpoint_every=2)
+
+    ckpt_dir = finetune_dir / "checkpoint"
+    assert (ckpt_dir / "model.pt").exists()
+    assert (ckpt_dir / "config.json").exists()
+    assert (ckpt_dir / "bpe_vocab.json").exists()
+    ckpt_history = json.loads((ckpt_dir / "history.json").read_text(encoding="utf-8"))
+    # last checkpoint write happens at epoch 4 (checkpoint_every=2 -> epochs 2 and 4)
+    assert ckpt_history[-1]["epoch"] == 4
+
+    # resuming: point a fresh finetune() call's pretrain_dir at the checkpoint
+    resumed_dir = tmp_path / "resumed_runs"
+    model, tokenizer, history = finetune(
+        data_path=data_path, pretrain_dir=ckpt_dir, out_dir=resumed_dir,
+        epochs=1, batch_size=4, val_split=0.2, patience=5,
+    )
+    assert len(history) == 1
+    assert (resumed_dir / "model.pt").exists()
+
+
+def test_pretrain_checkpoint_every_zero_writes_no_checkpoint_dir(tmp_path):
+    corpus_path = tmp_path / "corpus.txt"
+    corpus_path.write_text(_make_synthetic_corpus(), encoding="utf-8")
+    out_dir = tmp_path / "pretrain_runs"
+
+    pretrain(corpus_path=corpus_path, out_dir=out_dir, epochs=2, val_split=0.2,
+              patience=5, checkpoint_every=0, **_TINY_MODEL_KWARGS)
+
+    assert not (out_dir / "checkpoint").exists()
+
+
 def test_resolve_device_prefers_explicit_device_over_detection():
     assert _resolve_device("cpu") == "cpu"
     assert _resolve_device("xpu") == "xpu"
