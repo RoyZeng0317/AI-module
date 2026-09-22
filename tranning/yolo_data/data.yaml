@@ -1,0 +1,7 @@
+path: C:/Users/roy/Documents/GitHub/AI-module/tranning/yolo_data
+train: images/train
+val: images/val
+names:
+  0: circle
+  1: square
+  2: triangle

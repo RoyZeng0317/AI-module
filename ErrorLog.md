@@ -139,3 +139,11 @@ ErrorLog #30（同一顆 17M 參數 checkpoint 對分布外英文輸入生成不
 
 **相關**：ErrorLog #30（同顆 checkpoint 對分布外英文輸入的病徵）、
 to_do_list.md #27。
+
+## 34. lib/opencv2/dnn.py 攝影機物件偵測只顯示最後一幀、縮排錯誤
+
+**症狀（程式碼審視發現，尚未實機執行）**：`imshow`／`waitKey(0)` 寫在 `while` 迴圈外，只會顯示最後一幀；`net = cv2.dnn.readNet(...)` 與 `VideoCapture(0)` 縮排在 `with open(...)` 區塊內；沒有 `cap.release()`；設定檔副檔名寫成 `protext.txt`（Caffe 設定檔應為 `prototxt`）。
+
+**修正（2026-09-21）**：`imshow` 移進迴圈並用 `waitKey(1)`，按 q／ESC 離開；縮排修正；補 `release()`；模型路徑改為相對腳本所在的 `lib/opencv2/models/`，缺檔時明確丟 `FileNotFoundError`；類別名稱改 `splitlines()`，索引越界不再 IndexError；移除每幀 `print`。
+
+**尚未驗證**：`lib/opencv2/models/` 內沒有 `MobileNetSSD_deploy.caffemodel`／`.prototxt.txt`／`MobileNetSSD_labels.txt`，需使用者自行放入後實機測試。副檔名 `protext`→`prototxt` 是推測，若使用者檔案本來就叫 `protext` 需改回。MobileNetSSD 為現成預訓練模型，與 Rule 06 有衝突，是否保留待使用者決定。

@@ -147,3 +147,96 @@ pyinstaller --onefile --console --name install_check app/install/install_check.p
   霍夫圓檢測），跟 sinco 模型無關，有自己的 README/requirements/tests
 - 完整規則、待辦清單、每次修正的除錯脈絡見 [to_do_list.md](to_do_list.md) 與
   [ErrorLog.md](ErrorLog.md)——遇到相似問題先查那裡
+
+## 檔案索引（樹狀，2026-09-21 掃描；不含 .venv/.git/__pycache__）
+
+```
+AI-module/
+├── .venv/                          # Python 虛擬環境（不列內容）
+├── .vscode/settings.json           # VSCode 設定
+├── Agent/                          # Agent 工作紀錄
+│   ├── ErrorFinished/              # 已修好的錯誤紀錄 (ErrorLog.md、2026-08-13-*.md)
+│   ├── ErrorLog/                   # 每日錯誤紀錄 (2026-08-13/24/27/28.md)
+│   └── Index/                      # 2026-08-13-Project Advise.md
+├── Rule/Basic.md                   # 基本規則
+├── app/
+│   ├── command/                    # 「讀出來當提示詞」的指令內容 (.md)
+│   │   ├── AI_Assistant.md  Agent_Workflow.md  Architecture.md  BugFix.md
+│   │   ├── CodeReview.md  PR.md  Security.md  git_workfkow.md
+│   │   └── memorize.md  release.md  rules.md  system.md  task.md
+│   ├── components/.cli_history     # CLI 輸入歷史
+│   └── install/                    # install.msi、install_check.exe、install_check.py (環境檢查)
+├── baisc/                          # Python 基礎學習練習 (ch1 / ch2 / ch9/temp)
+├── check_GUI/check_errors_gui.py   # 錯誤檢查 GUI
+├── data/                           # 訓練資料
+│   ├── pairs.json  code_pairs.json  technical_pairs.json  schmitt_trigger_pairs.json
+│   ├── pairs_*_draft.json          # 草稿資料 (context / emotion / negation_contrast)
+│   ├── pairs_imported_train/val.json  character*.json  auto_learn_candidates.json
+│   ├── corpus_*.txt                # 語料 (code_fullstack / code_html_css / zh_starter)
+│   ├── mental.csv  mental.xlsx     # 情緒資料
+│   └── dataset/{train,val}/class_a~d/   # 影像分類資料 (共 2400 張，不列)
+├── install/install.ps1             # 安裝腳本
+├── lib/                            # 前端殼（GUI / CLI / 影像）
+│   ├── main.py                     # 桌面 GUI 入口 (python -m lib.main)
+│   ├── GUI.py  img.py  img_analyize.py  AI_formula.py  basic.py
+│   ├── NVIDIA.py  nvidia_api.py    # /model nvidia 用 (Rule 06 例外)
+│   ├── faces_encoding.dat  logits, temperature and softmax.py
+│   ├── test_NVIDIA.py  test_RAG.py  test_img.py
+│   ├── components/                 # GUI / CLI 元件
+│   │   ├── cli.py  command.py  conversation.py  gui.py  function.py
+│   │   ├── camera.py  character_browser.py  markdown_view.py  schemdraw.py
+│   │   ├── memory_store.py  conversation_store.py  session_store.py
+│   │   ├── project_init.py  pcb_inspection.py  see_image.py
+│   │   ├── test_*.py               # 對應上列各模組的測試
+│   │   └── prompt/                 # prompt.py  prompt_traits.py  prompt_voice.py
+│   ├── CVZone/                     # hand_track.py  pose.py
+│   ├── RAG/                        # RAG.py  RAG_ex.py  README.md
+│   ├── model/modules.py
+│   ├── yolo/Instant Image Reconginizion.py
+│   └── opencv2/                    # check_mouth  dnn  image  img_convert  img_to_gray  img_write  簽到 (.py) + 範例圖片
+├── machine_migration/              # 換機備份 (MIGRATION_MANIFEST.md、checksums_sha256.txt、git_info.txt、requirements_freeze.txt)
+├── materials_recongizion/          # 電子元件辨識 (capacitor.py、resistor.py、main.py + test_*)
+├── memory/                         # memory.json (/memory 指令)、usage.json
+├── output/                         # 輸出 (三星ring2新聞消息.md、Music-Player/front/action.md)
+├── shape-vision/                   # 獨立子專案：古典影像形狀辨識
+│   ├── main.py  README.md  requirements.txt
+│   ├── shape_vision/               # __init__  camera  gui  pipeline
+│   └── tests/test_pipeline.py
+├── tranning/                       # sinco 模型訓練
+│   ├── chats.py                    # seq2seq 聊天/程式碼模型 + smart_reply()
+│   ├── transformer_chat.py  character_model.py  reward_model.py  embedding_model.py
+│   ├── train_gui.py  train_utils.py  train_grpo.py  prompt_gui.py  bpe_tokenizer.py
+│   ├── tools.py  auto_learn.py  typo_augment.py  agent_workflow.py  terminal_exec.py
+│   ├── build_corpus.py  build_code_corpus.py  code_retrieval.py  code_snippet_import.py
+│   ├── dataset_import.py  data_split.py  filter_manifest.py  package_checkpoint.py
+│   ├── pcb_dataset_prep.py  kicad_dataset_convert.py  bayesian_utils.py
+│   ├── CNN.py  OCR.py  RNN.py  RNN.md  image_analysis.py  image_classifier_bnn.py  road_sign_train.py
+│   ├── cv_inference_check.py  inference_check.py
+│   ├── speech_to_text.py  voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py
+│   ├── download_commonvoice.py  diagnose_stt.py
+│   ├── schmitt_trigger_train.py  circuit_diagram_train.py  circuit_kicad_to_schemdraw.py
+│   ├── circuit_rule_check.py  circuit_schemdraw_render.py
+│   ├── calculus_generator.py  calculus_solver.py  logic_reasoning_generator.py  word_problem_generator.py
+│   ├── kernel_method.py  machine_learning.py  neural_network.py
+│   ├── data.csv  sft_agent_data.jsonl  kernel_svm_model.pkl  linear_regression_model.pkl
+│   ├── gpt_finetune_runs_log.txt  image_classifier_initial_run.log(.err)
+│   ├── test_*.py                   # 每支訓練腳本對應的測試
+│   ├── chat_runs/  code_runs/      # sinco 兩顆 checkpoint (config/history/vocab/encoder.pt/decoder.pt/progress.json)
+│   ├── characters/                 # 周柯宇.json、character_chat_runs/、character_runs/
+│   ├── MentalHealth/               # action.py  Overfitting.py  build_mental_health_data.py  emotion_runs/ ...
+│   ├── image_classifier_runs/  schmitt_chat_runs/  schmitt_pretrain_runs/   # 各模型 checkpoint
+│   ├── imagegen/                   # draw.py  test_draw.py  draw_runs/  demo_images/ (56 張，不列)
+│   ├── data/                       # English.md、Quartus 教學、microcontroller_code_gen.py、reward_pairs.jsonl、schmitt_trigger_*
+│   └── math/martix.py
+├── typings/                        # js.pyi  pyscript.pyi  pyodide/{__init__,ffi}.pyi
+├── web/
+│   ├── backend/                    # FastAPI：app.py  detector.py  *_store.py  requirements.txt  .env  tests/
+│   ├── frontend/src/components/    # 靜態 demo 頁 (index.html  script.js  style.css  python.py  google-auth-init.js)
+│   ├── admin/frontend/             # 管理頁 (package.json  script.js  視覺電路圖.py  data/basic_data.sql  src/components/*)
+│   └── Dockerfile  firebase.json  render.yaml  .dockerignore  .gitignore
+├── 猜拳/                           # main.py  test_main.py  models/{labels.txt,model.tflite}
+├── CLAUDE.md  README.MD  ErrorLog.md  to_do_list.md  UserPersonality.md   # 規則與紀錄
+├── yolo11n.pt  yolo26n.pt  face_landmarker.task  pose_landmarker.task     # 預訓練權重
+├── example_text_generation.py  package.json  pyrightconfig.json  前端部屬scp.md
+└── 人工智慧模型-Sinco研發報告.docx  result.png  torch_install.log  .csv
+```

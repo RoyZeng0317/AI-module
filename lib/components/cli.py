@@ -121,7 +121,7 @@ def _character_names() -> list[str]:
 
 
 _BUILTIN_SLASH_COMMANDS = {
-    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations",
+    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "see",
 }
 
 
@@ -201,6 +201,8 @@ def print_help(state: dict):
     lines.append("<路徑>      讀取檔案內容並送給模型\n")
     lines.append("  /preview ", style="bold")
     lines.append("<路徑>   直接把檔案當 markdown 渲染出來看，不會送進模型\n")
+    lines.append("  /see ", style="bold")
+    lines.append("<圖片>      YOLO 偵測圖片內容並回報（不送進模型）\n")
     lines.append("  /model ", style="bold")
     lines.append("<模式>    切換 auto/sinco/code/nvidia（不帶模式＝查看目前模式）\n")
     lines.append("  /character ", style="bold")
@@ -549,6 +551,10 @@ def process_input(text: str, state: dict) -> bool:
         return True
     if cmd == "preview":
         run_preview(arg)
+        return True
+    if cmd == "see":
+        from lib.components.see_image import see_image
+        console.print(escape(see_image(arg)))
         return True
     if cmd == "character":
         switch_character(arg, state)

@@ -457,6 +457,10 @@ def _run_local_command(message: str) -> tuple[str, str] | None:
     if name == "resume":
         return "reply", _run_resume_command(arg)
 
+    if name == "see":
+        from lib.components.see_image import see_image
+        return "reply", see_image(arg)
+
     if name == "open":
         if not arg:
             return "reply", "用法：/open <伺服器上的檔案路徑>"
