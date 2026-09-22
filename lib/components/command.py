@@ -36,7 +36,7 @@ from lib.components.session_store import (
 # .md 指令定義檔跟這支程式檔不是同一個資料夾：這支在 app/components/，
 # 指令檔在旁邊的 app/command/ 底下
 COMMAND_DIR = Path(__file__).resolve().parent.parent / "command"
-BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume", "chat", "conversations"}
+BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume", "chat", "conversations", "see"}
 COMMANDS = sorted(BUILTIN_COMMANDS | {p.stem for p in COMMAND_DIR.glob("*.md")})
 
 # @ 檔案附加：預設候選清單以整個專案資料夾為根，打相對路徑、即使打出 "../"
@@ -231,6 +231,9 @@ class CommandPalette:
         if name == "conversations":
             self._run_conversations(arg)
             return
+        if name == "see":
+            self._run_see(arg)
+            return
 
         path = COMMAND_DIR / f"{name}.md"
         if not path.exists():
@@ -338,6 +341,13 @@ class CommandPalette:
             return
         path = write_claude_md(root)
         self._system_message(f"已產生/更新：{path}")
+
+    # /see <圖片路徑>：YOLO 偵測後回報（見 see_image.py）。模型載入較慢，放背景執行緒避免卡住 Tk。
+    def _run_see(self, arg: str):
+        import threading
+        from lib.components.see_image import see_image
+        self._system_message("分析圖片中…")
+        threading.Thread(target=lambda: self.windows.after(0, self._system_message, see_image(arg)), daemon=True).start()
 
     # /character：開啟獨立的角色卡瀏覽器視窗（需求 #02：不是 home_screen.py
     # 這個 GUI 本身），選好角色後回呼切換 self.conversation 的 persona。

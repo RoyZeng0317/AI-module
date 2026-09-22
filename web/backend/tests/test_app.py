@@ -232,3 +232,10 @@ def test_detect_ws_endpoint_reports_bad_frame_without_closing():
         data = ws.receive_json()
         assert data["error"] == "could not decode image"
         assert data["detections"] == []
+
+
+def test_local_command_see_usage_and_missing(tmp_path):
+    from app import _run_local_command
+    assert _run_local_command("/see") == ("reply", "用法：/see <圖片路徑>")
+    kind, text = _run_local_command(f"/see {tmp_path / 'nope.png'}")
+    assert kind == "reply" and "找不到檔案" in text
