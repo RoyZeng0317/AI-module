@@ -15,6 +15,12 @@ Only one job runs at a time — a single RTX 4060 8GB can't usefully train two
 models at once anyway (Rule 06), so the whole app shares one subprocess slot,
 one log console, and one Stop button across every tab.
 
+The "總控台" tab shares that same slot for `chats.py --chat` inference test
+runs (temperature is adjustable there instead of only via a hand-typed
+terminal command), and separately polls any checkpoint folder's
+history.json to plot its per-epoch loss curve(s) — no torch import needed
+for that, it just reads the JSON train() already writes every epoch.
+
 Caveat surfaced in the UI itself: killing a running job does NOT save a
 checkpoint. best_model.pt / encoder.pt+decoder.pt are only written once the
 training loop finishes on its own (full epoch count or early stopping) —
@@ -24,6 +30,7 @@ one you want to keep.
 Run: python train_gui.py
 """
 
+import json
 import queue
 import re
 import subprocess
@@ -33,6 +40,9 @@ import tkinter as tk
 from dataclasses import dataclass
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 TRANNING_DIR = Path(__file__).resolve().parent
 PYTHON = sys.executable
@@ -385,6 +395,13 @@ CHAT_FIELDS = [
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
 ]
 
+CHAT_TEST_FIELDS = [
+    Field("out_dir", "Checkpoint 資料夾 (chat_runs 或 code_runs)", "dir", "--out-dir",
+          required=True, default="chat_runs"),
+    Field("temperature", "Temperature (0=貪婪解碼固定答案，越大回覆越隨機發散)", "float",
+          "--temperature", default=0.0),
+]
+
 CHARACTER_FIELDS = [
     Field("train_manifest", "訓練 manifest (JSON)", "file", "--train-manifest",
           required=True, filetypes=JSON_FT),
@@ -516,6 +533,7 @@ class TrainGUI:
         notebook = ttk.Notebook(root)
         notebook.pack(side="top", fill="both", expand=True, padx=10, pady=(10, 6))
 
+        self._build_console_tab(notebook)
         self._build_road_sign_tab(notebook)
         self._build_image_bnn_tab(notebook)
         self._build_ocr_tab(notebook)
@@ -530,6 +548,7 @@ class TrainGUI:
         self._build_log_console()
 
         self.root.after(80, self._poll_log)
+        self.root.after(1000, self._refresh_history_plot)
 
     # -- tabs ----------------------------------------------------------
 
@@ -539,6 +558,106 @@ class TrainGUI:
         tk.Label(outer, text=subtitle, bg=PANEL_BG, fg=MUTED_FG, anchor="w",
                   wraplength=820, justify="left").pack(fill="x", padx=10, pady=(10, 4))
         return outer
+
+    def _build_console_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "總控台",
+            "訓練參數/推論參數與結果放同一個地方看，不用再手動打終端機指令。"
+            "上半部監看任一個 checkpoint 資料夾的 history.json，畫出逐 epoch 的 loss 曲線"
+            "（訓練進行中每個 epoch 都會更新，訓練完的舊 checkpoint 打開一樣看得到最終曲線）；"
+            "下半部啟動 chats.py --chat 做推論測試，temperature 調完直接送訊息看效果。",
+        )
+
+        hist_frame = tk.LabelFrame(outer, text=" Loss 曲線（history.json） ", bg=PANEL_BG, fg=FG, bd=1)
+        hist_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        picker = tk.Frame(hist_frame, bg=PANEL_BG)
+        picker.pack(fill="x", padx=10, pady=(6, 4))
+        tk.Label(picker, text="Checkpoint 資料夾：", bg=PANEL_BG, fg=FG).pack(side="left")
+        self.history_dir_var = tk.StringVar(value="chat_runs")
+        tk.Entry(picker, textvariable=self.history_dir_var, bg=FIELD_BG, fg=FG,
+                  insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True, padx=(6, 6))
+        ttk.Button(picker, text="瀏覽…", command=lambda: _browse_dir(self.history_dir_var)).pack(side="left")
+
+        fig = Figure(figsize=(6, 3), dpi=100, facecolor=PANEL_BG)
+        self.history_ax = fig.add_subplot(111, facecolor=FIELD_BG)
+        self.history_canvas = FigureCanvasTkAgg(fig, master=hist_frame)
+        self.history_canvas.get_tk_widget().pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        self._style_history_axes()
+
+        chat_frame = tk.LabelFrame(outer, text=" 推論測試（chats.py --chat，temperature 等） ",
+                                    bg=PANEL_BG, fg=FG, bd=1)
+        chat_frame.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(chat_frame, CHAT_TEST_FIELDS)
+        start_btn = ttk.Button(chat_frame, text="啟動聊天測試", command=self._start_chat_test)
+        start_btn.grid(row=99, column=0, columnspan=3, pady=(4, 6))
+        self.start_buttons.append(start_btn)
+
+        send_row = tk.Frame(chat_frame, bg=PANEL_BG)
+        send_row.grid(row=100, column=0, columnspan=3, sticky="ew", padx=10, pady=(0, 10))
+        send_row.columnconfigure(0, weight=1)
+        self.chat_input_var = tk.StringVar()
+        entry = tk.Entry(send_row, textvariable=self.chat_input_var, bg=FIELD_BG, fg=FG,
+                          insertbackground=FG, relief="flat")
+        entry.grid(row=0, column=0, sticky="ew", padx=(0, 6))
+        entry.bind("<Return>", lambda _e: self._send_chat_message())
+        ttk.Button(send_row, text="傳送", command=self._send_chat_message).grid(row=0, column=1)
+
+    def _style_history_axes(self):
+        self.history_ax.tick_params(colors=FG)
+        self.history_ax.set_xlabel("epoch", color=FG)
+        self.history_ax.set_ylabel("value", color=FG)
+        for spine in self.history_ax.spines.values():
+            spine.set_color(MUTED_FG)
+
+    def _refresh_history_plot(self):
+        dir_str = self.history_dir_var.get().strip() if hasattr(self, "history_dir_var") else ""
+        if dir_str:
+            hist_dir = Path(dir_str)
+            if not hist_dir.is_absolute():
+                hist_dir = TRANNING_DIR / hist_dir
+            hist_path = hist_dir / "history.json"
+            if hist_path.exists():
+                try:
+                    history = json.loads(hist_path.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    history = None
+                if history:
+                    self._plot_history(history)
+        self.root.after(1000, self._refresh_history_plot)
+
+    def _plot_history(self, history: list[dict]):
+        """畫出 history.json 裡除了 epoch 以外的每個數值欄位（loss / train_loss /
+        val_loss / train_acc / val_acc……各腳本欄位名稱不同，通用畫全部）。"""
+        epochs = [h.get("epoch") for h in history]
+        keys = [k for k in history[0] if k != "epoch"]
+        self.history_ax.clear()
+        for k in keys:
+            ys = [h.get(k) for h in history]
+            if all(isinstance(y, (int, float)) for y in ys):
+                self.history_ax.plot(epochs, ys, label=k)
+        self._style_history_axes()
+        if keys:
+            self.history_ax.legend(loc="upper right", fontsize=8)
+        self.history_canvas.draw_idle()
+
+    def _start_chat_test(self):
+        values = collect_values(CHAT_TEST_FIELDS)
+        if values is None:
+            return
+        self._launch("聊天測試", ["chats.py", "--chat"] + build_argv(CHAT_TEST_FIELDS, values))
+
+    def _send_chat_message(self):
+        text = self.chat_input_var.get().strip()
+        if not text:
+            return
+        if self.proc is None or self.proc.poll() is not None or self.proc.stdin is None:
+            messagebox.showwarning("尚未啟動", "請先按「啟動聊天測試」")
+            return
+        self._append_log(f"You: {text}\n")
+        self.proc.stdin.write(text + "\n")
+        self.proc.stdin.flush()
+        self.chat_input_var.set("")
 
     def _build_road_sign_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
@@ -1020,7 +1139,8 @@ class TrainGUI:
         self._set_running_ui(True)
 
         self.proc = subprocess.Popen(
-            command, cwd=str(TRANNING_DIR), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            command, cwd=str(TRANNING_DIR), stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, bufsize=1, encoding="utf-8", errors="replace",
         )
         threading.Thread(target=self._reader, args=(self.proc,), daemon=True).start()
@@ -1076,7 +1196,7 @@ class TrainGUI:
         self.status_var = tk.StringVar(value="閒置")
         tk.Label(bar, textvariable=self.status_var, bg=BG, fg=FG, anchor="w").pack(side="left")
 
-        self.stop_btn = tk.Button(bar, text="停止訓練", bg=STOP_RED, fg="white", relief="flat",
+        self.stop_btn = tk.Button(bar, text="停止工作", bg=STOP_RED, fg="white", relief="flat",
                                     state="disabled", command=self.stop_training)
         self.stop_btn.pack(side="right", padx=(6, 0))
         ttk.Button(bar, text="清除紀錄", command=self._clear_log).pack(side="right")

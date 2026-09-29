@@ -147,3 +147,21 @@ to_do_list.md #27。
 **修正（2026-09-21）**：`imshow` 移進迴圈並用 `waitKey(1)`，按 q／ESC 離開；縮排修正；補 `release()`；模型路徑改為相對腳本所在的 `lib/opencv2/models/`，缺檔時明確丟 `FileNotFoundError`；類別名稱改 `splitlines()`，索引越界不再 IndexError；移除每幀 `print`。
 
 **尚未驗證**：`lib/opencv2/models/` 內沒有 `MobileNetSSD_deploy.caffemodel`／`.prototxt.txt`／`MobileNetSSD_labels.txt`，需使用者自行放入後實機測試。副檔名 `protext`→`prototxt` 是推測，若使用者檔案本來就叫 `protext` 需改回。MobileNetSSD 為現成預訓練模型，與 Rule 06 有衝突，是否保留待使用者決定。
+
+## 35. sinco 一般聊天模型過擬合追蹤：finetune 已早停、pretrain v2 中途停在 17/25 epoch 無行程可查
+
+**回報**：2026-09-29，`Agent/ErrorLog/2026-09-29.md` 記錄使用者要求對「一般聊天大量口吃／過擬合」做深度研究。這題本身已經是 to_do_list.md #42／#43 正在追的問題，本次只做現況診斷（`AskUserQuestion` 問過使用者，這輪範圍限定聊天模型、只診斷不訓練）。
+
+**確認**：
+1. `tranning/gpt_chat_runs_v2/history.json`（#42 的 finetune，`patience=10`）：`val_loss` 在 epoch 7 見底（3.8526），之後緩慢爬升到 epoch 17 的 3.9823，`train_loss` 同期從 2.447 一路壓到 1.112——是教科書等級的過擬合曲線；紀錄停在 epoch 17（7+10=17，`patience` 剛好打滿），檔案最後寫入時間 2026-09-22，判斷已依 early stop 自然結束，不是被中斷。
+2. `tranning/gpt_pretrain_runs_v2/history.json`（#43-5，已套用「語料含 `pairs.json` 口語內容」的 BPE 修法）：`val_loss` 在 epoch 11 見底（4.4209），epoch 17 回升到 4.4808，`train_loss` 同期仍持續下降（3.52→3.01），同一種過擬合訊號在 pretrain 階段也已出現。
+3. `history.json`／`model.pt` 最後寫入 2026-09-28 21:35:11，`checkpoint/` 底下最新一筆是 epoch 15（21:30:46）；`tasklist`／`Get-CimInstance Win32_Process` 查無任何跟本專案相關的 python 行程（僅兩個 `AutoPush\lib\GUI.py`，無關）。代表這個原本規劃跑 25 epoch 的 pretrain，在 epoch 17 之後、離目標還差 8 epoch 時就沒有再繼續，且發現當下（2026-09-29）已經超過 24 小時沒有動靜——研判是行程中途被中止（跟 ErrorLog #32 同一種「訓練行程跟編輯器/終端機一起被關掉」模式），不是正常跑完。好消息是這次有 `checkpoint_every=5` 安全網（#42 補的功能），只丟失 epoch 15→17 這 2 epoch 的進度，能從 `checkpoint/` 續跑，不用整個重來。
+
+**根因**：跟 to_do_list.md #43 第 301 行已下的診斷一致——8 層／384 維／約 1746 萬參數的 Transformer，相對 `data/pairs.json` 目前 742 筆的資料量仍然偏大，不管是 finetune 還是（這次已擴充語料的）pretrain 階段，都在總 epoch 數還沒跑完前 `val_loss` 就見底反彈。目前的診斷是資料量仍是主要瓶頸，架構是否要縮小，依 #43 既定順序（資料量→斷詞→embedding→架構）要等前面步驟都試過才輪到。
+
+**尚未修正**。這次只診斷、不訓練（使用者本輪明確選擇）。待使用者決定的選項：
+- pretrain v2 要不要從 `checkpoint/`（epoch 15）續跑到 25 epoch，還是就此用 epoch 11 附近的權重當 pretrain 基底往下走 finetune；
+- finetune（`gpt_chat_runs_v2`）已經因為 `patience` 自然早停，其 val_loss 最低點（epoch 7，3.8526）本身也還沒優於舊版 `gpt_chat_runs` 的最終數字（ErrorLog #30：`val_loss=2.156`），需要先用同一批測試句實測比較才能判斷是否真的優於舊版，不能只看數字；
+- 是否要現在就啟動任何一段訓練，依 `feedback_no_unattended_long_training` 規則，個別詢問。
+
+**相關**：to_do_list.md #42／#43、ErrorLog #30／#32／#33、memory `feedback_no_unattended_long_training`、`feedback_training_checkpoint_and_detach`。
