@@ -36,6 +36,17 @@ tranning/speech_runs/
 tranning/speech_data/
 tranning/Tranning/
 
+# 大型訓練 checkpoint 權重檔（可重新訓練、單檔近 70MB，不進版控；history.json/config.json 等中繼資料仍保留追蹤）
+tranning/gpt_chat_runs_v2/model.pt
+tranning/gpt_chat_runs_v2/checkpoint/model.pt
+tranning/gpt_chat_runs_v3/model.pt
+tranning/gpt_chat_runs_v3/checkpoint/model.pt
+tranning/gpt_pretrain_runs_v2/model.pt
+tranning/gpt_pretrain_runs_v2/checkpoint/model.pt
+
+# PCB 原始資料集封存檔（可重新下載，體積達數 GB，不進版控）
+data/pcb/archive/
+
 # nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
 /nova.exe
 /build/pyinstaller/
