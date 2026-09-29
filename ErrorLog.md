@@ -165,3 +165,26 @@ to_do_list.md #27。
 - 是否要現在就啟動任何一段訓練，依 `feedback_no_unattended_long_training` 規則，個別詢問。
 
 **相關**：to_do_list.md #42／#43、ErrorLog #30／#32／#33、memory `feedback_no_unattended_long_training`、`feedback_training_checkpoint_and_detach`。
+
+## 36. `git push` 一直失敗：`RPC failed; HTTP 500` / `unexpected disconnect while reading sideband packet`
+
+**回報**：2026-09-29，使用者要求把本地領先 origin/main 的 commit push 上 GitHub，push 直接失敗。
+
+**根因**：待推送的 3 個 commit（`模型訓練PCB`、`資料訓練擴增與報告編寫已知錯誤`、`股票預測數據資料集`）裡，前兩個一次性新增了約 **7.3GB** 的內容：
+- `data/pcb/archive/PKU-Market-PCB(...)` 原始資料集（見 `project_pcb_defect_dataset_found` 記憶），數千張圖片，每張約 5-6MB；
+- 6 份幾乎完全相同的 `model.pt` checkpoint（`gpt_chat_runs_v2`、`gpt_chat_runs_v3`、`gpt_pretrain_runs_v2` 各自的頂層與 `checkpoint/` 子目錄下各一份，每份約 72MB）。
+
+`.gitignore` 本來就有排除舊版 `tranning/gpt_chat_runs/`、`tranning/gpt_pretrain_runs/` 整個目錄（可重新產生/太大），但改版後新增的 `_v2`／`_v3` 目錄名稱沒有同步補上規則，才會被意外整包 commit 進去。單次 push 7GB+ 遠超過 GitHub HTTPS 服務穩定處理的範圍，才會回 HTTP 500。
+
+**修正過程**（依使用者要求：最多 5 次修正）：
+1. `git config http.postBuffer 1048576000` + `http.version HTTP/1.1` 後重試 → 失敗，仍是同樣錯誤。
+2. 單純重試（排除暫時性問題）→ 失敗，確認不是網路瞬斷。
+3. 用 `git diff-tree`／`git cat-file --batch-check` 精確定位是哪個 commit、哪些檔案造成 7.3GB，向使用者說明兩條可行路線（從 commit 中移除大檔案 / 改用 Git LFS / 先不處理只記錄），使用者選擇「從尚未推送的 commit 中移除大檔案」。
+4. 先建立備份分支 `backup-before-cleanup-20260929`（指向重寫前的原始 3 個 commit），再用 `git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch ...' -- origin/main..HEAD` 只重寫這 3 個本地尚未推送的 commit，把 `data/pcb/archive` 與 6 份 `model.pt` 從歷史中移除（origin 上沒有這些 commit，重寫不影響任何共享歷史）。
+   - **副作用**：`filter-branch` 重寫後會用新 HEAD 覆蓋工作目錄，導致這些大檔案連硬碟上的實體檔案都被砍掉，不只是取消追蹤——不是預期行為，發現後立刻用 `git checkout backup-before-cleanup-20260929 -- <paths>` 把檔案救回硬碟（再 `git reset` 取消暫存，維持未追蹤狀態），沒有實際遺失資料，但這是這次操作裡最大的風險點，下次做同類 `filter-branch` 清理前應該先預期這個副作用。
+   - 在 `.gitignore` 補上 6 個 `model.pt` 精確路徑與 `data/pcb/archive/` 整個目錄，避免以後又不小心重新加回版控。
+5. 重新 `git push origin main` → 待推送內容降到約 18MB，push 成功（`e5fa380a..73071297`）。
+
+**已修正**。備份分支 `backup-before-cleanup-20260929` 目前仍保留在本地（未刪除），供之後需要回頭核對原始歷史時使用；它只存在本機，不會被 push 上 GitHub。
+
+**相關**：`project_pcb_defect_dataset_found`（PCB 資料集來源）、`project_transformer_chat_retrain_v2` / `project_nlp_strengthen_plan`（`gpt_chat_runs_v2`／`gpt_pretrain_runs_v2` 這兩顆 checkpoint 的訓練脈絡）。
