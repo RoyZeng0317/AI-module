@@ -326,3 +326,11 @@
     `python transformer_chat.py finetune --data ../data/pairs.json --pretrain-dir gpt_pretrain_runs_v2/checkpoint --out-dir gpt_chat_runs_v4 --epochs 60 --dropout 0.2 --weight-decay 0.05 --checkpoint-every 5 --patience 10 --gpu-mem-fraction 0.85 --lm-corpus ../data/corpus_pretrain_v2.txt`
     跑完要（a）比較 v3（val_loss 最低 4.138）與 v4 的 val_loss 曲線是否不再早早反彈；（b）用同一批測試句（what are you doing now／ok, got it.／我不開心）實測回覆，確認不是只有 loss 數字變好；（c）你確認滿意後才把產線從 `gpt_chat_runs` 切過去。若 v4 反而欠擬合（train_loss 也降不下來），先把 `--freeze-layers` 從 4 降到 2 再試。
 
+45. [] 人物角色模擬要更像真人、要能依使用者描述的性格對話——2026-09-30：先查出真的 bug（ErrorLog #37：9/10 換成 Transformer 後選角色根本沒生效）。新增 `tranning/persona_chat.py`（不用重新訓練、不呼叫外部 API）：
+    - **範例優先**：角色卡 `prompt`（你寫的 `{"問": "答" | ["答1","答2"] | ""}`，空字串草稿自動略過）、`examples`、以及 `data/character.json`（只有內容提到這個角色名字才算它的）→ 字面相似度比對（先拿掉名字/暱稱，「柯宇在幹嘛呢?」≈「你在幹嘛」），命中就直接回你寫的原句。
+    - **依性格挑選＋改寫**：沒命中時 sinco 產生 6 個候選，依性格用字打分，扣分 AI/sinco 身分句與過長回覆，挑最高分那個再改寫語氣（`humanize()`）。
+    - **性格來源**：卡片 `traits` 分數 + 描述文字的性格關鍵字（18 種性格、40 多個同義說法，例如「陽光」→活潑、「壞學生」→俏皮、「話少/冷漠」→高冷）。
+    - **新增角色只要一句描述**：`python tranning/persona_chat.py new --name 小晴 --description "個性活潑開朗，講話很直，但很體貼" --call-user 你`；卡片可選欄位 `aliases`（暱稱）、`call_user`（角色怎麼稱呼你）。
+    - `/character` 瀏覽器的提示改成「目前有幾組你寫的範例，越多越像本人」（不再要求角色專屬 checkpoint）。
+    **限制（老實說）**：沒命中範例時，內容仍來自 sinco 一般模型（742 筆對話），這層只能改語氣、用字、自稱，沒辦法讓模型真的「理解」任意描述後自己推演台詞。**最有效的加強方式是多寫角色範例**（建議每個角色 50 組以上，涵蓋問候/日常/情緒/撒嬌/拒絕等情境）。之後資料夠了，可以再做「角色描述 + 對話」一起 finetune 的角色條件模型。
+
