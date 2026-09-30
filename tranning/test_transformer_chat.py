@@ -162,3 +162,78 @@ def test_resolve_device_falls_back_to_cpu_when_no_accelerator(monkeypatch):
     if hasattr(torch, "xpu"):
         monkeypatch.setattr(torch.xpu, "is_available", lambda: False)
     assert _resolve_device(None) == "cpu"
+
+
+def _pretrain_and_write_pairs(tmp_path):
+    corpus_path = tmp_path / "corpus.txt"
+    corpus_path.write_text(_make_synthetic_corpus(), encoding="utf-8")
+    pretrain_dir = tmp_path / "pretrain_runs"
+    pretrain(corpus_path=corpus_path, out_dir=pretrain_dir, epochs=1, val_split=0.2,
+              patience=5, **_TINY_MODEL_KWARGS)
+    data_path = tmp_path / "pairs.json"
+    data_path.write_text(json.dumps(_make_synthetic_pairs()), encoding="utf-8")
+    return corpus_path, pretrain_dir, data_path
+
+
+def test_finetune_freezing_keeps_frozen_weights_identical_to_pretrain(tmp_path):
+    """freeze_embeddings + freeze_layers: the frozen part of model.pt must
+    come out byte-identical to the pretrain checkpoint, while the unfrozen
+    top block still gets trained."""
+    corpus_path, pretrain_dir, data_path = _pretrain_and_write_pairs(tmp_path)
+    finetune_dir = tmp_path / "finetune_runs"
+
+    finetune(data_path=data_path, pretrain_dir=pretrain_dir, out_dir=finetune_dir,
+             epochs=2, batch_size=4, val_split=0.2, patience=5,
+             freeze_embeddings=True, freeze_layers=1)
+
+    before = torch.load(pretrain_dir / "model.pt", map_location="cpu")
+    after = torch.load(finetune_dir / "model.pt", map_location="cpu")
+    for key in before:
+        if key.startswith(("tok_emb.", "pos_emb.", "head.", "blocks.0.")):
+            assert torch.equal(before[key], after[key]), key
+    assert any(not torch.equal(before[k], after[k]) for k in before if k.startswith("blocks.1."))
+
+    config = json.loads((finetune_dir / "config.json").read_text(encoding="utf-8"))
+    assert config["finetune_regularization"]["freeze_layers"] == 1
+    assert reply("hello", out_dir=finetune_dir, max_new_tokens=5)
+
+
+def test_finetune_rejects_freeze_layers_beyond_model_depth(tmp_path):
+    corpus_path, pretrain_dir, data_path = _pretrain_and_write_pairs(tmp_path)
+    import pytest
+    with pytest.raises(ValueError):
+        finetune(data_path=data_path, pretrain_dir=pretrain_dir, out_dir=tmp_path / "ft",
+                 epochs=1, batch_size=4, freeze_layers=3)  # tiny model has n_layer=2
+
+
+def test_finetune_label_smoothing_typo_noise_and_rehearsal_run_end_to_end(tmp_path):
+    corpus_path, pretrain_dir, data_path = _pretrain_and_write_pairs(tmp_path)
+    finetune_dir = tmp_path / "finetune_runs"
+
+    model, tokenizer, history = finetune(
+        data_path=data_path, pretrain_dir=pretrain_dir, out_dir=finetune_dir,
+        epochs=2, batch_size=4, val_split=0.2, patience=5,
+        label_smoothing=0.1, typo_noise_prob=1.0, lm_corpus=corpus_path, lm_mix_ratio=0.5,
+    )
+
+    assert len(history) == 2
+    assert all(h["train_loss"] >= 0 and h["val_loss"] >= 0 for h in history)
+    assert model.label_smoothing == 0.1
+
+
+def test_label_smoothing_only_affects_training_mode_loss():
+    from transformer_chat import GPT
+    torch.manual_seed(0)
+    model = GPT(vocab_size=20, block_size=8, n_layer=1, n_embd=8, n_head=2, dropout=0.0)
+    x = torch.randint(4, 20, (2, 8))
+    y = torch.randint(4, 20, (2, 8))
+
+    model.eval()
+    _, plain = model(x, y)
+    model.label_smoothing = 0.2
+    _, eval_smoothed = model(x, y)
+    model.train()
+    _, train_smoothed = model(x, y)
+
+    assert torch.allclose(plain, eval_smoothed)
+    assert not torch.allclose(plain, train_smoothed)

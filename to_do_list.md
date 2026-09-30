@@ -314,3 +314,15 @@
     - [ ] 43-6 模型架構：43-1~43-5 跑完後，若仍有明顯欠擬合（而非過擬合）現象才考慮加大 `n_layer`/`n_embd`/`block_size`，否則維持現有架構不動
 
     **這次先列出待辦清單，尚未開始執行任何一步，等你確認後才動工。**
+
+44. [] 處理 sinco 一般聊天模型（`transformer_chat.py` finetune）的過擬合——2026-09-30：依 ErrorLog #35 的診斷（v2 val_loss 第 7 epoch 見底、v3 第 4 epoch 見底後回升，train_loss 持續下降；約 1746 萬參數全部可訓練、只有約 670 筆訓練 pairs，#42 已經把 dropout/weight_decay 調高過仍擋不住），這次**不是再調大 dropout/weight_decay**，而是在 `finetune()` 補四個從不同方向壓過擬合的機制（函式參數預設全關，既有呼叫與測試行為不變；CLI 預設開前三項）：
+    - `--freeze-embeddings`（CLI 預設開）＋`--freeze-layers N`（CLI 預設 4）：token/position embedding（透過 weight tying 同時也是輸出層，約 310 萬參數）與底下 N 層 Transformer block 維持 pretrain 權重不動，只微調上面幾層——底層學到的是 449 萬字語料的通用語法/用詞統計，讓 670 筆 pairs 去改寫它們正是記憶容量的主要來源。訓練開始會印出「可訓練參數 / 總參數」比例。
+    - `--label-smoothing`（CLI 預設 0.1）：只作用在訓練 loss，val_loss 仍是純 cross-entropy，數字能直接跟舊的 history.json 比較。
+    - `--typo-noise-prob`（CLI 預設 0.3）：跟 `chats.py` GRU 版 2026-09-08 同一套「只對 prompt 加錯字、每個 epoch 重抽」的資料擴增（用 `typo_augment.inject_typos()`），只套用在訓練集。
+    - `--lm-corpus` ＋ `--lm-mix-ratio`（預設關閉，要給 `--lm-corpus` 才開）：rehearsal——每個 epoch 額外混入「訓練 pairs 數量 × ratio」段隨機 pretrain 語料，讓 finetune 持續被拉回一般語言模型，不會一路漂成純背答案（也減少忘掉 pretrain 學到的東西）。
+    - 用到的正則化設定會一併寫進輸出 `config.json` 的 `finetune_regularization` 欄位（`_load_gpt()` 不讀這欄，只是紀錄這顆 checkpoint 怎麼訓練出來的）。
+    新增 4 項測試（凍結部分的權重跟 pretrain 完全相同、未凍結的最上層有被訓練到；`freeze_layers` 超過層數會報錯；label smoothing/錯字/rehearsal 一起開能跑完；label smoothing 只影響 train 模式 loss）。`pytest test_transformer_chat.py test_reward_model.py test_train_grpo.py` 24 項全過。
+    **尚未完成**：這次只改程式碼、沒有跑真實訓練（雲端環境沒有 GPU 也沒有 `model.pt`；依 `feedback_no_unattended_long_training` 規則也要先問過你才啟動）。建議指令（輸出到新資料夾 `gpt_chat_runs_v4`，不覆蓋既有 checkpoint）：
+    `python transformer_chat.py finetune --data ../data/pairs.json --pretrain-dir gpt_pretrain_runs_v2/checkpoint --out-dir gpt_chat_runs_v4 --epochs 60 --dropout 0.2 --weight-decay 0.05 --checkpoint-every 5 --patience 10 --gpu-mem-fraction 0.85 --lm-corpus ../data/corpus_pretrain_v2.txt`
+    跑完要（a）比較 v3（val_loss 最低 4.138）與 v4 的 val_loss 曲線是否不再早早反彈；（b）用同一批測試句（what are you doing now／ok, got it.／我不開心）實測回覆，確認不是只有 loss 數字變好；（c）你確認滿意後才把產線從 `gpt_chat_runs` 切過去。若 v4 反而欠擬合（train_loss 也降不下來），先把 `--freeze-layers` 從 4 降到 2 再試。
+

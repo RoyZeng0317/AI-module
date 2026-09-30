@@ -166,6 +166,8 @@ to_do_list.md #27。
 
 **相關**：to_do_list.md #42／#43、ErrorLog #30／#32／#33、memory `feedback_no_unattended_long_training`、`feedback_training_checkpoint_and_detach`。
 
+**2026-09-30 修正（程式碼部分）**：`transformer_chat.py` 的 `finetune()` 新增凍結 embedding/底層 block、label smoothing、prompt 錯字擴增、pretrain 語料 rehearsal 四個抗過擬合機制（CLI 預設開前三項），細節見 to_do_list.md #44。**真實訓練尚未執行**，效果待用 `gpt_chat_runs_v4` 實測驗證後才能標記為已修正。
+
 ## 36. `git push` 一直失敗：`RPC failed; HTTP 500` / `unexpected disconnect while reading sideband packet`
 
 **回報**：2026-09-29，使用者要求把本地領先 origin/main 的 commit push 上 GitHub，push 直接失敗。

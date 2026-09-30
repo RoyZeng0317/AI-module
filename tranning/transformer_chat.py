@@ -70,6 +70,39 @@ mechanism) are unchanged and still callable directly — they're just no
 longer smart_reply_traced()'s default path. sinco-code (CODE_OUT_DIR)
 still uses the GRU; this swap only covers general chat.
 
+2026-09-30 finetune overfitting fix (ErrorLog #35 / to_do_list.md #44): both
+v2 and v3 finetune runs hit their best val_loss within 4-7 epochs and then
+climbed while train_loss kept falling (v3: val 4.138 at epoch 4, train
+3.32 -> 1.59 by epoch 14) -- ~17M trainable parameters against ~670
+training pairs, and dropout 0.2 + weight_decay 0.05 (to_do #42) weren't
+enough. Raising those two further hurts the pretrained weights as much as it
+helps, so finetune() gained four independent knobs that attack the problem
+from different sides instead (all default OFF in the function signature so
+existing callers/tests are unchanged; the CLI turns the first three on by
+default):
+  - freeze_embeddings / freeze_layers: keep the token+position embeddings
+    (which are also the output head, via weight tying -- ~3.1M params) and
+    the bottom N Transformer blocks exactly as pretrain() left them, and only
+    fine-tune the top blocks. The lower layers hold the general grammar/
+    wording statistics learned from 4.5M characters of corpus; letting 670
+    pairs rewrite them is where most of the memorization capacity came from.
+  - label_smoothing: training loss only (val loss is always plain cross-
+    entropy so numbers stay comparable with older history.json files) --
+    stops the model from pushing reply-token probabilities to ~1.0 on
+    memorized pairs.
+  - typo_noise_prob: same prompt-only typo augmentation idea as chats.py's
+    GRU (2026-09-08), via typo_augment.inject_typos(), re-drawn every epoch
+    so the same pair never looks identical twice. Training split only.
+  - lm_corpus / lm_mix_ratio: "rehearsal" -- every epoch also mixes in
+    ratio x len(train pairs) random next-token chunks of the pretrain corpus,
+    so finetuning keeps being pulled back toward general language modelling
+    instead of drifting into pure pair memorization (also limits catastrophic
+    forgetting of what pretrain() taught). Off unless --lm-corpus is given.
+Honest caveat: these are standard small-data finetuning remedies, chosen
+from the v2/v3 loss curves; they were only smoke-tested on synthetic data
+here, a real run on the 4060 plus side-by-side reply comparison against
+gpt_chat_runs is still needed before switching production over.
+
 Usage:
     python transformer_chat.py pretrain --corpus path/to/corpus.txt --epochs 20
     python transformer_chat.py finetune --data ../data/pairs.json --epochs 50
@@ -88,6 +121,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
 from bpe_tokenizer import BPETokenizer, EOS, PAD, SEP
+from typo_augment import inject_typos
 
 DEFAULT_PRETRAIN_DIR = Path(__file__).resolve().parent / "gpt_pretrain_runs"
 DEFAULT_FINETUNE_DIR = Path(__file__).resolve().parent / "gpt_chat_runs"
@@ -220,6 +254,10 @@ class GPT(nn.Module):
         self.ln_f = nn.LayerNorm(n_embd)
         self.head = nn.Linear(n_embd, vocab_size, bias=False)
         self.head.weight = self.tok_emb.weight  # weight tying (standard GPT practice)
+        # training-only label smoothing (see module docstring 2026-09-30
+        # note); finetune() sets it, 0.0 keeps plain cross-entropy. Not a
+        # parameter, so it never ends up in model.pt / state_dict.
+        self.label_smoothing = 0.0
 
         self.apply(self._init_weights)
         # GPT-2-style scaled init on residual-branch output projections
@@ -270,7 +308,11 @@ class GPT(nn.Module):
             # first means the mean divides by the total valid-token count
             # across the whole batch, which is only zero if an entire batch
             # were nothing but padding — never true here.
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=PAD)
+            # label smoothing only while training: val loss stays plain
+            # cross-entropy so it remains comparable across runs.
+            smoothing = self.label_smoothing if self.training else 0.0
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1),
+                                   ignore_index=PAD, label_smoothing=smoothing)
         if return_hidden:
             # pre-head hidden state (B, T, n_embd), for reward_model.py to
             # attach a scalar head on top of instead of the vocab logits.
@@ -377,26 +419,76 @@ class ChatSFTDataset(Dataset):
     <pad>, extended here to also blank out the prompt span).
     """
 
-    def __init__(self, pairs: list[dict], tokenizer: BPETokenizer, block_size: int):
+    def __init__(self, pairs: list[dict], tokenizer: BPETokenizer, block_size: int,
+                 typo_prob: float = 0.0):
         self.block_size = block_size
+        self.tokenizer = tokenizer
+        # typo_prob: chance a prompt gets re-noised on each __getitem__ (so a
+        # different typo variant every epoch, same idea as chats.py's
+        # ChatPairsDataset); only ever set for the training split.
+        self.typo_prob = typo_prob
+        self.pairs = pairs
+        self.typo_char_pool = sorted({ch for p in pairs for ch in p["prompt"] if not ch.isspace()})
+        self._rng = random.Random()
         self.examples: list[tuple[list[int], int]] = []
         for pair in pairs:
-            prompt_ids = tokenizer.encode(pair["prompt"])
-            reply_ids = tokenizer.encode(pair["reply"])
-            seq = (prompt_ids + [SEP] + reply_ids + [EOS])[: block_size + 1]
-            prompt_len = min(len(prompt_ids) + 1, len(seq))  # +1 accounts for <sep>
-            self.examples.append((seq, prompt_len))
+            self.examples.append(self._build(pair["prompt"], self.tokenizer.encode(pair["reply"])))
+
+    def _build(self, prompt: str, reply_ids: list[int]) -> tuple[list[int], int]:
+        prompt_ids = self.tokenizer.encode(prompt)
+        seq = (prompt_ids + [SEP] + reply_ids + [EOS])[: self.block_size + 1]
+        prompt_len = min(len(prompt_ids) + 1, len(seq))  # +1 accounts for <sep>
+        return seq, prompt_len
 
     def __len__(self) -> int:
         return len(self.examples)
 
     def __getitem__(self, idx: int):
         seq, prompt_len = self.examples[idx]
+        if self.typo_prob > 0 and self.typo_char_pool and self._rng.random() < self.typo_prob:
+            pair = self.pairs[idx]
+            noisy = inject_typos(pair["prompt"], _TYPO_CHAR_RATE, self._rng, self.typo_char_pool)
+            seq, prompt_len = self._build(noisy, self.tokenizer.encode(pair["reply"]))
         seq = seq + [PAD] * (self.block_size + 1 - len(seq))
         x = torch.tensor(seq[:-1], dtype=torch.long)
         y = torch.tensor(seq[1:], dtype=torch.long)
         y[: max(prompt_len - 1, 0)] = PAD
         return x, y
+
+
+_TYPO_CHAR_RATE = 0.15  # 被選中的 prompt 每個字元的變動機率，跟 chats.py 同值
+
+
+class _RehearsalDataset(Dataset):
+    """`size` random pretrain-corpus chunks per epoch (idx is ignored, a new
+    random chunk is drawn every call) -- mixed into finetune()'s training set
+    via ConcatDataset when lm_corpus is given, see module docstring
+    2026-09-30 note. Same (x, y) shapes as ChatSFTDataset, since both pad to
+    block_size, so they batch together without a custom collate_fn.
+    """
+
+    def __init__(self, lm_dataset: LMChunkDataset, size: int):
+        self.lm_dataset = lm_dataset
+        self.size = size
+
+    def __len__(self) -> int:
+        return self.size
+
+    def __getitem__(self, idx: int):
+        return self.lm_dataset[random.randrange(len(self.lm_dataset))]
+
+
+def _freeze_for_finetune(model: GPT, freeze_embeddings: bool, freeze_layers: int) -> None:
+    """Turn off gradients for the embeddings (tok_emb is also the output
+    head through weight tying) and/or the bottom `freeze_layers` blocks."""
+    if freeze_layers < 0 or freeze_layers > len(model.blocks):
+        raise ValueError(f"freeze_layers must be between 0 and n_layer={len(model.blocks)}, got {freeze_layers}")
+    if freeze_embeddings:
+        for param in list(model.tok_emb.parameters()) + list(model.pos_emb.parameters()):
+            param.requires_grad = False
+    for block in model.blocks[:freeze_layers]:
+        for param in block.parameters():
+            param.requires_grad = False
 
 
 # --- shared training loop -----------------------------------------------
@@ -442,7 +534,7 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
             optimizer.zero_grad()
             _, loss = model(x, y)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], 1.0)
             optimizer.step()
             train_loss_sum += loss.item()
             train_batches += 1
@@ -565,7 +657,13 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
              lr: float = 1e-4, weight_decay: float = 0.01, dropout: float = 0.1,
              val_split: float = 0.1, patience: int = 8, val_data_path: Path | None = None,
              device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION,
-             checkpoint_every: int = 0):
+             checkpoint_every: int = 0, freeze_embeddings: bool = False, freeze_layers: int = 0,
+             label_smoothing: float = 0.0, typo_noise_prob: float = 0.0,
+             lm_corpus: Path | None = None, lm_mix_ratio: float = 0.5):
+    """Anti-overfitting knobs (freeze_embeddings/freeze_layers/
+    label_smoothing/typo_noise_prob/lm_corpus+lm_mix_ratio) all default
+    off here -- see the module docstring's 2026-09-30 note for what each
+    one does and why; the CLI enables the first four by default."""
     device = _resolve_device(device)
     _cap_gpu_memory(device, gpu_mem_fraction)
     pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
@@ -592,18 +690,37 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
     model = GPT(tokenizer.vocab_size, block_size, config["n_layer"], config["n_embd"],
                 config["n_head"], dropout).to(device)
     model.load_state_dict(torch.load(pretrain_dir / "model.pt", map_location=device))
+    model.label_smoothing = label_smoothing
+    _freeze_for_finetune(model, freeze_embeddings, freeze_layers)
+    trainable = [p for p in model.parameters() if p.requires_grad]
+    n_trainable = sum(p.numel() for p in trainable)
+    n_total = sum(p.numel() for p in model.parameters())
+    print(f"[finetune] trainable params: {n_trainable:,} / {n_total:,} "
+          f"({n_trainable / max(n_total, 1):.0%})", flush=True)
 
-    train_loader = DataLoader(ChatSFTDataset(train_pairs, tokenizer, block_size),
-                               batch_size=batch_size, shuffle=True)
+    train_dataset: Dataset = ChatSFTDataset(train_pairs, tokenizer, block_size, typo_prob=typo_noise_prob)
+    if lm_corpus is not None and lm_mix_ratio > 0:
+        lm_ids = tokenizer.encode(Path(lm_corpus).read_text(encoding="utf-8"))
+        rehearsal = _RehearsalDataset(LMChunkDataset(lm_ids, block_size),
+                                      max(1, int(len(train_dataset) * lm_mix_ratio)))
+        train_dataset = torch.utils.data.ConcatDataset([train_dataset, rehearsal])
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(ChatSFTDataset(val_pairs, tokenizer, block_size),
                              batch_size=batch_size, shuffle=False)
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = torch.optim.AdamW(trainable, lr=lr, weight_decay=weight_decay)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2)
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    saved_config = dict(config, dropout=dropout)
+    # extra "finetune_regularization" key is bookkeeping only (which knobs
+    # produced this checkpoint); _load_gpt() ignores keys it doesn't use.
+    saved_config = dict(config, dropout=dropout, finetune_regularization={
+        "freeze_embeddings": freeze_embeddings, "freeze_layers": freeze_layers,
+        "label_smoothing": label_smoothing, "typo_noise_prob": typo_noise_prob,
+        "lm_corpus": str(lm_corpus) if lm_corpus is not None else None,
+        "lm_mix_ratio": lm_mix_ratio if lm_corpus is not None else 0.0,
+    })
 
     def save_checkpoint(ckpt_model, ckpt_history):
         ckpt_dir = out_dir / "checkpoint"
@@ -756,6 +873,21 @@ def main():
     p_fin.add_argument("--checkpoint-every", type=int, default=0,
                         help="also save weights to <out-dir>/checkpoint/ every N epochs (0 = off); "
                              "resume an interrupted run with --pretrain-dir pointed at it")
+    # anti-overfitting defaults (2026-09-30, ErrorLog #35): on by default in
+    # the CLI; pass --no-freeze-embeddings / --freeze-layers 0 /
+    # --label-smoothing 0 / --typo-noise-prob 0 to get the old behaviour.
+    p_fin.add_argument("--freeze-embeddings", action=argparse.BooleanOptionalAction, default=True,
+                        help="keep token/position embeddings (= tied output head) frozen at pretrain values")
+    p_fin.add_argument("--freeze-layers", type=int, default=4,
+                        help="freeze the bottom N Transformer blocks; only the blocks above are fine-tuned")
+    p_fin.add_argument("--label-smoothing", type=float, default=0.1,
+                        help="label smoothing on the training loss only (val loss stays plain cross-entropy)")
+    p_fin.add_argument("--typo-noise-prob", type=float, default=0.3,
+                        help="chance each training prompt gets random typo noise, re-drawn every epoch")
+    p_fin.add_argument("--lm-corpus", type=Path, default=None,
+                        help="optional pretrain corpus .txt to mix in as rehearsal (off when omitted)")
+    p_fin.add_argument("--lm-mix-ratio", type=float, default=0.5,
+                        help="with --lm-corpus: corpus chunks per epoch as a fraction of the training pairs")
 
     p_chat = sub.add_parser("chat", help="REPL against a fine-tuned checkpoint")
     p_chat.add_argument("--out-dir", type=Path, default=DEFAULT_FINETUNE_DIR)
@@ -789,7 +921,10 @@ def main():
         finetune(args.data, args.pretrain_dir, args.out_dir, args.epochs, args.batch_size,
                   args.lr, args.weight_decay, args.dropout, args.val_split, args.patience,
                   val_data_path=args.val_data, gpu_mem_fraction=gpu_mem_fraction,
-                  checkpoint_every=args.checkpoint_every)
+                  checkpoint_every=args.checkpoint_every, freeze_embeddings=args.freeze_embeddings,
+                  freeze_layers=args.freeze_layers, label_smoothing=args.label_smoothing,
+                  typo_noise_prob=args.typo_noise_prob, lm_corpus=args.lm_corpus,
+                  lm_mix_ratio=args.lm_mix_ratio)
     elif args.command == "chat":
         print("Chat with the fine-tuned Transformer model (type 'exit' to quit)")
         while True:
