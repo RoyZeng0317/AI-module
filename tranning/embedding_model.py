@@ -16,7 +16,7 @@ from bpe_tokenizer import BPETokenizer, PAD
 
 DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "embed_runs"
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-DEFAULT_GPU_MEM_FRACTION = 0.85  # same RTX 4060 8GB headroom cap as transformer_chat.py
+DEFAULT_GPU_MEM_FRACTION = 0.5  # same RTX 4060 8GB headroom cap as transformer_chat.py
 
 
 def _resolve_device(device: str | None = None) -> str:

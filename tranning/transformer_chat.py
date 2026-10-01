@@ -88,12 +88,13 @@ DEFAULT_FINETUNE_DIR = Path(__file__).resolve().parent / "gpt_chat_runs"
 # that lets PyTorch's caching allocator claim the *entire* card (observed:
 # 7883/8151MB, ~97%, on a real run) leaves almost no headroom for anything
 # else on the same GPU and risks the whole system, not just this process,
-# destabilizing under an out-of-memory condition. 0.85 caps this process to
-# 85% of total VRAM: PyTorch raises its own clean "CUDA out of memory" error
-# if training actually needs more than that (a controlled, catchable
-# failure), instead of silently starving every other GPU consumer on the
-# machine first.
-DEFAULT_GPU_MEM_FRACTION = 0.85
+# destabilizing under an out-of-memory condition. 0.85 still let a real
+# pretrain run on this project's own 8GB card hit CUDA OOM (batch_size=32/
+# block_size=512's attention + final-head logits tensors alone exceeded the
+# 6.8GB it allowed) -- lowered to 0.5 so there is real headroom left over
+# for the desktop/OS and other GPU consumers, not just a number that still
+# lets PyTorch claim nearly the whole card before anything else notices.
+DEFAULT_GPU_MEM_FRACTION = 0.5
 
 # to-do #17's repetition-loop fix (see GPT.generate()'s docstring): 1.2 is
 # the value Keskar et al. 2019 (CTRL) report as a good default across
