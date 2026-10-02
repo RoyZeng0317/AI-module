@@ -133,19 +133,31 @@ _ENDING_PUNCT = "。！？!?~～…"
 
 # --- 角色卡 ---------------------------------------------------------------
 
+def _safe_filename(name: str) -> str:
+    # 跟 character_model._safe_filename() 同一套規則（那支會 import torch，這裡不依賴它）
+    cleaned = re.sub(r"[^\w\-一-鿿]", "_", name).strip("_")
+    return cleaned or "character"
+
+
 def card_path(name: str, characters_dir: Path = CHARACTERS_DIR) -> Path:
-    return characters_dir / f"{name}.json"
+    return characters_dir / f"{_safe_filename(name)}.json"
 
 
 def load_card(name: str, characters_dir: Path = CHARACTERS_DIR) -> dict | None:
-    path = card_path(name, characters_dir)
-    if not path.exists():
+    """依角色卡裡存的 "name" 欄位找卡，不拿 name 去拼檔案路徑：
+    (1) character_model.py 存檔時會把名字轉成安全檔名（「Alice Smith」→
+    Alice_Smith.json），拿顯示名稱當檔名會找不到；(2) name 可能來自網頁
+    /api/chat 的使用者輸入，拼路徑會讓「../../data/xxx」讀到資料夾外的檔案。"""
+    if not name or not characters_dir.exists():
         return None
-    try:
-        card = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return None
-    return card if card.get("name") else None
+    for path in sorted(characters_dir.glob("*.json")):
+        try:
+            card = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if isinstance(card, dict) and card.get("name") == name:
+            return card
+    return None
 
 
 def resolve_traits(card: dict) -> dict[str, float]:
@@ -340,7 +352,7 @@ def create_card(name: str, description: str, call_user: str | None = None,
     """只用一段性格描述建立角色卡（性格分數由描述自動推得，之後可用 prompt_traits.py 微調）。
     已存在的角色卡不覆蓋（使用者可能手動寫過範例）。"""
     path = card_path(name, characters_dir)
-    if path.exists():
+    if path.exists() or load_card(name, characters_dir) is not None:
         raise FileExistsError(f"{path} 已存在，不覆蓋；請直接編輯該檔案")
     card = {"name": name, "description": description}
     card["traits"] = resolve_traits(card)
@@ -370,7 +382,7 @@ def main():
         return
     card = load_card(args.name)
     if card is None:
-        print(f"找不到角色卡 {card_path(args.name)}")
+        print(f"找不到名字是「{args.name}」的角色卡（{CHARACTERS_DIR}）")
         return
     while True:
         text = input("You: ")

@@ -104,3 +104,19 @@ def test_create_card_from_description_does_not_overwrite(tmp_path):
     with pytest.raises(FileExistsError):
         create_card("小晴", "別的描述", characters_dir=tmp_path)
     assert persona_chat.load_card("小晴", characters_dir=tmp_path)["call_user"] == "你"
+
+
+def test_load_card_finds_cards_saved_under_a_sanitized_filename(tmp_path):
+    # character_model.build_character() 存成 Alice_Smith.json，但 UI 顯示/傳入的是原始名字
+    (tmp_path / "Alice_Smith.json").write_text(json.dumps({"name": "Alice Smith"}), encoding="utf-8")
+    assert persona_chat.load_card("Alice Smith", characters_dir=tmp_path)["name"] == "Alice Smith"
+
+
+def test_load_card_never_reads_outside_the_characters_dir(tmp_path):
+    characters = tmp_path / "characters"
+    characters.mkdir()
+    (tmp_path / "outside.json").write_text(json.dumps({"name": "outside"}), encoding="utf-8")
+    (characters / "list.json").write_text(json.dumps([{"prompt": "x"}]), encoding="utf-8")
+    assert persona_chat.load_card("../outside", characters_dir=characters) is None
+    assert persona_chat.load_card("outside", characters_dir=characters) is None
+    assert persona_chat.load_card("list", characters_dir=characters) is None  # 非 dict 的 JSON 不會噴錯
