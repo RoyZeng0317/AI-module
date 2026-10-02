@@ -70,6 +70,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
 import code_retrieval
+import persona_chat
 import transformer_chat
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
 from tools import route_reply
@@ -616,7 +617,8 @@ def _emotion_trace_suffix(message: str) -> str:
 
 def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
                         force_mode: str = "auto", temperature: float = 0.0,
-                        history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+                        history: list[tuple[str, str]] | None = None,
+                        character: str | None = None) -> tuple[str, str]:
     """Like smart_reply(), but also returns *why* that path answered the
     message — the actual rule/pattern that fired, not a decorative label and
     not a fabricated reasoning chain (sinco is a small memorization model,
@@ -641,6 +643,12 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     組成多輪 messages）。sinco/sinco-code 這兩個字元級模型故意不吃歷史（見
     lib/components/conversation.py 開頭的說明——塞歷史字串反而會把回覆拉走），
     所以其餘分支完全忽略這個參數，呼叫端可以無條件傳，不用依模式判斷要不要帶。
+
+    character（2026-09-30，to_do_list.md #45）：/character 選到的角色名字，
+    None 或 "sinco" = 一般模式。有值且找得到角色卡時，一般聊天分支改走
+    persona_chat.persona_reply()（角色範例 → 依性格挑選改寫 sinco 候選）。
+    修的是 2026-09-10 換成 Transformer 後一般聊天分支忽略 out_dir、導致選了
+    角色回覆仍是 sinco 本人的 bug；程式碼/nvidia/即時查詢分支不受角色影響。
     """
     routed = route_reply(message)
     if routed is not None:
@@ -684,6 +692,11 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     # 呼叫。沒有 MC Dropout 信心度這個機制可以沿用（Transformer 走取樣式
     # 生成，不是 GRU 的多次 dropout forward 投票），trace 改成誠實地只說明
     # 是哪個模型在回覆，不硬套一個不適用的信心度數字。
+    if character and character != "sinco":
+        card = persona_chat.load_card(character)
+        if card is not None:
+            trace, reply = persona_chat.persona_reply(message, card)
+            return trace + _emotion_trace_suffix(message), reply
     reply = transformer_chat.reply(message)
     reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
               "沒有比對到即時查詢或程式碼請求的句型")

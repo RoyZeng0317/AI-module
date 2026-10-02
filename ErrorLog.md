@@ -166,6 +166,8 @@ to_do_list.md #27。
 
 **相關**：to_do_list.md #42／#43、ErrorLog #30／#32／#33、memory `feedback_no_unattended_long_training`、`feedback_training_checkpoint_and_detach`。
 
+**2026-09-30 修正（程式碼部分）**：`transformer_chat.py` 的 `finetune()` 新增凍結 embedding/底層 block、label smoothing、prompt 錯字擴增、pretrain 語料 rehearsal 四個抗過擬合機制（CLI 預設開前三項），細節見 to_do_list.md #44。**真實訓練尚未執行**，效果待用 `gpt_chat_runs_v4` 實測驗證後才能標記為已修正。
+
 ## 36. `git push` 一直失敗：`RPC failed; HTTP 500` / `unexpected disconnect while reading sideband packet`
 
 **回報**：2026-09-29，使用者要求把本地領先 origin/main 的 commit push 上 GitHub，push 直接失敗。
@@ -188,3 +190,14 @@ to_do_list.md #27。
 **已修正**。備份分支 `backup-before-cleanup-20260929` 目前仍保留在本地（未刪除），供之後需要回頭核對原始歷史時使用；它只存在本機，不會被 push 上 GitHub。
 
 **相關**：`project_pcb_defect_dataset_found`（PCB 資料集來源）、`project_transformer_chat_retrain_v2` / `project_nlp_strengthen_plan`（`gpt_chat_runs_v2`／`gpt_pretrain_runs_v2` 這兩顆 checkpoint 的訓練脈絡）。
+
+## 37. /character 選了角色，回覆卻還是 sinco 本人（角色性格完全沒生效）
+
+**回報**：2026-09-30，使用者回報「人物的學習模擬個性不夠接近一般人類的回答，要能夠依使用者描述的性格進行對話」。
+
+**根因**（查程式碼確認，不是推測）：2026-09-10 把 `chats.smart_reply_traced()` 的一般聊天分支從 GRU 換成 `transformer_chat.reply(message)` 時，這一行**沒有帶 `out_dir`**——GUI（`conversation.py`）／CLI（`cli.py`）／網頁（`web/backend/app.py`）切換角色時改的是 `out_dir=character_chat_runs`，但一般聊天分支完全不看它。結果從 9/10 起：選了「周柯宇」，聊天視窗標籤顯示周柯宇，實際回覆卻是 sinco 一般模型；角色卡的描述、氣質分數、你寫的對話範例一個都沒被用到。另外兩個既有限制讓問題更明顯：(a) 舊的 `character_chat_runs` 是 GRU 死記 21 句（loss 0.0006），沒背過的問法本來就答不好；(b) 所有角色共用同一顆 checkpoint，新角色只寫描述完全沒有作用。
+
+**修正**：新增 `tranning/persona_chat.py`，`smart_reply_traced()` 新增 `character` 參數，GUI／CLI／網頁三個前端都把目前角色名字傳進去。角色回覆流程：你寫的角色範例（相似度比對，會先拿掉角色名字/暱稱）→ 沒有範例時讓 sinco 產生 6 個候選、依性格打分挑一個再改寫成角色語氣（拿掉 AI/sinco 身分句、只留口語一兩句、依性格補語尾/稱呼/表情，高冷型則反過來精簡）→ 模型沒訓練時用依性格寫好的備用短句。性格來源 = 角色卡滑桿分數 + 從自由描述文字抓到的性格關鍵字，所以只寫描述的新角色也能用。詳見 to_do_list.md #45。
+
+**已修正（程式碼）**，`pytest tranning/test_persona_chat.py`（13 項）、`test_chats.py`、`lib/components/test_cli.py`、`web/backend/tests/` 全過。尚待你在 GUI 實際用 `/character` 切換角色聊幾句確認體感。
+
