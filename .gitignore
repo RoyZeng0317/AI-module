@@ -36,6 +36,12 @@ tranning/speech_runs/
 tranning/speech_data/
 tranning/Tranning/
 
+# lib/IndexTTS2.py（/model nvidia 的同類 Rule 06 例外）用到的外部開源模型本體——
+# git clone 下來的 index-tts 原始碼跟 modelscope 下載的 checkpoint 都是數 GB
+# 的第三方內容，不是本專案自己的程式碼/訓練產物，不進版控
+lib/index-tts/
+lib/indextts2_checkpoints/
+
 # nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
 /nova.exe
 /build/pyinstaller/

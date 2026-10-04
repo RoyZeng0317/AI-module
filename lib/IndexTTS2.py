@@ -10,10 +10,13 @@ CLAUDE.md 規則 #06 的顯式例外（跟 lib/NVIDIA.py 的 `/model nvidia` 同
 的明確例外，而不是像 sinco 的程式邏輯一樣預設就能用。
 
 安裝步驟（使用者自行在自己電腦上做一次，這支檔案本身不會自動下載任何東西，
-也不會嘗試自動安裝）：
+也不會嘗試自動安裝；兩個目錄都已經列在 .gitignore，不會不小心進版控）：
+    cd lib
     git clone https://github.com/index-tts/index-tts.git
     cd index-tts && pip install -e .
-    modelscope download --model IndexTeam/IndexTTS-2.5 --local_dir checkpoints
+    cd ..
+    pip install modelscope
+    modelscope download --model IndexTeam/IndexTTS-2.5 --local_dir indextts2_checkpoints
 
 授權注意（私人使用在這個限制範圍內，但老實記錄下來）：index-tts 的程式碼
 本身是 Apache 2.0，但預訓練權重另外附了一份 INDEX_MODEL_LICENSE，商業用途
@@ -28,10 +31,18 @@ from pathlib import Path
 
 MODEL = "IndexTTS-2.5"
 
+# 固定指到這支檔案旁邊，而不是單純的相對路徑 "checkpoints" —— 後者會因為
+# Python 的執行目錄（cwd）不同而指到不同地方，呼叫端很容易在專案根目錄跑跟
+# 在 lib/ 底下跑得到兩個不同結果。跟 modelscope download 時要給的 --local-dir
+# 保持一致：
+#     modelscope download --model IndexTeam/IndexTTS-2.5 \
+#         --local_dir lib/indextts2_checkpoints
+DEFAULT_CHECKPOINT_DIR = Path(__file__).resolve().parent / "indextts2_checkpoints"
+
 _model = None
 
 
-def _get_model(checkpoint_dir: str | Path = "checkpoints"):
+def _get_model(checkpoint_dir: str | Path = DEFAULT_CHECKPOINT_DIR):
     """Lazily import + load the IndexTTS2 checkpoint. Raises a friendly
     RuntimeError (not an ImportError/FileNotFoundError the caller has to
     know to catch) if the `indextts` package hasn't been installed or the
@@ -60,7 +71,7 @@ def _get_model(checkpoint_dir: str | Path = "checkpoints"):
 
 
 def indextts2_speak(text: str, spk_audio_prompt: str | Path, output_path: str | Path,
-                     checkpoint_dir: str | Path = "checkpoints") -> str:
+                     checkpoint_dir: str | Path = DEFAULT_CHECKPOINT_DIR) -> str:
     """用一段參考語音（spk_audio_prompt，幾秒鐘的 wav 就可以）模仿那個聲音唸出
     text，存成 output_path。回傳 output_path 字串——跟
     tranning/voice_clone.py 的 synthesize_to_file() 回傳約定一致，呼叫端
