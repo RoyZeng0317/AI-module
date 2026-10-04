@@ -56,6 +56,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 手動切換用的 NVIDIA 雲端模型（需要環境變數 `NVIDIA_API_KEY`，讀取 `lib/.env`），只有
 使用者手動選擇該模式才會被呼叫；預設（`auto`/`sinco`/`code`）三種模式完全不碰外部 API。
 
+**本機開源權重模型也是 Rule 06 的顯式例外，跟上面 NVIDIA 同一個精神**（2026-10-04 決定）：
+`lib/IndexTTS2.py` 提供 `/voice indextts2` 手動切換用的零樣本語音克隆模型（
+index-tts/index-tts，Bilibili 團隊，程式碼 Apache 2.0、預訓練權重另有
+INDEX_MODEL_LICENSE，商業用途需另外取得書面授權——這個專案是私人非商業使用）。
+跟 NVIDIA 不同的地方：不是打雲端 API，是**本機**載入別人已經訓練好的權重，需要使用者
+自行 `git clone` + 下載 checkpoint（見 `lib/IndexTTS2.py` 開頭的安裝步驟），這支檔案本身
+不會自動下載任何東西。預設（`sinco`，見 `tranning/voice_clone.py` 的從零訓練 Tacotron
+式語音克隆模型）完全不受影響，只有明確切換到 `indextts2` 才會載入。**只有 `lib/IndexTTS2.py`
+這支後端模組跟測試已經完成，`/voice` 指令本身的 UI 層（command.py 的 `ARG_SUGGESTIONS`、
+cli.py 的 `_arg_suggestions()`，以及輸出的語音檔案要怎麼呈現給使用者）還沒接——這是刻意
+分開的下一步，不是遺漏。**
+
 ### sinco 核心模型（`tranning/`）
 
 字元級 seq2seq（GRU encoder + Luong attention GRU decoder），兩個獨立 checkpoint 不能混
@@ -112,8 +124,9 @@ pyinstaller --onefile --console --name install_check app/install/install_check.p
 
 ## 專案規則
 
-- 私人自建 AI 專案，禁止呼叫其他雲端 LLM API（Rule 06），唯一顯式例外是 `/model nvidia`
-  手動切換（見上）
+- 私人自建 AI 專案，禁止呼叫其他雲端 LLM API、禁止使用其他人已訓練好的模型（Rule 06），
+  目前兩個顯式例外都是手動切換才會生效（見上）：`/model nvidia`（外部雲端 API）、
+  `/voice indextts2`（本機開源權重模型，私人非商業使用）
 - 每支訓練腳本都有對應 `test_*.py`，用合成假資料驗證訓練管線本身能跑完、不代表真實
   準確度
 - `shape-vision/` 是獨立子專案（純古典影像處理，Canny 邊緣→輪廓→凸包→多邊形分類+
