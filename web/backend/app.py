@@ -25,11 +25,25 @@ TRAINING_DIR = BACKEND_DIR.parent.parent / "tranning"
 # "/memory"、"/learn" 的本機攔截），跟桌面 GUI（command.py）、CLI（cli.py）
 # 用的是同一支模組、同一份 memory/memory.json，不是各端各自一份。
 COMPONENTS_DIR = BACKEND_DIR.parent.parent / "lib" / "components"
+# 專案根目錄本身也要加——lib/NVIDIA.py（force_mode="nvidia" 時才會被
+# tranning/chats.py 的 _nvidia_reply() import）內部用的是 `from
+# lib.components.memory_store import list_memories` 這種絕對匯入（跟
+# lib/components/*.py 彼此之間互相 import 的慣例一致，例如
+# command.py 的 `from lib.components.memory_store import ...`），需要
+# 專案根目錄本身在 sys.path 上才能把 `lib` 解析成套件——桌面 GUI
+# 用 `python -m lib.main` 啟動時這件事是自動發生的（cwd 就是根目錄），
+# 但這支後端是 `cd web/backend && python app.py` 這樣啟動，根目錄不會
+# 自動在 sys.path 上，之前只在真的呼叫 `/model nvidia` 時才會在
+# ModuleNotFoundError: No module named 'lib' 這裡炸掉。lib/components/cli.py
+# 已經有同一個問題的防呆（偵測到不是用 -m 執行時塞進 PROJECT_ROOT_DIR），
+# 這裡補上同一個修法。
+PROJECT_ROOT_DIR = BACKEND_DIR.parent.parent
 
 sys.path.insert(0, str(BACKEND_DIR))
 sys.path.insert(0, str(TRAINING_DIR))
 sys.path.insert(0, str(FRONTEND_DIR))
 sys.path.insert(0, str(COMPONENTS_DIR))
+sys.path.insert(0, str(PROJECT_ROOT_DIR))
 
 from typing import Optional
 
