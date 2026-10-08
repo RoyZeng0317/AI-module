@@ -237,3 +237,66 @@ def test_label_smoothing_only_affects_training_mode_loss():
 
     assert torch.allclose(plain, eval_smoothed)
     assert not torch.allclose(plain, train_smoothed)
+
+
+def test_sft_split_is_stable_and_keeps_prompt_variants_together():
+    import random
+    from transformer_chat import _split_sft_pairs
+    pairs = _make_synthetic_pairs() + [{"prompt": " HELLO ", "reply": "another answer"}]
+    train, val = _split_sft_pairs(pairs, 0.2, 42)
+    reordered = pairs[::-1]
+    random.seed(123)
+    train2, val2 = _split_sft_pairs(reordered, 0.2, 42)
+    normalize = lambda rows: {p["prompt"].strip().casefold() for p in rows}
+    assert normalize(train) == normalize(train2)
+    assert normalize(val) == normalize(val2)
+    assert not normalize(train) & normalize(val)
+    assert len(train) + len(val) == len(pairs)
+
+
+def test_sft_split_rejects_fake_or_leaking_validation():
+    import pytest
+    from transformer_chat import _split_sft_pairs
+    pairs = _make_synthetic_pairs()
+    for bad in ([], [{"prompt": " HELLO ", "reply": "different"}]):
+        with pytest.raises(ValueError):
+            _split_sft_pairs(pairs, 0.2, 42, bad)
+    with pytest.raises(ValueError):
+        _split_sft_pairs([pairs[0]], 0.2, 42)
+    for fraction in (0, 1, -0.1):
+        with pytest.raises(ValueError):
+            _split_sft_pairs(pairs, fraction, 42)
+
+
+def test_evaluation_matches_token_cross_entropy_across_batch_sizes():
+    from transformer_chat import GPT, _evaluate_loss
+    from bpe_tokenizer import PAD
+    from torch.utils.data import DataLoader, TensorDataset
+    import torch.nn.functional as F
+    torch.manual_seed(4)
+    model = GPT(12, 4, 1, 8, 2, 0.5)
+    model.label_smoothing = 0.4
+    x = torch.tensor([[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6]])
+    y = torch.tensor([[2, PAD, PAD, PAD], [3, 4, 5, 6], [4, 5, PAD, PAD]])
+    dataset = TensorDataset(x, y)
+    model.eval()
+    with torch.no_grad():
+        logits, _ = model(x)
+        expected = F.cross_entropy(logits.reshape(-1, 12), y.reshape(-1), ignore_index=PAD).item()
+    for size in (1, 2, 3):
+        result = _evaluate_loss(model, DataLoader(dataset, batch_size=size), "cpu")
+        assert abs(result - expected) < 1e-6
+    assert model.training is False
+
+
+def test_finetune_records_clean_loss_and_validation_membership(tmp_path):
+    _, pretrain_dir, data_path = _pretrain_and_write_pairs(tmp_path)
+    out = tmp_path / "finetune"
+    _, _, history = finetune(data_path, pretrain_dir, out, epochs=1, device="cpu",
+                            label_smoothing=0.2, typo_noise_prob=0.5)
+    assert history[0]["train_eval_loss"] >= 0
+    config = json.loads((out / "config.json").read_text())
+    split = config["validation"]
+    assert split["split_seed"] == 42
+    assert not set(split["train_prompts"]) & set(split["val_prompts"])
+    assert split["train_pairs"] + split["val_pairs"] == 20

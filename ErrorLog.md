@@ -201,3 +201,9 @@ to_do_list.md #27。
 
 **已修正（程式碼）**，`pytest tranning/test_persona_chat.py`（13 項）、`test_chats.py`、`lib/components/test_cli.py`、`web/backend/tests/` 全過。尚待你在 GUI 實際用 `/character` 切換角色聊幾句確認體感。
 
+
+## 38. Transformer 微調驗證切分與 loss 統計影響過擬合判斷（2026-10-08）
+
+查程式確認：finetune 每次使用全域 random.shuffle 重新切分；空驗證集會退回訓練集；epoch loss 使用 batch mean 等權平均；開 label smoothing／錯字／rehearsal 後仍直接拿混合訓練 loss 與驗證 CE 比較。已改成固定 seed 的 prompt 分組切分、拒絕空或重疊的顯式驗證集、按有效 token 加權及乾淨 train_eval_loss。28 項相關測試通過。
+
+額外確認 data/corpus_pretrain_v2.txt 含全部 742 筆對話 prompt 與 reply；現有微調驗證資料不能視為預訓練未見資料。此資料隔離問題尚待本機準備全新測試集／隔離語料。真實過擬合改善尚未验证，缺少 GitHub 未提供的 model.pt。詳見 Agent/Index/2026-10-08-overfitting-handoff.md。
