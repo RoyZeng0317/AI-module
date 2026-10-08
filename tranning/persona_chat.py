@@ -51,6 +51,8 @@ import sys
 from pathlib import Path
 from typing import Callable
 
+from emotion_response import emotion_reply, explicit_emotion, negation_signature
+
 if getattr(sys, "frozen", False):
     _PROJECT_ROOT = Path(sys.executable).resolve().parent
 else:
@@ -210,19 +212,30 @@ def card_examples(card: dict, legacy_path: Path = LEGACY_EXAMPLES_PATH) -> list[
     return list(merged.items())
 
 
-def _normalize(text: str, aliases: list[str]) -> str:
+def _without_aliases(text: str, aliases: list[str]) -> str:
     for alias in aliases:
         text = text.replace(alias, "")
-    return _STRIP_FOR_MATCH.sub("", text)
+    return text
+
+
+def _normalize(text: str, aliases: list[str]) -> str:
+    return _STRIP_FOR_MATCH.sub("", _without_aliases(text, aliases))
 
 
 def match_example(message: str, card: dict, examples: list[tuple[str, list[str]]],
                   threshold: float = RETRIEVAL_THRESHOLD) -> tuple[str, list[str], float] | None:
     aliases = _aliases(card)
+    query_text = _without_aliases(message, aliases)
     query = _normalize(message, aliases)
     best, best_score = None, 0.0
     for prompt, replies in examples:
         target = _normalize(prompt, aliases)
+        target_text = _without_aliases(prompt, aliases)
+        if negation_signature(query_text) != negation_signature(target_text):
+            continue
+        query_emotion, target_emotion = explicit_emotion(query_text), explicit_emotion(target_text)
+        if query_emotion and target_emotion and query_emotion != target_emotion:
+            continue
         if not query and not target:
             score = 1.0  # 只叫了名字（「周柯宇」「柯宇」）
         elif not query or not target:
@@ -324,6 +337,12 @@ def persona_reply(message: str, card: dict, generate: Callable[[str], str] | Non
         prompt, replies, score = matched
         return (f"角色「{card['name']}」→ 命中你寫的角色範例「{prompt}」（相似度 {score:.0%}，直接使用範例原句）",
                 rng.choice(replies))
+
+    emotional = emotion_reply(_without_aliases(message, _aliases(card)))
+    if emotional is not None:
+        trace, text = emotional
+        # Do not append playful emojis or teasing particles to distress.
+        return f"角色「{card['name']}」→ {trace}", text
 
     candidates = []
     for _ in range(max(1, n_candidates)):
