@@ -120,3 +120,34 @@ def test_load_card_never_reads_outside_the_characters_dir(tmp_path):
     assert persona_chat.load_card("../outside", characters_dir=characters) is None
     assert persona_chat.load_card("outside", characters_dir=characters) is None
     assert persona_chat.load_card("list", characters_dir=characters) is None  # 非 dict 的 JSON 不會噴錯
+
+
+@pytest.mark.parametrize("query,prompt", [
+    ("我今天不開心", "我今天開心"), ("我不難過", "我難過"),
+    ("我不想聊天", "我想聊天"), ("我今天很傷心", "我今天很開心"),
+    ("I am not happy", "I am happy"),
+])
+def test_example_match_rejects_opposite_emotion_or_negation(query, prompt):
+    assert match_example(query, CARD, [(prompt, ["wrong reply"])]) is None
+
+
+def test_persona_emotion_response_never_selects_opposite_example():
+    trace, reply = persona_reply("我今天不開心", CARD,
+                                generate=lambda _: pytest.fail("explicit phrase needs no model"),
+                                examples=[("我今天開心", ["太好了，恭喜！"])])
+    assert "你怎麼了" in reply and "規則" in trace
+    assert "恭喜" not in reply
+
+
+def test_persona_keeps_appropriate_user_written_emotion_example():
+    trace, reply = persona_reply("我今天心情不好", CARD,
+                                generate=lambda _: pytest.fail("example first"),
+                                examples=[("我今天心情不好", ["怎麼了？我在聽。"])])
+    assert reply == "怎麼了？我在聽。" and "範例" in trace
+
+
+def test_persona_respects_boundary_with_character_alias():
+    trace, reply = persona_reply("柯宇，我今天心情不好，不想聊", CARD,
+                                generate=lambda _: pytest.fail("explicit boundary needs no model"),
+                                examples=[])
+    assert "不追問" in reply and "？" not in reply

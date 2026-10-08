@@ -70,6 +70,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
 import code_retrieval
+from emotion_response import emotion_reply, explicit_emotion
 import persona_chat
 import transformer_chat
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
@@ -600,7 +601,8 @@ def _nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) ->
 
 
 def _emotion_trace_suffix(message: str) -> str:
-    """Detection-only add-on for the trace string: reports what
+    """Detection-only add-on for the trace string: explicit phrases use
+    reviewed local phrase labels; other messages report what
     tranning/MentalHealth/action.py's predict_emotion() thinks `message`'s
     emotional valence is (0~5 score + label) plus its MC Dropout confidence,
     or "" if that checkpoint hasn't been trained yet — never raises, never
@@ -608,6 +610,11 @@ def _emotion_trace_suffix(message: str) -> str:
     stochastic dropout passes, not correctness — a wrong prediction can
     still land at 100% if the model is *consistently* wrong about it.
     """
+    kind = explicit_emotion(message)
+    if kind is not None:
+        labels = {"negative": "負向感受", "positive": "正向感受",
+                  "relief": "否定負向感受／表示緩解", "boundary": "希望暫時不談"}
+        return f"\n情緒表達：{labels[kind]}（依明確句型，非模型判斷）"
     result = emotion_action.predict_emotion(message)
     if result["status"] is not None:
         return ""
@@ -696,7 +703,11 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
         card = persona_chat.load_card(character)
         if card is not None:
             trace, reply = persona_chat.persona_reply(message, card)
-            return trace + _emotion_trace_suffix(message), reply
+            emotional_message = persona_chat._without_aliases(message, persona_chat._aliases(card))
+            return trace + _emotion_trace_suffix(emotional_message), reply
+    emotional = emotion_reply(message)
+    if emotional is not None:
+        return emotional
     reply = transformer_chat.reply(message)
     reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
               "沒有比對到即時查詢或程式碼請求的句型")

@@ -9,6 +9,8 @@ prompt/reply pairs.
 import json
 import random
 
+import pytest
+
 import chats
 from chats import (
     ChatPairsDataset, build_vocab, chat_reply, encode, inject_typos, is_code_request,
@@ -214,3 +216,33 @@ def test_chat_pairs_dataset_typo_prob_augments_prompt_not_reply():
         src_variants.add(tuple(src.tolist()))
 
     assert len(src_variants) > 1  # 每次抽到不同的錯字版本，不是同一個固定結果
+
+
+def test_explicit_negative_emotion_routes_before_random_generation(monkeypatch):
+    monkeypatch.setattr(chats, "route_reply", lambda _: None)
+    monkeypatch.setattr(chats.transformer_chat, "reply", lambda _: pytest.fail("should use explicit emotion path"))
+    trace, reply = smart_reply_traced("我今天心情不好")
+    assert "你怎麼了" in reply and "非模型生成" in trace
+
+
+def test_emotion_path_does_not_override_external_or_code_modes(monkeypatch):
+    monkeypatch.setattr(chats, "route_reply", lambda _: None)
+    monkeypatch.setattr(chats, "_nvidia_reply", lambda *a, **k: ("", "external result"))
+    monkeypatch.setattr(chats.code_retrieval, "retrieve", lambda _: ("code result", 1.0, "example"))
+    assert smart_reply_traced("我今天心情不好", force_mode="nvidia")[1] == "external result"
+    assert smart_reply_traced("我今天心情不好", force_mode="code")[1] == "code result"
+
+
+def test_emotion_path_preserves_live_tool_route(monkeypatch):
+    monkeypatch.setattr(chats, "route_reply", lambda _: ("tool", "tool result"))
+    assert smart_reply_traced("我今天心情不好") == ("tool", "tool result")
+
+
+def test_explicit_persona_emotion_trace_does_not_use_wrong_regressor(monkeypatch):
+    monkeypatch.setattr(chats, "route_reply", lambda _: None)
+    monkeypatch.setattr(chats.persona_chat, "load_card", lambda _: {"name": "小晴"})
+    monkeypatch.setattr(chats.persona_chat, "card_examples", lambda _: [])
+    monkeypatch.setattr(chats.emotion_action, "predict_emotion",
+                        lambda _: pytest.fail("explicit phrase must not get contradictory model label"))
+    trace, reply = smart_reply_traced("小晴，我今天不開心", character="小晴")
+    assert "負向感受" in trace and "你怎麼了" in reply
