@@ -308,8 +308,9 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
     _isolate_conversations(tmp_path, monkeypatch)
     seen = {}
 
-    def fake_smart_reply_traced(message, out_dir, force_mode, history):
+    def fake_smart_reply_traced(message, out_dir, force_mode, history, character=None):
         seen["history"] = list(history)  # 快照——ask_model() 接下來會就地 append 同一個 list
+        seen["character"] = character  # /character 選的角色要一路傳到 smart_reply_traced()
         return "· trace", "回覆內容"
 
     monkeypatch.setattr(cli, "smart_reply_traced", fake_smart_reply_traced)
@@ -319,6 +320,7 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
 
     assert seen["history"] == [("之前的問題", "之前的回覆")]
     assert state["history"] == [("之前的問題", "之前的回覆"), ("測試訊息", "回覆內容")]
+    assert seen["character"] == cli.DEFAULT_PERSONA
 
 
 def test_ask_model_creates_and_appends_to_shared_conversation(tmp_path, monkeypatch, capsys):

@@ -550,7 +550,8 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
     else:
         model_message = outcome[1] if outcome is not None else payload.message
         history = _build_nvidia_history(conversation_id, client_id) if force_mode == "nvidia" else None
-        _, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history)
+        _, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history,
+                                      character=None if out_dir == DEFAULT_OUT_DIR else persona)
         # /open、app/command/*.md 提示詞指令這兩種才會真的問模型，比照 CLI
         # 的 ask_model()：只有「真的問過模型」的這一輪才落地到 session.json，
         # /memory、/learn、/resume 這種純本機指令不記錄（跟 CLI 行為一致，

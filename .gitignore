@@ -51,5 +51,14 @@ data/pcb/archive/
 /nova.exe
 /build/pyinstaller/
 
+
 # MSI 打包暫存區（install/build_msi.ps1 產生，可重建，不進版控）
 /build/msi/
+
+# 可重建的情緒資料下載／訓練輸出；來源與匯入報告仍追蹤
+/data/emotion_datasets/raw/
+/data/emotion_datasets/pairs_*.json
+/data/emotion_datasets/external_pairs_*.json
+/data/emotion_datasets/classification/
+/data/emotion_datasets/import.log
+

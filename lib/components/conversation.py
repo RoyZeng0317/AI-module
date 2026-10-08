@@ -164,8 +164,10 @@ class Conversation:
             # history 只有 nvidia 模式會真的用到（見 smart_reply_traced() 的
             # 說明），這裡無條件傳，讓 /model nvidia 能接上 self.history（含
             # /resume 還原回來的歷史）當多輪對話上下文。
+            # character：/character 選的角色名字（見 chats.smart_reply_traced() 說明），
+            # 沒有它的話一般聊天分支會忽略角色、一律用 sinco 本人回答。
             trace, reply = smart_reply_traced(model_input, out_dir=self.out_dir, force_mode=self.force_mode,
-                                               history=self.history)
+                                               history=self.history, character=self.persona)
 
             def show_result():
                 chat_display.configure(state="normal")

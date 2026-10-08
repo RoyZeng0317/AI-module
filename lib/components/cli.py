@@ -466,7 +466,7 @@ def ask_model(message: str, state: dict, check_code: bool = False):
     with console.status(f"[dim]思考中...（輸入約 {in_tokens} 個 token）[/dim]", spinner="dots"):
         try:
             trace, reply = smart_reply_traced(message, out_dir=state["out_dir"], force_mode=state["force_mode"],
-                                               history=state["history"])
+                                               history=state["history"], character=state["persona"])
         except Exception as exc:  # 模型端任何未預期錯誤都要看得到，不要整支 CLI 崩潰
             console.print(f"[red]發生錯誤：{escape(str(exc))}[/red]")
             return

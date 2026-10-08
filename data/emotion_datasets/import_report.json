@@ -1,0 +1,82 @@
+{
+  "seed": 42,
+  "max_chars": 480,
+  "raw_candidate_pairs": 36675,
+  "length_or_content_filtered": 509,
+  "deduplication": {
+    "duplicates_removed": 425,
+    "cross_split_texts_removed": 377
+  },
+  "pairs": {
+    "test": {
+      "count": 3766,
+      "by_source": {
+        "esconv": 613,
+        "empathetic": 2521,
+        "dailydialog": 557,
+        "sinco_existing": 75
+      },
+      "by_language": {
+        "en": 3697,
+        "zh-Hant": 69
+      }
+    },
+    "val": {
+      "count": 3664,
+      "by_source": {
+        "esconv": 516,
+        "empathetic": 2743,
+        "dailydialog": 339,
+        "sinco_existing": 66
+      },
+      "by_language": {
+        "en": 3603,
+        "zh-Hant": 61
+      }
+    },
+    "train": {
+      "count": 27934,
+      "by_source": {
+        "esconv": 4548,
+        "empathetic": 17675,
+        "dailydialog": 5179,
+        "sinco_existing": 532
+      },
+      "by_language": {
+        "en": 27445,
+        "zh-Hant": 489
+      }
+    }
+  },
+  "classification": {
+    "cped": {
+      "deduplication": {
+        "duplicates_removed": 2499,
+        "cross_split_texts_removed": 10069
+      },
+      "splits": {
+        "test": 26214,
+        "val": 10016,
+        "train": 83964
+      }
+    },
+    "goemotions": {
+      "deduplication": {
+        "duplicates_removed": 93,
+        "cross_split_texts_removed": 170
+      },
+      "splits": {
+        "test": 5422,
+        "val": 5412,
+        "train": 43166
+      }
+    }
+  },
+  "legacy_source_sha256": "d831a1c9397797b8c954a910c38dcc9a7ed901fdf339e6ae77251cd985248a03",
+  "notes": [
+    "External chat pairs are English; no English-to-Chinese translation was performed.",
+    "CPED and GoEmotions are separate classification label spaces, not chat replies.",
+    "ESConv and legacy use deterministic conversation/prompt hash splits; others keep published splits.",
+    "Pre-existing Sinco pairs may already have appeared in pretraining; new external test files must stay out of pretraining/rehearsal."
+  ]
+}

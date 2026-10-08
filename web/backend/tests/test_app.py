@@ -66,7 +66,8 @@ def test_chat_endpoint_returns_reply_from_self_built_model(tmp_path, monkeypatch
     with patch("web.backend.app.smart_reply_traced", return_value=("trace", "hi there")) as mock_smart_reply:
         r = client.post("/api/chat", json={"message": "hello"})
     mock_smart_reply.assert_called_once_with(
-        "hello", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None
+        "hello", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None,
+        character=None,
     )
     assert r.status_code == 200
     assert r.json() == {"reply": "hi there", "conversation_id": None}
@@ -137,7 +138,8 @@ def test_chat_endpoint_open_command_feeds_file_content_to_model(tmp_path, monkey
     assert r.status_code == 200
     assert r.json()["reply"] == "讀到了"
     mock_smart_reply.assert_called_once_with(
-        "檔案內容", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None
+        "檔案內容", out_dir=app_module.DEFAULT_OUT_DIR, force_mode="auto", history=None,
+        character=None,
     )
 
 
