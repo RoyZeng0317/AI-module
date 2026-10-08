@@ -50,3 +50,10 @@ data/pcb/archive/
 # nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
 /nova.exe
 /build/pyinstaller/
+
+# 可重建的情緒資料下載／訓練輸出；來源與匯入報告仍追蹤
+/data/emotion_datasets/raw/
+/data/emotion_datasets/pairs_*.json
+/data/emotion_datasets/external_pairs_*.json
+/data/emotion_datasets/classification/
+/data/emotion_datasets/import.log
