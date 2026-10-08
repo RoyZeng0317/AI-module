@@ -153,7 +153,8 @@ def make_claude_icon_button(parent, icon_type, command, size=34, icon_color=None
 windows = tk.Tk()
 windows.geometry("800x600")
 windows.title(f"{MODULE}")
-windows.iconbitmap()
+_ICON = __import__("pathlib").Path(__file__).resolve().parents[1] / "model_icon.ico"  # 專案根目錄的應用程式圖示（MSI 捷徑也用同一個）
+if _ICON.exists(): windows.iconbitmap(default=str(_ICON))
 windows.configure(bg=BG)
 
 # 頂部標題列：強調色圓點 + 名稱，仿 Claude 網頁版左上角的品牌識別，跟下面聊天區

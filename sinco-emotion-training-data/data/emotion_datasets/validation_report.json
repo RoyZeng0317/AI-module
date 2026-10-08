@@ -1,0 +1,48 @@
+{
+  "pairs": {
+    "train": 27934,
+    "val": 3664,
+    "test": 3766
+  },
+  "classification": {
+    "cped": {
+      "train": 83964,
+      "val": 10016,
+      "test": 26214
+    },
+    "goemotions": {
+      "train": 43166,
+      "val": 5412,
+      "test": 5422
+    }
+  },
+  "cross_split_prompt_overlap": 0,
+  "cross_split_conversation_overlap": 0,
+  "tokenizer_check": {
+    "tokenizer_dir": "tranning/gpt_pretrain_runs_v2",
+    "block_size": 512,
+    "overlength_pairs": 0,
+    "by_source": {
+      "esconv": {
+        "tokens": 863165,
+        "unk_tokens": 1,
+        "unk_rate": 1.1585270487102698e-06
+      },
+      "empathetic": {
+        "tokens": 2393524,
+        "unk_tokens": 3,
+        "unk_rate": 1.2533820425448e-06
+      },
+      "dailydialog": {
+        "tokens": 550840,
+        "unk_tokens": 52,
+        "unk_rate": 9.440127804807204e-05
+      },
+      "sinco_existing": {
+        "tokens": 30168,
+        "unk_tokens": 0,
+        "unk_rate": 0.0
+      }
+    }
+  }
+}

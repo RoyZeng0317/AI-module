@@ -50,3 +50,6 @@ data/pcb/archive/
 # nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
 /nova.exe
 /build/pyinstaller/
+
+# MSI 打包暫存區（install/build_msi.ps1 產生，可重建，不進版控）
+/build/msi/

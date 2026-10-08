@@ -94,5 +94,17 @@
     "category": "developer_preference",
     "text": "不論用戶的情緒你都必須接住我，適當的安慰且不能鬧脾氣",
     "created_at": "2026-08-28T00:27:53+00:00"
+  },
+  {
+    "id": "ed2a5a56",
+    "category": "developer_preference",
+    "text": "使用者輸入含中文時，使用繁體中文回應；僅全英文輸入時使用 A2+ 程度英文回應。修改前先讀 AGENTS.md 與 README，遵守專案範圍，不碰 .env，不刪除保留註解；大型任務先拆分，方向不明時一次集中提問。",
+    "created_at": "2026-10-07T14:02:07+00:00"
+  },
+  {
+    "id": "fb2a262f",
+    "category": "project",
+    "text": "2026-10-07：使用者想參考 GPT Image 2 與 Nano Banana 的圖像修改功能，自行設計本地修圖模型；本次明確選擇本地自建，不串接兩者雲端 API。",
+    "created_at": "2026-10-07T14:02:07+00:00"
   }
 ]
