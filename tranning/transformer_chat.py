@@ -309,7 +309,7 @@ class GPT(nn.Module):
             # across the whole batch, which is only zero if an entire batch
             # were nothing but padding — never true here.
             # label smoothing only while training: val loss stays plain
-            # cross-entropy so it remains comparable across runs.
+            # cross-entropy; comparisons also require the same held-out data.
             smoothing = self.label_smoothing if self.training else 0.0
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1),
                                    ignore_index=PAD, label_smoothing=smoothing)
@@ -493,10 +493,57 @@ def _freeze_for_finetune(model: GPT, freeze_embeddings: bool, freeze_layers: int
 
 # --- shared training loop -----------------------------------------------
 
+def _evaluate_loss(model, loader, device):
+    """Plain CE per scored token, independent of batch size and padding."""
+    model.eval()
+    total, count = 0.0, 0
+    with torch.no_grad():
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            tokens = int(y.ne(PAD).sum().item())
+            if not tokens:
+                continue
+            _, loss = model(x, y)
+            total += loss.item() * tokens
+            count += tokens
+    if not count:
+        raise ValueError("Evaluation dataset has no scored target tokens")
+    return total / count
+
+
+def _split_sft_pairs(pairs, val_split, seed, val_pairs=None):
+    """Keep identical prompts together; never validate on training data."""
+    def key(pair):
+        return pair["prompt"].strip().casefold()
+
+    if not pairs:
+        raise ValueError("Training pairs must not be empty")
+    if val_pairs is not None:
+        if not val_pairs:
+            raise ValueError("Validation pairs must not be empty")
+        if {key(p) for p in pairs} & {key(p) for p in val_pairs}:
+            raise ValueError("Training and validation contain overlapping prompts")
+        return list(pairs), list(val_pairs)
+    if not 0 < val_split < 1:
+        raise ValueError("val_split must be between 0 and 1")
+    groups = {}
+    for pair in pairs:
+        groups.setdefault(key(pair), []).append(pair)
+    if len(groups) < 2:
+        raise ValueError("Need at least two distinct prompts for held-out validation")
+    keys = sorted(groups)
+    random.Random(seed).shuffle(keys)
+    n_val = min(len(keys) - 1, max(1, round(len(keys) * val_split)))
+    val_keys = set(keys[:n_val])
+    train = [p for k in keys if k not in val_keys for p in groups[k]]
+    val = [p for k in keys if k in val_keys for p in groups[k]]
+    return train, val
+
+
 def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
                  optimizer: torch.optim.Optimizer, scheduler, epochs: int, patience: int,
                  device: str, tag: str, baseline_loss: float,
-                 checkpoint_every: int = 0, save_checkpoint=None) -> list[dict]:
+                 checkpoint_every: int = 0, save_checkpoint=None, train_eval_loader=None) -> list[dict]:
     """`baseline_loss` is ln(vocab_size) -- the loss an untrained model
     with a uniform random output distribution would score. Unlike OCR.py's
     CTC loss (where the warning thresholds this loop's structure was copied
@@ -528,33 +575,32 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
 
     for epoch in range(1, epochs + 1):
         model.train()
-        train_loss_sum, train_batches = 0.0, 0
+        train_loss_sum, train_tokens = 0.0, 0
         for x, y in train_loader:
             x, y = x.to(device), y.to(device)
+            tokens = int(y.ne(PAD).sum().item())
+            if not tokens:
+                continue
             optimizer.zero_grad()
             _, loss = model(x, y)
             loss.backward()
             torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], 1.0)
             optimizer.step()
-            train_loss_sum += loss.item()
-            train_batches += 1
-        train_loss = train_loss_sum / max(train_batches, 1)
-
-        model.eval()
-        val_loss_sum, val_batches = 0.0, 0
-        with torch.no_grad():
-            for x, y in val_loader:
-                x, y = x.to(device), y.to(device)
-                _, loss = model(x, y)
-                val_loss_sum += loss.item()
-                val_batches += 1
-        val_loss = val_loss_sum / max(val_batches, 1)
+            train_loss_sum += loss.item() * tokens
+            train_tokens += tokens
+        if not train_tokens:
+            raise ValueError("Training dataset has no scored target tokens")
+        train_loss = train_loss_sum / train_tokens
+        val_loss = _evaluate_loss(model, val_loader, device)
+        train_eval_loss = (_evaluate_loss(model, train_eval_loader, device)
+                           if train_eval_loader is not None else None)
+        gap_loss = train_eval_loss if train_eval_loss is not None else train_loss
         scheduler.step(val_loss)
 
         warning = ""
-        if val_loss > train_loss * 1.3 and train_loss < baseline_loss:
+        if val_loss > gap_loss * 1.3 and gap_loss < baseline_loss:
             warning = "  [warning: val loss well above train loss -- possible overfitting]"
-        elif train_loss > baseline_loss * 0.7 and epoch >= max(3, epochs // 3):
+        elif gap_loss > baseline_loss * 0.7 and epoch >= max(3, epochs // 3):
             warning = "  [warning: train loss still high this far in -- possible underfitting]"
 
         # flush=True on every print in this loop: a run launched in the
@@ -566,7 +612,11 @@ def _run_epochs(model: GPT, train_loader: DataLoader, val_loader: DataLoader,
         # here means progress is visible the moment each epoch finishes,
         # regardless of how the caller invoked the script.
         print(f"[{tag}] epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}{warning}", flush=True)
-        history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss})
+        row = {"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss}
+        if train_eval_loss is not None:
+            row["train_eval_loss"] = train_eval_loss
+            print(f"[{tag}] clean train_eval_loss={train_eval_loss:.4f}", flush=True)
+        history.append(row)
 
         if save_checkpoint is not None and checkpoint_every > 0 and epoch % checkpoint_every == 0:
             save_checkpoint(model, history)
@@ -659,7 +709,7 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
              device: str | None = None, gpu_mem_fraction: float | None = DEFAULT_GPU_MEM_FRACTION,
              checkpoint_every: int = 0, freeze_embeddings: bool = False, freeze_layers: int = 0,
              label_smoothing: float = 0.0, typo_noise_prob: float = 0.0,
-             lm_corpus: Path | None = None, lm_mix_ratio: float = 0.5):
+             lm_corpus: Path | None = None, lm_mix_ratio: float = 0.5, split_seed: int = 42):
     """Anti-overfitting knobs (freeze_embeddings/freeze_layers/
     label_smoothing/typo_noise_prob/lm_corpus+lm_mix_ratio) all default
     off here -- see the module docstring's 2026-09-30 note for what each
@@ -667,20 +717,9 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
     device = _resolve_device(device)
     _cap_gpu_memory(device, gpu_mem_fraction)
     pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
-    random.shuffle(pairs)
-
-    if val_data_path is not None:
-        # caller already split train/val into separate files -- use them
-        # as-is instead of re-splitting data_path with val_split.
-        train_pairs = pairs
-        val_pairs = json.loads(Path(val_data_path).read_text(encoding="utf-8"))
-        if not val_pairs:
-            val_pairs = train_pairs
-    else:
-        split = max(1, int(len(pairs) * (1 - val_split)))
-        train_pairs, val_pairs = pairs[:split], pairs[split:]
-        if not val_pairs:
-            val_pairs = train_pairs
+    explicit_val = (json.loads(Path(val_data_path).read_text(encoding="utf-8"))
+                    if val_data_path is not None else None)
+    train_pairs, val_pairs = _split_sft_pairs(pairs, val_split, split_seed, explicit_val)
 
     pretrain_dir = Path(pretrain_dir)
     tokenizer = BPETokenizer.load(pretrain_dir)
@@ -708,6 +747,8 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
     val_loader = DataLoader(ChatSFTDataset(val_pairs, tokenizer, block_size),
                              batch_size=batch_size, shuffle=False)
 
+    train_eval_loader = DataLoader(ChatSFTDataset(train_pairs, tokenizer, block_size),
+                                   batch_size=batch_size, shuffle=False)
     optimizer = torch.optim.AdamW(trainable, lr=lr, weight_decay=weight_decay)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2)
 
@@ -715,7 +756,13 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
     out_dir.mkdir(parents=True, exist_ok=True)
     # extra "finetune_regularization" key is bookkeeping only (which knobs
     # produced this checkpoint); _load_gpt() ignores keys it doesn't use.
-    saved_config = dict(config, dropout=dropout, finetune_regularization={
+    saved_config = dict(config, dropout=dropout, validation={
+        "split_seed": split_seed, "train_pairs": len(train_pairs), "val_pairs": len(val_pairs),
+        "train_prompts": [p["prompt"] for p in train_pairs],
+        "val_prompts": [p["prompt"] for p in val_pairs],
+        "val_data_path": str(val_data_path) if val_data_path is not None else None,
+        "loss_reduction": "scored_token_mean",
+    }, finetune_regularization={
         "freeze_embeddings": freeze_embeddings, "freeze_layers": freeze_layers,
         "label_smoothing": label_smoothing, "typo_noise_prob": typo_noise_prob,
         "lm_corpus": str(lm_corpus) if lm_corpus is not None else None,
@@ -733,7 +780,8 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
     history = _run_epochs(model, train_loader, val_loader, optimizer, scheduler,
                            epochs, patience, device, tag="finetune",
                            baseline_loss=math.log(tokenizer.vocab_size),
-                           checkpoint_every=checkpoint_every, save_checkpoint=save_checkpoint)
+                           checkpoint_every=checkpoint_every, save_checkpoint=save_checkpoint,
+                           train_eval_loader=train_eval_loader)
 
     # see pretrain()'s identical comment: tokenizer/config/weights written
     # together after training finishes, not before, so out_dir never sits in
@@ -866,6 +914,7 @@ def main():
     p_fin.add_argument("--lr", type=float, default=1e-4)
     p_fin.add_argument("--weight-decay", type=float, default=0.01)
     p_fin.add_argument("--val-split", type=float, default=0.1)
+    p_fin.add_argument("--split-seed", type=int, default=42, help="fixed prompt-group validation split")
     p_fin.add_argument("--patience", type=int, default=8)
     p_fin.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
                         help="cap this process to this fraction of total VRAM on CUDA devices "
@@ -924,7 +973,7 @@ def main():
                   checkpoint_every=args.checkpoint_every, freeze_embeddings=args.freeze_embeddings,
                   freeze_layers=args.freeze_layers, label_smoothing=args.label_smoothing,
                   typo_noise_prob=args.typo_noise_prob, lm_corpus=args.lm_corpus,
-                  lm_mix_ratio=args.lm_mix_ratio)
+                  lm_mix_ratio=args.lm_mix_ratio, split_seed=args.split_seed)
     elif args.command == "chat":
         print("Chat with the fine-tuned Transformer model (type 'exit' to quit)")
         while True:
