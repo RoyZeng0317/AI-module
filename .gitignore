@@ -49,6 +49,12 @@ tranning/Tranning/
 lib/index-tts/
 lib/indextts2_checkpoints/
 
+# lib/SDXL.py（/image sdxl）、lib/LTXVideo.py（/video ltxvideo）用到的外部
+# 開源模型權重——diffusers 第一次呼叫時自動從 Hugging Face 下載到這兩個
+# 資料夾，一樣是數 GB 的第三方內容，不進版控
+lib/sdxl_checkpoints/
+lib/ltxvideo_checkpoints/
+
 # nova 指令的 PyInstaller 打包產物（可用 pyinstaller 重新產生，機器相依、體積大，不進版控）
 /nova.exe
 /build/pyinstaller/

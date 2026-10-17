@@ -68,6 +68,19 @@ INDEX_MODEL_LICENSE，商業用途需另外取得書面授權——這個專案�
 cli.py 的 `_arg_suggestions()`，以及輸出的語音檔案要怎麼呈現給使用者）還沒接——這是刻意
 分開的下一步，不是遺漏。**
 
+**圖片／影片生成也是同一類顯式例外**（2026-10-17 決定）：使用者想要 Image 2.0
+（OpenAI ChatGPT Images 2.0／xAI Grok Imagine Image 2.0）與 Seedance（ByteDance
+Seed 團隊）那種效果——`tranning/imagegen/draw.py` 是從零訓練的卷積 VAE，架構上
+不支援文字提示詞；影片生成這塊專案目前完全沒有架構（能力是 0，不是「不夠好」）。
+`lib/SDXL.py` 提供 `/image sdxl`（Stability AI 的 SDXL，CreativeML Open RAIL++-M
+授權，個人/研究使用）、`lib/LTXVideo.py` 提供 `/video ltxvideo`（Lightricks 的
+LTX-Video 0.9，程式碼 Apache 2.0、權重另有 LTX 社群授權，年營收低於 1000 萬美元
+組織可免費商業使用——這個專案是私人非商業使用）。兩者都透過 Hugging Face
+`diffusers` 函式庫本機載入（不是打 API），第一次呼叫會自動下載權重到
+`lib/sdxl_checkpoints/`／`lib/ltxvideo_checkpoints/`（已排除版控），`enable_model_
+cpu_offload()` 預設開啟以配合 8GB VRAM 預算。**跟 IndexTTS2 一樣，這次只完成
+後端模組跟測試，`/image`、`/video` 指令本身的 UI 層還沒接，是刻意分開的下一步。**
+
 ### sinco 核心模型（`tranning/`）
 
 字元級 seq2seq（GRU encoder + Luong attention GRU decoder），兩個獨立 checkpoint 不能混
@@ -125,8 +138,9 @@ pyinstaller --onefile --console --name install_check app/install/install_check.p
 ## 專案規則
 
 - 私人自建 AI 專案，禁止呼叫其他雲端 LLM API、禁止使用其他人已訓練好的模型（Rule 06），
-  目前兩個顯式例外都是手動切換才會生效（見上）：`/model nvidia`（外部雲端 API）、
-  `/voice indextts2`（本機開源權重模型，私人非商業使用）
+  目前四個顯式例外都是手動切換才會生效（見上）：`/model nvidia`（外部雲端 API）、
+  `/voice indextts2`、`/image sdxl`、`/video ltxvideo`（皆為本機開源權重模型，
+  私人非商業使用）
 - 每支訓練腳本都有對應 `test_*.py`，用合成假資料驗證訓練管線本身能跑完、不代表真實
   準確度
 - `shape-vision/` 是獨立子專案（純古典影像處理，Canny 邊緣→輪廓→凸包→多邊形分類+
