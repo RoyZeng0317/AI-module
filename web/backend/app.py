@@ -67,6 +67,7 @@ from fastapi import (
     File,
     HTTPException,
     Request,
+    Response,
     UploadFile,
     WebSocket,
     WebSocketDisconnect,
@@ -161,6 +162,26 @@ def _check_chat_rate_limit(client_ip: str) -> None:
 # /memory、/learn、/resume 跟 app/command/*.md 提示詞指令才會真的打
 # /api/chat（見下面 _run_local_command()）。
 # ═══════════════════════════════════════════════════════════════
+
+router = APIRouter(prefix=MOUNT_PREFIX)
+
+@router.post("/api/your-endpoint")
+async def process_img(frame: UploadFile = File(...)):
+    data = await frame.read()
+    img_file = ""   # 根據選選擇的圖片檔案
+    img = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if img is None:
+        return {"Error:": "無法讀取到圖片影像"}
+
+    width = int(img.shape[1] * 0.8)
+    height = int(img.shape[0] * 0.5)
+    resized_img = cv2.resize(img, (width, height))
+    gary_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
+
+    ok, encoded = cv2.imencode(".png", gary_img)
+    if not ok:
+        return {"error": "圖片無法進行解碼"}
+    return Response(content=encoded.tobytes(), media_type="image/png")
 
 _BUILTIN_SLASH_COMMANDS = {
     "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "learn",
@@ -544,13 +565,14 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
     # 同一個現況，sinco/預設人格才用 chat_runs，其餘角色一律共用同一個目錄。
     out_dir = DEFAULT_OUT_DIR if persona.lower() in ("sinco", "default", "reset") else CHARACTER_CHAT_DIR
 
+    trace = "本機指令處理"
     outcome = _run_local_command(payload.message.strip())
     if outcome is not None and outcome[0] == "reply":
         reply = outcome[1]
     else:
         model_message = outcome[1] if outcome is not None else payload.message
         history = _build_nvidia_history(conversation_id, client_id) if force_mode == "nvidia" else None
-        _, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history,
+        trace, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history,
                                       character=None if out_dir == DEFAULT_OUT_DIR else persona)
         # /open、app/command/*.md 提示詞指令這兩種才會真的問模型，比照 CLI
         # 的 ask_model()：只有「真的問過模型」的這一輪才落地到 session.json，
@@ -565,7 +587,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
     if conversation_id is not None:
         convo_store.append_message(conversation_id, "assistant", reply)
 
-    return {"reply": reply, "conversation_id": conversation_id}
+    return {"reply": reply, "conversation_id": conversation_id, "trace": trace}
 
 
 @router.get("/api/usage")
