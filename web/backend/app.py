@@ -111,6 +111,14 @@ CHAT_RATE_WINDOW_SEC = 60
 _chat_request_log: dict[str, list[float]] = defaultdict(list)
 
 
+def _client_ip(request: Request) -> str:
+    """request.client 的型別是 Address | None——不是純粹型別檢查器吹毛求疵,
+    某些 ASGI 情境（例如測試用的 TestClient、某些反向代理設定）下真的會是
+    None。沒有真實來源位址時退回 "unknown"，讓 rate limit／用量統計照樣用
+    一個固定 key 累加，不會直接丟 AttributeError。"""
+    return request.client.host if request.client is not None else "unknown"
+
+
 def _check_chat_rate_limit(client_ip: str) -> None:
     now = time.time()
     log = _chat_request_log[client_ip]
@@ -324,7 +332,7 @@ def _run_local_command(message: str) -> str | None:
 
 @router.post("/api/chat")
 async def chat_endpoint(payload: ChatRequest, request: Request):
-    client_ip = request.client.host
+    client_ip = _client_ip(request)
     _check_chat_rate_limit(client_ip)
 
     if not payload.message.strip():
@@ -361,7 +369,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
 async def usage_endpoint(request: Request):
     """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效
     （例如手動測試，或之後接進 admin 端畫面）。"""
-    used = usage_store.get_usage(request.client.host)
+    used = usage_store.get_usage(_client_ip(request))
     return {
         "chars_used": used,
         "char_limit": usage_store.USAGE_CHAR_LIMIT,
