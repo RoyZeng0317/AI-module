@@ -1,0 +1,30 @@
+[
+  {
+    "timezoneId": "Asia/Taipei",
+    "info": "瀏覽器時區：Asia/Taipei\nUTC 時差：UTC+08:00\nUTC：2026-10-18T16:00:09.335Z\n本地時間：Mon Oct 19 2026 00:00:09 GMT+0800 (台北標準時間)",
+    "codePointLimit": 200,
+    "requestsDuringTool": 0,
+    "errors": []
+  },
+  {
+    "timezoneId": "Asia/Shanghai",
+    "info": "瀏覽器時區：Asia/Shanghai\nUTC 時差：UTC+08:00\nUTC：2026-10-18T16:00:13.486Z\n本地時間：Mon Oct 19 2026 00:00:13 GMT+0800 (中國標準時間)",
+    "codePointLimit": 200,
+    "requestsDuringTool": 0,
+    "errors": []
+  },
+  {
+    "timezoneId": "Asia/Kathmandu",
+    "info": "瀏覽器時區：Asia/Katmandu\nUTC 時差：UTC+05:45\nUTC：2026-10-18T16:00:16.853Z\n本地時間：Sun Oct 18 2026 21:45:16 GMT+0545 (尼泊爾時間)",
+    "codePointLimit": 200,
+    "requestsDuringTool": 0,
+    "errors": []
+  },
+  {
+    "timezoneId": "America/New_York",
+    "info": "瀏覽器時區：America/New_York\nUTC 時差：UTC-04:00\nUTC：2026-10-18T16:00:20.235Z\n本地時間：Sun Oct 18 2026 12:00:20 GMT-0400 (東部夏令時間)",
+    "codePointLimit": 200,
+    "requestsDuringTool": 0,
+    "errors": []
+  }
+]

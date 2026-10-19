@@ -1,0 +1,27 @@
+{
+  "tokenizer_dir": "tranning\\gpt_pretrain_runs_v2\\checkpoint",
+  "block_size": 512,
+  "train": {
+    "rows": 797,
+    "tokens": 43556,
+    "unknown_tokens": 0,
+    "unknown_ratio": 0.0,
+    "longest_sequence": 195,
+    "truncated_rows": 0,
+    "empty_answer_targets": 0,
+    "unknown_characters": [],
+    "issues": []
+  },
+  "val": {
+    "rows": 140,
+    "tokens": 7301,
+    "unknown_tokens": 0,
+    "unknown_ratio": 0.0,
+    "longest_sequence": 167,
+    "truncated_rows": 0,
+    "empty_answer_targets": 0,
+    "unknown_characters": [],
+    "issues": []
+  },
+  "meaning": "Format coverage only; not a measure of comprehension or reply quality."
+}

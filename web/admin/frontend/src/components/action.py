@@ -315,6 +315,13 @@ def _escape(s):
 
 def _inline(line):
     h = _escape(line)
+    # 一次辨識 Markdown 與裸網址，避免把既有連結的 href 再包成連結。
+    def _link(match):
+        label, target, bare = match.groups()
+        url = target or bare.rstrip(".,:!?，。；：！？)")
+        suffix = bare[len(url):] if bare else ""
+        return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{label or url}</a>{suffix}'
+    h = _re.sub(r"\[([^\]\n]+)\]\((https?://[^\s<>\)]+)\)|(?<![\w:/])(https?://[^\s<>]+)", _link, h)
     h = _re.sub(r"\*\*(.+?)\*\*|__(.+?)__", lambda m: f"<strong>{m[1] or m[2]}</strong>", h)
     h = _re.sub(r"`([^`]+)`", lambda m: f'<code class="md-code-inline">{m[1]}</code>', h)
     h = _re.sub(r"(?<!\*)\*([^*\n]+?)\*(?!\*)", lambda m: f"<em>{m[1]}</em>", h)
@@ -815,6 +822,7 @@ def _append_chat(role, content, pending=False):
         chat_empty.remove()
         _dom["chat_empty"] = None
 
+    _dom["chat_panel"].classList.remove("is-empty")
     wrapper, bubble = _build_message_element(role, content)
     if pending:
         bubble.classList.add("is-pending")
@@ -828,8 +836,9 @@ def _render_messages(messages):
     那一批訊息，不是附加。"""
     chat_log = _dom["chat_log"]
     chat_log.innerHTML = ""
+    _dom["chat_panel"].classList.toggle("is-empty", not bool(messages))
     if not messages:
-        empty = el("div", cls="chat-empty", id="chatEmpty", text="說點什麼開始對話吧")
+        empty = _build_chat_empty()
         chat_log.appendChild(empty)
         _dom["chat_empty"] = empty
         return
@@ -841,6 +850,35 @@ def _render_messages(messages):
 
 
 async def send_chat(text):
+    if _state.get("chat_busy"):
+        return
+    _state["chat_busy"] = True
+    _dom["chat_send"].disabled = True
+    _dom["input_status"].textContent = "正在處理訊息…"
+    _dom["chat_log"].setAttribute("aria-busy", "true")
+    try:
+        await _send_chat_once(text)
+    except Exception as exc:
+        _append_chat("assistant", f"訊息未送出：{exc}。請稍後重試。")
+        _dom["chat_input"].value = text
+    finally:
+        _state["chat_busy"] = False
+        _dom["chat_send"].disabled = False
+        _dom["input_status"].textContent = "Enter 送出 · Shift + Enter 換行"
+        _dom["chat_log"].setAttribute("aria-busy", "false")
+        _dom["chat_input"].focus()
+
+
+def _append_trace(bubble, trace):
+    if not isinstance(trace, (dict, str)) or not trace:
+        return
+    details = el("details", cls="reply-trace")
+    details.appendChild(el("summary", text="查看回答處理紀錄"))
+    details.appendChild(el("pre", text=trace if isinstance(trace, str) else _json.dumps(trace, ensure_ascii=False, indent=2)))
+    bubble.parentNode.appendChild(details)
+
+
+async def _send_chat_once(text):
     text = text.strip()
     if not text:
         return
@@ -879,13 +917,18 @@ async def send_chat(text):
             "conversation_id": conversation_id,
             "force_mode": _state["current_model"],
             "persona": _state["persona"],
+            "client_timezone": _client_timezone(),
         })
         pending.innerHTML = render_markdown(data["reply"])
         pending.setAttribute("data-raw-md", data["reply"])
         pending.classList.remove("is-pending")
+        _append_trace(pending, data.get("trace"))
         await refresh_history_list()
     except Exception as exc:
         pending.textContent = f"錯誤：{exc}"
+        pending.setAttribute("data-raw-md", pending.textContent)
+        pending.classList.remove("is-pending")
+        _dom["chat_input"].value = text
     finally:
         _dom["chat_send"].disabled = False
         _dom["chat_input"].focus()
@@ -919,6 +962,7 @@ async def refresh_history_list():
 
 async def switch_conversation(conversation_id):
     if _state.get("conversation_id") == conversation_id:
+        _close_mobile_sidebar()
         return
     try:
         conv = await api_get(f"{CONVERSATIONS_URL}/{conversation_id}")
@@ -927,6 +971,7 @@ async def switch_conversation(conversation_id):
         return
     _state["conversation_id"] = conversation_id
     _render_messages(conv["messages"])
+    _close_mobile_sidebar()
     await refresh_history_list()
 
 
@@ -934,6 +979,7 @@ async def new_conversation():
     conv = await api_post(CONVERSATIONS_URL, {})
     _state["conversation_id"] = conv["id"]
     _render_messages([])
+    _close_mobile_sidebar()
     await refresh_history_list()
 
 
@@ -1211,6 +1257,9 @@ async def _load_commands():
 
 def _set_model(mode):
     _state["current_model"] = mode
+    header_model = _dom.get("header_model")
+    if header_model:
+        header_model.innerHTML = ICONS["model"] + "<span>" + _escape(mode) + " ▾</span>"
     badge = _dom.get("model_badge")
     if badge:
         badge.textContent = mode
@@ -1501,6 +1550,14 @@ async def _on_learn_click():
 # 建構 UI
 # ═══════════════════════════════════════════════════════════════
 
+def _client_timezone():
+    """只附加裝置時區，無法取得時不影響聊天。"""
+    try:
+        return str(window.Intl.DateTimeFormat.new().resolvedOptions().timeZone)
+    except Exception:
+        return None
+
+
 def _build_sidebar():
     """左側邊欄：品牌 + 連線狀態 + 模型切換 + 功能導覽 + 相機控制 + 頁尾。
 
@@ -1515,8 +1572,8 @@ def _build_sidebar():
     brand = el("div", cls="sidebar-brand")
     brand.appendChild(el("div", cls="brand-mark", html=ICONS["logo"]))
     bt = el("div", cls="brand-text")
-    bt.appendChild(el("h1", text="AI Modules"))
-    bt.appendChild(el("span", text="本機視覺與對話模型 Playground"))
+    bt.appendChild(el("h1", text="Sinco"))
+    bt.appendChild(el("span", text="你的個人 AI 工作空間"))
     brand.appendChild(bt)
     aside.appendChild(brand)
 
@@ -1535,6 +1592,7 @@ def _build_sidebar():
 
     history_list = el("div", cls="history-list", id="historyList")
     _dom["history_list"] = history_list
+    history_section.appendChild(el("span", cls="section-label", text="最近的對話"))
     history_section.appendChild(history_list)
 
     aside.appendChild(history_section)
@@ -1543,7 +1601,8 @@ def _build_sidebar():
     aside.appendChild(el("div", cls="sidebar-spacer"))
 
     # ── 連線狀態 ──
-    status_section = el("div", cls="sidebar-section")
+    status_section = el("details", cls="sidebar-section connection-details")
+    status_section.appendChild(el("summary", text="系統狀態"))
 
     pill = el("div", cls="status-pill", id="statusPill")
     pill.setAttribute("data-state", "checking")
@@ -1570,8 +1629,8 @@ def _build_sidebar():
     aside.appendChild(status_section)
 
     # ── 功能導覽：角色／記憶／學習 ──
-    tools_section = el("div", cls="sidebar-section nav-section")
-    tools_section.appendChild(el("span", cls="section-label", text="功能"))
+    tools_section = el("details", cls="sidebar-section nav-section")
+    tools_section.appendChild(el("summary", text="工具與個人化"))
     tools_section.appendChild(icon_button("character", "角色", on_click=lambda _: _on_character_click()))
     tools_section.appendChild(icon_button("memory", "記憶", on_click=lambda _: asyncio.ensure_future(_on_memory_click())))
     tools_section.appendChild(icon_button("learn", "學習", on_click=lambda _: asyncio.ensure_future(_on_learn_click())))
@@ -1590,6 +1649,7 @@ def _build_sidebar():
         "bell", "發送通知", on_click=lambda _: toggle_notify_composer(), cls="footer-action", btn_id="notifyComposerBtn"
     ))
     footer.appendChild(el("div", cls="sidebar-credit", text="© Author: Roy Zeng"))
+    footer.appendChild(el("a", cls="sidebar-credit", text="IP Geolocation by DB-IP", href="https://db-ip.com"))
 
     aside.appendChild(footer)
 
@@ -1833,6 +1893,46 @@ def _build_notify_composer_modal():
     return box
 
 
+def _build_chat_empty():
+    empty = el("div", cls="chat-empty", id="chatEmpty")
+    empty.appendChild(el("span", cls="welcome-eyebrow", text="SINCO / 個人 AI 工作空間"))
+    empty.appendChild(el("h2", text="從一個好奇的問題開始"))
+    empty.appendChild(el("p", text="討論概念、釐清問題，或輸入「搜尋」查詢網頁資料。"))
+    prompts = el("div", cls="starter-prompts")
+    for label, question in (("投資入門", "你懂得股票投資嗎？"), ("理解模型", "什麼是交叉熵損失？"), ("名詞解釋", "名詞解釋什麼是 RAG")):
+        button = el("button", cls="starter-prompt", type="button")
+        button.appendChild(el("small", text=label))
+        button.appendChild(el("span", text=question))
+        def _choose(_e, value=question):
+            _dom["chat_input"].value = value
+            _dom["chat_input"].focus()
+        button.addEventListener("click", create_proxy(_choose))
+        prompts.appendChild(button)
+    empty.appendChild(prompts)
+
+    return empty
+
+
+def _sync_sidebar_accessibility(_e=None):
+    mobile = window.matchMedia("(max-width: 760px)").matches
+    classes = _dom["shell"].classList
+    expanded = classes.contains("sidebar-open") if mobile else not classes.contains("sidebar-collapsed")
+    _dom["sidebar_toggle"].setAttribute("aria-expanded", str(expanded).lower())
+
+
+def _close_mobile_sidebar(_e=None):
+    _dom["shell"].classList.remove("sidebar-open")
+    _sync_sidebar_accessibility()
+
+
+def _toggle_sidebar(_e=None):
+    mobile = window.matchMedia("(max-width: 760px)").matches
+    state = "sidebar-open" if mobile else "sidebar-collapsed"
+    active = not _dom["shell"].classList.contains(state)
+    _dom["shell"].classList.toggle(state, active)
+    _sync_sidebar_accessibility()
+
+
 def _build_chat_card():
     """對話面板：結構/命名對齊 default.html 的
     `.chat-header` / `.chat-messages` / `.chat-input-container` /
@@ -1841,30 +1941,46 @@ def _build_chat_card():
     （index.html 載入 action.py），default.html 本身只是示範用的
     靜態樣式參考，沒有接任何 JS/後端邏輯。
     """
-    panel = el("section", cls="chat-panel")
+    panel = el("section", cls="chat-panel is-empty")
+    _dom["chat_panel"] = panel
 
     header = el("header", cls="chat-header")
+    menu_btn = el("button", cls="sidebar-toggle", id="sidebarToggle", text="☰", type="button", aria_label="展開或收合功能選單", aria_controls="sidebar", aria_expanded=str(not window.matchMedia("(max-width: 760px)").matches).lower())
+    menu_btn.addEventListener("click", create_proxy(_toggle_sidebar))
+    _dom["sidebar_toggle"] = menu_btn
+    header.appendChild(menu_btn)
+    model_entry = icon_button("model", "Sinco ▾", on_click=lambda _: toggle_settings_modal(), cls="header-model", btn_id="headerModelBtn")
+    model_entry.innerHTML = ICONS["model"] + "<span>" + _escape(_state["current_model"]) + " ▾</span>"
+    header.appendChild(model_entry)
+    _dom["header_model"] = model_entry
     title_info = el("div", cls="chat-title-info")
     title_el = el("h2", text="對話")
     _dom["chat_title"] = title_el
     title_info.appendChild(title_el)
+
     header.appendChild(title_info)
 
     export_btn = el("button", cls="btn-export-md", id="exportMdBtn", title="把目前這則對話匯出成 Markdown 檔案")
     export_btn.setAttribute("type", "button")
+    export_btn.setAttribute("aria-label", "匯出 Markdown")
     export_btn.appendChild(svg_span(ICONS["download"]))
-    export_btn.appendChild(el("span", text="匯出 Markdown"))
+    export_btn.appendChild(el("span", cls="export-label", text="匯出 Markdown"))
     export_btn.addEventListener("click", create_proxy(lambda _: export_conversation_markdown()))
     header.appendChild(export_btn)
 
     panel.appendChild(header)
 
+    workspace = el("div", cls="chat-workspace")
+    panel.appendChild(workspace)
     chat_log = el("div", cls="chat-messages", id="chatLog")
-    chat_empty = el("div", cls="chat-empty", id="chatEmpty", text="說點什麼開始對話吧")
+    chat_log.setAttribute("role", "log")
+    chat_log.setAttribute("aria-label", "對話訊息")
+    chat_log.setAttribute("aria-live", "polite")
+    chat_empty = _build_chat_empty()
     chat_log.appendChild(chat_empty)
     _dom["chat_log"] = chat_log
     _dom["chat_empty"] = chat_empty
-    panel.appendChild(chat_log)
+    workspace.appendChild(chat_log)
 
     footer = el("footer", cls="chat-input-container")
 
@@ -1879,8 +1995,9 @@ def _build_chat_card():
     form = el("form", id="chatForm")
 
     chat_input = el("textarea", id="chatInput")
-    chat_input.setAttribute("placeholder", "輸入訊息…（Shift + Enter 換行，「/」跳出指令選單）")
+    chat_input.setAttribute("placeholder", "傳送訊息給 Sinco…")
     chat_input.setAttribute("rows", "1")
+    chat_input.setAttribute("aria-label", "輸入訊息")
     _dom["chat_input"] = chat_input
 
     def _autosize(_evt=None):
@@ -1896,6 +2013,8 @@ def _build_chat_card():
             asyncio.ensure_future(send_chat(text))
 
     def _on_keydown(e):
+        if e.isComposing or e.keyCode == 229:
+            return
         menu_open = not cmd_menu.hidden
         if menu_open:
             if e.key == "ArrowDown":
@@ -1943,6 +2062,7 @@ def _build_chat_card():
 
     send_btn = el("button", cls="btn-send", id="chatSend", html=ICONS["send"])
     send_btn.setAttribute("type", "submit")
+    send_btn.setAttribute("aria-label", "送出訊息")
     _dom["chat_send"] = send_btn
     input_footer.appendChild(send_btn)
     form.appendChild(input_footer)
@@ -1957,7 +2077,11 @@ def _build_chat_card():
 
     form.addEventListener("submit", create_proxy(_on_submit))
     footer.appendChild(form)
-    panel.appendChild(footer)
+    status = el("div", cls="input-status", id="inputStatus", text="Enter 送出 · Shift + Enter 換行 · / 指令", role="status")
+    _dom["input_status"] = status
+    footer.appendChild(status)
+    footer.appendChild(el("small", cls="welcome-note", text="Sinco 的回答可能有誤，請核對重要資訊與來源。"))
+    workspace.appendChild(footer)
 
     return panel
 
@@ -1967,7 +2091,14 @@ def build_ui():
     root.innerHTML = ""
 
     shell = el("div", cls="app-shell")
-    shell.appendChild(_build_sidebar())
+    _dom["shell"] = shell
+    sidebar = _build_sidebar()
+    sidebar.id = "sidebar"
+    shell.appendChild(sidebar)
+    backdrop = el("button", cls="sidebar-backdrop", type="button", aria_label="關閉功能選單")
+    backdrop.addEventListener("click", create_proxy(_close_mobile_sidebar))
+    document.addEventListener("keydown", create_proxy(lambda e: _close_mobile_sidebar(e) if e.key == "Escape" else None))
+    shell.appendChild(backdrop)
 
     main = el("main", cls="main")
     grid = el("div", cls="main-grid")
@@ -1976,6 +2107,8 @@ def build_ui():
     shell.appendChild(main)
 
     root.appendChild(shell)
+    window.matchMedia("(max-width: 760px)").addEventListener("change", create_proxy(_sync_sidebar_accessibility))
+    _sync_sidebar_accessibility()
     root.appendChild(_build_settings_modal())
     root.appendChild(_build_notify_composer_modal())
 

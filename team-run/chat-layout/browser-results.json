@@ -1,0 +1,18 @@
+{
+  "home": {
+    "x": 472,
+    "y": 472.390625,
+    "width": 760,
+    "height": 106
+  },
+  "chatting": {
+    "x": 472,
+    "y": 731,
+    "width": 760,
+    "height": 106
+  },
+  "requests": 1,
+  "pageErrors": [],
+  "overflow": false,
+  "backend": "mock responses; real PyScript DOM and handlers"
+}

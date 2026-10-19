@@ -201,3 +201,53 @@ to_do_list.md #27。
 
 **已修正（程式碼）**，`pytest tranning/test_persona_chat.py`（13 項）、`test_chats.py`、`lib/components/test_cli.py`、`web/backend/tests/` 全過。尚待你在 GUI 實際用 `/character` 切換角色聊幾句確認體感。
 
+
+
+## 2026-10-18：灰階分類器特徵層未從自己的資料學習
+
+檢查發現 `image_classifier_bnn.py` 原本使用外部 ImageNet 預訓練 MobileNetV2，且預設凍結 features；單純加灰階前處理不能讓卷積特徵層學習。新訓練改用自建 FeatureCNN，全卷積層可訓練，config 記錄架構；舊 checkpoint 保留讀取分支但禁止下載權重。新增橫線／直線合成測試，驗證三階段卷積梯度非零、權重更新及 loss 下降；含既有分類流程共 7 項測試通過。尚未執行真實資料重訓，待使用者驗證實際效果，未登記為功能驗收完成。
+
+
+## 2026-10-18：特徵輸出範例圖片路徑不存在
+
+使用者直接執行 `--features "圖片路徑.jpg"`，因該文字是佔位範例而非實際檔案，Pillow 拋出 FileNotFoundError。文件改提供專案現有驗證圖片範例；export_features 先檢查圖片是否存在，再載入模型，CLI 將路徑與圖片格式錯誤顯示為參數提示，不再輸出整段 traceback。圖片路徑相對於執行時目錄，並非 checkpoint 目錄。保留模型及原圖。
+
+
+## 2026-10-18：一般問答偏題、搜尋污染與前端狀態
+
+使用者案例為「你懂得股票投資嗎」「什麼是交叉商損失」「名詞解釋什麼是RAG」。直接既有Transformer推論已重現偏成程式邏輯／英文文法（team-run/BASELINE.json）。一般分支未使用多輪歷史，且過寬路由讓故事進程式、能力問答進行情。加入保守雙語規則與有限輸出檢查，仍不代表模型語意能力提升。
+
+獨立審查抓到「台股／天氣的意思是什麼」仍誤進即時工具，已改定義意圖優先並加反例；英文禮貌搜尋不再被能力gate略過。公開DDG回202驗證頁，Bing RSS能取得索引但RAG實際回政治人物內容，因此加入明顯詞面不符過濾。此次測試新增的錯誤候選（id 6ebce3ff）已移除，保留既有候選及pairs。RAG／交叉熵精確本機詞條附原始論文／官方文件，明示日期、非即時／非生成，不宣稱搜尋或泛化成功。
+
+前端原本裸來源URL不可點、hidden指令選單被display:flex覆蓋而留下14px空白條，已修格式與CSS；新增IME、防重送及錯誤復原。第一次連結測試發現trim分號會破壞HTML entity，已保留分號。整合測試最初引用錯誤測試路徑而未跑，改正後執行；測試stub有未await coroutine警告，非瀏覽器實測失敗，另有既有套件deprecation警告。
+
+重要未完成項：真實24筆離線驗收顯示自然中英文未見題仍不通順／偏題，記錄於team-run/chat_eval_offline.jsonl。未進行長時間訓練或替換權重，正常人類／母語品質不視為完成，見to_do_list #46。此處記錄問題與工程處置，尚待使用者實際驗收。
+
+補充：既有HTTP測試曾寫入真實usage.json的testclient測試帳；已增加autouse暫存用量fixture並還原該測試帳原始紀錄，保留其他使用者用量。20項HTTP測試重驗通過。
+
+## 2026-10-18：聊天版型重整的瀏覽器驗證問題
+
+重整實際 admin PyScript 前端時，手機規則 `.btn-export-md span` 同時隱藏文字與包住 SVG 的 span，使匯出按鈕外觀變成空白。改以 `.export-label` 限定文字標籤，並補充按鈕 ARIA 名稱及最小點擊區，待使用者驗收整體介面。
+
+瀏覽器驗證腳本首次等待「後端已連線」可見而逾時；該狀態已收在預設關閉的系統狀態 details 中，文字存在但不可見。檢查條件改等待節點存在。此為測試條件與新布局不符，非 API 連線失敗。瀏覽器測試使用實際 PyScript DOM 與模擬 API，未代表真實模型、相機或通知服務驗收。
+
+## 2026-10-18：時區與 Unicode 練習的 Windows 測試編碼
+
+CLI 子程序 smoke test 首次以 UTF-8 解碼系統預設編碼的輸出，發生 UnicodeDecodeError。測試呼叫改用 Python `-X utf8` 後，emoji、結合字及 200 碼位限制檢查通過。從專案根合跑 `web/backend/tests/test_frontend_chat.py` 與 `web/admin/frontend/src/components/test_render_markdown.py`，共 8 項通過；後者 mock 排程出現 4 個 coroutine 未 await 警告。單跑前者則是 4 項通過、無警告；兩者範圍不同，不代表使用者驗收完成。
+
+## 2026-10-19：瀏覽器時區別名的測試斷言
+
+四時區驗證時，Chromium 的 Intl API 將輸入 Asia/Kathmandu 回報為別名 Asia/Katmandu；原測試要求字串完全一致而失敗。測試改接受該別名，UTC+05:45 檢查保留，四時區重跑通過。產品維持顯示瀏覽器真實回傳值，未將別名當成位置證據。
+
+## 2026-10-19：本機 IP 國別資料下載需要來源標頭
+
+初次透過 urllib 下載 DB-IP 公開 Country Lite MMDB 壓縮包時 HTTP 403；供應商公開下載頁可正常讀取，確認相同官方連結後，為下載請求加入明示 AI-module User-Agent 與下載頁 Referer 即成功。已解壓並用 maxminddb 讀取資料庫，114.114.114.114→CN、1.9.1.1→MY、168.95.1.1→TW；來源與 SHA256 記於 team-run/region-signals/database-download.json。此為資料庫讀取 smoke，不代表已驗證真實使用者所在地或風控準確率。
+
+補充（本輪開發過程）：初次套用內部評估 hook 的 patch 曾命中通知處理區段，已移除該誤置區塊並改置 /api/chat；目前搜尋 assessment 僅在聊天流程，50 項規則／HTTP／前端回歸通過。此記錄為開發問題與驗證，不代表使用者已驗收。
+測試開發補充：初版測試曾有括號語法錯誤，另因 app.py 採裸 import region_signals，mock 若套用 package import 副本不會影響實際API；已修語法並改對 app 模組所持參照做 mock，最終50項通過。
+
+## 2026-10-19：OpenCV 讀圖與 Request.client 的可空型別
+
+`lib/img_convert_gray.py` 的 cv2.imread 可能回傳 None，直接傳進 cvtColor 造成型別警告及執行錯誤；讀圖後加入 None 檢查，失敗時顯示路徑／格式提示。保留原有註解與其他範例內容。
+
+`web/backend/app.py` 的 _resolve_client_id 原先直接讀取 request.client.host，client=None 會 AttributeError。首次驗證仍重現該行，重新核對並套用後，統一轉呼叫既有 _client_ip，缺來源時回 unknown。新增缺來源／正常來源兩項回歸，後端25項通過；讀圖失敗防護與實際BGR轉RGB smoke通過，未開啟攝影機。本環境未安裝Pyright，未宣稱完成靜態檢查器重跑；尚待使用者IDE確認。保留兩項既有第三方deprecation警告。

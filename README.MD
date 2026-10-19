@@ -242,3 +242,66 @@ pip install pyinstaller markdown
 ## 詳細記錄
 
 專案規則、待辦事項、每次修正的完整脈絡都記錄在 [`CLAUDE.md`](CLAUDE.md)（Error log / 修正日誌），遇到相似問題可以先查那裡。
+
+
+### 影像分類訓練：灰階輸入（2026-10-18）
+
+在專案根目錄執行；資料夾需包含 `train/類別名稱/` 與 `val/類別名稱/`：
+
+```powershell
+.\.venv\Scripts\python.exe tranning/image_classifier_bnn.py --data-dir data/dataset --grayscale --out-dir tranning/image_classifier_gray_runs
+```
+
+`--grayscale` 會在載入時去除色彩，不修改原圖。為配合既有分類器，灰階亮度複製成三通道，並不會減少輸入通道或保證提升準確度。設定寫入輸出目錄的 `config.json`，推論自動沿用；舊 checkpoint 沒有此設定時仍使用彩色輸入。建議使用獨立輸出目錄保存灰階模型。
+
+```powershell
+.\.venv\Scripts\python.exe tranning/image_classifier_bnn.py --classify path/to/image.jpg --out-dir tranning/image_classifier_gray_runs
+```
+
+OCR 的 `tranning/OCR.py` 已內建單通道灰階載入，不需要新增選項。此變更不修改生圖、修圖或去模糊模型。
+
+
+分類器訓練結束後會自動產生 `--out-dir` 下的 `training_curves.png`，包含訓練／驗證 loss 與 accuracy 曲線。需安裝 `matplotlib`。若已有 `history.json`，可直接產圖，不必重新訓練：
+
+```powershell
+.\.venv\Scripts\python.exe tranning/image_classifier_bnn.py --plot-history --out-dir tranning/image_classifier_runs
+```
+
+灰階模型請將 `--out-dir` 改成 `tranning/image_classifier_gray_runs`；圖表只代表該目錄實際記錄的訓練結果。
+
+
+### 灰階特徵學習（2026-10-18）
+
+`image_classifier_bnn.py` 新訓練使用自建三層 CNN（16/32/64 通道），所有卷積層從隨機權重學習，不下載預訓練模型。灰階仍複製成三通道，保留既有前處理介面；`--unfreeze-backbone` 僅保留舊指令相容性，自建 CNN 一律訓練全部特徵層。GUI 的圖像分類訓練亦提供灰階勾選。
+
+建議使用新目錄，避免覆蓋舊模型：
+
+```powershell
+.\.venv\Scripts\python.exe tranning/image_classifier_bnn.py --data-dir data/dataset --grayscale --out-dir tranning/image_classifier_feature_runs --epochs 30
+.\.venv\Scripts\python.exe tranning/image_classifier_bnn.py --features data/dataset/val/class_d/class_d_0018.jpg --out-dir tranning/image_classifier_feature_runs
+```
+
+第一行會訓練並輸出 loss/acc 曲線；第二行使用訓練好的模型輸出 `feature_maps.png`（三個階段、每階段前四個通道）。特徵圖顯示卷積反應，不代表模型一定理解物件或具有真實泛化能力。沒有 `architecture` 欄位的舊 checkpoint 仍以原 MobileNetV2 結構讀取，但初始化不再下載權重；舊模型不會自動變成自建 CNN，必須重新訓練。
+
+`--features` 必須指定實際存在的圖片；`圖片路徑.jpg` 是佔位範例，不是專案檔案。相對路徑以執行指令時的目錄為準。
+
+
+### 問答、上網與網頁介面（2026-10-18）
+
+三個前端仍共用 `tranning/chats.py`。新增 `chat_quality.py` 的精確常用中英文對話輔助與有限輸出檢查，修正故事誤進程式模式、能力詢問誤查行情、定義題誤查天氣。這些規則不是模型已學會理解；未見問法仍可能偏題，角色模式維持既有流程。
+
+`搜尋 關鍵字` 或 `search topic` 走網路索引。Serper 若有 process 環境變數 `SERPER_API_KEY` 則沿用；沒有時使用公開 DuckDuckGo HTML／Bing RSS，不自動讀取 `.env`。外站可能驗證、限流或查不到，會回報失敗。只過濾明顯詞面不符結果，不保證語意正確。搜尋結果保留來源，候選資料仍需 `/learn` 人工審核；不自動訓練。
+
+RAG／交叉熵的精確定義題有中英文已審核本機詞條，附來源與查核日期，明確標示非即時搜尋、非模型生成。詞條參考 RAG 原始論文（https://arxiv.org/abs/2005.11401）與 PyTorch CrossEntropyLoss 文件（https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html）。其他領域的 RAG 縮寫仍需補充語境。
+
+實際網頁在 `web/admin/frontend/src/components`：深色響應式介面、提問卡、手機功能選單、回答處理紀錄、安全來源連結、組字 Enter 保護與防重複送出。`/api/chat` 新增 `trace` 欄位；現有 `reply` 與 `conversation_id` 保留。重新啟動後端再整理網頁才會載入新的後端流程。
+
+#### 中英文品質驗收
+
+`data/chat_eval_cases.json` 含 24 筆日常、知識、主體、否定及追問案例，獨立於訓練 pairs。記錄輸出供人工審查，不產生虛假的語意準確率：
+
+```powershell
+.\.venv\Scripts\python.exe tranning/evaluate_chat.py --run --output output/chat_eval_offline.jsonl
+```
+
+預設停用工具並略過網路案例，適合單獨觀察聊天生成；加入 `--allow-network` 才會執行完整工具路由與查詢。此指令會進行模型推論，不會訓練或修改 checkpoint。完整路由結果不能直接當作純模型能力。`team-run/chat_eval_offline.jsonl` 是此次實測，未見中文／自然英文改寫仍多有不通順與不相關回覆；目前**未達一般人類或英文母語對話品質，更未證實與 Claude／GPT 同等能力**。後續需擴充經審核雙語語料、多輪格式、重訓並人工比較，不能只靠更多固定回覆或 loss 下降判定完成。

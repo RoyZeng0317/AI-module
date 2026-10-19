@@ -1,0 +1,2178 @@
+[
+  {
+    "id": "glv1_crypto_start_zh-Hant",
+    "group_id": "glv1_crypto_start",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "我沒有買過幣，第一步學什麼？",
+    "reply": "先學區塊鏈、錢包、私鑰，再學波動、費用與詐騙。用模擬紀錄練習，理解風險後才評估是否投入可承受損失的資金。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_start_en",
+    "group_id": "glv1_crypto_start",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "I have never bought crypto. Where should I start?",
+    "reply": "Learn about blockchains, wallets, and private keys. Then study price changes, fees, and scams. Try a practice record before deciding whether to use money you can afford to lose.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_budget_zh-Hant",
+    "group_id": "glv1_crypto_budget",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "生活費能拿去買虛擬貨幣嗎？",
+    "reply": "生活費和緊急預備金應先保留。幣價可能大幅下跌，不要靠投資收益支付近期帳單。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_budget_en",
+    "group_id": "glv1_crypto_budget",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Should I use my rent money to buy crypto?",
+    "reply": "Keep money for rent, food, and emergencies safe. Crypto can fall sharply. Do not depend on it to pay bills due soon.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_loss_zh-Hant",
+    "group_id": "glv1_crypto_loss",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "幣價跌一半，再漲一半就回本嗎？",
+    "reply": "不會。100元跌到50元，再漲50%只有75元；從50元回到100元需要上漲100%。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_loss_en",
+    "group_id": "glv1_crypto_loss",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "If a coin falls by half and then rises by half, am I back to the start?",
+    "reply": "No. A price of 100 falls to 50. A 50% rise takes it to 75. It needs a 100% rise from 50 to return to 100.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_promise_zh-Hant",
+    "group_id": "glv1_crypto_promise",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "有人保證買幣每週固定獲利，能信嗎？",
+    "reply": "保證獲利是警訊。先查證身分、平台與提款條件，不因截圖或名人照片就匯款，也不要提供私鑰或驗證碼。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_promise_en",
+    "group_id": "glv1_crypto_promise",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Someone promises a fixed crypto profit every week. Is that reliable?",
+    "reply": "A promise of profit is a warning sign. Screenshots and famous faces are not proof. Check who runs the service and how withdrawals work. Never share private keys or security codes.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_keys_zh-Hant",
+    "group_id": "glv1_crypto_keys",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "錢包私鑰可以交給客服嗎？",
+    "reply": "不要提供私鑰或助記詞。取得它們的人可能控制資產；遇到自稱客服索取時，停止對話並從官方管道核實。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_keys_en",
+    "group_id": "glv1_crypto_keys",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Can support staff keep my wallet private key for me?",
+    "reply": "Do not give support staff your private key or recovery words. A person with them may control your assets. Stop and check through the official support channel.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_custody_zh-Hant",
+    "group_id": "glv1_crypto_custody",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "自己保管錢包是不是沒有風險？",
+    "reply": "不是。遺失私鑰、備份外洩或誤簽交易都可能造成損失。先學安全備份與交易確認，不把自己保管當成零風險。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_custody_en",
+    "group_id": "glv1_crypto_custody",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Does keeping my own wallet remove all risk?",
+    "reply": "No. Lost keys, stolen backups, or a bad transaction can cause loss. Learn how to back up keys and check transactions.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_platform_zh-Hant",
+    "group_id": "glv1_crypto_platform",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "幣放交易平台就跟銀行存款一樣安全嗎？",
+    "reply": "不能這樣假設。平台有保管、提款或倒閉風險，保障也依地區和產品不同；應查閱官方條款與當地規定。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_platform_en",
+    "group_id": "glv1_crypto_platform",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Is crypto on a platform as safe as money in a bank?",
+    "reply": "Do not assume that. A platform may fail or stop withdrawals. Protection depends on the place and product. Read official terms and local rules first.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_fees_zh-Hant",
+    "group_id": "glv1_crypto_fees",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "買入賣出價格一樣，為何還虧錢？",
+    "reply": "可能有交易費、買賣價差或轉帳費。計算損益要把所有費用算進去，不只比較畫面幣價。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_fees_en",
+    "group_id": "glv1_crypto_fees",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Why can I lose money if I buy and sell at the same price?",
+    "reply": "Trading fees, the gap between buy and sell prices, and transfer fees can cost money. Include all costs when you work out profit or loss.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_liquidity_zh-Hant",
+    "group_id": "glv1_crypto_liquidity",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "價格上漲就一定能照報價賣掉嗎？",
+    "reply": "不一定。成交需要買方，交易量不足時可能只能較低價賣出。畫面報價不保證實際成交價格。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_liquidity_en",
+    "group_id": "glv1_crypto_liquidity",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Can I always sell at the price shown on the screen?",
+    "reply": "No. You need a buyer. If few people are trading, you may get a lower price. The shown price is not a promise of your sale price.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_leverage_zh-Hant",
+    "group_id": "glv1_crypto_leverage",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "新手借錢買幣會學得更快嗎？",
+    "reply": "借款增加還款壓力，價格下跌仍要還錢。先用模擬紀錄學習，不把高風險投入當學習捷徑。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_leverage_en",
+    "group_id": "glv1_crypto_leverage",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Will borrowing money to buy crypto help me learn faster?",
+    "reply": "Debt adds pressure. You still owe the money if the price falls. Start with a practice record that uses no real loan. More risk is not a safe way to learn faster.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_stable_zh-Hant",
+    "group_id": "glv1_crypto_stable",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "穩定幣不可能跌吧？",
+    "reply": "仍可能偏離目標價格。儲備、發行方與維持價格的機制都有風險，要研究運作方式，不只看名稱。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_stable_en",
+    "group_id": "glv1_crypto_stable",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Can a stablecoin never fall because it is called stable?",
+    "reply": "It can fall. Its reserves, issuer, or price system may have problems. Study how it tries to keep its price instead of trusting its name.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_research_zh-Hant",
+    "group_id": "glv1_crypto_research",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "研究一個幣除了價格還看什麼？",
+    "reply": "看用途、供給規則、持有人集中程度、團隊資訊與風險揭露，再交叉查證。熱度不能代替研究。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_research_en",
+    "group_id": "glv1_crypto_research",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "What should I study about a coin besides its price?",
+    "reply": "Check its purpose, supply rules, who holds it, team information, and risks. Compare sources. Popular posts and follower numbers are not enough.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_practice_zh-Hant",
+    "group_id": "glv1_crypto_practice",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "還不想花錢，怎麼練習投資紀錄？",
+    "reply": "建模擬表，記日期、假設買價、數量、費用與理由，之後比較結果。模擬獲利不保證真實交易也會獲利。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_practice_en",
+    "group_id": "glv1_crypto_practice",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "How can I practise without spending money?",
+    "reply": "Make a practice sheet with the date, assumed price, amount, fees, and reason for each choice. Review it later. A good practice result does not promise real profit.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_diversity_zh-Hant",
+    "group_id": "glv1_crypto_diversity",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "買十種幣風險就低了嗎？",
+    "reply": "不一定。它們可能同時下跌，仍集中在同類高風險資產。分散數量不能取代整體風險與資金用途的評估。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_diversity_en",
+    "group_id": "glv1_crypto_diversity",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Does buying ten coins make the risk low?",
+    "reply": "Not always. Many coins can fall together. You may still hold only one risky asset type. More names do not replace a plan for your total risk.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_sources_zh-Hant",
+    "group_id": "glv1_crypto_sources",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "群組說某幣明天一定漲，怎麼查證？",
+    "reply": "找原始公告，核對日期、發布者與完整內容，再比較可靠來源。轉傳不是事實，也沒有人能保證明天價格。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_sources_en",
+    "group_id": "glv1_crypto_sources",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "A group says a coin will surely rise tomorrow. How do I check?",
+    "reply": "Find the original notice. Check its date, author, and full text. Compare reliable sources. A forwarded message is not proof, and tomorrow's price is not certain.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_exit_zh-Hant",
+    "group_id": "glv1_crypto_exit",
+    "topic": "crypto",
+    "language": "zh-Hant",
+    "prompt": "還沒買幣就該想賣出條件嗎？",
+    "reply": "可以先寫目標、可承受損失和重新評估時間，減少情緒決策。計畫不能消除價格跳動或成交風險。",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_crypto_exit_en",
+    "group_id": "glv1_crypto_exit",
+    "topic": "crypto",
+    "language": "en",
+    "prompt": "Should I plan when to review or sell before buying crypto?",
+    "reply": "Write down your goal, possible loss limit, and review dates first. This can reduce emotional choices. A plan cannot remove price jumps or trading risk.",
+    "source_urls": [
+      "https://www.investor.gov/crypto-assets",
+      "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"
+    ],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_styles_zh-Hant",
+    "group_id": "glv1_office_word_styles",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Word長文件標題要逐一放大嗎？",
+    "reply": "建議套用標題樣式，以便統一調整字型和層級，也方便產生目錄。先以一段測試，再套用整份文件。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_styles_en",
+    "group_id": "glv1_office_word_styles",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Must I enlarge every heading in a long Word file by hand?",
+    "reply": "Use heading styles. You can change their look together and build a table of contents. Test the style on a small part before using it across the file.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_break_zh-Hant",
+    "group_id": "glv1_office_word_break",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Word換頁能一直按Enter嗎？",
+    "reply": "使用分頁符號較穩定；要改不同頁的頁首頁尾或方向時，再考慮分節符號。大量空白段落容易使排版移位。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_break_en",
+    "group_id": "glv1_office_word_break",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Should I press Enter many times to start a new Word page?",
+    "reply": "Use a page break. Use a section break when page settings need to change. Many empty lines can move the layout when you edit the text.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_review_zh-Hant",
+    "group_id": "glv1_office_word_review",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "如何讓同事看出Word改了哪些字？",
+    "reply": "先啟用追蹤修訂再編輯，用註解說明原因。送出前檢查顯示模式；隱藏標記不等於接受修訂。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_review_en",
+    "group_id": "glv1_office_word_review",
+    "topic": "office",
+    "language": "en",
+    "prompt": "How can a colleague see my changes in Word?",
+    "reply": "Turn on Track Changes before editing and add comments when needed. Check the view before sharing. Hiding marks does not accept the changes.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_table_zh-Hant",
+    "group_id": "glv1_office_word_table",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Word表格太寬，文字擠在一起。",
+    "reply": "先檢查頁面寬度，再調整欄寬和儲存格邊界。欄位很多可評估橫向頁面，不先把字縮到難以閱讀。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_table_en",
+    "group_id": "glv1_office_word_table",
+    "topic": "office",
+    "language": "en",
+    "prompt": "My Word table is too wide. What can I try?",
+    "reply": "Check the page width, column sizes, and cell margins. A landscape page may help with many columns. Keep the text large enough to read.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_template_zh-Hant",
+    "group_id": "glv1_office_word_template",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "怎麼整理可重用的報告格式？",
+    "reply": "先定義標題、內文、頁碼與表格樣式，標記待填位置。用短報告測試內容增加時的排版，再存成範本。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_word_template_en",
+    "group_id": "glv1_office_word_template",
+    "topic": "office",
+    "language": "en",
+    "prompt": "How do I plan a reusable report template?",
+    "reply": "Set styles for headings, text, page numbers, and tables. Mark the places to fill in. Test the layout with a short report before saving it as a template.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_sum_zh-Hant",
+    "group_id": "glv1_office_excel_sum",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Excel的B2到B10金額如何加總？",
+    "reply": "輸入 =SUM(B2:B10)。若結果不對，檢查數值是否存成文字，以及範圍有沒有漏列。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_sum_en",
+    "group_id": "glv1_office_excel_sum",
+    "topic": "office",
+    "language": "en",
+    "prompt": "How do I add the amounts in Excel cells B2 to B10?",
+    "reply": "Enter =SUM(B2:B10) in the result cell. If the total looks wrong, check for numbers stored as text and missing rows.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_reference_zh-Hant",
+    "group_id": "glv1_office_excel_reference",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Excel複製公式後稅率位置跑掉了。",
+    "reply": "用絕對參照，例如 =B2*$E$1。複製時B2隨列變動，$E$1保持同一位置。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_reference_en",
+    "group_id": "glv1_office_excel_reference",
+    "topic": "office",
+    "language": "en",
+    "prompt": "My tax rate cell moves when I copy an Excel formula. How can I fix it?",
+    "reply": "Use an absolute reference, such as =B2*$E$1. B2 changes when copied down, but $E$1 stays fixed.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_sort_zh-Hant",
+    "group_id": "glv1_office_excel_sort",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Excel只排序姓名欄，資料對不上了。",
+    "reply": "排序應包含整筆資料的相關欄位，避免姓名和金額分開。先保留副本，再以完整範圍或表格排序。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_sort_en",
+    "group_id": "glv1_office_excel_sort",
+    "topic": "office",
+    "language": "en",
+    "prompt": "I sorted only names in Excel and the rows no longer match. What happened?",
+    "reply": "Names may have moved without their related values. Keep a backup, then sort the full data range or table so each row stays together.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_filter_zh-Hant",
+    "group_id": "glv1_office_excel_filter",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "只看未付款列，不想刪掉其他資料。",
+    "reply": "在含標題的範圍開啟篩選，選付款狀態為未付款。篩選會隱藏不符合的列，不會刪除原資料。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_filter_en",
+    "group_id": "glv1_office_excel_filter",
+    "topic": "office",
+    "language": "en",
+    "prompt": "How can I view unpaid rows in Excel without deleting other rows?",
+    "reply": "Turn on a filter for the range with headers and select the unpaid status. A filter hides other rows; it does not delete them.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_chart_zh-Hant",
+    "group_id": "glv1_office_excel_chart",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "每月支出比較適合哪種圖？",
+    "reply": "直條圖可比較各月金額，月份放橫軸、金額放縱軸並標單位。要看長期變化時，也可考慮折線圖。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_chart_en",
+    "group_id": "glv1_office_excel_chart",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Which chart can compare my spending each month?",
+    "reply": "A column chart can compare monthly amounts. Put months along the bottom and label the money unit. A line chart can help show a longer trend.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_blank_zh-Hant",
+    "group_id": "glv1_office_excel_blank",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "Excel平均值會把空白當零嗎？",
+    "reply": "AVERAGE對範圍中的空白通常略過，但數值0會計入。先確認空白是缺資料還是真的沒有支出，再選計算方式。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_excel_blank_en",
+    "group_id": "glv1_office_excel_blank",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Does Excel AVERAGE treat an empty cell as zero?",
+    "reply": "AVERAGE usually skips empty cells in a range, but includes a number 0. Decide whether an empty cell means missing data or no spending before choosing a method.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_focus_zh-Hant",
+    "group_id": "glv1_office_ppt_focus",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "簡報每頁放整段報告好嗎？",
+    "reply": "每頁聚焦一個訊息，保留必要數字或圖示，細節放講稿。觀眾應能快速知道這頁的重點。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_focus_en",
+    "group_id": "glv1_office_ppt_focus",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Can I put a whole report paragraph on each slide?",
+    "reply": "Give each slide one main message. Keep useful numbers or a simple visual and put details in notes. The audience should quickly see the point.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_master_zh-Hant",
+    "group_id": "glv1_office_ppt_master",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "PowerPoint每頁都要重做公司標題嗎？",
+    "reply": "用投影片母片與版面配置統一字型、標題和固定元素。修改前保留副本，再檢查每種版面的內容是否被遮住。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_master_en",
+    "group_id": "glv1_office_ppt_master",
+    "topic": "office",
+    "language": "en",
+    "prompt": "Must I remake the company title on every PowerPoint slide?",
+    "reply": "Use the slide master and layouts for shared titles, fonts, and fixed items. Keep a copy first and check that each layout still shows its content.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_contrast_zh-Hant",
+    "group_id": "glv1_office_ppt_contrast",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "投影時文字看不清楚，先改哪裡？",
+    "reply": "提高文字與背景的對比，減少每頁字量並放大字體。用實際播放模式檢查，不只看編輯畫面。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_ppt_contrast_en",
+    "group_id": "glv1_office_ppt_contrast",
+    "topic": "office",
+    "language": "en",
+    "prompt": "My slide text is hard to read on a projector. What should I change first?",
+    "reply": "Increase the contrast between text and background. Use less text and a larger font. Check in slide show mode, not only in the editor.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_capability_zh-Hant",
+    "group_id": "glv1_action_verification",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "你解釋Office，是已經改好檔案嗎？",
+    "reply": "不是。說明步驟不等於修改檔案。須先確認檔案、修改需求與可用工具，再依實際結果回報完成或錯誤。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_capability_en",
+    "group_id": "glv1_action_verification",
+    "topic": "office",
+    "language": "en",
+    "prompt": "If you explain Office, does that mean you have edited my file?",
+    "reply": "No. Explaining steps is not editing a file. The file, requested changes, and available tools must be checked first. Completion must follow a real successful action.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_preserve_zh-Hant",
+    "group_id": "glv1_office_preserve",
+    "topic": "office",
+    "language": "zh-Hant",
+    "prompt": "修改Office文件如何避免覆蓋原版？",
+    "reply": "先確認輸入與輸出名稱，預設另存新檔。完成後重新開啟，檢查內容、公式或版面，不只看檔案是否出現。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_office_preserve_en",
+    "group_id": "glv1_office_preserve",
+    "topic": "office",
+    "language": "en",
+    "prompt": "How can an Office edit avoid replacing my original file?",
+    "reply": "Choose a new output name before editing. Open the new file again and check its text, formulas, or layout. A file name alone does not prove success.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_late_zh-Hant",
+    "group_id": "glv1_daily_late",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "今天遲到要怎麼跟同事說？",
+    "reply": "說明預計晚到多久、表達歉意並交代工作銜接。例如：我會晚到15分鐘，抱歉，請先開始會議，我到場後補上進度。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_late_en",
+    "group_id": "glv1_daily_late",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "How can I tell a coworker I will be late today?",
+    "reply": "Say when you expect to arrive, say sorry, and explain the work plan. For example: I will be 15 minutes late. Sorry. Please start the meeting, and I will catch up.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_meal_zh-Hant",
+    "group_id": "glv1_daily_meal",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "冰箱剩蛋和青菜，晚餐怎麼安排？",
+    "reply": "可做青菜炒蛋配飯或麵。洗菜、打散蛋後炒熟；也可提供其他食材，方便調整搭配。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_meal_en",
+    "group_id": "glv1_daily_meal",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "I have eggs and vegetables left. What can I make for dinner?",
+    "reply": "You could make eggs with vegetables and add rice or noodles. Wash the vegetables, beat the eggs, cook them, and mix them together.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_list_zh-Hant",
+    "group_id": "glv1_daily_list",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "出門常忘東西，有簡單方法嗎？",
+    "reply": "門邊放短清單，例如鑰匙、手機、錢包，出門前逐項確認。依當天行程添加需要的物品，避免清單過長。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_list_en",
+    "group_id": "glv1_daily_list",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "How can I stop forgetting things when I leave home?",
+    "reply": "Keep a short list near the door: keys, phone, and wallet. Check each item before leaving. Add only what you need for that day's plan.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_clean_zh-Hant",
+    "group_id": "glv1_daily_clean",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "房間很亂，不知道從哪開始。",
+    "reply": "選一小區如桌面，分成留下、丟棄、移到別處。完成一區再做下一區，比同時翻動全部物品容易收尾。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_clean_en",
+    "group_id": "glv1_daily_clean",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "My room is messy. Where should I start?",
+    "reply": "Start with one small area, such as the desk. Sort items into keep, throw away, and move. Finish that area before starting another.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_delay_zh-Hant",
+    "group_id": "glv1_daily_delay",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "今天事情很多，怎麼排順序？",
+    "reply": "先列有期限且必須完成的事，再看哪些會阻擋別人工作。選最重要的一件開始，其餘安排時間或協調延後。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_delay_en",
+    "group_id": "glv1_daily_delay",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "I have too many tasks today. How do I choose the order?",
+    "reply": "List tasks with deadlines first. Check which ones block other people's work. Start with the most important one, then schedule or discuss the rest.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_budget_zh-Hant",
+    "group_id": "glv1_daily_budget",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "想知道零用錢花去哪裡。",
+    "reply": "記一週實際支出，分成飲食、交通、娛樂等類別。比較各類金額，再決定調整哪一項，不必先設很細的分類。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_budget_en",
+    "group_id": "glv1_daily_budget",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "How can I see where my spending money goes?",
+    "reply": "Record real spending for one week. Group it into food, travel, fun, and other needs. Compare the totals before choosing what to change.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_rain_zh-Hant",
+    "group_id": "glv1_daily_rain",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "週末要出門，可能下雨怎麼辦？",
+    "reply": "先準備室內備案，出發前查所在地最新預報。戶外行程選容易縮短或轉移的路線，依實際天氣調整。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_rain_en",
+    "group_id": "glv1_daily_rain",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "My weekend plan is outdoors, but it may rain. What can I do?",
+    "reply": "Prepare an indoor plan and check a current local forecast before leaving. Choose an outdoor route that is easy to shorten or leave.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_note_zh-Hant",
+    "group_id": "glv1_daily_note",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "筆記很多，卻找不到重點。",
+    "reply": "每份先寫一句摘要，再列幾個重點和下一步。加日期與清楚標題，比保留整頁逐字紀錄容易查找。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_note_en",
+    "group_id": "glv1_daily_note",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "I have many notes but cannot find the main point. What helps?",
+    "reply": "Write a one-sentence summary, a few key points, and the next action. Add a date and a clear title so the note is easier to find later.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_recall_zh-Hant",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "課本看很多次還是忘，怎麼讀？",
+    "reply": "讀一小段後合書，用自己的話說重點再核對，隔天練忘記的部分。這能找出不懂之處，不只反覆看同一頁。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_recall_en",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "study",
+    "language": "en",
+    "prompt": "I read the chapter many times but still forget it. What can I try?",
+    "reply": "Close the book after a small section and explain it in your own words. Check what you missed, then review those parts the next day.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_spacing_zh-Hant",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "怎麼改掉考前一天才讀書？",
+    "reply": "把內容分到幾天，每次讀少量並回顧之前重點。先安排能做到的短時段，讓複習形成習慣。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_spacing_en",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "study",
+    "language": "en",
+    "prompt": "How can I stop studying only the night before a test?",
+    "reply": "Split the material across several days. Study a small part and review earlier points each time. Start with short study times you can keep.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_goal_zh-Hant",
+    "group_id": "glv1_study_goal",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "想學Python，但目標太大。",
+    "reply": "先選小成果，如讀文字檔並計算行數。為此學變數、迴圈和讀檔，再逐步加功能。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_goal_en",
+    "group_id": "glv1_study_goal",
+    "topic": "study",
+    "language": "en",
+    "prompt": "Learning Python feels too big. How can I start?",
+    "reply": "Choose one small result, such as counting lines in a text file. Learn variables, loops, and file reading for that task, then add more later.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_error_zh-Hant",
+    "group_id": "glv1_study_error",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "題目一直犯同樣錯誤怎麼辦？",
+    "reply": "保留錯題，寫下錯誤步驟與正確原因。隔幾天換不同數字重做，檢查是否理解，而不是只記答案。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_error_en",
+    "group_id": "glv1_study_error",
+    "topic": "study",
+    "language": "en",
+    "prompt": "I keep making the same mistake in exercises. What should I do?",
+    "reply": "Keep the question and note the step that went wrong. Explain the correct reason. Try a similar question later with different numbers.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_break_zh-Hant",
+    "group_id": "glv1_study_break",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "讀書一直分心，要硬撐兩小時嗎？",
+    "reply": "試短時段專注，收起通知，完成一個小目標再休息。重點是能持續投入，不只累積坐著的時間。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_break_en",
+    "group_id": "glv1_study_break",
+    "topic": "study",
+    "language": "en",
+    "prompt": "I lose focus while studying. Should I force myself to sit for two hours?",
+    "reply": "Try a short focused session with notifications off. Finish one small goal, then take a break. Useful study matters more than time spent sitting.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_language_zh-Hant",
+    "group_id": "glv1_study_language",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "英文單字背了卻不會用。",
+    "reply": "把字放進與生活有關的短句，自己說和寫。複習時想使用情境，不只看中文意思。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_language_en",
+    "group_id": "glv1_study_language",
+    "topic": "study",
+    "language": "en",
+    "prompt": "I know English words but cannot use them. How can I practise?",
+    "reply": "Put each word in a short sentence about your life. Say and write your own examples. Review situations where you can use it, not only its translation.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_feedback_zh-Hant",
+    "group_id": "glv1_study_feedback",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "老師說文章不清楚，先改哪裡？",
+    "reply": "檢查每段是否只有一個主意，連接主張、理由與例子。可提供一段文字，才能針對句子和段落提建議。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_feedback_en",
+    "group_id": "glv1_study_feedback",
+    "topic": "study",
+    "language": "en",
+    "prompt": "My teacher says my writing is unclear. What should I change first?",
+    "reply": "Check that each paragraph has one main idea. Connect the point, reason, and example. Share a paragraph if you want specific suggestions.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_progress_zh-Hant",
+    "group_id": "glv1_study_progress",
+    "topic": "study",
+    "language": "zh-Hant",
+    "prompt": "每天讀書怎麼知道有沒有進步？",
+    "reply": "用固定小測驗或實作比較前後，記正確率、時間與錯誤類型。讀書時數不能單獨證明理解程度。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_study_progress_en",
+    "group_id": "glv1_study_progress",
+    "topic": "study",
+    "language": "en",
+    "prompt": "How can I tell whether my study is working?",
+    "reply": "Use a short quiz or task again after some time. Compare correct answers, time, and mistakes. Study hours alone do not show better understanding.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_fraction_zh-Hant",
+    "group_id": "glv1_math_fraction",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "半杯水加四分之一杯是多少？",
+    "reply": "一半是四分之二，再加四分之一得四分之三杯。先把分母換成相同數字再相加。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_fraction_en",
+    "group_id": "glv1_math_fraction",
+    "topic": "math",
+    "language": "en",
+    "prompt": "What is half a cup plus a quarter of a cup?",
+    "reply": "Half is two quarters. Two quarters plus one quarter is three quarters of a cup. Use the same denominator before adding.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_percent_zh-Hant",
+    "group_id": "glv1_math_percent",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "200元打八折是多少？",
+    "reply": "八折是付80%，200乘0.8等於160元，省下40元。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_percent_en",
+    "group_id": "glv1_math_percent",
+    "topic": "math",
+    "language": "en",
+    "prompt": "What is the price of a 200 dollar item after 20% off?",
+    "reply": "You pay 80% of the price. 200 times 0.8 is 160 dollars. You save 40 dollars.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_average_zh-Hant",
+    "group_id": "glv1_math_average",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "60、75、90三個成績平均多少？",
+    "reply": "相加225再除以3，平均是75。平均反映整體，不會呈現每次成績差異。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_average_en",
+    "group_id": "glv1_math_average",
+    "topic": "math",
+    "language": "en",
+    "prompt": "What is the average of 60, 75, and 90?",
+    "reply": "Their sum is 225. Divide by 3 to get 75. The average does not show every difference between the scores.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_ratio_zh-Hant",
+    "group_id": "glv1_math_ratio",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "果汁和水1比3，總共800毫升，果汁多少？",
+    "reply": "共4份，每份200毫升，果汁1份是200毫升，水是600毫升。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_ratio_en",
+    "group_id": "glv1_math_ratio",
+    "topic": "math",
+    "language": "en",
+    "prompt": "Juice and water are mixed 1 to 3. How much juice is in 800 ml?",
+    "reply": "There are 4 parts in total. Each part is 200 ml. Juice is 1 part, or 200 ml. Water is 600 ml.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_units_zh-Hant",
+    "group_id": "glv1_math_units",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "一公尺有幾公分，如何換算？",
+    "reply": "一公尺是100公分。公尺轉公分乘100，公分轉公尺除以100。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_units_en",
+    "group_id": "glv1_math_units",
+    "topic": "math",
+    "language": "en",
+    "prompt": "How many centimetres are in one metre?",
+    "reply": "One metre is 100 centimetres. Multiply metres by 100 to get centimetres. Divide centimetres by 100 to get metres.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_probability_zh-Hant",
+    "group_id": "glv1_math_probability",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "硬幣連續兩次正面，下次一定反面嗎？",
+    "reply": "若是公平且每次獨立的擲幣，第三次正反面仍各一半。前兩次不會讓下一次必須反面。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_probability_en",
+    "group_id": "glv1_math_probability",
+    "topic": "math",
+    "language": "en",
+    "prompt": "A fair coin lands heads twice. Must the next result be tails?",
+    "reply": "No. If the tosses are independent, heads and tails each still have a half chance. Earlier results do not force the next result.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_area_zh-Hant",
+    "group_id": "glv1_math_area",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "長5公分寬3公分，長方形面積多少？",
+    "reply": "長乘寬是5乘3，得到15平方公分。面積單位是平方公分，不是公分。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_area_en",
+    "group_id": "glv1_math_area",
+    "topic": "math",
+    "language": "en",
+    "prompt": "What is the area of a rectangle 5 cm long and 3 cm wide?",
+    "reply": "Multiply length by width: 5 times 3 is 15 square centimetres. Area uses square units.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_meaning_zh-Hant",
+    "group_id": "glv1_math_meaning",
+    "topic": "math",
+    "language": "zh-Hant",
+    "prompt": "數字變兩倍是增加100%還是200%？",
+    "reply": "增加100%。10變20多了10，增加量相對原值是100%；新總值則是原值的200%。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_math_meaning_en",
+    "group_id": "glv1_math_meaning",
+    "topic": "math",
+    "language": "en",
+    "prompt": "If a number doubles, is the increase 100% or 200%?",
+    "reply": "The increase is 100%. From 10 to 20, the extra amount is 10, equal to the original amount. The new total is 200% of the old total.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_evaporation_zh-Hant",
+    "group_id": "glv1_science_evaporation",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "衣服沒煮沸為什麼會乾？",
+    "reply": "水在未沸騰時也會從表面蒸發。通風帶走潮濕空氣，通常有助衣服變乾。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_evaporation_en",
+    "group_id": "glv1_science_evaporation",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Why do wet clothes dry without boiling?",
+    "reply": "Water can leave the surface as water vapour below its boiling point. Moving air carries damp air away and often helps clothes dry.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_moon_zh-Hant",
+    "group_id": "glv1_science_moon",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "月亮自己會發光嗎？",
+    "reply": "看到的月光主要是反射太陽光。月相變化與我們看見多少被照亮的部分有關。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_moon_en",
+    "group_id": "glv1_science_moon",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Does the Moon make its own light?",
+    "reply": "The moonlight we see is mainly reflected sunlight. Its shape seems to change as we see different amounts of its sunlit part.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_mass_zh-Hant",
+    "group_id": "glv1_science_mass",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "重量和質量完全相同嗎？",
+    "reply": "不相同。質量描述物質的量，重量是重力造成的力，會隨重力環境改變。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_mass_en",
+    "group_id": "glv1_science_mass",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Are mass and weight exactly the same?",
+    "reply": "No. Mass describes the amount of matter in an object. Weight is the force of gravity on it, so weight can change with gravity.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_sound_zh-Hant",
+    "group_id": "glv1_science_sound",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "太空能像空氣裡傳聲嗎？",
+    "reply": "聲音要有物質作介質，不能在真空中像空氣裡那樣傳播。太空船內有空氣，人仍能交談。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_sound_en",
+    "group_id": "glv1_science_sound",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Can sound travel through empty space like it does through air?",
+    "reply": "Sound needs matter to travel through. It cannot travel through a vacuum in the same way. People can talk inside a spacecraft because it contains air.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_magnet_zh-Hant",
+    "group_id": "glv1_science_magnet",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "磁鐵會吸所有金屬嗎？",
+    "reply": "不會。鐵等某些材料容易被吸引，鋁和銅通常不會像鐵一樣明顯被吸住。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_magnet_en",
+    "group_id": "glv1_science_magnet",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Does a magnet attract every metal?",
+    "reply": "No. Iron and some other materials are strongly attracted. Metals such as aluminium and copper are not attracted in the same simple way.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_experiment_zh-Hant",
+    "group_id": "glv1_science_experiment",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "比較兩種肥料如何設計才公平？",
+    "reply": "除肥料種類外，盡量保持植物、土壤、光照與澆水相同。每組用多株，先定義高度或葉片數等觀察指標。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_experiment_en",
+    "group_id": "glv1_science_experiment",
+    "topic": "science",
+    "language": "en",
+    "prompt": "How can I fairly compare two plant feeds?",
+    "reply": "Keep the plants, soil, light, and water as similar as possible. Use several plants in each group. Decide what to measure, such as height or leaf count.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_energy_zh-Hant",
+    "group_id": "glv1_science_energy",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "省電燈泡完全不發熱嗎？",
+    "reply": "不是。省電不等於沒有熱，燈具會把電能轉成光與熱，仍須依產品說明保持散熱。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_energy_en",
+    "group_id": "glv1_science_energy",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Does an energy-saving lamp make no heat at all?",
+    "reply": "No. Saving energy does not mean zero heat. Lamps turn electricity into both light and heat. Follow the product instructions for cooling.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_correlation_zh-Hant",
+    "group_id": "glv1_science_correlation",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "冰淇淋銷量和溺水一起增加，是吃冰造成溺水嗎？",
+    "reply": "不能直接推論。炎熱天氣可能同時增加吃冰與游泳的人數；要檢查共同因素，相關不等於因果。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_correlation_en",
+    "group_id": "glv1_science_correlation",
+    "topic": "science",
+    "language": "en",
+    "prompt": "If ice cream sales and drowning both rise, does ice cream cause drowning?",
+    "reply": "That does not follow. Hot weather may lead to more ice cream and more swimming. A link between numbers does not prove that one causes the other.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_feature_zh-Hant",
+    "group_id": "glv1_ai_feature",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "灰階轉換和學會辨識特徵一樣嗎？",
+    "reply": "不同。灰階只改變輸入的顏色表示，模型仍需用資料和損失函數更新權重，才能學辨識特徵。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_feature_en",
+    "group_id": "glv1_ai_feature",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Is making an image grey the same as learning its features?",
+    "reply": "No. Greyscale changes the input's colour information. A model still needs data and training to update its weights and learn useful patterns.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_loss_zh-Hant",
+    "group_id": "glv1_ai_loss",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "訓練loss下降就能處理新問題嗎？",
+    "reply": "還要看獨立驗證資料和未見題表現。訓練變好但驗證變差，可能過擬合，不能只看訓練曲線。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_loss_en",
+    "group_id": "glv1_ai_loss",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Does a falling training loss prove the model handles new questions?",
+    "reply": "No. Check validation data and questions it has not seen. Better training results with worse validation results may mean overfitting.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_accuracy_zh-Hant",
+    "group_id": "glv1_ai_accuracy",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "準確率90%，每個類別都是90%嗎？",
+    "reply": "不一定。整體分數受類別數量影響，應檢查各類別與混淆矩陣，找出容易混淆的類別。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_accuracy_en",
+    "group_id": "glv1_ai_accuracy",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Does 90% accuracy mean every class has 90% accuracy?",
+    "reply": "No. Large classes can affect the total score more. Check each class and a confusion matrix to see which classes are often mixed up.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_split_zh-Hant",
+    "group_id": "glv1_ai_split",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "同張照片裁切成兩張，可分到訓練和驗證嗎？",
+    "reply": "不建議。共享原始內容可能使驗證分數偏高，應以原圖或來源群組一起切分，避免洩漏。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_split_en",
+    "group_id": "glv1_ai_split",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Can two crops of the same photo go into training and validation separately?",
+    "reply": "It is better to keep them together. Shared image content may make the score look too good. Split by original photo or source group.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_tokens_zh-Hant",
+    "group_id": "glv1_ai_tokens",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "模型為何看不到長文章的結尾？",
+    "reply": "可能超過可處理長度而被截斷。要檢查實際分詞和長度設定，必要時分段，不假設全文都有進模型。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_tokens_en",
+    "group_id": "glv1_ai_tokens",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Why might a model miss the end of a long article?",
+    "reply": "The input may be longer than its limit and get cut off. Check the actual token length. Process sections if needed instead of assuming the whole article was read.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_search_zh-Hant",
+    "group_id": "glv1_ai_search",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "能上網的AI不會答錯吧？",
+    "reply": "仍可能答錯。搜尋可能過時、無關或不可靠，模型也可能誤讀；要核對原文、日期和來源，區分事實與推論。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_search_en",
+    "group_id": "glv1_ai_search",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "If an AI can search the web, can it still be wrong?",
+    "reply": "Yes. Results may be old, unrelated, or unreliable, and the AI may misunderstand them. Check the original page, date, and source. Keep facts separate from guesses.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_training_size_zh-Hant",
+    "group_id": "glv1_ai_training_size",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "同題複製一千次等於增加很多知識嗎？",
+    "reply": "不是。只會提高該題比重，沒有增加新知識。應補不同主題、問法和反例，並以獨立評估檢查品質。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_training_size_en",
+    "group_id": "glv1_ai_training_size",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "Does copying one question a thousand times add a lot of knowledge?",
+    "reply": "No. It makes that question appear more often but adds no new knowledge. Add varied topics, questions, and examples, then check answer quality.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_tools_zh-Hant",
+    "group_id": "glv1_action_verification",
+    "topic": "ai",
+    "language": "zh-Hant",
+    "prompt": "模型說已建立檔案，怎麼確認？",
+    "reply": "檢查工具實際成功、檔案存在，再重新讀取內容。自然語言的完成宣告不是操作證據。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_ai_tools_en",
+    "group_id": "glv1_action_verification",
+    "topic": "ai",
+    "language": "en",
+    "prompt": "How do I check a model's claim that it created a file?",
+    "reply": "Check that the tool succeeded, the file exists, and its content can be opened again. A sentence saying it is done is not proof of an action.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_clarify_zh-Hant",
+    "group_id": "glv1_communication_clarify",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "朋友只說幫我處理一下，我不知道要做什麼。",
+    "reply": "一次確認對象、成果與期限。例如：要修改哪個檔案、哪些內容，以及什麼時候需要？",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_clarify_en",
+    "group_id": "glv1_communication_clarify",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "A friend says, 'Please handle it.' I do not know what they need.",
+    "reply": "Ask what item they mean, what result they want, and when they need it. For example: Which file should I change, what changes are needed, and by when?",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_disagree_zh-Hant",
+    "group_id": "glv1_communication_disagree",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "不同意同事方案，怎麼說才有幫助？",
+    "reply": "先指出共同目標，說具體疑慮與依據，再提替代方案。例如希望準時完成，但某步會延誤，可先做較小版本。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_disagree_en",
+    "group_id": "glv1_communication_disagree",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "How can I disagree with a coworker's plan in a useful way?",
+    "reply": "Start with the shared goal. Explain a specific concern and offer another option. For example: I also want to finish on time, but this step may delay us. Could we start with a smaller version?",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_apology_zh-Hant",
+    "group_id": "glv1_communication_apology",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "傳錯檔案給同事，怎麼補救？",
+    "reply": "指出哪個檔案錯誤，請停止使用，再提供清楚命名的正確版本。若涉及敏感資料，依工作規範回報處理。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_apology_en",
+    "group_id": "glv1_communication_apology",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "I sent a coworker the wrong file. How should I fix it?",
+    "reply": "Say which file was wrong and ask them not to use it. Send the correct version with a clear name. If it contains private data, follow your workplace process.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_summary_zh-Hant",
+    "group_id": "glv1_communication_summary",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "討論結束怎麼確認大家理解相同？",
+    "reply": "整理決定、負責人、期限與未定問題請大家確認。不把只是提出的想法寫成已同意的決定。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_summary_en",
+    "group_id": "glv1_communication_summary",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "How can we check that everyone understood a meeting the same way?",
+    "reply": "Send a short note with decisions, owners, deadlines, and open questions. Ask people to confirm. Do not describe a suggestion as an agreed decision.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_refuse_zh-Hant",
+    "group_id": "glv1_communication_refuse",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "沒空幫忙，但不想口氣太差。",
+    "reply": "說明現在無法接下，簡短交代理由；可行時給替代時間或資源，不答應做不到的期限。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_refuse_en",
+    "group_id": "glv1_communication_refuse",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "How can I politely say I have no time to help?",
+    "reply": "Say clearly that you cannot take it on now and give a short reason. Offer another time or resource if possible. Do not promise a deadline you cannot meet.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_context_zh-Hant",
+    "group_id": "glv1_communication_context",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "對方英文講太快，怎麼請他慢一點？",
+    "reply": "可以說 Could you speak more slowly, please? 若需要簡單說法，可說 Could you explain that in simple words?。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_context_en",
+    "group_id": "glv1_communication_context",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "What can I say when someone speaks English too fast?",
+    "reply": "Say, 'Could you speak more slowly, please?' You can also ask, 'Could you explain that in simple words?'",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_email_zh-Hant",
+    "group_id": "glv1_communication_email",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "請主管確認預算，信件主旨怎麼寫？",
+    "reply": "可用「請確認：十月活動預算」。內文先寫金額、用途和回覆期限，再附明細，方便作決定。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_email_en",
+    "group_id": "glv1_communication_email",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "What subject can I use to ask my manager to approve a budget?",
+    "reply": "Try 'Approval needed: October event budget'. State the amount, purpose, and reply deadline first, then add the details.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_ambiguity_zh-Hant",
+    "group_id": "glv1_communication_ambiguity",
+    "topic": "communication",
+    "language": "zh-Hant",
+    "prompt": "下週五交件，但不確定指哪天。",
+    "reply": "請對方確認完整日期和時間，寫入紀錄。具體日期與時區能減少跨週或所在地不同造成的誤會。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_communication_ambiguity_en",
+    "group_id": "glv1_communication_ambiguity",
+    "topic": "communication",
+    "language": "en",
+    "prompt": "Someone says next Friday, but I am not sure which date they mean.",
+    "reply": "Ask for the full date and time, then record it. A clear date and time zone can avoid mistakes about the week or location.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_backup_zh-Hant",
+    "group_id": "glv1_computer_backup",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "備份和同步有什麼不同？",
+    "reply": "同步保持各處一致，刪除也可能同步；備份保留可回復的副本或版本。重要資料要測試能否還原。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_backup_en",
+    "group_id": "glv1_computer_backup",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "What is the difference between backup and sync?",
+    "reply": "Sync keeps copies the same and may copy a deletion too. A backup keeps a copy or older version for recovery. Test that important files can be restored.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_paths_zh-Hant",
+    "group_id": "glv1_computer_paths",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "照範例輸入圖片路徑.jpg卻找不到檔案。",
+    "reply": "那是待替換的範例名，應填實際存在的路徑。確認位置和副檔名，路徑有空格就用引號包住。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_paths_en",
+    "group_id": "glv1_computer_paths",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "The example 'image_path.jpg' gives a file not found error. Why?",
+    "reply": "That name is a placeholder. Replace it with a real image path. Check the folder and file extension, and use quotes if the path has spaces.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_save_zh-Hant",
+    "group_id": "glv1_computer_save",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "程式顯示存檔成功，卻不知道存哪。",
+    "reply": "查看完整輸出路徑；相對路徑則須確認工作目錄。必要時指定明確輸出資料夾，再確認檔案存在。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_save_en",
+    "group_id": "glv1_computer_save",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "A program says it saved a file, but where is it?",
+    "reply": "Check the full output path. A relative path depends on the working folder. Set an output folder clearly and check that the file is there.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_csv_zh-Hant",
+    "group_id": "glv1_computer_csv",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "CSV和Excel活頁簿相同嗎？",
+    "reply": "不同。CSV主要存文字與欄位值，通常不保留多工作表、格式或圖表；有這些需求應用適當活頁簿格式。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_csv_en",
+    "group_id": "glv1_computer_csv",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "Is a CSV file the same as an Excel workbook?",
+    "reply": "No. CSV mainly stores text values in rows and columns. It usually does not keep multiple sheets, formatting, or charts. Use a workbook format for those features.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_version_zh-Hant",
+    "group_id": "glv1_computer_version",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "改程式前為何先看git diff？",
+    "reply": "確認尚未提交的修改，區分既有工作和新變更。改後再看一次，避免誤刪無關內容。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_version_en",
+    "group_id": "glv1_computer_version",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "Why should I check git diff before editing code?",
+    "reply": "It shows changes that are not yet committed. This helps separate earlier work from new edits. Check again after editing to catch unrelated changes.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_error_zh-Hant",
+    "group_id": "glv1_computer_error",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "出錯要直接刪掉重裝嗎？",
+    "reply": "先保留完整錯誤、指令與環境資訊，找有意義的錯誤位置。查明原因再修正，避免重裝掩蓋問題。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_error_en",
+    "group_id": "glv1_computer_error",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "Should I delete everything and reinstall when I see an error?",
+    "reply": "First keep the error message, command, and environment details. Find the useful error point and check the cause before changing things.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_password_zh-Hant",
+    "group_id": "glv1_computer_password",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "能公開密碼請人幫忙檢查嗎？",
+    "reply": "不要公開密碼、金鑰或驗證碼。提供去敏感資訊的錯誤；已外洩就更換並查存取紀錄。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_password_en",
+    "group_id": "glv1_computer_password",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "Can I post my password in a public forum for help?",
+    "reply": "No. Remove passwords, keys, and security codes from examples. If one was exposed, change it and check account activity.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_permissions_zh-Hant",
+    "group_id": "glv1_failed_action",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "沒寫入權限還能說完成嗎？",
+    "reply": "不能。應回報無法寫入和目標路徑，保留原檔，選有權限位置或取得授權後重試。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_permissions_en",
+    "group_id": "glv1_failed_action",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "Can a program report success if it has no permission to save?",
+    "reply": "No. It should report the save error and target path. Keep the original file and use an allowed location or obtain permission before trying again.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_negation_zh-Hant",
+    "group_id": "glv1_reason_negation",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "我不是要買新電腦，是要舊電腦快一點。",
+    "reply": "你要改善現有電腦。先檢查啟動程式、剩餘空間和資源使用量；提供系統與卡頓情況，再選合適調整。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_negation_en",
+    "group_id": "glv1_reason_negation",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "I do not want a new computer. I want my old one to run faster.",
+    "reply": "You want to improve the computer you have. Check startup apps, free storage, and resource use first. The system details and slow tasks can help choose the next step.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_subject_zh-Hant",
+    "group_id": "glv1_reason_subject",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "妹妹把傘借給哥哥，現在誰拿著傘？",
+    "reply": "依這句話是哥哥拿著傘；妹妹是借出的人。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_subject_en",
+    "group_id": "glv1_reason_subject",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "A sister lends her umbrella to her brother. Who has it now?",
+    "reply": "The brother has it after the loan. The sister is the person who lent it.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_order_zh-Hant",
+    "group_id": "glv1_reason_order",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "先寄信再檢查附件，順序好嗎？",
+    "reply": "先確認收件人、內容和附件，再寄出。寄出才發現漏檔，可能須補寄說明。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_order_en",
+    "group_id": "glv1_reason_order",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "Is it a good order to send an email and then check its attachment?",
+    "reply": "Check the recipient, message, and attachment before sending. If you notice a missing file later, you may need a second email.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_comparison_zh-Hant",
+    "group_id": "glv1_reason_comparison",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "比較方案怎麼避免只選便宜的？",
+    "reply": "列需求、總成本、限制與維護負擔，先看必要條件。初期價格低不代表長期成本低。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_comparison_en",
+    "group_id": "glv1_reason_comparison",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "How can I compare two plans without choosing only the cheapest?",
+    "reply": "Compare your needs, total cost, limits, and upkeep. Check required features first. A lower starting price may not mean a lower long-term cost.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_uncertainty_zh-Hant",
+    "group_id": "glv1_reason_uncertainty",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "資訊不足時應該猜答案嗎？",
+    "reply": "先說缺什麼資訊，必要時釐清。若依假設回答，要明示假設，不能把猜測當已確認。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_uncertainty_en",
+    "group_id": "glv1_reason_uncertainty",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "Should you guess when information is missing?",
+    "reply": "State what is missing and ask a useful question if needed. If you answer using an assumption, name it clearly. Do not present a guess as a checked fact.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_scope_zh-Hant",
+    "group_id": "glv1_reason_scope",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "我只要摘要，不要改原文件。",
+    "reply": "可提供摘要並保留原檔。需要先取得內容，不能擅自把摘要寫回文件。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_scope_en",
+    "group_id": "glv1_reason_scope",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "I only want a summary. Do not edit the original document.",
+    "reply": "A summary can be provided without changing the original. The text or file is needed first. The summary should not be written back into the source without a request.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_evidence_zh-Hant",
+    "group_id": "glv1_reason_evidence",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "三個人說有效，就證明方法一定有效嗎？",
+    "reply": "不能。少量經驗可能有偏差，還要看樣本、比較方式與其他原因。可以當線索，不能當普遍有效的證明。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_evidence_en",
+    "group_id": "glv1_reason_evidence",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "If three people say a method works, does that prove it always works?",
+    "reply": "No. A few experiences may be biased. Check the sample, comparison, and other possible causes. Treat it as a clue, not proof for everyone.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_followup_zh-Hant",
+    "group_id": "glv1_reason_followup",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "剛剛說明太難了，請簡單一點。",
+    "reply": "可以改用短句與生活例子。請指出最難的詞或段落，從核心意思開始，不一次加入太多細節。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_followup_en",
+    "group_id": "glv1_reason_followup",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "Your explanation was too hard. Can you make it simpler?",
+    "reply": "Yes. Tell me which word or part was difficult. I can use short sentences and everyday examples, starting with the main idea.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_translation_zh-Hant",
+    "group_id": "glv1_reason_translation",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "我正在學習的英文怎麼說？",
+    "reply": "可說 I am learning. 若是正在學英文，說 I am learning English. am搭配動詞ing形式描述目前進行的事。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_translation_en",
+    "group_id": "glv1_reason_translation",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "How do I say that I am studying English now?",
+    "reply": "You can say, 'I am learning English.' Use 'am' with the verb ending in 'ing' to describe an activity happening now.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_instruction_zh-Hant",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "列三個讀書方法，不用長篇解釋。",
+    "reply": "1. 合書回想重點。2. 隔幾天分次複習。3. 用小測驗檢查理解。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_instruction_en",
+    "group_id": "glv1_recall_spacing_methods",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "Give me three study methods without a long explanation.",
+    "reply": "1. Close the book and recall key points. 2. Review across several days. 3. Use short quizzes to check understanding.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_missing_zh-Hant",
+    "group_id": "glv1_reason_missing",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "幫我比較這兩個東西。",
+    "reply": "請提供兩個項目和在意條件，例如價格、功能或情境。知道對象和目標才能做有用比較。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_missing_en",
+    "group_id": "glv1_reason_missing",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "Please compare these two things.",
+    "reply": "Please name the two items and what matters to you, such as price, features, or use. Then a useful comparison can be made.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_honesty_zh-Hant",
+    "group_id": "glv1_failed_action",
+    "topic": "reason",
+    "language": "zh-Hant",
+    "prompt": "工具失敗還會說處理好了嗎？",
+    "reply": "不應該。要說失敗原因、實際完成部分與是否能安全重試，不把預期結果當實際結果。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_reason_honesty_en",
+    "group_id": "glv1_failed_action",
+    "topic": "reason",
+    "language": "en",
+    "prompt": "If a tool fails, should you still say the task is done?",
+    "reply": "No. Report the failure, what was actually completed, and whether a safe retry is possible. An expected result is not a real result.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. Crypto sources support general risk context; arithmetic and teaching plans are original. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_geography_scale_zh-Hant",
+    "group_id": "glv1_geography_scale",
+    "topic": "geography",
+    "language": "zh-Hant",
+    "prompt": "地圖比例尺1比10000，圖上2公分實際多長？",
+    "reply": "實際長度是2乘10000，得到20000公分，也就是200公尺。先保持單位一致再換算。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_geography_scale_en",
+    "group_id": "glv1_geography_scale",
+    "topic": "geography",
+    "language": "en",
+    "prompt": "On a map with a scale of 1 to 10000, how far is 2 cm?",
+    "reply": "Multiply 2 cm by 10000 to get 20000 cm. That is 200 metres. Keep the units the same before converting them.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_density_zh-Hant",
+    "group_id": "glv1_science_density",
+    "topic": "science",
+    "language": "zh-Hant",
+    "prompt": "一公斤棉花和一公斤鐵，哪個比較重？",
+    "reply": "質量同為一公斤；在相同重力環境下重量相同。棉花通常體積較大，不能把體積大當作比較重。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_science_density_en",
+    "group_id": "glv1_science_density",
+    "topic": "science",
+    "language": "en",
+    "prompt": "Which is heavier, one kilogram of cotton or one kilogram of iron?",
+    "reply": "They have the same mass. In the same gravity, they have the same weight. Cotton usually takes up more space, but more space does not mean more weight.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_encoding_zh-Hant",
+    "group_id": "glv1_computer_encoding",
+    "topic": "computer",
+    "language": "zh-Hant",
+    "prompt": "文字檔打開變亂碼，是內容一定壞了嗎？",
+    "reply": "不一定，可能是用錯字元編碼讀取。先保留原檔，用正確編碼重新開啟；不要直接存回，以免覆蓋可還原的原始資料。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_computer_encoding_en",
+    "group_id": "glv1_computer_encoding",
+    "topic": "computer",
+    "language": "en",
+    "prompt": "A text file shows strange symbols. Is the file certainly broken?",
+    "reply": "Not always. It may be opened with the wrong text encoding. Keep the original and try the correct encoding. Do not save over it before checking.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_packing_zh-Hant",
+    "group_id": "glv1_daily_packing",
+    "topic": "daily",
+    "language": "zh-Hant",
+    "prompt": "兩天旅行行李太多，怎麼精簡？",
+    "reply": "先依天氣和活動列必需品，選可重複搭配的衣物，確認住處提供哪些用品。先保留證件與必要物品，再刪除重複或只是可能會用的東西。",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  },
+  {
+    "id": "glv1_daily_packing_en",
+    "group_id": "glv1_daily_packing",
+    "topic": "daily",
+    "language": "en",
+    "prompt": "I packed too much for a two-day trip. How can I reduce it?",
+    "reply": "List what you need for the weather and activities. Choose clothes that work together and check what the hotel provides. Keep documents and needed items first, then remove duplicates.",
+    "source_urls": [],
+    "originality_note": "Original educational wording authored for this dataset. Paired translations share a group. No evaluation prompts used."
+  }
+]

@@ -61,6 +61,7 @@ Usage:
 import argparse
 import json
 import random
+import re
 import sys
 import time
 from pathlib import Path
@@ -72,6 +73,7 @@ from torch.utils.data import DataLoader, Dataset
 import code_retrieval
 import persona_chat
 import transformer_chat
+import chat_quality
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
 from tools import route_reply
 
@@ -128,7 +130,9 @@ def is_code_request(message: str) -> bool:
     like "你能幫我寫程式嗎" (routes to the normal chat checkpoint)?
     """
     text = message.strip()
-    if text.startswith(_CODE_PREFIXES):
+    code_terms = r"(?i)(?<![a-z])(?:python|javascript|typescript|java|c\+\+|c#|sql|html|css|rust|golang)(?![a-z])|程式|函式|函數|演算法|排序法|迴圈|陣列|類別|正規表示式"
+    has_code = bool(re.search(code_terms, text))
+    if text.startswith(_CODE_PREFIXES) and has_code:
         return True
     if text.lower().startswith("python") and "寫" in text:
         return True
@@ -137,7 +141,9 @@ def is_code_request(message: str) -> bool:
     # 開頭是語言字樣而不是「寫一個」，原本單純 startswith(_CODE_PREFIXES)
     # 比對不到，會讓這批多語言程式碼訓練資料在實際聊天路由時被誤判成一般
     # 聊天請求——這裡額外比對「用...寫」這個形狀。
-    if text.startswith("用") and any(prefix in text for prefix in _CODE_PREFIXES):
+    if text.startswith("用") and has_code and any(prefix in text for prefix in _CODE_PREFIXES):
+        return True
+    if re.match(r"(?i)^(?:please\s+)?(?:write|create|implement)\b", text) and has_code:
         return True
     return False
 
@@ -650,6 +656,9 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     修的是 2026-09-10 換成 Transformer 後一般聊天分支忽略 out_dir、導致選了
     角色回覆仍是 sinco 本人的 bug；程式碼/nvidia/即時查詢分支不受角色影響。
     """
+    # Empty input never reaches a tool, checkpoint or external API.
+    if not message.strip():
+        return "輸入檢查：空白訊息", chat_quality.dialogue_reply(message)
     routed = route_reply(message)
     if routed is not None:
         return routed
@@ -662,7 +671,7 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     use_code = force_mode == "code" or (force_mode == "auto" and is_code_request(message))
     if use_code:
         reason_prefix = "已手動切換為程式碼模式" if force_mode == "code" else \
-            '訊息以「寫一個／寫一段」或「用<語言>寫」開頭，判斷為程式碼請求'
+            '訊息包含撰寫要求與程式語言／程式術語，判斷為程式碼請求'
         # 先試檢索式：data/code_pairs.json 裡有夠相似的既有範例就直接回傳
         # 原文，不經過模型生成——比 sinco-code 生成可靠得多（見
         # code_retrieval.py 開頭說明），資料庫沒覆蓋到才退回模型生成。
@@ -697,7 +706,13 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
         if card is not None:
             trace, reply = persona_chat.persona_reply(message, card)
             return trace + _emotion_trace_suffix(message), reply
+    known_reply = chat_quality.dialogue_reply(message)
+    if known_reply is not None:
+        return "一般對話：精確比對已審核句型（非模型生成）", known_reply
     reply = transformer_chat.reply(message)
+    issue = chat_quality.output_issue(message, reply)
+    if issue:
+        return f"一般聊天模型輸出檢查：{issue}；請使用者補充內容", chat_quality.clarification(message)
     reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
               "沒有比對到即時查詢或程式碼請求的句型")
     return (

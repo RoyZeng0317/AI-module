@@ -7,11 +7,8 @@ Run:
 Then open http://localhost:8080/
 """
 
-import json
-import os
-import sys
-import time
-from collections import defaultdict
+import json, os, sys, time
+from collections import defaultdict, deque
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -74,7 +71,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import auto_learn
 import conversation_store as convo_store
@@ -85,6 +82,7 @@ import notify_store
 # 這是使用者明確選擇的行為（比照 CLI）。
 import session_store
 import usage_store
+import region_signals
 from chats import DEFAULT_OUT_DIR, smart_reply_traced
 from detector import detect
 from function import read_as_chat_content
@@ -107,6 +105,7 @@ MOUNT_PREFIX = os.environ.get("MOUNT_PREFIX", "").rstrip("/")
 
 class ChatRequest(BaseModel):
     message: str
+    client_timezone: Optional[str] = Field(default=None, max_length=128)
     # 沒帶 conversation_id 時維持原本無狀態行為（不寫入任何存檔）——只有
     # action.py 側邊欄「對話紀錄」這條新流程才會帶 id 進來，直接呼叫這支
     # API 的舊用法/其他呼叫端不會被逼著配合這個新功能。
@@ -129,7 +128,7 @@ class NotificationCreateRequest(BaseModel):
 
 def _resolve_client_id(request: Request) -> str:
     """用連線 IP 識別呼叫端，聊天/對話紀錄/用量限制共用同一個 key。"""
-    return request.client.host
+    return _client_ip(request)
 
 
 # 單一使用者一段時間內能送出的聊天請求數量上限。key 優先用 Google 帳號識別
@@ -139,6 +138,12 @@ CHAT_RATE_LIMIT = 20
 CHAT_RATE_WINDOW_SEC = 60
 _chat_request_log: dict[str, list[float]] = defaultdict(list)
 
+def _client_ip(request: Request) -> str:
+    """request.client 的型別是 Address | None --不是純粹型別檢查器吹毛求疵,
+    某些 ASGI 情境(例如測試用的 TestClient、某些反向代理設定) 下真的會是
+    None。沒有真實來源位址時退回 "unknow"，讓 rate limit/用量統計照樣用
+    一個固定 key 累加，不會直接丟 AttributeError。"""
+    return request.client.host if request.client is not None else "unknown"
 
 def _check_chat_rate_limit(client_ip: str) -> None:
     now = time.time()
@@ -232,6 +237,7 @@ def _arg_suggestions(name: str) -> list[str] | None:
 
 
 app = FastAPI(title="AI-module camera object detection")
+app.state.region_assessments = deque(maxlen=200)
 router = APIRouter(prefix=MOUNT_PREFIX)
 
 app.add_middleware(
@@ -357,6 +363,7 @@ async def list_notifications_endpoint():
 async def create_notification_endpoint(payload: NotificationCreateRequest):
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
+
     return notify_store.create_notification(payload.message.strip())
 
 
@@ -534,11 +541,16 @@ def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[t
 
 @router.post("/api/chat")
 async def chat_endpoint(payload: ChatRequest, request: Request):
-    client_id = _resolve_client_id(request)
+    client_id = _client_ip(request)
     _check_chat_rate_limit(client_id)
 
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
+
+    # 不採信body國別/IP或X-Forwarded-For；代理來源由ASGI部署設定決定。
+    assessment = region_signals.assess_region(payload.message, payload.client_timezone, client_id)
+    request.state.region_assessment = assessment
+    app.state.region_assessments.append(assessment)
 
     if usage_store.get_usage(client_id) >= usage_store.USAGE_CHAR_LIMIT:
         window_hours = usage_store.USAGE_WINDOW_SEC // 3600
@@ -594,7 +606,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
 async def usage_endpoint(request: Request):
     """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效
     （例如手動測試，或之後接進 admin 端畫面）。"""
-    used = usage_store.get_usage(_resolve_client_id(request))
+    used = usage_store.get_usage(_client_ip(request))
     return {
         "chars_used": used,
         "char_limit": usage_store.USAGE_CHAR_LIMIT,

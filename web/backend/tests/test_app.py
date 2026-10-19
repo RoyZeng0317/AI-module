@@ -5,6 +5,7 @@ detector.detect() wouldn't (routing, static file exposure, query params).
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from web.backend import app as app_module
@@ -13,10 +14,22 @@ from web.backend.app import app
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def isolate_usage_file(tmp_path, monkeypatch):
+    # HTTP tests must not charge or overwrite the user's real usage ledger.
+    monkeypatch.setattr(app_module.usage_store, "USAGE_PATH", tmp_path / "usage.json")
+
+
 def test_index_served():
     r = client.get("/")
     assert r.status_code == 200
     assert "text/html" in r.headers["content-type"]
+
+
+@pytest.mark.parametrize("address,expected", [(None, "unknown"), (("127.0.0.1", 8080), "127.0.0.1")])
+def test_client_id_handles_missing_connection(address, expected):
+    request = app_module.Request({"type": "http", "client": address})
+    assert app_module._resolve_client_id(request) == expected
 
 
 def test_public_assets_served():
@@ -70,7 +83,7 @@ def test_chat_endpoint_returns_reply_from_self_built_model(tmp_path, monkeypatch
         character=None,
     )
     assert r.status_code == 200
-    assert r.json() == {"reply": "hi there", "conversation_id": None}
+    assert r.json() == {"reply": "hi there", "conversation_id": None, "trace": "trace"}
 
 
 def test_chat_endpoint_without_conversation_id_does_not_persist(tmp_path, monkeypatch):
@@ -99,7 +112,7 @@ def test_conversation_lifecycle_create_chat_get_delete(tmp_path, monkeypatch):
     with patch("web.backend.app.smart_reply_traced", return_value=("trace", "嗨，我是 sinco")):
         chat_resp = client.post("/api/chat", json={"message": "你好", "conversation_id": conv_id})
     assert chat_resp.status_code == 200
-    assert chat_resp.json() == {"reply": "嗨，我是 sinco", "conversation_id": conv_id}
+    assert chat_resp.json() == {"reply": "嗨，我是 sinco", "conversation_id": conv_id, "trace": "trace"}
 
     fetched = client.get(f"/api/conversations/{conv_id}").json()
     assert [m["role"] for m in fetched["messages"]] == ["user", "assistant"]
@@ -241,3 +254,10 @@ def test_local_command_see_usage_and_missing(tmp_path):
     assert _run_local_command("/see") == ("reply", "用法：/see <圖片路徑>")
     kind, text = _run_local_command(f"/see {tmp_path / 'nope.png'}")
     assert kind == "reply" and "找不到檔案" in text
+
+
+def test_chat_trace_for_local_commands_does_not_invent_web_lookup():
+    with patch("web.backend.app.smart_reply_traced") as model:
+        response = client.post("/api/chat", json={"message": "/help"})
+    model.assert_not_called()
+    assert response.json()["trace"] == "本機指令處理"

@@ -491,7 +491,7 @@ IMAGE_SPLIT_FIELDS = [
 
 IMAGE_BNN_FIELDS = [
     Field("data_dir", "資料夾（--source/--output 分割後的輸出）", "dir", "--data-dir", required=True),
-    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="image_classifier_runs"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="image_classifier_feature_runs"),
     Field("epochs", "Epochs", "int", "--epochs", default=30),
     Field("batch_size", "Batch size", "int", "--batch-size", default=32),
     Field("lr", "學習率 (lr)", "float", "--lr", default=3e-4),
@@ -500,8 +500,7 @@ IMAGE_BNN_FIELDS = [
     Field("dropout", "Dropout（貝氏 MC Dropout：推論時同一層繼續發揮作用）", "float",
           "--dropout", default=0.3),
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
-    Field("unfreeze_backbone", "解凍 backbone（train_acc 一直偏低才勾）", "bool",
-          "--unfreeze-backbone", default=False),
+    Field("grayscale", "灰階輸入（卷積層從零學習特徵）", "bool", "--grayscale", default=True),
     Field("no_hflip", "停用水平翻轉增強（類別有方向性時勾選，例如箭頭/文字）", "bool",
           "--no-hflip", default=False),
 ]
@@ -700,7 +699,7 @@ class TrainGUI:
     def _build_image_bnn_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "圖像分類（貝氏）",
-            "貝氏（MC Dropout）MobileNetV2 遷移學習分類器 (image_classifier_bnn.py)，"
+            "貝氏（MC Dropout）自建 CNN 特徵學習分類器 (image_classifier_bnn.py)，"
             "適用任何「一個子資料夾一個類別」的通用圖像分類任務（不限路牌，路牌請仍用"
             "「路牌辨識」分頁）。原始圖片先用「步驟一」依類別子資料夾分割成 train/val/test，"
             "再用「步驟二」指到分割後的輸出資料夾進行訓練。訓練用的 Dropout 層在推論時會"

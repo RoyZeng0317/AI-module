@@ -1,0 +1,20 @@
+[
+  {
+    "timezoneId": "Asia/Shanghai",
+    "sentTimezone": "Asia/Shanghai",
+    "visibleAssessment": false,
+    "errors": []
+  },
+  {
+    "timezoneId": "Asia/Kuala_Lumpur",
+    "sentTimezone": "Asia/Kuala_Lumpur",
+    "visibleAssessment": false,
+    "errors": []
+  },
+  {
+    "timezoneId": "Asia/Taipei",
+    "sentTimezone": "Asia/Taipei",
+    "visibleAssessment": false,
+    "errors": []
+  }
+]

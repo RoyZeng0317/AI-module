@@ -2,7 +2,7 @@
   "stubPath": "typings",
   "typeCheckingMode": "basic",
   "reportMissingModuleSource": "none",
-  "extraPaths": ["tranning", "web/backend", "web/frontend/src/components", "web/admin/frontend/src/components"],
+  "extraPaths": ["tranning", "web/backend", "web/frontend/src/components", "web/admin/frontend/src/components", "lib/components"],
   "exclude": [
     "**/__pycache__",
     "**/.*",

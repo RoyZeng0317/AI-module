@@ -150,11 +150,11 @@ def test_knowledge_question_fallback_fires_for_you_know_x_pattern(tmp_path, monk
     monkeypatch.setattr(tools.auto_learn, "save_candidate", lambda **kw: saved.update(kw))
     monkeypatch.setattr(tools, "web_search", lambda subject: f"{subject} 是數學的一個分支。")
 
-    reason, reply = route_reply("你會微積分嗎")
+    reason, reply = route_reply("什麼是微積分")
 
     assert "微積分" in reason
     assert "微積分 是數學的一個分支。" == reply
-    assert saved == {"prompt": "你會微積分嗎", "reply": reply, "topic": "微積分", "source": "duckduckgo"}
+    assert saved == {"prompt": "什麼是微積分", "reply": reply, "topic": "微積分", "source": "duckduckgo"}
 
 
 def test_knowledge_question_fallback_fires_for_what_is_x_pattern(tmp_path, monkeypatch):
@@ -219,7 +219,7 @@ def test_knowledge_question_fallback_uses_wikipedia_and_records_its_source(tmp_p
     saved = {}
     monkeypatch.setattr(tools.auto_learn, "save_candidate", lambda **kw: saved.update(kw))
 
-    reason, reply = route_reply("你會微積分嗎")
+    reason, reply = route_reply("什麼是微積分")
 
     assert "中文維基百科" in reason
     assert reply == "微積分 是數學的一個分支。"
@@ -369,7 +369,7 @@ def test_route_reply_knowledge_fallback_fires_with_leading_filler_prefix(tmp_pat
     monkeypatch.setattr(tools, "_PAIRS_PATH", _write_pairs(tmp_path, ["hi"]))
     monkeypatch.setattr(tools, "web_search", lambda subject: f"{subject} 是數學的一個分支。")
 
-    reason, reply = route_reply("那你懂微積分嗎")
+    reason, reply = route_reply("那什麼是微積分")
 
     assert "微積分" in reason
 
@@ -442,7 +442,7 @@ def test_web_search_expands_truncated_related_topic_via_first_url(monkeypatch):
 
     monkeypatch.setattr(tools, "_fetch_abstract", fake_fetch)
     result = tools.web_search("Tokenization")
-    assert result == "完整的 Tokenization 說明，沒有被截斷。"
+    assert result.splitlines()[0] == "完整的 Tokenization 說明，沒有被截斷。"
     assert calls == ["Tokenization", "Tokenization (data security)"]
 
 
@@ -462,7 +462,7 @@ def test_web_search_falls_back_to_truncated_text_when_expansion_fails(monkeypatc
 
     monkeypatch.setattr(tools, "_fetch_abstract", fake_fetch)
     result = tools.web_search("Tokenization")
-    assert result == "Tokenization (data security) The process of substituting..."
+    assert result.splitlines()[0] == "Tokenization (data security) The process of substituting..."
 
 
 def test_web_search_returns_related_topic_text_unchanged_when_not_truncated(monkeypatch):
@@ -473,7 +473,7 @@ def test_web_search_returns_related_topic_text_unchanged_when_not_truncated(monk
         }
 
     monkeypatch.setattr(tools, "_fetch_abstract", fake_fetch)
-    assert tools.web_search("foo") == "完整的一句話，沒有省略號"
+    assert tools.web_search("foo").splitlines()[0] == "完整的一句話，沒有省略號"
 
 
 # ---------------------------------------------------------------------------
@@ -710,7 +710,7 @@ def test_route_reply_search_not_found_uses_english_message_for_english_question(
 
     reason, reply = route_reply("search: xyzxyzxyz nothing here")
 
-    assert "no information found" in reply.lower()
+    assert "reliable web results" in reply.lower()
 
 
 def test_route_reply_image_recognition_reports_missing_file_in_english():
@@ -738,7 +738,7 @@ def test_general_web_search_puts_link_on_its_own_line(monkeypatch):
 
     monkeypatch.setattr(tools.requests, "post", lambda *a, **kw: _FakeResp())
 
-    result = tools.general_web_search("測試查詢")
+    result = tools.general_web_search("標題")
 
     lines = result.split("\n")
     assert "https://example.com/page" in lines

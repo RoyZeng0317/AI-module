@@ -1,0 +1,6 @@
+[
+  {"prompt": "hi", "reply": "Hi! How can I help you?", "reason": "Keep an English reply for an English greeting."},
+  {"prompt": "hello", "reply": "Hello! I am sinco. What would you like to talk about?", "reason": "Keep an English reply for an English greeting."},
+  {"prompt": "bye", "reply": "Goodbye! See you next time.", "reason": "Keep an English reply for an English farewell."},
+  {"prompt": "give me an example of the svoo pattern", "reply": "He gave me a gift. He is the subject, gave is the verb, me is the person receiving it, and a gift is the thing given.", "reason": "Explain the English grammar example in English."}
+]

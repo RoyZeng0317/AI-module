@@ -90,12 +90,12 @@ def test_smart_reply_traced_general_chat_uses_transformer(monkeypatch):
     nvidia-mode tests fake out _nvidia_reply, so this doesn't need a real
     checkpoint on disk.
     """
-    monkeypatch.setattr(chats.transformer_chat, "reply", lambda message: f"echo: {message}")
+    monkeypatch.setattr(chats.transformer_chat, "reply", lambda message: "Please share the text you want to review.")
 
-    trace, reply = smart_reply_traced("hello")
+    trace, reply = smart_reply_traced("I have a draft to review")
 
     assert "Transformer" in trace
-    assert reply == "echo: hello"
+    assert reply == "Please share the text you want to review."
 
 
 def test_smart_reply_traced_force_mode_overrides_auto_routing(tmp_path):

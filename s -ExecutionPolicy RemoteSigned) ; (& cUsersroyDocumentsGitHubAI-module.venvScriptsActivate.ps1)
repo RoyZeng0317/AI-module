@@ -1,0 +1,35 @@
+[1mdiff --git a/web/backend/app.py b/web/backend/app.py[m
+[1mindex 78bf9258..4b87c3ef 100644[m
+[1m--- a/web/backend/app.py[m
+[1m+++ b/web/backend/app.py[m
+[36m@@ -139,6 +139,12 @@[m [mCHAT_RATE_LIMIT = 20[m
+ CHAT_RATE_WINDOW_SEC = 60[m
+ _chat_request_log: dict[str, list[float]] = defaultdict(list)[m
+ [m
+[32m+[m[32mdef _client_ip(request: Request) -> str:[m
+[32m+[m[32m    """request.client 的型別是 Address | None --不是純粹型別檢查器吹毛求疵,[m
+[32m+[m[32m    某些 ASGI 情境(例如測試用的 TestClient、某些反向代理設定) 下真的會是[m
+[32m+[m[32m    None。沒有真實來源位址時退回 "unknow"，讓 rate limit/用量統計照樣用[m
+[32m+[m[32m    一個固定 key 累加，不會直接丟 AttributeError。"""[m
+[32m+[m[32m    return request.client.host if request.client is not None else "unknow"[m
+ [m
+ def _check_chat_rate_limit(client_ip: str) -> None:[m
+     now = time.time()[m
+[36m@@ -534,7 +540,7 @@[m [mdef _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[t[m
+ [m
+ @router.post("/api/chat")[m
+ async def chat_endpoint(payload: ChatRequest, request: Request):[m
+[31m-    client_id = _resolve_client_id(request)[m
+[32m+[m[32m    client_id = _client_ip(request)[m
+     _check_chat_rate_limit(client_id)[m
+ [m
+     if not payload.message.strip():[m
+[36m@@ -594,7 +600,7 @@[m [masync def chat_endpoint(payload: ChatRequest, request: Request):[m
+ async def usage_endpoint(request: Request):[m
+     """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效[m
+     （例如手動測試，或之後接進 admin 端畫面）。"""[m
+[31m-    used = usage_store.get_usage(_resolve_client_id(request))[m
+[32m+[m[32m    used = usage_store.get_usage(_client_ip(request))[m
+     return {[m
+         "chars_used": used,[m
+         "char_limit": usage_store.USAGE_CHAR_LIMIT,[m
