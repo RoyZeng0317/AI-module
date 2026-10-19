@@ -251,3 +251,9 @@ CLI 子程序 smoke test 首次以 UTF-8 解碼系統預設編碼的輸出，發
 `lib/img_convert_gray.py` 的 cv2.imread 可能回傳 None，直接傳進 cvtColor 造成型別警告及執行錯誤；讀圖後加入 None 檢查，失敗時顯示路徑／格式提示。保留原有註解與其他範例內容。
 
 `web/backend/app.py` 的 _resolve_client_id 原先直接讀取 request.client.host，client=None 會 AttributeError。首次驗證仍重現該行，重新核對並套用後，統一轉呼叫既有 _client_ip，缺來源時回 unknown。新增缺來源／正常來源兩項回歸，後端25項通過；讀圖失敗防護與實際BGR轉RGB smoke通過，未開啟攝影機。本環境未安裝Pyright，未宣稱完成靜態檢查器重跑；尚待使用者IDE確認。保留兩項既有第三方deprecation警告。
+
+## 2026-10-19：安裝檔超過 GitHub 單檔上限，導致 push 失敗
+
+使用者回報 `app/install/install.msi`（161,636,352 bytes，約154.15 MiB）超過普通Git的100 MiB限制，分批push不能繞過單檔限制。將origin/main以外的6筆未推送提交轉為Git LFS，加入.gitattributes；本機原始歷史另保留於backup-before-lfs-20261019，不推送此備份分支，不強制覆寫遠端歷史。遷移後執行git lfs checkout還原本機實體安裝檔，SHA256與遷移前相同，並檢查待推送普通blob已無超限檔案。
+
+處理時發現LFS遷移也更新了指向同一tip的本機備份ref，已將備份明確恢復至原提交1abc5f64842812ea0185fbcdf89a8899b7bde0aa。一次Git物件檢查遇到PowerShell環境CP950解碼錯誤，改用bytes擷取與UTF-8解碼後檢查成功。大檔先透過LFS上傳，再依可fast-forward的提交分批推送；遠端是否同步以推送後核對為準。
