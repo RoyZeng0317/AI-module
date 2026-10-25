@@ -62,3 +62,40 @@ data/pcb/archive/
 /data/emotion_datasets/classification/
 /data/emotion_datasets/import.log
 
+# 大型資料集與訓練產物（可重新下載/重新產生，不進版控；既有已追蹤的 exports 不受影響）
+/MNIST_Dataset/
+/mnist_test/
+/tranning/mnist_runs/
+/tranning/object_detection_runs/
+/data/object_detection/exports/
+/data/object_detection/source/
+/data/object_detection/trash/
+/team-run/
+
+# 物件標記/照片編輯/MNIST 等功能開發過程中的測試與demo暫存輸出（可重新產生，不進版控）
+output/object-labeling-*
+output/review-independent-*/
+output/object-detection-diagnosis/
+output/object-evaluation-review-tests/
+output/object_detection_logs/
+output/cleanup-audit/
+output/mnist_report_review/
+output/project_test_inventory/
+output/test_evaluate_models_review.py
+output/test_object_delete_review.py
+output/update_mnist_report.py
+output/breadboard_example/
+output/circuit_dataset_inspection/
+output/circuit_edges_demo/
+output/circuit_edges_source.png
+output/circuit_edges_teaching.png
+output/circuit_edges_teaching_demo/
+output/circuit_pipeline_demo/
+output/circuit_teaching_pipeline/
+output/mnist_preprocessed_p1.png
+output/mnist_preprocessed_p2.png
+output/mnist_preprocessed_p3.png
+output/photo_edit_demo/
+output/photo_edit_try/
+output/photo_rotation_example/
+output/user_circuit_dataset/
