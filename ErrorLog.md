@@ -1,5 +1,22 @@
 # Error Log
 
+## Transformer本地上下文與指令遵守檢查（待修正）
+
+使用者主要回報不記得上下文／不遵守要求。唯讀檢查確認GUI雖保存並傳遞history至smart_reply_traced，一般分支卻只呼叫transformer_chat.reply(message)，reply只編碼當句+SEP，未收到前輪；本地分支亦未自動讀取memory_store。SFT採單輪prompt/reply，尚無一致多輪角色格式。真實正式權重固定seed抽樣出現姓名答成sinco、單字限制未遵守、機器學習問題答非所問，目前output_issue未捕捉。主模型17,465,088參數／8層／6頭／384維／8000BPE／512tokens；主history最佳epoch26，訓練與驗證有落差，但程式會恢復最佳權重，不能誤稱model.pt是最後epoch。詳細[現況報告](output/transformer-audit/STATUS.md)、[獨立檢查](output/transformer-audit/REVIEW.md)與原始樣本已保存。此回合未改推論／訓練程式或權重，未重訓，不記為修正完成。
+
+
+## 2026-10-25：使用者確認YOLO物品辨識改善
+
+使用者回饋「這次的準確率很高了」，已依確認寫入[修正成功紀錄](Agent/ErrorLog/Success/2026-10-25-YOLO物品標記與小資料訓練修正.md)，包含原因、最後設定、實測比較、剩餘限制及下次排查順序。此為目前使用情境的正向確認，不代表已測得所有類別泛化準確率。整理時發現舊索引提到的Agent/ErrorFinished目錄已不存在，改依實際Agent/ErrorLog/Success目錄新增，沒有刪除歷史紀錄。
+
+
+## 2026-10-23：img_nmist.py 資料載入參數名稱錯誤
+
+- 錯誤：`image_dataset_from_directory()` 不接受 `img_size`，執行時產生 `TypeError`。
+- 修正：`lib/img_nmist.py` 改用 `image_size=(img_h, img_w)`；保留既有的 `validation_split=0.2` 與訓練設定。
+- oneDNN 訊息是運算後端提示，並非此次中斷原因。
+- 接續檢查發現資料夾名稱拼成 `MNIST_Traning`，實際為 `MNIST_Training`，已一併修正。
+
 > **2026-09-14 補記**：`to_do_list.md`／Claude memory 裡多處引用「ErrorLog #22」
 > 「ErrorLog #23」「ErrorLog #29」，代表根目錄這份 `ErrorLog.md` 過去確實累積到
 > 至少 29 號。但今天要新增紀錄時發現**這個檔案在磁碟上完全不存在**：`git log --all`
@@ -257,3 +274,129 @@ CLI 子程序 smoke test 首次以 UTF-8 解碼系統預設編碼的輸出，發
 使用者回報 `app/install/install.msi`（161,636,352 bytes，約154.15 MiB）超過普通Git的100 MiB限制，分批push不能繞過單檔限制。將origin/main以外的6筆未推送提交轉為Git LFS，加入.gitattributes；本機原始歷史另保留於backup-before-lfs-20261019，不推送此備份分支，不強制覆寫遠端歷史。遷移後執行git lfs checkout還原本機實體安裝檔，SHA256與遷移前相同，並檢查待推送普通blob已無超限檔案。
 
 處理時發現LFS遷移也更新了指向同一tip的本機備份ref，已將備份明確恢復至原提交1abc5f64842812ea0185fbcdf89a8899b7bde0aa。一次Git物件檢查遇到PowerShell環境CP950解碼錯誤，改用bytes擷取與UTF-8解碼後檢查成功。大檔先透過LFS上傳，再依可fast-forward的提交分批推送；遠端是否同步以推送後核對為準。
+
+
+## 2026-10-19：MNIST 舊版匯入路徑與未完成語法
+
+`lib/pytensorflow/main.py` 的 `from tensorflow.examples.tutorials.mnist` 缺少同一陳述式內的 `import ...`，下一行 `import input_data` 會被視為另一個頂層模組匯入；檔尾另有未完成的 `def de`。舊教學 MNIST input_data 不能直接套用現行 tf.keras 資料集介面，應改用 `tf.keras.datasets.mnist.load_data()`。實查專案 .venv 未安裝 tensorflow／keras；尚未安裝套件、下載 MNIST 或修改使用者未完成的範例程式，只記錄診斷。
+
+
+## 2026-10-19：MNIST 函式參數作用域及新舊 TensorFlow 介面混用
+
+`lib/pytensorflow/main.py` 的 conv2d() 只有空 return，後續 tf.layers.conv2d 未縮排而落在模組層，input_layer／filters 超出函式參數作用域；另殘留未匯入的 input_data、one_host 拼字及 pool_size=[2,25]。沿用原四個函式改為 tf.keras.layers，MNIST 僅透過 keras 載入一次，保留舊教學55,000訓練／5,000驗證、4,000測試及flatten／one-hot格式。Dropout需在訓練時傳training=True，CNN使用前需將flatten影像reshape為(N,28,28,1)。語法與return作用域檢查通過；.venv仍未安裝TensorFlow，未宣稱通過真實TensorFlow推論或資料下載。初次patch因檔案空行上下文不符而未套用，重新讀取後以較小範圍修正，未修改其他筆記。
+
+## 2026-10-19：MNIST 輸入與展平變數名稱不一致
+
+lib/pytensorflow/main.py 定義 x_input 卻使用 input_x，定義 flat 卻使用 flat_0，造成未定義名稱。統一為 x_input 與 flat_0，並以 tf.keras.Input、Reshape、Flatten 取代混入的 TF1 placeholder 與 reshape，沿用前處理的 0~1 資料，避免重複除以 255。Keras 標籤由後續訓練傳入，不建立 y_output placeholder。語法及名稱檢查通過；專案 .venv 未安裝 TensorFlow，未執行真實模型、資料下載或訓練。
+
+## 2026-10-19：MNIST 損失函數使用未定義 y_output 與 TF1 介面
+
+lib/pytensorflow/main.py 已改為 Keras Input，新增的 TF1 損失／優化器／指標仍引用已移除的 y_output，另有 softmax_cross_entopy、lavels 拼字錯誤。改用 Keras Model.compile、CategoricalCrossentropy(from_logits=True)、Adam(learning_rate=0.000095)、CategoricalAccuracy；真實 one-hot 標籤由後續 fit 的 y_train 傳入。輸出 logits 移除 ReLU；Dropout 改 training=None，讓 Keras 依訓練／推論階段控制。語法及設定靜態檢查通過，.venv 未安裝 TensorFlow，未執行訓練或宣稱實際準確率。
+
+
+## 2026-10-20：照片方向與灰階修圖示範的能力邊界及執行紀錄
+
+既有影像分類／CVAE 不代表已具備任意照片的方向推理或文字語意修改。本次新增獨立示範 `tranning/photo_edit.py`、`lib/photo_edit_demo.py`，有限精確指令可立即執行；方向 CNN 與灰階文字殘差 CNN 從零訓練。沒有方向權重時不自動旋轉，低信心時保持方向；灰階外另存原色度，不宣稱能由灰階恢復原始色彩。真實方向泛化、視角理解、任意文字物件修改仍未驗收，列入 to_do_list.md #47。
+
+執行中發現／處理：
+- 根 README 的首次 apply_patch 因上下文不吻合而未套用（沒有修改檔案），改用 UTF-8 追加獨立章節，保留既有內容。
+- 檢查時發現手動指定角度仍先讀方向 checkpoint，會受無效權重路徑阻擋；改為手動角度優先分支。
+- 純添加標記原先仍做 YCbCr 往返，可能改動未修改位置的 RGB；調整為沒有亮度操作時直接複製原圖。
+- 工具擷取 Python 終端輸出時曾出現中文字碼顯示不符；UTF-8 原始檔與 JSON 正常，驗證程序設定 PYTHONIOENCODING=utf-8，未讀寫 .env。
+
+整合驗證：`.venv/Scripts/python.exe -m pytest tranning/test_photo_edit.py -q --basetemp=team-run/photo-edit/integration-tmp`：4 passed。另有企鵝實拍逐步輸出與一次 epoch 合成 smoke；測試／合成權重僅證明管線可跑，不能作真實準確率或功能驗收完成的依據。獨立審查結果另見 `team-run/photo-edit/REVIEW.md`。
+
+
+照片示範獨立審查補充：發現預設指令添加圓形固定於 (40,40)，使寬或高不超過 40 的合法照片失敗。核心與 CLI 改共用不含座標的亮度／銳化預設，保留顯式圓形操作；新增 1×1、12×30 的 CLI 回歸驗證與越界座標拒絕測試。最終整合測試 6 passed（3.95s）。建置補充文件時另有一次工具 JavaScript 字串包裝 SyntaxError，shell 未執行、檔案未改，重試完成。
+
+另產出 `output/photo_rotation_example/` 實拍人工旋轉案例，輸入逆時針 90°，指定校正 270°；獨立逐像素比較確認校正圖等於原始照片。此為人工指定角度的流程示範，並非模型自動判斷成果。一次 epoch 合成方向 smoke 驗證準確率為 0.25，權重只用於管線測試，不能投入正式照片方向判斷。
+
+
+## 2026-10-20：電路圖邊緣處理示範
+
+使用者新增 `lib/img_edge.py` 練習檔以 `cv2.imread()` 讀 BGR，卻使用 COLOR_RGB2GRAY，且 Canny 迴圈未存圖；本次沿用其架構修正為 COLOR_BGR2GRAY、high 拼字與實際輸出，加入 photo／circuit CLI。核心新增共用 extract_edges：電路 Canny 使用3×3輕微去噪，另外對原灰階作 Otsu 反向二值化保留線寬，不用閉運算／膨脹以免隨意接線。電路預設不做亮度／銳化。既有 KiCad 範例渲染有近似符號與重疊標籤，不作清晰教學例，另外用 schemdraw 產生 RC 圖；未修改原 KiCad、SVG 或渲染器。
+
+驗證 `.venv/Scripts/python.exe -m pytest tranning/test_photo_edit.py -q --basetemp=team-run/photo-edit/circuit-test-tmp`：8 passed。新增細線、單像素間隙、預設電路不改色、門檻檢查、練習 CLI 三圖輸出與拒絕覆寫。實際跑 RC 圖兩種 CLI 並檢視 preview。此為影像前處理，尚無元件或導線連接理解，黑底圖與強陰影掃描尚待前處理，不登記為完整功能驗收。首次檔案搜尋有 rg 無匹配回傳1，非 Python 或測試失敗。
+
+
+## 2026-10-20：麵包板實拍不能沿用白底墨線假設
+
+使用者要求支援杜邦線、電阻等麵包板實拍，既有 circuit Otsu 僅適用白底深線，不能當作實拍元件遮罩；灰階也無法保留線色及色環供後續辨識。新增 breadboard 模式保留彩圖，雙邊保邊去噪與 Canny，額外保存非語意 HSV 彩色區域及邊緣疊圖，不自動補線、不輸出元件／導通判定。尚待使用者確認後續層級與自有照片。
+
+尋找官方實拍時 SparkFun 教學頁由 web 工具取得403；Adafruit教學頁的 urllib存取也回HTTP403，未持續繞過限制，改採搜尋結果所列 Adafruit公開CDN產品圖，成功保存為 output/breadboard_example/source.jpg 並記錄來源與SHA256。照片已目視確認為含麵包板、杜邦接頭線、電阻、LED及開發板的實拍，不是原理圖。此照片僅本機處理示範，未用於模型訓練。
+
+驗證 `.venv/Scripts/python.exe -m pytest tranning/test_photo_edit.py -q --basetemp=team-run/photo-edit/breadboard-test-tmp`：10 passed。兩入口實拍執行完成；目視檢查 preview，原色保留、邊緣與彩色區域可見。新增斷言：預設原彩圖像素與來源相同、黑線未出現在飽和遮罩但保留於原圖、RGB色序正確、沒有誤產生原理圖墨線遮罩；報告明確註明元件／連接not_implemented。仍未驗證多種類／多角度真實電路辨識率。
+
+麵包板共用前處理獨立審查通過（BREADBOARD_REVIEW.md）；再次獨立驗證十項測試、小尺寸、無效參數與不覆寫，實拍兩入口原色逐像素相同且來源SHA256不變。此審查不代表完整元件或接線能力通過驗收。
+
+
+## 2026-10-20：地區封禁需求盤點
+
+讀取前端註解所指 web/backend/auth.py 時確認該檔不存在；實際 app.py 以來源 IP 識別，不能當成穩定帳戶身分。另一靜態前端已有公開 Google Client ID，但實際後端提供 admin/frontend，未接帳戶驗證。region_signals.py 為 observe_only，尚無已定義文字封禁門檻或低誤判率資料。本次先記錄規格、隱私草案與模型差距時間表，待使用者確認身份來源、介面與文字門檻後才實作封禁；未觸碰 .env，未宣稱修復或上線完成。
+
+
+## 2026-10-20：自有接線資料匯入與標註缺口
+
+正確來源為Downloads/電路資料集，先前使用者誤傳的專題測試結果排除。新工具lib/breadboard_dataset.py／tranning/breadboard_dataset.py唯讀整理照片影片，實跑加--hash-videos產生15來源（8照片7影片）、29資產（8原照21抽幀）、errors0與全來源SHA256，原檔不搬移不覆寫。大影片僅有界抽樣，時間是index/FPS估計，不是PTS；尚無元件、腳序或接線真值。端點／連線／孔列模板的空白是未知，不能當斷路或負例。watch技能的預設setup會讀寫專案外設定及.env、可啟動外部模型，與使用者規則衝突，因此僅依本機抽幀方法以cv2/PIL處理，不執行設定與轉錄。
+
+新增工具測試3 passed（合成MJPG實際寫入解碼，無skip），舊影像測試待整合複驗；真實3近拍已以原解析度處理。未發生新程式／解碼錯誤，沒有啟動正式訓練或聲稱接線辨識完成。使用者已一次收到預期電路與三腳元件資料補問，等待期間完成資料前置，不捏造標註。
+
+
+資料整理獨立審查補充：原本來源stat/SHA256在單檔try外，模擬PermissionError會整批中止且無manifest；縮圖重讀來源失效亦可能丟失紀錄。已將stat/hash納入逐檔錯誤處理並繼續其他來源，manifest在縮圖前先落地，縮圖逐張失敗改佔位並記error。公開函式原本接受3.5／True作抽樣數，改為真正int且排除bool、範圍1..32，非法值不建輸出。加入來源拒讀／另一張成功、縮圖失效與型別回歸後，新增工具7項＋既有影像10項共17 passed（3.95s）。先前審查一度使用不存在的lib/test_img_analyize.py導致pytest無測試可跑，隨即改正測試路徑；屬操作錯誤，非程式失敗。既有真實15來源／29資產／0錯誤輸出與空模板未更改。
+
+
+## 2026-10-24：MNIST 自訂測試圖片路徑
+
+lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，且下方單張預測另行寫死 Test_data/5.jpg，未使用該變數。已將預測路徑接至 test_img_dir，並依邊框底色將小畫家白底黑字反轉為 MNIST 黑底白字；模型內已有 Rescaling(1/255)，不再對輸入重複正規化。新增空白／極低對比圖片拒絕，輸出類別與 softmax 機率。未執行 30 epochs 正式訓練或評估使用者手寫圖片準確度。
+
+
+## 2026-10-24：獨立 MNIST 數字輸出入口
+
+依使用者澄清新增 tranning/img_mnist_predict.py，不再修改 lib/img_nmist.py（保留使用者後續更新的 mnist_test/p1.png 路徑）。新入口使用同一圖片路徑，無圖表、無機率陣列，只向 stdout 印一個數字；找不到快取模型時從本機 MNIST 訓練 5 輪並保存於 tranning/mnist_runs/digit.keras。已以合成資料跑過一輪訓練、模型保存／載入、黑白底前處理、空白拒絕與單數字輸出，並以 SHA256 確認原檔未變；未執行真實 60000 張完整訓練，未宣稱使用者圖片辨識準確。檢查時 Keras 提示 Dataset 自行洗牌，因此 fit 明確設 shuffle=False。TensorFlow 仍可能將底層環境訊息寫入 stderr，與數字 stdout 分開。
+
+
+## 2026-10-24：小畫家細筆畫縮圖後誤判為 1
+
+檢查真實 p1/p2/p3 圖片與現存 digit.keras：原前處理縮成 28x28 後，圖片最高亮度僅 51～61，筆畫近乎消失；模型抽查 MNIST 0/1/3/7 可辨識，三張使用者圖片卻皆誤判 1。此外 model_path 存在即載入，修改 epochs 不會重訓。僅修改獨立 tranning/img_mnist_predict.py：稀疏筆畫先依原尺寸加粗、補黑邊後縮圖，並新增 --retrain 明確重新訓練。保留使用者 p3.png 與 epochs=30 設定，未修改原課本檔、圖片或已訓練模型。三張真實圖片已實測 p1=7、p2=7、p3=2；main 標準輸出精確為 2 換行，模型 SHA256 不變。此結果不代表所有手寫字體準確度。
+
+## 2026-10-25：物品標註工具測試清理與中文字型下載
+
+新增標註工具首次測試出現 `_tkinter.TclError: can't invoke "winfo" command: application has been destroyed`：測試在 `app.close()` 銷毀 Tk 後又查詢視窗。已將測試清理改為安全處理重複 destroy；屬測試清理錯誤，未刪除或修改使用者影像。
+
+檢查已安裝 Ultralytics 8.4.90 原始碼發現 `check_det_dataset()` 即使 `plots=False`，仍因中文類別呼叫中文字型下載檢查。新物品微調入口只在 `model.train()` 範圍暫停該字型檢查、保留資料驗證，結束或例外均還原；畫面中文由 Tk 顯示。未修改套件檔，升級套件後需重新確認相容性。驗證與限制見 [建置紀錄](team-run/object-labeling/BUILD_LOG.md)；尚未正式訓練或驗證實體攝影機，不作使用者驗收紀錄。
+
+獨立審查首次整組測試為 25 passed／1 failed，第三個 Tk 建構瞬時找不到 `ttk/notebook.tcl`，發生在 `tk.Tk()`；單項重跑通過，再完整重跑為 26 passed（2.61s）。未修改專案外 Python 安裝；保留此環境現象供重現追查。審查判定與獨立多類座標／負例檢查見 [審查紀錄](team-run/object-labeling/REVIEW.md)。
+
+## 2026-10-25：YOLO 即時畫面唯讀導致 FPS 繪字失敗
+
+使用者載入自訂 best.pt 後，`lib/yolo/Instant Image Reconginizion.py` 在 `cv2.putText()` 出現 `img marked as output argument, but provided NumPy array marked as readonly`。直接原因為 `results[0].plot()` 回傳唯讀影像，OpenCV 5.0.0 拒絕原地寫入；不是權重路徑錯誤。改為 `plot().copy()` 取得可寫副本，並將 FPS 繪製移至 imshow 之前，保留使用者 best.pt 路徑與原有註解。
+
+以真實 cv2.putText 重現唯讀陣列錯誤，再用假 YOLO／攝影機執行整支腳本，確認複製後可繪字、顯示前已有 FPS、來源影像未修改、按 q 後釋放鏡頭。未占用實體攝影機或驗證辨識精度；待使用者實機確認，不寫入已驗收修正日誌。
+
+## 2026-10-25：自訂物品權重沒有偵測框與繁體中文繪製
+
+檢查 ff12324270144ba8833cc34af3a25f3f/best.pt，模型類別確有橡皮擦等13個繁體中文名稱。其訓練快照只有11張訓練圖，每個已出現類別各1個框；類別1與11沒有訓練框。驗證只有1張圖、2個框（直尺與耳機）。以真實權重在GPU抽查2張訓練圖與1張驗證圖，conf=0.001下最高分別約0.001226、0.004405、0.001295，全部低於即時程式0.35門檻；這解釋抽查時沒有框，不能以降低門檻或畫人工真值假裝辨識正確。
+
+新增 lib/yolo/detection_overlay.py，使用本機Windows微軟正黑體以Pillow繪製模型預測框與繁體中文名稱；即時程式改呼叫此函式，沒有預測框時明確顯示中文提示。合成預測驗證中文繪製、框線、唯讀來源不變及可寫輸出，輸出示意在 output/object-detection-diagnosis/chinese-label-check.png；不是模型真實辨識成果。未重訓或操作實體鏡頭。下一步需要補各類多樣照片及獨立驗證資料，既有模型品質尚未通過驗收。
+
+## 2026-10-25：新增標註與重訓後攝影機仍載入舊模型
+
+使用者已提供30張工作區影像，29張已儲存：train 27張／57框，val 2張／4框，另1張未確認；新模型 f68b9a8872ae4be897db2c5fc417cf4c 使用這份快照、batch4、epochs50。但即時腳本仍指向舊的 ff12324270144ba8833cc34af3a25f3f（11張train），已僅更新權重路徑為新模型。新權重GPU抽查2張train、2張val，最高分別0.2109、0.0636、0.0233、0.1645，均未達0.35；不能宣稱換路徑就能準確辨識。未改門檻、未重訓或操作實體鏡頭；先前只依舊資料提出增加照片的建議不完整，應先核對實際模型與資料快照。
+
+## 2026-10-25：物品標註工作區刪除功能
+
+依使用者要求移除1張尚未確認、沒有框且非背景負例的照片（e6a144232ad8f861e8e768fabcaafdb0561130d0e9e2c3cf31978c104aa5beca）；工作區30→29張，原圖副本及原annotations.json保留在data/object_detection/trash內，已確認備份存在。新增「刪除未標註照片」「刪除類別」「更名類別」，類別刪除同步調整ID並讓受影響照片待重新確認，更名保留框；既有匯出與模型不變。30項相關測試通過，未操作實體鏡頭或重訓。操作文件首次套用patch因預期文字不是完整行而失敗，無修改發生，改以標題定位後成功。詳見team-run/object-labeling/DELETE_CHANGES.md；未宣告使用者驗收完成。
+
+## 2026-10-25：小資料訓練更新不足與50張加強比較
+
+舊模型即使conf反覆降低仍誤判／漏判。確認27train每epoch7批，batch4與預設nbs64配合會約16批累積更新、warmup至少100步；先前50epochs有效更新少，少樣本多類與強增強也是因素，不能只歸因單一參數。使用者期間擴充為50張且全部儲存，另建48train102框／2val4框快照；舊模型在此快照conf.25 IoU.5僅TP1 FP1 FN101。
+
+完成有界YOLO26更新設定比較及最後本地YOLO11凍結特徵150epoch實驗；最終best在同快照train TP101 FP21 FN1、val TP4 FP1 FN0。訓練圖指標不等於泛化精度，驗證只有4框且無橡皮擦。使用者截圖回放best能找橡皮擦82.01%／直尺42.12%，單顆橡皮擦70.76%，仍漏指甲剪。選expanded_50_transfer11/weights/best.pt，保留舊模型，GUI/CLI同步較佳配方、加入缺類警告；即時conf改為評估用.25並印實際模型路徑。詳見team-run/object-labeling/TRAINING_COMPARISON.md及output/object-detection-diagnosis原始報告，尚未做實體鏡頭驗收，不記為完整物品辨識已修好。
+
+測試中有瞬時Tk缺listbox.tcl／notebook.tcl，單項及完整33項重跑通過，不修改專案外安裝。根代理真權重GPU搭配假鏡頭執行整支即時腳本，中文繪製、可寫陣列與q釋放通過。臨時接觸表腳本首次因PIL.ImageOps未匯入失敗，改為按圖片數預先配置畫布後成功；完成程序後一次輪詢回報Unknown process id，已由結果檔確認正常結束。更新攝影機patch因使用者同期將conf從.15改.05而比對失敗，重讀後僅更新模型與驗證門檻，其餘修改保留。
+
+## 2026-10-24：GitHub 專案快取清理
+
+使用者明確授權清理 C:\Users\roy\Documents\GitHub 內所有專案。盤點排除 Git、虛擬環境、依賴、建置輸出、模型、資料集與 .env，僅處理 __pycache__、.pytest_cache、.mypy_cache、.ruff_cache 與個別 pyc/pyo/系統縮圖快取；每個目標確認位於授權目錄內、無路徑連結、未被 Git 追蹤。永久刪除命令遭自動安全審核以 blocked by policy 拒絕，未執行；改採可復原的 Windows 資源回收筒。
+
+共 11 個專案、70 個快取項目、553 個檔案、7459395 bytes（7.11 MiB）已移至資源回收筒，0 失敗，逐項確認原位置不再存在。詳細盤點、驗證名單與結果在 output/cleanup-audit/。沒有清空資源回收筒，因此不宣稱已釋放磁碟空間；既有模型與成果檔保留。

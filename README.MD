@@ -91,7 +91,7 @@ AI-module/
 │   ├── yolo/Instant Image Reconginizion.py
 │   └── opencv2/                    # check_mouth  dnn  image  img_convert  img_to_gray  img_write  簽到 (.py) + 範例圖片
 ├── machine_migration/              # 換機備份 (MIGRATION_MANIFEST.md、checksums_sha256.txt、git_info.txt、requirements_freeze.txt)
-├── materials_recongizion/          # 電子元件辨識 (capacitor.py、resistor.py、main.py + test_*)
+├── materials_recongizion/          # 電子元件辨識 (capacitor.py、resistor.py、main.py、detect_and_read.py + test_*)
 ├── memory/                         # memory.json (/memory 指令)、usage.json
 ├── output/                         # 輸出 (三星ring2新聞消息.md、Music-Player/front/action.md)
 ├── shape-vision/                   # 獨立子專案：古典影像形狀辨識
@@ -106,6 +106,8 @@ AI-module/
 │   ├── build_corpus.py  build_code_corpus.py  code_retrieval.py  code_snippet_import.py
 │   ├── dataset_import.py  data_split.py  filter_manifest.py  package_checkpoint.py
 │   ├── pcb_dataset_prep.py  kicad_dataset_convert.py  bayesian_utils.py
+│   ├── yolo_custom.py  yolo_train_utils.py  pcb_defect_train.py  road_sign_yolo_train.py
+│   ├── materials_yolo_train.py  region_refer.py
 │   ├── CNN.py  OCR.py  RNN.py  RNN.md  image_analysis.py  image_classifier_bnn.py  road_sign_train.py
 │   ├── cv_inference_check.py  inference_check.py
 │   ├── speech_to_text.py  voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py
@@ -200,13 +202,22 @@ pyinstaller --onefile --console --name install_check app/install/install_check.p
 - `web/backend/`：FastAPI，`/api/detect`（攝影機畫面丟進 YOLOv8n 做物件偵測）、`/api/chat`（接 sinco 的 `smart_reply`）
 - `web/frontend/`：純靜態 HTML/JS/CSS demo 頁面，另有 `視覺電路圖.py`（攝影機即時電路元件辨識腳本，刻意不存截圖/錄影）
 - 部署：後端 Render.com（`Dockerfile` + `render.yaml`，免信用卡的免費方案）、前端 Firebase Hosting（純靜態，`firebase.json`）
-
+- 網頁版後端暫定使用指令啟動:
+```bash
+cd web/backend/
+python app.py
+```
 ### 5. 訓練骨架（等真實資料集）— `tranning/`
 
 | 檔案 | 用途 | 狀態 |
 |---|---|---|
 | `road_sign_train.py` | 台灣路牌辨識（MobileNetV2 遷移學習，凍結 backbone、不做水平/垂直翻轉增強因為路牌有方向性） | 架構完成，等真實路牌資料集 |
-| `circuit_diagram_train.py` | 電路圖元件偵測（YOLOv8 微調，同樣不翻轉） | 架構完成，等真實電路元件標註資料集 |
+| `circuit_diagram_train.py` | 電路圖元件偵測（YOLO11 微調，同樣不翻轉） | 架構完成，等真實電路元件標註資料集 |
+| `yolo_custom.py` | 通用 YOLO 偵測骨架（合成圓/方/三角資料驗證管線，支援背景訓練/資料增強旗標） | 合成資料已跑完，等真實資料集 |
+| `pcb_defect_train.py` | PCB 缺陷偵測（YOLO，接 `pcb_dataset_prep.py --yolo-out` 的輸出，不裁圖分類） | 架構完成，等真實標註資料集 |
+| `road_sign_yolo_train.py` | 路牌偵測（YOLO 版本，一張畫面多個路牌，跟上面的分類器並存） | 架構完成，等真實標註資料集 |
+| `materials_yolo_train.py` | 電阻/電容定位（YOLO，接 `materials_recongizion/detect_and_read.py` 做既有古典 CV 判讀） | 架構完成，等真實標註資料集 |
+| `region_refer.py` | 區域指稱（YOLO 候選框 + 自訓視覺編碼器 + 既有文字 embedding 對比學習，概念參考 VLX-Seek、乾淨室重新實作） | 合成資料已跑完，等真實圖說資料集 |
 | `data_split.py` | 分層 train/val/test 切分（稀有類別也會分到三個 split） | 完成 |
 | `machine_learning.py` | 線性迴歸教學範例（身高體重） | 完成，教學用 |
 | `neural_network.py` | 極簡 PyTorch 全連接網路範例 | 草稿，僅定義了模型結構 |
@@ -305,3 +316,52 @@ RAG／交叉熵的精確定義題有中英文已審核本機詞條，附來源�
 ```
 
 預設停用工具並略過網路案例，適合單獨觀察聊天生成；加入 `--allow-network` 才會執行完整工具路由與查詢。此指令會進行模型推論，不會訓練或修改 checkpoint。完整路由結果不能直接當作純模型能力。`team-run/chat_eval_offline.jsonl` 是此次實測，未見中文／自然英文改寫仍多有不通順與不相關回覆；目前**未達一般人類或英文母語對話品質，更未證實與 Claude／GPT 同等能力**。後續需擴充經審核雙語語料、多輪格式、重訓並人工比較，不能只靠更多固定回覆或 loss 下降判定完成。
+
+
+### 照片方向、灰階特徵與文字修改示範（2026-10-20）
+
+獨立前端為 `lib/photo_edit_demo.py`，訓練與推論核心為 `tranning/photo_edit.py`。
+不呼叫外部 AI、不載入預訓練權重；既有聊天、分類器及 `lib/img.py` 不變。
+
+```powershell
+.\.venv\Scripts\python.exe lib/photo_edit_demo.py
+```
+
+預設使用專案內的企鵝實拍照片，寫入新目錄 `output/photo_edit_demo`：原圖、灰階、邊緣、角點、旋轉結果、彩色修改結果、四方向候選及 JSON 報告。輸出目錄已存在時，請改用 `--output output/photo_edit_demo_2`，避免覆寫。
+
+```powershell
+.\.venv\Scripts\python.exe lib/photo_edit_demo.py --input lib/opencv2/penguins.jpg --output output/my_photo_demo --instruction "亮度 15；銳化 0.5；添加圓形 40 40 15 #ff5500"
+```
+
+以保留原圖色度的方式合成灰階亮度修改；新增彩色圖形屬明確操作。沒有方向 checkpoint 時保持原方向，不會用隨機權重自動旋轉；手動 `--angle 90` 為逆時針。四方向自建模型可用方向正確的照片資料夾訓練；灰階文字殘差模型可用每組 `source.png`、`target.png`、`instruction.txt` 訓練。
+
+**能力界線**：邊緣與角點不等同語意理解；立即示範僅接受文件列出的精確文字語法。學習式編輯目前只改亮度，不能學會替換顏色，也未完成任意指令移除人物或增加真實物件的能力。尚無真實獨立照片集證明方向與語意編輯品質。完整語法、資料夾格式與訓練指令見 [示範說明](team-run/photo-edit/README.md)。
+
+
+照片示範已擴充電路圖邊緣模式：`lib/img_edge.py --mode circuit --input output/circuit_edges_teaching.png --output output/circuit_edges_try`。使用專案 `.venv/Scripts/python.exe` 執行；輸出三組邊緣門檻比較與保留線寬的二值圖。完整管線 `lib/photo_edit_demo.py` 也支援 `--mode circuit`、`--edge-low`、`--edge-high`；電路預設不修改亮度。此為白底深線的影像前處理，尚非元件辨識或電路連接分析，詳見上述示範說明。
+
+
+實拍麵包板可使用 `--mode breadboard`（兩個入口皆支援）：例如 `.venv/Scripts/python.exe lib/img_edge.py --mode breadboard --input output/breadboard_example/source.jpg --output output/breadboard_edges_try`。新增保邊去噪、保留原色與邊緣疊圖；實拍範例來自 Adafruit https://www.adafruit.com/product/4203 ，來源紀錄見該資料夾 source.json。色彩遮罩只是像素前處理，尚未辨識杜邦線／電阻／孔位或接線，完整層級仍待使用者確認；不將單張實拍流程通過當作模型已理解真實電路。
+
+
+### 地區封禁規格、隱私草案與模型改進計畫（2026-10-20）
+
+[需求與待確認項](team-run/region-enforcement/REQUIREMENTS.md)、[隱私協議草案](team-run/region-enforcement/PRIVACY_DRAFT.md)、[模型能力差距與16週作業表](team-run/region-enforcement/MODEL_ROADMAP.md)。四地限制、拒絕定位仍可使用與僅人工解除已記錄；現有後端仍為 IP 識別與 observe_only，未啟用帳戶封禁。隱私草案保留待填資訊，不是已生效協議；時程為附投入假設的工作估算，並非達到 Claude/GPT 整體能力的承諾。
+
+
+使用者現已確認目標為「接線理解」，並提供自有來源 `C:/Users/roy/Downloads/電路資料集/`（先前專題測試結果為誤傳，排除）。新增唯讀整理工具 `lib/breadboard_dataset.py`／`tranning/breadboard_dataset.py`，實跑結果15來源、29資產、0讀取錯誤，含全來源SHA256、抽幀、空白端點／連線／孔列與分組模板，見 [資料說明](output/user_circuit_dataset/README.md) 與 [盤點結果](team-run/photo-edit/DATASET_FINDINGS.md)。未訓練或產生已驗證netlist；預期電路／三腳元件腳序仍待補充。
+
+
+## conda 環境
+建置程式:
+```bash
+conda create -n AI-module python=3.11
+```
+啟動程式:
+```bash
+conda activate AI-module
+```
+
+## 自訂物品標註與即時偵測
+
+執行 `.\.venv\Scripts\python.exe -m lib.yolo.object_labeler`，可匯入照片或擷取攝影機影像，人工框選橡皮擦等自訂類別、儲存標註、微調本地 YOLO 權重，再使用訓練出的 `best.pt` 即時偵測。完整步驟見 [操作說明](lib/yolo/README.md)。這次已明確授權物品偵測使用預訓練權重微調；尚未收集真實標註或完成真實模型訓練，不代表已能準確辨識橡皮擦。
