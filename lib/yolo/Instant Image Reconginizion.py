@@ -1,7 +1,12 @@
 import cv2, time
 from ultralytics import YOLO
+from detection_overlay import draw_detections
 # 01. loading the model (please make sure the model name and path)
-model = YOLO("yolo26n.pt")
+model = YOLO(
+    r"C:\Users\roy\Documents\GitHub\AI-module\tranning\object_detection_runs\expanded_50_transfer11\weights\best.pt"
+)
+print("使用模型：", model.ckpt_path)
+print("物品類別：", "、".join(model.names.values()))
 
 # 02. open the image resource (0 means default camera; also can use the webcam, ex: "rtsp://..." or "http://...m3u8")
 source = 0
@@ -25,7 +30,8 @@ while True:
         break
     # 03. running the YOLO
     # conf: ; imgsz: ; stream=True adapt to continue pixcel image
-    results = model(frame, conf=0.15, imgsz=640, verbose=False)
+    results = model(frame, device=0, conf=0.25, imgsz=640, verbose=False)  # 與真實資料比較使用相同門檻
+
     # results = model.train(
     #     data="custom_road.yaml",
     #     epochs=50,
@@ -37,20 +43,19 @@ while True:
     # )
 
     # 04. draw the limit tline and types label (Ultralytics provid include draw tools)
-    annotated_frame = results[0].plot()
+    annotated_frame = draw_detections(frame, results[0])  # 本機繁體中文字型與可寫入的影像
 
     # 05. display the result
-    cv2.imshow("Real-Time YOLO Detection", annotated_frame)
-
-    # press the 'q' keypress to exit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
     curr_time = time.time()
     fps = 1 / (curr_time - prev_time)
     prev_time = curr_time
 
     cv2.putText(annotated_frame, f"FPS: {int(fps)}", (20, 40),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.imshow("Real-Time YOLO Detection", annotated_frame)
+
+    # press the 'q' keypress to exit
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 cap.release()
 cv2.destroyAllWindows()
