@@ -257,3 +257,17 @@ CLI 子程序 smoke test 首次以 UTF-8 解碼系統預設編碼的輸出，發
 使用者回報 `app/install/install.msi`（161,636,352 bytes，約154.15 MiB）超過普通Git的100 MiB限制，分批push不能繞過單檔限制。將origin/main以外的6筆未推送提交轉為Git LFS，加入.gitattributes；本機原始歷史另保留於backup-before-lfs-20261019，不推送此備份分支，不強制覆寫遠端歷史。遷移後執行git lfs checkout還原本機實體安裝檔，SHA256與遷移前相同，並檢查待推送普通blob已無超限檔案。
 
 處理時發現LFS遷移也更新了指向同一tip的本機備份ref，已將備份明確恢復至原提交1abc5f64842812ea0185fbcdf89a8899b7bde0aa。一次Git物件檢查遇到PowerShell環境CP950解碼錯誤，改用bytes擷取與UTF-8解碼後檢查成功。大檔先透過LFS上傳，再依可fast-forward的提交分批推送；遠端是否同步以推送後核對為準。
+
+## 2026-10-25：`lib/yolo/Instant Image Reconginizion.py` 顯示的標籤不是自己訓練的類別
+
+**現象**：即時辨識畫面出現的是 person/car 等 COCO 標籤，不是 `tranning/yolo_data/data.yaml` 的 circle／square／triangle。
+
+**原因**：
+1. 程式寫死載入 `yolo26n.pt`（COCO 80 類預訓練權重），而不是訓練好的 `tranning/yolo_runs/custom/weights/best.pt`，所以標籤永遠是 COCO 的。
+2. 權重路徑是相對路徑，從 `lib/yolo/` 執行時找不到根目錄的檔案。
+3. `conf=0.15` 門檻太低，容易出現錯誤標籤；FPS 文字在 `imshow` 之後才畫，畫面看不到。
+4. 另外發現 `runs/detect/train/weights/best.pt` 是拿 custom 權重再用 `coco8.yaml` 訓練 100 epochs，類別被改回 COCO 80 類，三種形狀的標籤已經不在裡面，不能拿來當形狀辨識用。
+
+**修正**：預設改用 custom `best.pt`，路徑以專案根目錄解析；從 `data.yaml` 讀標籤並與模型內建標籤比對（類別數不同會警告）；`conf` 預設 0.5，可用 `--weights`／`--data`／`--source`／`--conf` 調整；終端機同步印出偵測到的標籤。找不到 custom 權重時退回 `yolo26n.pt` 並提示。
+
+**驗證**：雲端環境沒有攝影機，以 `--source tranning/yolo_data/images/val/0.jpg` 測試，偵測結果為 4 個 triangle（信心 0.93～1.00），與標註檔 `labels/val/0.txt`（4 個 class 2）一致。實體攝影機尚待使用者在本機確認。
