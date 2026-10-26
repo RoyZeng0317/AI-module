@@ -1,5 +1,12 @@
 # Error Log
 
+## 2026-10-26：人物單圖入口補上Tkinter結果主視窗
+
+上一版img_character_predict.py僅選圖對話框與終端機姓名輸出，未滿足使用者要Tkinter顯示圖片結果的要求。已改預設開啟主視窗，含匯入、門檻、重新辨識、等比例預覽、繁體中文框／名稱／分數與無結果提示；--no-gui保留文字模式。推論在worker，queue由主Tk處理，關閉等待worker，錯誤移除舊圖避免誤讀。共享renderer只新增可選空結果文字，物品預設不變，MNIST未改。
+
+9項測試通過；另用真characters.pt及白色合成圖完成Tk預覽／無人物結果／關閉煙測，模型SHA不變。未重訓或使用實體鏡頭，未將介面測試當人物身份準確率驗收。說明同步lib/yolo/CHARACTERS.md與team-run/character-detection/IMAGE_GUI_BUILD.md。
+
+
 ## 2026-10-26：獨立人物圖片匯入預測入口
 
 依使用者要求新增tranning/img_character_predict.py，沿用img_mnist_predict.py的路徑／參數、prepare_image、get_model、main與CLI區段，原MNIST程式未修改。不指定圖片時開啟選圖，亦支援圖片路徑或test_img_dir設定；只讀characters.pt，彩色BGR與EXIF／透明底處理，不套MNIST灰階，不訓練或改權重。8項新測試通過，含中文路徑、色彩、唯讀來源、模型名稱輸出、無框／取消、非法門檻與空權重；另以白色合成圖載入真實characters.pt執行，模型SHA未變。此為管線驗證，不代表人物身份準確率驗收。

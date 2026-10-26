@@ -119,3 +119,4 @@ output/character-*
 output/context-*
 output/transformer-audit/
 output/test_character_review.py
+output/test_character_image_close_review.py

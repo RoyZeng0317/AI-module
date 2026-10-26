@@ -178,5 +178,11 @@
     "category": "task_progress",
     "text": "2026-10-26：人物已獨立data/character_detection（136張、84reviewed），run d15bd93e0eed427d84a9ae9e0f74e6a7已訓練，characters.pt不是空檔。val30張31框比較後以last.pt發布到tranning/yolo_runs/custom/weights/characters.pt（備份原best），門檻.25可TP24/31且FP1；人物GUI新增best/last選擇與conf欄位、發布清cache。人物用python -m lib.yolo.character_labeler及使用自訂模型按鈕，原Instant Image Reconginizion.py仍是物品入口。52pending照片保留，不混物品資料，尚未驗收真實身份辨識。",
     "created_at": "2026-10-26T05:57:05+00:00"
+  },
+  {
+    "id": "3f082c1a",
+    "category": "developer_preference",
+    "text": "2026-10-26：使用者明確要求人物單張圖片識別要有Tkinter結果主視窗，不能只有選檔對話框或終端機輸出。img_character_predict.py現在預設GUI，含匯入、預覽、中文框/姓名/分數、門檻與重試；--no-gui才走純文字。仍讀獨立characters.pt，MNIST原檔保留。",
+    "created_at": "2026-10-26T06:24:05+00:00"
   }
 ]

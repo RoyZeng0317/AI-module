@@ -1,0 +1,1611 @@
+{
+  "classes": [
+    "張凌赫",
+    "穆祉丞",
+    "余景天",
+    "周柯宇",
+    "_ziejie"
+  ],
+  "images": {
+    "50e490c574cf8ef317e3184970009dbd2a1736f12433b951d28c378bebbed6c5": {
+      "boxes": [
+        [
+          0,
+          504.52951927500004,
+          36.679790124999954,
+          1621.8523586449999,
+          1065.124668375
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "0ee7530fba34bdfae8ea66f2eafaa8d11a2c8c4a6c7e68117523306afdd59013": {
+      "boxes": [
+        [
+          1,
+          128.7401568,
+          228.18897720000004,
+          739.6063008,
+          929.7637812
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "44d68f67f9e761ab362c38f9e3108936f9a66bbbf21620a887f2e0bba8280a73": {
+      "boxes": [
+        [
+          2,
+          62.171257500000024,
+          91.24803261000001,
+          448.4940925,
+          342.47637626999995
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "caf4323294429a47cd2f1ee92bb298ef78b446780b0cf3dea300af172fa4de62": {
+      "boxes": [
+        [
+          3,
+          1174.8031488000001,
+          45.354326399999906,
+          4349.606297599999,
+          2868.6614111999997
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "2547a7aceb3d030c0e0da47810a742a696fed49198ffaaa3f49b53d3916b1f5f": {
+      "boxes": [
+        [
+          4,
+          22.488187679999925,
+          79.37006111999985,
+          2350.67715792,
+          2211.7795056
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "d5962ceb1b43d18e53600dcb1bd3b5d5b6f43831dfa2a4660bdf6d2562d5e67f": {
+      "boxes": [
+        [
+          0,
+          64.41404295000001,
+          100.49868814499999,
+          205.11220625,
+          195.254595595
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "0599bcd49003d2fbea6907401a68f2f556bfc8b761f6bc6b1d2bb73a7cbe5bd4": {
+      "boxes": [
+        [
+          0,
+          134.61417423999998,
+          78.7401576,
+          285.79527599999994,
+          208.5039384
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "d1d5f09836830ea06214e2ef013119f1e7aaecb37bc2d0fb328bb5486f51565c": {
+      "boxes": [
+        [
+          0,
+          644.16929204,
+          12.842517299999974,
+          1045.95669868,
+          420.13385214000004
+        ],
+        [
+          0,
+          515.7440918,
+          647.62991682,
+          913.86219892,
+          1119.1338521399998
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "f2f116cda32cde9b616dcbef95f327c09c7e9e4078090afbac348b9166a2c095": {
+      "boxes": [
+        [
+          0,
+          608.9468436,
+          180.18110392499997,
+          954.6003900000001,
+          592.023617175
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "27fadcbf151b55cf5ecac19795ec7d0da48f077855313d84255b9570cb41ec0d": {
+      "boxes": [
+        [
+          0,
+          75.85039800000004,
+          44.20471620000005,
+          759.9711276,
+          827.25984012
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "4472e0494820a3326b9989d2ecefd3863475fdb714f6d051912cb72050c806ba": {
+      "boxes": [
+        [
+          0,
+          295.43700628,
+          168.70079280000002,
+          484.3818862,
+          355.39632312000003
+        ],
+        [
+          0,
+          191.96718528000002,
+          1000.9580029999998,
+          387.66010352,
+          1165.16009428
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "9fb30be5f26067efbbcd7fba2841768e6b83cd2ba614b52fa3075d6fea2b0283": {
+      "boxes": [
+        [
+          0,
+          310.18110424,
+          119.93701313999999,
+          448.85827240000003,
+          311.08662269999996
+        ],
+        [
+          0,
+          585.6614184000001,
+          13.118107799999974,
+          902.37007536,
+          391.66928387999997
+        ],
+        [
+          0,
+          104.03936880000002,
+          717.7480359,
+          456.35433423999996,
+          1045.70078802
+        ],
+        [
+          0,
+          866.7637776,
+          734.6141795999999,
+          1041.0472435200002,
+          890.15748024
+        ],
+        [
+          0,
+          806.79527752,
+          1070.06299638,
+          996.0708671199999,
+          1270.58268498
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "1cf06888abb033298e932b8ce744af5cf3c2c8588aebe0fb5c4a625eb563b856": {
+      "boxes": [
+        [
+          0,
+          110.3681106,
+          174.437011815,
+          700.4389733999999,
+          788.196857565
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "3c18bf94cc14674553cf6d863fc3573ebc100f0953a9440ff28ce3a9ba9d6749": {
+      "boxes": [
+        [
+          4,
+          136.5354306,
+          137.95274879999997,
+          741.2598414,
+          812.5984224
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "51dbbe0baba05bd54c880074420809fe8b8992896a00181a8a4fcec7c088d35e": {
+      "boxes": [
+        [
+          4,
+          207.29592738000002,
+          143.2349022,
+          580.0518329399999,
+          495.28215229999995
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "30076955b26fbe5789ad80327a997323a6662b30bd87c377f1402f1e2d066af9": {
+      "boxes": [
+        [
+          1,
+          535.8746693950001,
+          91.75853967500002,
+          1066.353665805,
+          453.05775072499995
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "4e71cbe381294ca7232d2c2b90d1829cd4206a4e9b1f4155283e877a2fda82c4": {
+      "boxes": [
+        [
+          0,
+          72.28936734499993,
+          40.88975124000002,
+          1344.415354255,
+          1583.34251496
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "86da67fe25e883c262a96bf681a886042502e72f54c430257fda4c2a2d93ec60": {
+      "boxes": [
+        [
+          0,
+          851.4665392900001,
+          431.61416973,
+          1233.10433947,
+          849.59842815
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "ed990f03964c635914e2cbd8d5621f62846b83f670a9c9465dbdaa8009b02a33": {
+      "boxes": [
+        [
+          0,
+          643.303809,
+          267.6916041399999,
+          894.8261214,
+          524.6036749
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "0ff4449498761a70910ed4274c7b88af7016228472c3de0158b339969f457d59": {
+      "boxes": [
+        [
+          0,
+          594.3477696,
+          140.14173515000002,
+          742.9829440000001,
+          335.49081952999995
+        ],
+        [
+          0,
+          165.4291328,
+          1087.16010418,
+          331.05117440000004,
+          1257.02887602
+        ],
+        [
+          0,
+          435.09580159999996,
+          1061.67979164,
+          711.1325504,
+          1501.21521936
+        ],
+        [
+          0,
+          868.2611584,
+          1080.79003009,
+          1033.8832,
+          1223.05512327
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "cc5517f49a3ea15bde445d2ac3488d4cffb49d0feb6a95e13b8c29ee340837f2": {
+      "boxes": [
+        [
+          0,
+          838.5341248,
+          278.16010418,
+          976.5524928,
+          426.79527953999997
+        ],
+        [
+          0,
+          88.98818559999998,
+          1034.07610489,
+          328.92782080000006,
+          1293.12597871
+        ],
+        [
+          0,
+          422.35564159999996,
+          1053.18634334,
+          736.6128576,
+          1327.09973146
+        ],
+        [
+          0,
+          891.6181055999999,
+          1163.6010417999998,
+          1014.77296,
+          1312.23621716
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "e17c3fdc6a703ae368a8f9f8200e375138c02e6803a36b5adc94a4d879b74110": {
+      "boxes": [
+        [
+          0,
+          452.0826816,
+          129.52492881999996,
+          1069.9803200000001,
+          845.0971107800001
+        ],
+        [
+          0,
+          76.24802559999999,
+          1048.93964346,
+          333.1745408,
+          1414.1574835
+        ],
+        [
+          0,
+          411.7388416,
+          1108.3937006600001,
+          706.885824,
+          1286.7559046200001
+        ],
+        [
+          0,
+          821.5472448,
+          1085.03674615,
+          985.0459328,
+          1193.32807849
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "155aab57917dce9cce25e195776f072fbcc99a51e6f5f15dc49cea299b14362b": {
+      "boxes": [
+        [
+          0,
+          837.1522340999999,
+          114.64567659999996,
+          2547.2834750999996,
+          1824.7768993999998
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "c749a2b4b11fbe5a194c8a8be45ac6939e1aeb17e24006f05aa841e624ef45dc": {
+      "boxes": [
+        [
+          0,
+          780.76641792,
+          118.25721343999999,
+          2430.99213312,
+          1763.10759424
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "6c8c4e32bde05bb95fb6780775aeba4182c165307ad4db66928d708d44852932": {
+      "boxes": [
+        [
+          0,
+          770.01575424,
+          150.50917888000004,
+          1963.3385779199998,
+          1365.33334016
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "ca38a44817eb126c9a360ebf41f54ab37361f4ab5134791ef73d1bf9b801274b": {
+      "boxes": [
+        [
+          0,
+          1545.062981535,
+          143.9343915899999,
+          2473.191588445,
+          1116.73230029
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "32e566614979af76c4e0c276145ff949329c4005e3e71c77699bf52ccbe48891": {
+      "boxes": [
+        [
+          0,
+          1302.1732454399998,
+          161.25984768,
+          2328.8608972800002,
+          1171.82152704
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "6e6e6eb6f8fbbf7ba41e019c175c85f02ab056363ae8cfa86a2c3245c7cf0944": {
+      "boxes": [
+        [
+          0,
+          576.6948951749999,
+          88.90417442500005,
+          1842.272317025,
+          1244.658780675
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "07a6235702cb7a474e6c8f986a89d7dde334d0d4cb4ded5e3e3789a97fda1747": {
+      "boxes": [
+        [
+          0,
+          985.02887424,
+          182.76116480000002,
+          1807.45408512,
+          1128.81891328
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "6bb105c637113f0b28139133cac03177036c9b3023ff5ee3a6bd08f74bad8074": {
+      "boxes": [
+        [
+          0,
+          995.77952256,
+          155.8845030399999,
+          2011.7165260800002,
+          1327.70603008
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "4db9b1c89f617d6705fa870e41ae8b3998b66ed7f2272eb5f35222ebd548e1ea": {
+      "boxes": [
+        [
+          0,
+          1124.63385138,
+          1252.23623505,
+          1425.7440999799999,
+          1663.27559643
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "6e241d4f4fbe8e98745c7c5e3cc99cff7e1a3440d3866642b603dc48780c093c": {
+      "boxes": [
+        [
+          0,
+          952.5708794999999,
+          205.51966248000005,
+          1832.0039470600002,
+          1108.8503854799999
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "7f9a16e881f8c5c2731b6c02166aef51318fb5ba7f7b08bf514a406fe6dba0a0": {
+      "boxes": [
+        [
+          0,
+          920.5249382400001,
+          112.8819097600001,
+          1871.95802112,
+          1333.08137472
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "1dd52e821ac519245685a46312a5c937f1e3149480dd3cd7d2179f67ec1b8d0a": {
+      "boxes": [
+        [
+          0,
+          1259.17062144,
+          150.50917888000004,
+          2033.21785344,
+          1257.82677504
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "7739de3006daad84dfd3ea7049be16a474f2afc41ac13521ab948082d849975a": {
+      "boxes": [
+        [
+          0,
+          723.15355634,
+          181.62206034000002,
+          1607.36614862,
+          1199.66143386
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "463eb1ba6d0cf8eb5f14efcb5d6bfe564a986611e6468a04d4f9bf5f75067ad7": {
+      "boxes": [
+        [
+          0,
+          1006.5301708800001,
+          139.75851008,
+          2017.09185024,
+          1155.69553408
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "4c05ba2d3a1cd91873e0d379e6d6ffe634b1f88ed17edd685b4083bf86bd3e43": {
+      "boxes": [
+        [
+          0,
+          220.2368832,
+          91.36089854999994,
+          982.9940975999999,
+          1015.59317921
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "d6ecba7f286ce07c8b04281010d2e1a50731f3cbe94014a9efd59767df57c98c": {
+      "boxes": [
+        [
+          0,
+          520.4422585799999,
+          21.24934304,
+          981,
+          494.5301833599999
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "2e4743f95db652e6c24cadb1e9c083fc26aa0e94b7d9c9cac7aa41bd31e3fd55": {
+      "boxes": [
+        [
+          0,
+          558.0597114,
+          303.82808076000003,
+          908.6305734000001,
+          798.87664008
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "8ee8abde85c4ee6df340ebd8769c46f613144e5c58d6f737651a0230e8f70dfa": {
+      "boxes": [
+        [
+          0,
+          134.14632840000002,
+          252.04987359499998,
+          483.90092280000005,
+          695.261154445
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "088f2ae43d0172d5e8bd6469e9e610c49f46b3526472108b5c13d083e0e0bddf": {
+      "boxes": [
+        [
+          0,
+          303.2145684,
+          58.65747553500002,
+          632.6948844,
+          451.787399865
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "a3c29345d59dfce007127ac6861f008e0f2ddc846cd49a5a4fc6a0d75e814ddd": {
+      "boxes": [
+        [
+          0,
+          194.3799192,
+          43.326771975,
+          622.0570824,
+          538.0905524249999
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "d7a346e28629c46a63f908409c303da7267afbfc86946b37ed8a16ec57e397fe": {
+      "boxes": [
+        [
+          0,
+          354.41797920000005,
+          194.510500595,
+          775.542648,
+          659.069561945
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "de3fcdda47c87cf7f9ff0f7f31b3e2eb2ed18c4a60688939659bc4114fe1bdea": {
+      "boxes": [
+        [
+          0,
+          159.21260100000003,
+          149.29133759999996,
+          678.897639,
+          803.1496032
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "87d4a6e7c21f3e09f4b54d2af6368b4b7ada974c9d91d9b3cb614ffe70971331": {
+      "boxes": [
+        [
+          0,
+          514.4881859999999,
+          379.84252319999996,
+          994.4881812,
+          978.8976432000001
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "84ab00f17c7f04d0047e2281fdc8ce35cd67bc949aaa7aa924693841a255c260": {
+      "boxes": [
+        [
+          0,
+          112.85105399999998,
+          243.667981495,
+          569.5544628,
+          707.3333315650001
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "13180dc5e830ea1faac7768e46608c125a0be038cdb34a0f4b1c88390da1a06a": {
+      "boxes": [
+        [
+          0,
+          173.51049600000005,
+          168.03149464999998,
+          653.4186336,
+          642.84776535
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "ef91f8cdfbb175894a6758f997ceab6f193470d1ded86212e8985cda819a6ad7": {
+      "boxes": [
+        [
+          0,
+          411.24672000000004,
+          349.3438245,
+          598.91076,
+          583.2020975
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "cee8002d7118f899ac9d63d753837b4ef3841622fffab5125060338501450e9e": {
+      "boxes": [
+        [
+          0,
+          308.7611568,
+          208.86088607999997,
+          656.1522288,
+          558.38320048
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "9f76fd8c018464b576699d053a01152a09a675f06e5770279df9e21b1d88d290": {
+      "boxes": [
+        [
+          0,
+          166.7716506,
+          0,
+          1043.6220414,
+          812.5984224
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "d8349af71f647cd9f2e22f469039d745d498592ee30989aeeff1f715e4b33ddf": {
+      "boxes": [
+        [
+          0,
+          412.44094079999996,
+          45.354326400000026,
+          918.8976312,
+          617.9527584
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "66be5fa66757a97866485b403ddc8a905a068aa715f220e1724c5e8fe42ae0f8": {
+      "boxes": [
+        [
+          0,
+          413.2027584,
+          175.50000351000003,
+          703.3996080000001,
+          475.37007921000003
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "63d551183e59ce817160dd1bead0030d8f5d6711d9a6bfa931de72c61a54937e": {
+      "boxes": [
+        [
+          0,
+          194.25524760000005,
+          12.177166775000003,
+          477.03609,
+          343.6666683849999
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "3e2b79f90a5f32d61551d5631139ba2dd72bd98555dda57e26c486360db93cfa": {
+      "boxes": [
+        [
+          0,
+          122.21653446,
+          9.181105199999998,
+          503.64960534,
+          409.8110265600001
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "aef056ddc8efb5db92a6004e2d1248792704f6b5883a1301725544906701c9c0": {
+      "boxes": [
+        [
+          0,
+          417.7559124,
+          342.28346580000004,
+          700.511814,
+          688.818897
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "e8c5fd0a1d56549fe0333d0eff4de8740bfe64ef44accb41742815c7dbe46c3c": {
+      "boxes": [
+        [
+          0,
+          76.06299059999998,
+          13.228343999999975,
+          896.2204662,
+          721.8897552
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "b3cbfc35086716f737de605460bcc6184b63df07474d6915fa318a6043151858": {
+      "boxes": [
+        [
+          0,
+          586.2992112,
+          315.5905512,
+          881.1023616,
+          646.2992088
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "3be013adc6488a536455d19e1be40979d58d8fbfe0773c3d01225b76d58e7ccc": {
+      "boxes": [
+        [
+          0,
+          189.44882099999998,
+          24.56693279999999,
+          939.6850446000001,
+          922.2047280000002
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "becb293100f4f15b5a35323921d9f8dd14b5d89d7cb6bb5c4e766781b941ba90": {
+      "boxes": [
+        [
+          0,
+          365.19685379999993,
+          66.1417344,
+          771.4960613999999,
+          374.1732288
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "8afdc80a291efd4ac556db90efab7cbb6a0a12cb89b6b5a936f2ea8aad402e3b": {
+      "boxes": [
+        [
+          0,
+          185.66929619999996,
+          364.7244096000001,
+          735.5905542,
+          886.2992064
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "f2879d6037c3d343075fa2d24a4965dc57ad1abb4e98c459a2c01627bc912afa": {
+      "boxes": [
+        [
+          0,
+          65.19685439999996,
+          122.83464239999999,
+          575.433072,
+          612.2834568
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "1cd6864e4a1b9add34e553744b4edb3a7f1f80f7b236734c731f55dda5ebe154": {
+      "boxes": [
+        [
+          0,
+          783.7795223999999,
+          114.8031522,
+          1234.4881788,
+          588.188979
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "c5389bfa173fce98e2ae64565cb87cfaf84a6cbb81933ae6fa915a90009bd4d5": {
+      "boxes": [
+        [
+          0,
+          483.66141660000005,
+          423.0708732,
+          845.0787402000001,
+          716.4566964
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "105977c327837e908d1c5417032fb5e8ec63cb1986a134d9c6f45f65e27dea08": {
+      "boxes": [
+        [
+          0,
+          481.53543659999997,
+          91.41731279999995,
+          1047.0472505999999,
+          903.5433036
+        ],
+        [
+          0,
+          0,
+          10.629921600000023,
+          577.2047256000001,
+          822.7559124
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "aeda02d4bb0ff518dd8d6191efbcfe502009a549e1b4d507e27cff496e19e892": {
+      "boxes": [
+        [
+          0,
+          391.6535382,
+          9.448826400000016,
+          1079.9999946,
+          657.6377976
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "e72e7fd07b8702056a2d65bcdd7cfdaa1f1c0e1c144607050a6f2bcc20b72389": {
+      "boxes": [
+        [
+          0,
+          288.9429138,
+          267.04200043000003,
+          719.5951494,
+          609.3070860500001
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "2ff4a004c41affa08ec4b20d7c55829933c0b5109cd5492a0f0adcbe6142c054": {
+      "boxes": [
+        [
+          0,
+          304.7244084,
+          404.40944879999995,
+          637.3228284,
+          848.5039368
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "f36245c62500d44da45ed690f6b018808f7e647efad67fa745776071cc96be31": {
+      "boxes": [
+        [
+          0,
+          238.53018112,
+          8.062986239999987,
+          930.6036736000001,
+          740.45144064
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "38231c1603a377cb7a4d0ce72e9cb9eb0d10ed8a77244a84858b4422dc48d12d": {
+      "boxes": [
+        [
+          0,
+          66.968505,
+          146.69291159999997,
+          653.7401622,
+          850.3936956
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "337bfae76ae572d67dd58f2c4d3b80284ce02dd7bdc35c5ee2c417e15b2fccdb": {
+      "boxes": [
+        [
+          0,
+          224.29134360000003,
+          65.90550419999995,
+          991.7716572000002,
+          835.5118086
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "63603dcfff10940317ab7bbd5503a1d29d27570d47c741ce7bd6e94f4123bd01": {
+      "boxes": [
+        [
+          0,
+          207.3228318,
+          102.90814248000001,
+          915.2598402000001,
+          814.3937079199999
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "0bd136676f95da9b5490ba6da85f0da4bc968c7d1f5676bcd74c60eea3136774": {
+      "boxes": [
+        [
+          0,
+          234.92125440000007,
+          14.881887000000017,
+          1064.0551176,
+          835.5118086
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "6b81116a517906a2d844982b9666e24703317965ff50f12df1105b25e345e2ad": {
+      "boxes": [
+        [
+          0,
+          356.10236819999994,
+          201.96850229999998,
+          783.4252014,
+          682.4409489000001
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "52343b3e98a52b5a72c47c86e685f4a015fd3919edc11cc4d0450d1edd81c3df": {
+      "boxes": [
+        [
+          0,
+          161.1023634,
+          136.06299359999997,
+          799.842519,
+          699.2126064
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "c12cdda2494ae730d41e596d0ff375d85599b34fee6c7a08627b5a3b6a812b29": {
+      "boxes": [
+        [
+          0,
+          111.61417680000002,
+          12.755904300000019,
+          1080,
+          1120.3936929000001
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "9d48c37f59bf238fe1b4d922616515d58c2677b72438a5960826f5997987d030": {
+      "boxes": [
+        [
+          0,
+          258.48096840000005,
+          14.872708745000011,
+          808.7709924,
+          641.650927835
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "4b48efd1713471d1da30dd4526085b4d308ebe6437de360e0a3906d0c6b9995e": {
+      "boxes": [
+        [
+          0,
+          375.3379241999999,
+          38.24409085500001,
+          1048.8589182,
+          798.876631985
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "7f1957a727cb485100c2bc74b8fe270c47a3c970c308c5d9f1449a60f1bcfa92": {
+      "boxes": [
+        [
+          0,
+          295.27559099999996,
+          115.2755928,
+          935.9055089999999,
+          763.464564
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "82a5cac53b3fa4ae8fb3c772c6385f7525f11bf37aafd61c39da0bec14575e5f": {
+      "boxes": [
+        [
+          0,
+          15.590550600000029,
+          18.897631199999964,
+          688.346451,
+          706.7716488
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "93d2b29455dec4a24ba830559729372b7aec255fb5fa66d2acb706dde0297f97": {
+      "boxes": [
+        [
+          0,
+          231.0236262,
+          476.2204703999999,
+          716.6929194,
+          1039.3700832
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "e66873038b3a9113384a76c69054b1557ee94d38c48ec94616c3407eb80d9c8b": {
+      "boxes": [
+        [
+          0,
+          55.275588000000035,
+          86.92914239999998,
+          650.5511759999999,
+          973.2283487999998
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "af9cf442794a2fc1725429b8241299ddda3417a4ed429a2f0979e3fb8e985d55": {
+      "boxes": [
+        [
+          0,
+          294.1732224,
+          91.9685088,
+          919.0551168,
+          745.8267744
+        ]
+      ],
+      "reviewed": true,
+      "split": "train",
+      "negative": false
+    },
+    "bd60f0367dedd75e4a80ccec6c1885df75986b8383b8d1d4f717a418463c5cf7": {
+      "boxes": [
+        [
+          0,
+          212.92913339999998,
+          232.53542892,
+          923.5748034,
+          884.5039371600001
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "967d9813c5501ffa116b2ed44ef7cbeee2c1e88b919f03df72af54c51e89be5d": {
+      "boxes": [
+        [
+          0,
+          662.8070889100001,
+          72.28346040000001,
+          1218.39763515,
+          654.8031467999999
+        ]
+      ],
+      "reviewed": true,
+      "split": "val",
+      "negative": false
+    },
+    "16d7d7625dd246ac25256585f93602cce1ff2dbc3f56cde67a77d7c98fb8a055": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "7bd0de20630dbaf14014d26ffc36192055230e461653222c64e9953c7af00fbf": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "fb017d7da0c593427886bf028d63b17af3c653dbe1ee60fd3f98897167afa4eb": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "e53696b413be0ee4eaeeecf2fe4d31d4208e21ce3a38d6b404c67ae2c85a817f": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "2a6484d975808ecb91adbfcc937fca148c10a2b40a0e93a068e50ccf75ff36e2": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "c743b549a54e373e95017dac5b948a93ff8bb2afe1a6ef64340f30edda4bf70c": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "20d809e58c6f1b335002f3dcde3d904c76e9c6fbfc5d93261424b43316a1b649": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "66236297c4e38f6bc215833973cdbb38cb61b6b46a27fb18d58e9fadb552fa11": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "1dc67fe5aa100e87ac34f171d969871f8094119054eb8bd37ecd980e992e1ae8": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "3948a741313a2069ff49e4594299b510d011f86ff994174bd1455699ce7c893a": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "fd93fdfeb1ffb6aa15c24ee1100260935bd6bde6fcf9d1b27f38899c35a6dc99": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "e3caa5ecb51f29731873f369863268603a1e4b4e0c7f7b81a77a6ee9874ad9ac": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "1883e54d04b6f8d69e3b0df7b1175611834611726f3f6920f4ee3add323e08e6": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "71d6919f00f7caad395ce5cd6662e31b90188787c1541e5d4335a1e7985a8b46": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "c4f054fe401c28443eac219c2f8b02421e29c7015cdee1a1ffed5844b22e9e37": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "dc5f89930c2c5044e6ec9626463b4a762617d4945732177d3b10cb3840900e7e": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "6b804e51cc6f7ece968d51799420fbbc2fc547ba911858dc7bf318a4e3bfba1f": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "5521487289c77df85a9689268ae2cdf1a8df59562f54ed9d9752bdd128b9f349": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "a9e783a47c6649816ad58342b1d4de874f6b382749e1b17908b6eea4aed94adb": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "6658ed9897350bdcdc99baf2c4edacbf1fc75e2ba31b76bb4f537f21c505caf3": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "d11f96937c2e968b4dded9dd12f7b01de7a475b28d6c36e342f9fa61485a6624": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "cf3b1820b9585861b169fd5c1282ccd214b178aea1eb598c6d851f3739624e15": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "5b169b74e819a09b025c5142c6c7f326add16872d7dae2e1d889b2599fb59416": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "3a15c7cef4d854b9e2234769a72e98de2deaf2baf373c548290aa3bfa4d0b900": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "0fe543a6b387eb17e78d8bf6ca09d9eef697b4e3413e3653f86d4eec9588d504": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "8e61310ab351e46d400374e56957cffbe495c513c0a0a3ab71242afe9e478a78": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "e680920b1c9e43e0baee5eff97c7a40bebdf9d13640b8834d332b2ad8aab2c0e": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "748c7efa08c4958212a2d17a5a4045fc58e17867a8e390118eaded20745c26c3": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "1dd06a28a5a063e45aa9c834ca65c99408b39df98b4beecef9dd4d70d5eee863": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "7adf3fb8b2990eda943dfb45f159bb93910d03c3fe587404c33e0669ed263af6": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "55c15e29e8649994d334ed53395e8df64b74a86656795ea09530ced19a3652ba": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "7a533e71cd5d091ddde7002c6a24b04bb97ecc51d29b4dc04c610488c45006ae": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "2e9cb2a2ff20311354972f30bd46db887695e21eac80304e9f37858632c7a471": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "2ba536fe511c7c2a10644178d816c7f03d66cecec9d42a0535ac997515552efd": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "2a8f0016d6e25ed8f97ce7cbb0cb15ca9fc0fe609d5d349f1429f75367046af7": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "af4f9d94ccc9c58544a91f3e78a101a6c6996933b5b6fc51d9bd8bdf62486cf3": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "ad8580e489e611225dccb16153aa0a6325168b71374fda382067c6becde09b63": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "73f8a16b1526698a6b3780b0d353f13b269a8db0173ef9baaf3fa72f1de12b22": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "66a93dc3faa76d225985d276eb57e53d834c0c36f25f2d4e21bbe91184433cc1": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "7243bff3881d7c060b4925d9aaec10b40e0a2c944d99748d6bfd10fd68cee278": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "8887e2538cf698c45be37038a509fc05eaab82871ea1dfd45ce37956fb0d3422": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "54d6ae8cba60e350219aef0957c54dd57afdd952fd3c970e506cdb7f939b3ed4": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "c7b114d013a583ac0670af6388224ffa736d8ee70f05acdda59b3d06c85dc062": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "806795599ba76485103978033d9c7bd57244ce890f9a182f543b10f8fdc6552a": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "77032864e4bb3fb573d306b0d7e957c449cc9ae8e829ce6ac816ba74456f5c21": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "08e27f934bd8bd9e541a0bbbc4f35fb27395b3f73cc7cae9161132baa257ed8f": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "99e9f97ee2990163123c70ecc644ca9bc4506c8018cbe402316d67959234e397": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "cd3a2c9a1aa9725a74dbe441d5713e373d7603678aa152d9ee1fac8b722f5468": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "4468e1c6a3f1dda8a29311f6ffa2ca9716a4fd46814a4171c700b666aab05bed": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "1231c67066691a4d15c18689e7b0428d7690c6baa8b17719e5ac40d2b80514ac": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "41cf2a7ce61d951074630020bd51fa5e15e780fc680a4a03f9ecad51a6043108": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    },
+    "bfec199af891e969b69b9b917bc6ef4688f610115d1aabd03effa3ce3921990d": {
+      "boxes": [],
+      "reviewed": false,
+      "split": "train",
+      "negative": false
+    }
+  }
+}
