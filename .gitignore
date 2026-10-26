@@ -108,11 +108,20 @@ data/character_detection/trash/
 # 與已發布 characters.pt 重複的原始訓練輸出目錄（可重新訓練，不進版控）
 tranning/character_detection_runs/
 
+# 覆寫前自動留的 characters.pt 備份副本（與已發布權重重複，不進版控）
+tranning/yolo_runs/custom/weights/characters_backup/
+
 # 多輪上下文 pilot 實驗的大型權重 blob（可重新訓練、單檔近70MB；config.json/history.json 等中繼資料仍保留追蹤）
 tranning/gpt_context_runs/pilot_v1/model.pt
 tranning/gpt_context_runs/pilot_v1/checkpoint/model.pt
 tranning/gpt_context_runs/pilot_v2/model.pt
 tranning/gpt_context_runs/pilot_v2/checkpoint/model.pt
+
+# 可重新下載的中文語意模型與本機快取
+/models/bge-small-zh-v1.5/
+/models/.hf-cache/
+/output/word-sense-tests/
+/tranning/gpt_word_sense_runs/**/model.pt
 
 # 人物標註／多輪上下文開發過程中的測試與demo暫存輸出（可重新產生，不進版控）
 output/character-*
