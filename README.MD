@@ -364,4 +364,6 @@ conda activate AI-module
 
 ## 自訂物品標註與即時偵測
 
+人物模型需獨立使用時，執行 `.\.venv\Scripts\python.exe -m lib.yolo.character_labeler`；使用獨立人物資料及 `characters.pt`，見[人物操作說明](lib/yolo/CHARACTERS.md)。
+
 執行 `.\.venv\Scripts\python.exe -m lib.yolo.object_labeler`，可匯入照片或擷取攝影機影像，人工框選橡皮擦等自訂類別、儲存標註、微調本地 YOLO 權重，再使用訓練出的 `best.pt` 即時偵測。完整步驟見 [操作說明](lib/yolo/README.md)。這次已明確授權物品偵測使用預訓練權重微調；尚未收集真實標註或完成真實模型訓練，不代表已能準確辨識橡皮擦。

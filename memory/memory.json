@@ -160,5 +160,23 @@
     "category": "task_progress",
     "text": "2026-10-25：使用者確認本次YOLO加強後「準確率很高了」，並要求記錄問題原因。已寫入 Agent/ErrorLog/Success/2026-10-25-YOLO物品標記與小資料訓練修正.md，區分舊權重、小資料有效更新不足與顯示問題；保留量化評估及泛化限制，不把使用者正向回饋換算成未測準確率。",
     "created_at": "2026-10-25T15:37:48+00:00"
+  },
+  {
+    "id": "4bf6dc59",
+    "category": "task_progress",
+    "text": "2026-10-26：Transformer多輪工程已完成dialogue_v1及三前端history串接、mask和隔離；兩次本地實訓未達gate（test去重macro14.71%、單輪20/20→3/20），正式gpt_chat_runs未切換。pilot_v2只供明確選用實驗，不能宣稱理解已完成；後續優先補多樣上下文/指令與知識保留，用新獨立測試驗收。詳team-run/transformer-context/EXPERIMENT.md。",
+    "created_at": "2026-10-25T16:49:10+00:00"
+  },
+  {
+    "id": "2ed03cc7",
+    "category": "project",
+    "text": "2026-10-26：使用者要求人物特徵標註用獨立characters.pt，自行按人物標記。既有路徑tranning/yolo_runs/custom/weights/characters.pt為空檔；新增lib.yolo.character_labeler，獨立data/character_detection與character_detection_runs，訓練成功後備份發布characters.pt，不覆蓋物品模型。尚待人物照片與訓練，不等同完整人臉身份驗證。",
+    "created_at": "2026-10-26T04:38:39+00:00"
+  },
+  {
+    "id": "7824ae07",
+    "category": "task_progress",
+    "text": "2026-10-26：人物已獨立data/character_detection（136張、84reviewed），run d15bd93e0eed427d84a9ae9e0f74e6a7已訓練，characters.pt不是空檔。val30張31框比較後以last.pt發布到tranning/yolo_runs/custom/weights/characters.pt（備份原best），門檻.25可TP24/31且FP1；人物GUI新增best/last選擇與conf欄位、發布清cache。人物用python -m lib.yolo.character_labeler及使用自訂模型按鈕，原Instant Image Reconginizion.py仍是物品入口。52pending照片保留，不混物品資料，尚未驗收真實身份辨識。",
+    "created_at": "2026-10-26T05:57:05+00:00"
   }
 ]

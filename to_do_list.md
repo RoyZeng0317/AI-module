@@ -376,3 +376,15 @@
     - 已實作獨立工具 `python -m lib.yolo.object_labeler`：照片匯入／鏡頭擷取、人工框選與重載、可新增類別、背景負例、YOLO 資料快照、背景微調及自訂 `best.pt` 即時偵測；預設類別「橡皮擦」。[操作說明](lib/yolo/README.md)、[計畫與驗證](team-run/object-labeling/BUILD_LOG.md)。
     - 使用者明確允許本次沿用本地 YOLO 預訓練權重微調，不擴張至雲端 API；專案記憶已記錄。
     - [ ] 蒐集並人工標註真實物品資料，以不同場景分 train/val，完成實際微調、實體攝影機與辨識品質驗收。工具測試不代表橡皮擦已能正確辨識。
+
+
+50. [ ] Transformer多輪上下文理解（2026-10-26）
+    - [x] 共用dialogue_v1訓練／推論格式、512token預算、完整輪裁切、answer-only mask、動態padding與GUI／CLI／Web歷史隔離已實作；舊模型維持legacy格式，持久memory未自動注入。
+    - [x] 建立四類多輪資料及去重／反事實raw評估，完成兩次有界本地微調與獨立測試；原正式權重保留。[實驗與切換決策](team-run/transformer-context/EXPERIMENT.md)。
+    - [ ] 模型尚未達標：獨立test去重macro14.71%，偏好／格式0%，單輪保留能力退步；需更多多樣多輪／引用資料與保留舊能力策略，再用新的獨立測試集驗收，不把程式串接當理解。
+
+
+51. [ ] 獨立人物YOLO模型characters.pt（2026-10-26）
+    - [x] 獨立人物標註入口、data/character_detection、character_detection_runs與characters.pt備份發布已實作；不混入物品模型。操作見[人物說明](lib/yolo/CHARACTERS.md)。
+    - [x] 使用者已標註84張人物影像並完成54train／30val訓練；characters.pt已為有效權重，經驗證發布last.pt，.25門檻正確配對24/31框、FP1。人物資料及權重仍獨立，52張pending保留。[本輪修正](team-run/character-detection/DETECTION_FIX.md)。
+    - [ ] 補齊剩餘人物標註，實機與不同場景辨識驗收；不宣稱完成人臉身份驗證或未知人物拒絕。

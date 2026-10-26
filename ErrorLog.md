@@ -1,5 +1,52 @@
 # Error Log
 
+## 2026-10-26：獨立人物圖片匯入預測入口
+
+依使用者要求新增tranning/img_character_predict.py，沿用img_mnist_predict.py的路徑／參數、prepare_image、get_model、main與CLI區段，原MNIST程式未修改。不指定圖片時開啟選圖，亦支援圖片路徑或test_img_dir設定；只讀characters.pt，彩色BGR與EXIF／透明底處理，不套MNIST灰階，不訓練或改權重。8項新測試通過，含中文路徑、色彩、唯讀來源、模型名稱輸出、無框／取消、非法門檻與空權重；另以白色合成圖載入真實characters.pt執行，模型SHA未變。此為管線驗證，不代表人物身份準確率驗收。
+
+
+## 2026-10-26：人物已訓練但best與固定門檻造成漏判
+
+人物資料確實獨立在data/character_detection，136張中84已儲存標註；本次run d15bd93e0eed427d84a9ae9e0f74e6a7用54train／30val、5類，原characters.pt已非空且可載入。以使用者標註為真值、同類IoU>=.5配對，best在conf.35 TP5 FP0 FN26；last在conf.25 TP24 FP1 FN7，.15 TP25 FP3 FN6。這是現有val診斷，不是身份驗證保證，先前僅說輸出圖片還需訓練不適用本次實況。
+
+已備份原characters.pt並用本run last.pt發布，SHA256與來源一致；物品資料及物品腳本權重未改。人物視窗加入best／last發布選擇（依本輪驗證預設last）、發布後清模型快取；共用標註視窗加入可設定偵測門檻，預設.25，避免寫死.35。外部更新後須重啟人物視窗，並按使用自訂模型偵測。52張未完成標註影像未刪除，也未移到物品目錄。
+
+35項回歸通過；新增快取／門檻測試時第二次Tk建立出現invalid command name tcl_findLibrary，屬本機已見的Tk初始化現象，未改專案外安裝，另單項新程序複驗。沒有操作實體相機或再訓練。比較數據保存於output/character-detection-diagnosis/checkpoint_thresholds.json，說明同步lib/yolo/CHARACTERS.md。
+
+
+## 2026-10-26：人物模型characters.pt為空檔，建立獨立資料與訓練入口
+
+使用者要求人物特徵另存獨立.pt。實際檔案tranning/yolo_runs/custom/weights/characters.pt為0bytes，不能作為已訓練權重或訓練起點。本次保留空檔，新增lib/yolo/character_labeler.py，人物資料data/character_detection與run目錄tranning/character_detection_runs獨立；成功訓練後才備份並發布characters.pt，不改物品資料及攝影機模型路徑。35項相關測試通過，含真Tk隔離與假checkpoint檔案發布契約；沒有執行真實人物訓練或身份驗證，不能宣稱辨識品質及未知人拒絕已實作。操作見lib/yolo/CHARACTERS.md。
+
+
+## 2026-10-26：最新YOLO best.pt分數過低，改用經比較的last.pt及可調門檻
+
+使用者回報疑似門檻過高。最新602e...權重best.pt在訓練快照train+val的179個真值框上，conf=.25/.15/.10均0個預測；抽查最高分僅.0103～.0184。同run last.pt則conf=.25 TP127 FP10 FN52；.15 TP155 FP38 FN24；.10 TP164 FP67 FN15，皆以同類IoU>=.5配對。這些是訓練快照診斷，不是獨立準確率。mAP排序成績好不保證在固定門檻有足夠分數，不能只憑best檔名與類別齊全就切換；前回只確認能載入後切換不完整。
+
+已切換同run last.pt、預設conf=.15，加入--conf與即時-/+調整，畫面顯示目前門檻；更低門檻會增加誤報，不能當品質修復。最新args使用yolo26n、batch128，85張每epoch僅1批，和先前較佳yolo11n/batch4不同，也是後續訓練需檢查因素，不能由此單獨證明所有漏判原因。未重訓、未變更標註或操作實體鏡頭。比較數據留在output/object-detection-diagnosis/threshold_88.json及threshold_88_last.json。
+
+
+## 2026-10-26：88張物品資料重訓後即時腳本仍使用50張舊權重
+
+使用者回報訓練後部分物品仍不顯示。工作區已88張、15類，最新602e16d7b6a548b9b322fec81c7e9b22訓練快照有錢包／睡眠耳機／零錢分類器，但攝影機仍指定expanded_50_transfer11（13類且無這三類）。已僅將即時腳本權重路徑改為最新best.pt，保留conf=.25及其他設定；須重啟才能載入。睡眠耳機只有2個train框、剪刀3個、存錢筒4個，鉛筆無train框，val仍只有直尺／耳機／立可帶／鑰匙各1框，因此不能宣稱換權重就能保證每類辨識。未重訓或操作實體鏡頭，亦未將人物身份辨識當成已完成功能。
+
+
+## 2026-10-26：YOLO啟動時cv2匯入被中斷
+
+使用者執行即時腳本在第一行import cv2出現KeyboardInterrupt，尚未載入YOLO或best.pt。使用同一專案.venv獨立測試：OpenCV5.0.0正常匯入，耗時0.144秒、exit0，未重現卡住。KeyboardInterrupt代表程序收到中斷訊號，不能據此判定套件損壞或模型錯誤，亦不能僅憑trace斷言是使用者按Ctrl+C。環境同時安裝opencv-python與opencv-contrib-python5.0.0.93，暫未證實與本次中斷有因果關係，未卸載或修改套件、程式、模型。建議重新執行；若再次停住再紀錄等待時間與獨立匯入結果。
+
+
+## 2026-10-26：Transformer多輪串接完成，語意微調未達標
+
+新建共用dialogue_v1、有限history預算／完整輪裁切、回答loss mask及動態padding，GUI/CLI/Web補history與隔離、/resume clear清history、/clear仍只清畫面。新checkpoint的repetition penalty只作用於生成片段；legacy維持舊格式與澄清，不切換未達標候選。資料1356train／200val／200test，val/test各152unique，原先136為估算錯誤已訂正。
+
+初始manifest以LF字串算hash，Windowswrite_text寫成CRLF造成byteshash不符，資料本身沒被更改；已修read_bytes，保留原logical content_sha256，補實際落盤hash測試。先前評估程序在評估器更新前已import，code版本不一致的val報告只保留歷史，最終用凍結評估器全部重跑。原test實際byteshashb0f77dba42577f92866025e60bd849f1e824a66ad8a369ec505347df837d4f12不變。
+
+兩次真實有界GPU微調：pilot_v1最佳epoch2；pilot_v2新增2048本地詞表跨度複述練習，解除凍結、lr5e-5、epoch4早停，最佳epoch1。最終test去重macro14.71%，只有姓名32.35%／物品26.47%有進展，偏好與格式0%；單輪回歸20/20跌至3/20，故不換正式gpt_chat_runs。訓練loss下降不等於理解，沒有用regex/runtime固定答案掩蓋。詳見team-run/transformer-context/EXPERIMENT.md與output/transformer-context原始報告，語意仍待改善，不寫修正成功紀錄。
+
+初次前端測試112pass1fail為角色測試patch指到舊module，改為實際lib.components.character_browser後通過；未改角色實作。獨立工程回歸223項通過，後續新增hash／課程／REPL／legacy保護測試另通過。曾因同時代理數限制無法喚醒規劃代理，後續補強由主代理記錄決策並獨立審查，未改門檻或外部呼叫。
+
+
 ## Transformer本地上下文與指令遵守檢查（待修正）
 
 使用者主要回報不記得上下文／不遵守要求。唯讀檢查確認GUI雖保存並傳遞history至smart_reply_traced，一般分支卻只呼叫transformer_chat.reply(message)，reply只編碼當句+SEP，未收到前輪；本地分支亦未自動讀取memory_store。SFT採單輪prompt/reply，尚無一致多輪角色格式。真實正式權重固定seed抽樣出現姓名答成sinco、單字限制未遵守、機器學習問題答非所問，目前output_issue未捕捉。主模型17,465,088參數／8層／6頭／384維／8000BPE／512tokens；主history最佳epoch26，訓練與驗證有落差，但程式會恢復最佳權重，不能誤稱model.pt是最後epoch。詳細[現況報告](output/transformer-audit/STATUS.md)、[獨立檢查](output/transformer-audit/REVIEW.md)與原始樣本已保存。此回合未改推論／訓練程式或權重，未重訓，不記為修正完成。
