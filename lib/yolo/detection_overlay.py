@@ -6,7 +6,7 @@ import cv2, numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 
-def draw_detections(frame, result):
+def draw_detections(frame, result, empty_label='未偵測到物品：模型信心未達門檻'):
     image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts/msjh.ttc"), 22)
@@ -19,5 +19,5 @@ def draw_detections(frame, result):
         draw.rectangle(draw.textbbox(position, label, font=font), fill="#102018")
         draw.text(position, label, font=font, fill="#00ff80")
     if len(boxes) == 0:
-        draw.text((12, 55), "未偵測到物品：模型信心未達門檻", font=font, fill="#ffe080")
+        draw.text((12, 55), empty_label, font=font, fill="#ffe080")
     return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)

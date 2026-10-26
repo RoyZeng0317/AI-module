@@ -14,9 +14,10 @@ from object_labeling import DEFAULT_DATASET, LabelDataset, fit_geometry, project
 
 class CameraWorker:
     """相機與推論在背景執行；只保留最新幀，不累積影像。"""
-    def __init__(self, index=0, weights=None, classes=None, capture=None, detector=None, loader=None):
+    def __init__(self, index=0, weights=None, classes=None, capture=None, detector=None, loader=None, conf=0.35):
         self.index, self.weights, self.classes = index, weights, classes
         self.capture, self.detector, self.loader = capture, detector, loader
+        self.conf = conf
         self.messages, self.stop_event = queue.Queue(maxsize=1), threading.Event()
         self.thread = None
 
@@ -48,7 +49,7 @@ class CameraWorker:
                 ok, frame = cap.read()
                 if not ok:
                     raise ValueError("無法讀取攝影機畫面。")
-                detections = self.detector(frame, weights=str(weights), conf=0.35) if self.weights is not None else []
+                detections = self.detector(frame, weights=str(weights), conf=self.conf) if self.weights is not None else []
                 self.publish(("frame", Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)), detections))
                 self.stop_event.wait(0.02)
         except Exception as exc:
@@ -80,6 +81,7 @@ class Labeler:
         self.class_name = tk.StringVar(value=self.dataset.classes[0])
         self.weights = tk.StringVar(value=str(ROOT / "yolo11n.pt"))
         self.best = tk.StringVar()
+        self.confidence = tk.StringVar(value="0.25")
         self.epochs, self.batch, self.camera_index = tk.StringVar(value="150"), tk.StringVar(value="4"), tk.StringVar(value="0")
         root.title("物品標註與自訂 YOLO 偵測")
         root.geometry("1120x820")
@@ -97,6 +99,8 @@ class Labeler:
             self.button(toolbar, title, action)
         ttk.Label(toolbar, text="鏡頭索引").pack(side="left")
         ttk.Entry(toolbar, textvariable=self.camera_index, width=3).pack(side="left")
+        ttk.Label(toolbar, text="偵測門檻").pack(side="left")
+        ttk.Entry(toolbar, textvariable=self.confidence, width=5).pack(side="left")
         self.button(toolbar, "刪除未標註照片", self.delete_unmarked)
         edit = ttk.Frame(self.root); edit.pack(fill="x")
         self.class_box = ttk.Combobox(edit, textvariable=self.class_name, values=self.dataset.classes, state="readonly", width=16)
@@ -325,12 +329,15 @@ class Labeler:
         if not self.may_leave():
             return
         index = int(self.camera_index.get())
+        confidence = float(self.confidence.get())
+        if not 0 < confidence < 1:
+            raise ValueError("偵測門檻必須介於0與1之間。")
         if index < 0:
             raise ValueError("鏡頭索引不能小於零。")
         if weights is not None and not project_path(weights).is_file():
             raise ValueError("請先訓練並選擇本地 best.pt，尚無權重時不會使用通用模型替代。")
         self.frame, self.detections = None, []
-        self.worker = CameraWorker(index, weights, self.dataset.classes.copy())
+        self.worker = CameraWorker(index, weights, self.dataset.classes.copy(), conf=confidence)
         self.worker.start()
         self.status.set("正在載入自訂模型與開啟鏡頭…" if weights else "攝影機預覽：按「擷取這一幀」後框選物品。")
 
@@ -402,7 +409,7 @@ class Labeler:
     def launch_training(self, path, training):
         weights, epochs, batch = training
         run_id = uuid.uuid4().hex
-        self.run_dir = ROOT / "tranning" / "object_detection_runs" / run_id
+        self.run_dir = getattr(self, "runs_root", ROOT / "tranning" / "object_detection_runs") / run_id
         logs = project_path(ROOT / "output" / "object_detection_logs")
         logs.mkdir(parents=True, exist_ok=True)
         self.log_path = logs / f"{run_id}.log"
@@ -456,10 +463,14 @@ class Labeler:
             self.log_handle.close(); self.log_handle = None
             best = self.run_dir / "weights" / "best.pt"
             if code == 0 and best.is_file():
-                self.best.set(str(best)); self.status.set(f"微調結束，已選擇 {best}。請用不同場景驗證辨識結果。")
+                self.safe(lambda: self.training_finished(best))
             else:
                 self.status.set(f"訓練未完成（結束碼 {code}），請查看 {self.log_path}")
         self.timer = self.root.after(50, self.poll)
+
+    def training_finished(self, best):
+        self.best.set(str(best))
+        self.status.set(f"微調結束，已選擇 {best}。請用不同場景驗證辨識結果。")
 
     def close(self):
         if self.closing:
