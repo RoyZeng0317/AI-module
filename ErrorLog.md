@@ -454,3 +454,17 @@ lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，�
 使用者明確授權清理 C:\Users\roy\Documents\GitHub 內所有專案。盤點排除 Git、虛擬環境、依賴、建置輸出、模型、資料集與 .env，僅處理 __pycache__、.pytest_cache、.mypy_cache、.ruff_cache 與個別 pyc/pyo/系統縮圖快取；每個目標確認位於授權目錄內、無路徑連結、未被 Git 追蹤。永久刪除命令遭自動安全審核以 blocked by policy 拒絕，未執行；改採可復原的 Windows 資源回收筒。
 
 共 11 個專案、70 個快取項目、553 個檔案、7459395 bytes（7.11 MiB）已移至資源回收筒，0 失敗，逐項確認原位置不再存在。詳細盤點、驗證名單與結果在 output/cleanup-audit/。沒有清空資源回收筒，因此不宣稱已釋放磁碟空間；既有模型與成果檔保留。
+# 2026-10-26 字詞語意：預訓練資源下載受限
+
+- 獨立審查找到詞 span 將字面 `[MASK]` 等控制 token 當一般詞的問題（M1）；已同步在保留與完整 token offsets 排除控制 special IDs，保留一般未知字 UNK，並新增純控制／混合範圍測試。詳見 `team-run/word-sense/REVIEW.md`，本輪未因此修改模型權重。
+- 回歸測試使用專案內已建立的父目錄後完成：原 Transformer／embedding 20 passed；第一次指定的 basetemp 父路徑未存在曾引發 WinError3，已建立父目錄解決。
+
+- 測試環境另遇預設 `AppData/Local/Temp/pytest-of-roy` 與舊 `.pytest_cache` 的 `WinError 5` 權限問題，15 項既有回歸測試在 fixture 建立時受阻，非模型斷言失敗。改用專案內專用 `--basetemp output/word-sense-tests/...` 並 `-p no:cacheprovider`，不修改專案外權限或檔案；新測試也採此方式。
+
+- 嘗試以專案 `.venv` 的 `huggingface_hub.snapshot_download` 將 `BAAI/bge-small-zh-v1.5` 存入專案 `models/`，HF_HOME 亦限本專案。
+- 連線在 repo_info 階段遭執行環境拒絕：`httpx.ConnectError: [WinError 10013]`，後續為 `LocalEntryNotFoundError`，未完成權重下載。
+- 保留離線載入入口與可由使用者執行的明確下載指令；不繞過網路限制，不將隨機測試模型宣稱為預訓練模型，也不宣稱真實消歧品質已驗證。
+
+
+## 2026-10-26：字詞語意資料建置工具問題
+資料Builder首次用PowerShell管線傳送含中文Python程式，系統編碼將文字轉成問號；已改為UTF-8原始檔build_fixtures.py重建六個word_sense JSON，新增span、無問號與SFT對齊測試。首次rg對tranning/gpt*路徑在Windows回報os error123，改明確檔名。三個新測試通過；pytest cache因WinError183無法建立，僅快取警告，不更改專案外環境。未執行模型訓練。

@@ -1,0 +1,578 @@
+[
+  {
+    "id": "purchase_0",
+    "family": "purchase",
+    "term": "蘋果",
+    "text": "我買蘋果是為了換掉舊手機。",
+    "span": [
+      2,
+      4
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "purchase_1",
+    "family": "purchase",
+    "term": "蘋果",
+    "text": "我買蘋果準備榨汁喝。",
+    "span": [
+      2,
+      4
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "purchase_2",
+    "family": "purchase",
+    "term": "鼠",
+    "text": "我訂購一隻鼠，用來控制電腦游標。",
+    "span": [
+      5,
+      6
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "purchase_3",
+    "family": "purchase",
+    "term": "鼠",
+    "text": "我領養一隻鼠，準備餵牠飼料。",
+    "span": [
+      5,
+      6
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "purchase_4",
+    "family": "purchase",
+    "term": "病毒",
+    "text": "我要移除病毒，讓筆電能正常開機。",
+    "span": [
+      4,
+      6
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "purchase_5",
+    "family": "purchase",
+    "term": "病毒",
+    "text": "我要檢驗病毒，確認病人感染原因。",
+    "span": [
+      4,
+      6
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "purchase_6",
+    "family": "purchase",
+    "term": "蘋果",
+    "text": "我想買蘋果。",
+    "span": [
+      3,
+      5
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "purchase_7",
+    "family": "purchase",
+    "term": "鼠",
+    "text": "他帶來了一隻鼠。",
+    "span": [
+      6,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "purchase_8",
+    "family": "purchase",
+    "term": "病毒",
+    "text": "我想了解病毒。",
+    "span": [
+      4,
+      6
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "care_instruction_0",
+    "family": "care_instruction",
+    "term": "蘋果",
+    "text": "蘋果充電時請使用合適的充電線。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "care_instruction_1",
+    "family": "care_instruction",
+    "term": "蘋果",
+    "text": "蘋果切片前請先洗乾淨果皮。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "care_instruction_2",
+    "family": "care_instruction",
+    "term": "鼠",
+    "text": "鼠的按鍵失靈，請重新安裝驅動程式。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "care_instruction_3",
+    "family": "care_instruction",
+    "term": "鼠",
+    "text": "鼠的籠子髒了，請清理木屑和飲水器。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "care_instruction_4",
+    "family": "care_instruction",
+    "term": "病毒",
+    "text": "病毒刪除了硬碟檔案，請隔離受感染的程式。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "care_instruction_5",
+    "family": "care_instruction",
+    "term": "病毒",
+    "text": "病毒透過飛沫傳播，請保持室內通風。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "care_instruction_6",
+    "family": "care_instruction",
+    "term": "蘋果",
+    "text": "請處理這個蘋果。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "care_instruction_7",
+    "family": "care_instruction",
+    "term": "鼠",
+    "text": "請幫我看一下鼠。",
+    "span": [
+      6,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "care_instruction_8",
+    "family": "care_instruction",
+    "term": "病毒",
+    "text": "請處理這種病毒。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "purchase_exact_0",
+    "family": "purchase",
+    "term": "蘋果",
+    "text": "我想買一台蘋果手機。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "purchase_exact_1",
+    "family": "purchase",
+    "term": "蘋果",
+    "text": "我想買一斤蘋果。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "manual_0",
+    "family": "manual",
+    "term": "蘋果",
+    "text": "我在果汁店訂了一箱蘋果。",
+    "span": [
+      9,
+      11
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "manual_1",
+    "family": "ambiguous_aug",
+    "term": "蘋果",
+    "text": "我剛剛看到蘋果。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_2",
+    "family": "ambiguous_aug",
+    "term": "蘋果",
+    "text": "他說起了蘋果。",
+    "span": [
+      4,
+      6
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_3",
+    "family": "ambiguous_aug",
+    "term": "蘋果",
+    "text": "這份清單上寫著蘋果。",
+    "span": [
+      7,
+      9
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_4",
+    "family": "ambiguous_aug",
+    "term": "鼠",
+    "text": "我聽說有鼠。",
+    "span": [
+      4,
+      5
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_5",
+    "family": "ambiguous_aug",
+    "term": "鼠",
+    "text": "文件裡提到了鼠。",
+    "span": [
+      6,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_6",
+    "family": "ambiguous_aug",
+    "term": "鼠",
+    "text": "他指著鼠說了些話。",
+    "span": [
+      3,
+      4
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_7",
+    "family": "ambiguous_aug",
+    "term": "病毒",
+    "text": "新聞報導提到病毒。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_8",
+    "family": "ambiguous_aug",
+    "term": "病毒",
+    "text": "會議中討論了病毒。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_9",
+    "family": "ambiguous_aug",
+    "term": "病毒",
+    "text": "紀錄裡出現了病毒這個詞。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "manual_10",
+    "family": "contrast_clue",
+    "term": "蘋果",
+    "text": "辦公室桌上的蘋果不是水果，螢幕顯示電池只剩20%。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "manual_11",
+    "family": "contrast_clue",
+    "term": "蘋果",
+    "text": "廚房籃子裡的蘋果不是手機，削皮後準備做成派。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "manual_12",
+    "family": "contrast_clue",
+    "term": "鼠",
+    "text": "實驗室裡的鼠不是動物，接著USB插槽才能使用。",
+    "span": [
+      5,
+      6
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "manual_13",
+    "family": "contrast_clue",
+    "term": "鼠",
+    "text": "倉庫角落的鼠不是裝置，正啃著麻布袋。",
+    "span": [
+      5,
+      6
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "manual_14",
+    "family": "contrast_clue",
+    "term": "病毒",
+    "text": "工廠機台的病毒不是生物，讓整條生產線的控制系統當機。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "manual_15",
+    "family": "contrast_clue",
+    "term": "病毒",
+    "text": "宿舍裡傳開的病毒不是程式，讓好幾位同學開始發燒咳嗽。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "manual_16",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "鼠按右鍵可以叫出選單。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "manual_17",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "這隻鼠的滾輪壞了，游標卡住不動。",
+    "span": [
+      2,
+      3
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "manual_18",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "鼠需要換電池才能連線。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "manual_19",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "鼠在牆角留下了一排小腳印。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "manual_20",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "這隻鼠的毛色是灰色的。",
+    "span": [
+      2,
+      3
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "manual_21",
+    "family": "balance_aug",
+    "term": "鼠",
+    "text": "鼠鑽進牆壁的縫隙裡不見了。",
+    "span": [
+      0,
+      1
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "manual_22",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "病毒讓電腦風扇狂轉，檔案一直被加密。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "manual_23",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "掃毒軟體偵測到病毒，建議立刻隔離檔案。",
+    "span": [
+      7,
+      9
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "manual_24",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "病毒透過隨身碟傳播到公司所有電腦。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "manual_25",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "病毒讓他全身無力，還伴隨咳嗽。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "manual_26",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "醫生說這種病毒會透過飛沫傳染。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "manual_27",
+    "family": "balance_aug",
+    "term": "病毒",
+    "text": "病毒潛伏在體內，症狀慢慢才會出現。",
+    "span": [
+      0,
+      2
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  }
+]

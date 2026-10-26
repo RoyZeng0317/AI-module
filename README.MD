@@ -1,5 +1,17 @@
 # AI Module
 
+## 上下文字詞語意（2026-10-26）
+
+本次使用者明確允許本機中文預訓練資源作為原「從零訓練」規則的例外，沿用自建 GPT 聊天訓練，不使用雲端 AI。新增獨立的 `ContextualEncoder`：句向量採 CLS，字詞向量依明確字元區間抽取完整句子的雙向上下文表示，供分類與語意搜尋重用。預訓練向量不會自動改變原聊天模型的權重。
+
+完整操作、資料與待核准訓練指令見 [字詞語意說明](data/word_sense/README.md)。準備選用模型時，在專案根目錄手動執行：
+
+```powershell
+.\.venv\Scripts\python.exe tranning/prepare_contextual_model.py
+```
+
+此明確下載步驟使用 [BAAI/bge-small-zh-v1.5 官方模型](https://huggingface.co/BAAI/bge-small-zh-v1.5)，僅存入 `models/bge-small-zh-v1.5`，記錄來源 revision；推論只讀本機，沒有隱性下載。此次環境拒絕下載（WinError 10013），尚未取得真實權重或驗證消歧品質。離線隨機小模型測試只驗證程式。38 筆人工示範含蘋果、鼠與病毒的異義、否定、後置線索及資訊不足；不能代表一般中文理解。原 GPT 的 9 筆 val 原始回覆已存於 `output/word-sense/chat_val_baseline.json`，明顯偏題，尚未學會本次消歧任務。正式訓練仍依既有逐次確認約定，尚未啟動。
+
 私人自建 AI 專案。核心規則：**禁止使用其他 AI 模型或雲端 API**（不呼叫 Claude／GPT／任何 LLM API），所有模型都自己從零設計、從零訓練，算力上限抓 **RTX 4060 8GB**，目前僅供個人使用，不考慮對外公開。完整規則見 [`CLAUDE.md`](CLAUDE.md)。
 
 ## 使用大綱

@@ -1,0 +1,15 @@
+[finetune] trainable params: 14,196,480 / 17,465,088 (81%)
+[finetune] epoch   1  train_loss=3.1059  val_loss=1.1383
+[finetune] epoch   2  train_loss=2.8151  val_loss=0.6431
+[finetune] epoch   3  train_loss=2.6394  val_loss=0.4388
+[finetune] epoch   4  train_loss=2.5253  val_loss=0.3253
+[finetune] epoch   5  train_loss=2.4140  val_loss=0.2298
+[finetune] epoch   5  checkpoint saved
+[finetune] epoch   6  train_loss=2.3045  val_loss=0.1958
+[finetune] epoch   7  train_loss=2.2142  val_loss=0.1744
+[finetune] epoch   8  train_loss=2.1318  val_loss=0.1515
+[finetune] epoch   9  train_loss=2.0559  val_loss=0.1268
+[finetune] epoch  10  train_loss=1.9814  val_loss=0.1582
+[finetune] epoch  10  checkpoint saved
+[finetune] epoch  11  train_loss=1.9160  val_loss=0.1387
+Early stopping at epoch 11 (no val improvement for 2 epochs)
