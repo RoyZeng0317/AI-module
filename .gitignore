@@ -99,3 +99,23 @@ output/photo_edit_demo/
 output/photo_edit_try/
 output/photo_rotation_example/
 output/user_circuit_dataset/
+
+# 人物偵測原始照片／匯出快照／垂圾桶（可重新匯出，不進版控；annotations.json 標註成果仍追蹤）
+data/character_detection/source/
+data/character_detection/exports/
+data/character_detection/trash/
+
+# 與已發布 characters.pt 重複的原始訓練輸出目錄（可重新訓練，不進版控）
+tranning/character_detection_runs/
+
+# 多輪上下文 pilot 實驗的大型權重 blob（可重新訓練、單檔近70MB；config.json/history.json 等中繼資料仍保留追蹤）
+tranning/gpt_context_runs/pilot_v1/model.pt
+tranning/gpt_context_runs/pilot_v1/checkpoint/model.pt
+tranning/gpt_context_runs/pilot_v2/model.pt
+tranning/gpt_context_runs/pilot_v2/checkpoint/model.pt
+
+# 人物標註／多輪上下文開發過程中的測試與demo暫存輸出（可重新產生，不進版控）
+output/character-*
+output/context-*
+output/transformer-audit/
+output/test_character_review.py
