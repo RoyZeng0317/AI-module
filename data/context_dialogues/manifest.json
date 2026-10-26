@@ -1,0 +1,85 @@
+{
+  "format": "dialogue_v1",
+  "response_budget": 60,
+  "seed": 42,
+  "files": {
+    "train.json": {
+      "sha256": "e76a84d5bb577f0ce368a93fa030bf23862f7abf89a801426f9e1716f3541efe",
+      "records": 1356,
+      "tasks": {
+        "format": 339,
+        "object": 339,
+        "preference": 339,
+        "name": 339
+      },
+      "content_sha256": "fdc07ab684222f0a1a969cb4fd77aa927d35f6ba28fd87053f6b9e971077dbab"
+    },
+    "val.json": {
+      "sha256": "a847c13621b30f1073d04f41cba56ab6511b417020cf933d0368824c4f5c150b",
+      "records": 200,
+      "tasks": {
+        "preference": 50,
+        "format": 50,
+        "object": 50,
+        "name": 50
+      },
+      "content_sha256": "cd2e646103dcdcabfc44ceac08c1127109ab2fdc5024d5c783f2a6aca764f2e9"
+    },
+    "test.json": {
+      "sha256": "b0f77dba42577f92866025e60bd849f1e824a66ad8a369ec505347df837d4f12",
+      "records": 200,
+      "tasks": {
+        "format": 50,
+        "name": 50,
+        "object": 50,
+        "preference": 50
+      },
+      "content_sha256": "196e83c6931c897e91bf26767d674f95773f5897b75f10dd29aee91eeb595760"
+    },
+    "regression.json": {
+      "sha256": "605a6a56e755271f02510b1e88cd1890a74f530abba988872f29b13255352db8",
+      "records": 20,
+      "tasks": {
+        "legacy_regression": 20
+      },
+      "content_sha256": "145aa2856e93498e4914a35e947ce4e36c8bc4ddd15508847a9ce6528d3e29c7"
+    },
+    "replay.json": {
+      "sha256": "e2f99e3b5e033f4ce52971d0fd3eb4f29d07a013cfaa3deb8ede72a1780e0219",
+      "records": 722,
+      "tasks": {
+        "legacy_replay": 722
+      },
+      "content_sha256": "b4c324343143c2a3d577c022887c7e4baedf1e967911723df8d395290ff15565"
+    }
+  },
+  "groups": {
+    "dialogue_id": {
+      "train": 684,
+      "val": 104,
+      "test": 104
+    },
+    "template_id": {
+      "train": 12,
+      "val": 8,
+      "test": 8
+    },
+    "entity_group": {
+      "train": 236,
+      "val": 56,
+      "test": 56
+    }
+  },
+  "cross_split_intersections": 0,
+  "tokenizer_sha256": "baeed3e7aeb19ecbe9585b3ac8ad0dd806c155e92f8c109e160d9cc4ae390e2b",
+  "unk_tokens": 0,
+  "total_tokens": 168128,
+  "max_prompt_tokens": 156,
+  "max_reply_tokens_with_eos": 13,
+  "limitations": [
+    "deterministic模板任務，不代表一般語意理解",
+    "實體及具體模板variant分組隔離；字元和任務類型仍會共用",
+    "回歸資料由既有pairs前20筆預先固定，不是新獨立世界知識測試"
+  ],
+  "hash_note": "content_sha256保留原LF文字雜湊；sha256是實際檔案bytes。未改資料內容。"
+}

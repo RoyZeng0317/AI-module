@@ -397,9 +397,14 @@ class CommandPalette:
     # 去，維持跟正常聊天時同一種「累積歷史」狀態。跟 CLI（cli.py 的
     # run_resume()）同一套 session_store.py、同一份檔案，兩邊互通。
     def _run_resume(self, arg: str):
+        if getattr(self.conversation, "busy", False):
+            self._system_message("請等待目前回覆完成，再還原或清除上下文。")
+            return
         sub = arg.strip().lower()
         if sub in ("clear", "reset"):
             clear_session()
+            if self.conversation is not None:
+                self.conversation.history = []
             self._system_message("已清除記錄下的對話（下次聊出新內容後，主旨會依新內容重新產生）")
             return
 
@@ -452,6 +457,9 @@ class CommandPalette:
     def _run_conversations(self, arg: str):
         sub, _, rest = arg.partition(" ")
         sub, rest = sub.strip().lower(), rest.strip()
+        if sub in ("new", "open") and getattr(self.conversation, "busy", False):
+            self._system_message("請等待目前回覆完成，再切換對話，避免上下文混入另一個聊天。")
+            return
 
         if sub in ("", "list"):
             conversations = convo_store.list_conversations()

@@ -519,9 +519,9 @@ def _run_local_command(message: str) -> tuple[str, str] | None:
     return "reply", f"未知指令：/{name}（輸入 /help 查看可用指令）"
 
 
-def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[tuple[str, str]]:
-    """/model nvidia 是唯一會吃多輪歷史的模式（見 chats.smart_reply_traced()
-    的 history 參數說明），history 直接從這個對話已經存下來的訊息現算，不用
+def _build_chat_history(conversation_id: str | None, client_id: str) -> list[tuple[str, str]]:
+    """本地Transformer與明確選用的NVIDIA模式共用此歷史快照，
+    history直接從這個對話已經存下來的訊息現算，不用
     像 CLI 那樣另外在記憶體維護一份 state["history"]——重新整理分頁、換一台
     裝置都還讀得到同一份，且 CLI 那份的建立時機（process 存活期間）在瀏覽器
     分頁這種隨時可能重整的環境下不夠可靠。"""
@@ -531,12 +531,18 @@ def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[t
     if conv is None:
         return []
     messages = conv["messages"]
-    pairs = [
-        (messages[i]["content"], messages[i + 1]["content"])
-        for i in range(0, len(messages) - 1, 2)
-        if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant"
-    ]
+    pairs, pending = [], None
+    for message in messages:
+        if message["role"] == "user":
+            pending = message["content"]
+        elif message["role"] == "assistant" and pending is not None:
+            pairs.append((pending, message["content"]))
+            pending = None
     return pairs[-RESUME_HISTORY_CAP:]
+
+
+# 保留舊介面供既有呼叫與測試；本地Transformer也使用同一權限隔離的歷史快照。
+_build_nvidia_history = _build_chat_history
 
 
 @router.post("/api/chat")
@@ -583,7 +589,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
         reply = outcome[1]
     else:
         model_message = outcome[1] if outcome is not None else payload.message
-        history = _build_nvidia_history(conversation_id, client_id) if force_mode == "nvidia" else None
+        history = _build_chat_history(conversation_id, client_id) if conversation_id and force_mode in ("auto", "sinco", "nvidia") else None
         trace, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history,
                                       character=None if out_dir == DEFAULT_OUT_DIR else persona)
         # /open、app/command/*.md 提示詞指令這兩種才會真的問模型，比照 CLI

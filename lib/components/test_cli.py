@@ -238,10 +238,13 @@ def test_run_resume_clear_wipes_recorded_session(tmp_path, monkeypatch, capsys):
     _isolate_session(tmp_path, monkeypatch)
     session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
 
-    cli.run_resume("clear", _state())
+    state = _state()
+    state["history"] = [("舊問題", "舊回答")]
+    cli.run_resume("clear", state)
 
     assert "已清除" in _printed(capsys)
     assert session_store.load_session(path=session_store.SESSION_PATH) == []
+    assert state["history"] == []
 
 
 def test_run_resume_shows_generated_subject(tmp_path, monkeypatch, capsys):

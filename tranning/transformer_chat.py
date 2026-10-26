@@ -122,6 +122,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from bpe_tokenizer import BPETokenizer, EOS, PAD, SEP
 from typo_augment import inject_typos
+from context_format import FORMAT_VERSION, RESPONSE_BUDGET, build_prompt
 
 DEFAULT_PRETRAIN_DIR = Path(__file__).resolve().parent / "gpt_pretrain_runs"
 DEFAULT_FINETUNE_DIR = Path(__file__).resolve().parent / "gpt_chat_runs"
@@ -322,7 +323,7 @@ class GPT(nn.Module):
     @torch.no_grad()
     def generate(self, idx: torch.Tensor, max_new_tokens: int, temperature: float = 0.7,
                  top_k: int | None = 30, top_p: float | None = 0.85,
-                 repetition_penalty: float = 1.3) -> torch.Tensor:
+                 repetition_penalty: float = 1.3, penalty_generated_only: bool = False) -> torch.Tensor:
         """Autoregressive sampling: temperature + top-k + top-p (nucleus),
         not chat_reply()'s pure greedy argmax. Greedy decoding from a
         language model collapses into repetition loops far more readily
@@ -344,6 +345,7 @@ class GPT(nn.Module):
         used breaks the cycle instead of just narrowing the sampling pool.
         """
         self.eval()
+        prompt_length = idx.size(1)
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.block_size:]
             logits, _ = self(idx_cond)
@@ -351,7 +353,7 @@ class GPT(nn.Module):
 
             if repetition_penalty != 1.0:
                 for b in range(logits.size(0)):
-                    seen = idx[b].unique()
+                    seen = idx[b, prompt_length:].unique() if penalty_generated_only else idx[b].unique()
                     seen_logits = logits[b, seen]
                     logits[b, seen] = torch.where(
                         seen_logits > 0, seen_logits / repetition_penalty, seen_logits * repetition_penalty
@@ -747,7 +749,17 @@ def finetune(data_path: Path, pretrain_dir: Path = DEFAULT_PRETRAIN_DIR,
 
 # --- inference -------------------------------------------------------------
 
+def finetune_context(*args, **kwargs):
+    """獨立多輪SFT入口；詳見context_training.finetune_context。"""
+    from context_training import finetune_context as train_context
+    return train_context(*args, **kwargs)
+
 _loaded_gpt: dict = {}
+
+
+def context_enabled(out_dir: Path = DEFAULT_FINETUNE_DIR) -> bool:
+    path = Path(out_dir) / "config.json"
+    return path.is_file() and json.loads(path.read_text(encoding="utf-8")).get("context_format") == FORMAT_VERSION
 
 
 def _load_gpt(out_dir: Path, device: str | None = None):
@@ -780,7 +792,8 @@ def _load_gpt(out_dir: Path, device: str | None = None):
 
 def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: int = 60,
           temperature: float = 0.7, top_k: int = 30, top_p: float = 0.85,
-          repetition_penalty: float = 1.3, device: str | None = None) -> str:
+          repetition_penalty: float = 1.3, device: str | None = None, *,
+          history: list[tuple[str, str]] | None = None, context_format: str | None = None) -> str:
     """Generate a reply from the fine-tuned GPT checkpoint at out_dir (expects
     prompt+<sep>+reply-structured training, i.e. a finetune() output).
 
@@ -792,10 +805,24 @@ def reply(message: str, out_dir: Path = DEFAULT_FINETUNE_DIR, max_new_tokens: in
         return "Transformer 模型尚未訓練，請先執行 `python transformer_chat.py pretrain --corpus ...`，再執行 `finetune`。"
 
     model, tokenizer, block_size, device = loaded
-    prompt_ids = (tokenizer.encode(message) + [SEP])[-block_size:]
+    config = json.loads((Path(out_dir) / "config.json").read_text(encoding="utf-8"))
+    formatting = context_format or config.get("context_format")
+    if formatting not in (None, "legacy", FORMAT_VERSION):
+        raise ValueError(f"不支援的對話格式：{formatting}")
+    if not isinstance(max_new_tokens, int) or isinstance(max_new_tokens, bool) or max_new_tokens < 1:
+        raise ValueError("max_new_tokens必須為正整數。")
+    contextual = formatting == FORMAT_VERSION
+    if contextual:
+        budget = config.get("response_budget", RESPONSE_BUDGET)
+        if not isinstance(budget, int) or isinstance(budget, bool) or budget < 1 or budget >= block_size or max_new_tokens > budget:
+            raise ValueError("回答長度超過模型設定的response_budget。")
+        prompt_ids = build_prompt(tokenizer, message, history, block_size-budget)
+    else:
+        prompt_ids = (tokenizer.encode(message) + [SEP])[-block_size:]
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens=max_new_tokens, temperature=temperature,
-                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
+                          top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty,
+                          **({"penalty_generated_only": True} if contextual else {}))
     generated = out[0, len(prompt_ids):].tolist()
     return tokenizer.decode(generated) or "..."
 
@@ -927,11 +954,20 @@ def main():
                   lm_mix_ratio=args.lm_mix_ratio)
     elif args.command == "chat":
         print("Chat with the fine-tuned Transformer model (type 'exit' to quit)")
+        history = []
         while True:
             text = input("You: ")
             if text.strip().lower() in {"exit", "quit"}:
                 break
-            print(f"Model: {reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature, top_k=args.top_k, top_p=args.top_p, repetition_penalty=args.repetition_penalty)}")
+            try:
+                answer = reply(text, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens, temperature=args.temperature,
+                               top_k=args.top_k, top_p=args.top_p, repetition_penalty=args.repetition_penalty, history=history)
+            except ValueError as exc:
+                print(f"上下文輸入錯誤：{exc}")
+                continue
+            print(f"Model: {answer}")
+            history.append((text, answer))
+            del history[:-6]
     elif args.command == "complete":
         print(complete(args.prompt, out_dir=args.out_dir, max_new_tokens=args.max_new_tokens,
                         temperature=args.temperature, top_k=args.top_k, top_p=args.top_p,

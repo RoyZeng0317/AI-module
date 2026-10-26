@@ -161,8 +161,8 @@ class Conversation:
             self.on_ask_start()
 
         def worker():
-            # history 只有 nvidia 模式會真的用到（見 smart_reply_traced() 的
-            # 說明），這裡無條件傳，讓 /model nvidia 能接上 self.history（含
+            # history交給共用路由，本地多輪checkpoint及明確選用的NVIDIA可使用。
+            # 這裡無條件傳，讓各支援模式接上self.history（含
             # /resume 還原回來的歷史）當多輪對話上下文。
             # character：/character 選的角色名字（見 chats.smart_reply_traced() 說明），
             # 沒有它的話一般聊天分支會忽略角色、一律用 sinco 本人回答。

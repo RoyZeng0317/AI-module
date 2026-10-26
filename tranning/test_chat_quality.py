@@ -45,13 +45,29 @@ def test_observed_unrelated_topic_regressions_and_counterexamples():
     assert chat_quality.output_issue("RAG 是用來回答英文文法嗎", "可以先檢索英文文法，例如主詞與受詞的資料。") is None
 
 
-def test_known_and_followup_skip_generation(monkeypatch):
+def test_known_without_history_skips_but_followup_with_history_generates(monkeypatch):
+    monkeypatch.setattr(chats.transformer_chat, "context_enabled", lambda: True)
     monkeypatch.setattr(chats, "route_reply", lambda message: None)
     monkeypatch.setattr(chats.transformer_chat, "reply", lambda message: pytest.fail("must not generate"))
     assert "你好" in chats.smart_reply_traced("你好")[1]
+    seen = {}
+    def contextual(message, *, history):
+        seen.update(message=message, history=history)
+        return "你指的是火星。"
+    monkeypatch.setattr(chats.transformer_chat, "reply", contextual)
+    monkeypatch.setattr(chats, "_emotion_trace_suffix", lambda message: "")
     trace, answer = chats.smart_reply_traced("那個呢", history=[("火星", "紅色星球")])
-    assert "補充" in answer
-    assert "精確比對" in trace
+    assert answer == "你指的是火星。"
+    assert seen == {"message": "那個呢", "history": [("火星", "紅色星球")]}
+    assert "精確比對" not in trace
+
+
+def test_legacy_checkpoint_keeps_existing_followup_clarification(monkeypatch):
+    monkeypatch.setattr(chats, "route_reply", lambda message: None)
+    monkeypatch.setattr(chats.transformer_chat, "context_enabled", lambda: False)
+    monkeypatch.setattr(chats.transformer_chat, "reply", lambda *args, **kwargs: pytest.fail("舊權重不應假裝支援上下文"))
+    trace, answer = chats.smart_reply_traced("那個呢", history=[("火星", "紅色星球")])
+    assert "補充" in answer and "精確比對" in trace
 
 
 def test_unknown_prompt_still_generates_and_bad_output_is_guarded(monkeypatch):
