@@ -40,6 +40,17 @@ def test_generated_corpus_has_no_rule_check_errors(tmp_path):
         assert errors == []
 
 
+def test_every_pair_fits_the_model_context():
+    # prompt + <sep> + reply + <eos> must fit BLOCK_SIZE or the tail of the
+    # circuit is silently cut off before it reaches the loss
+    from bpe_tokenizer import BPETokenizer
+    text = stt.CORPUS_PATH.read_text(encoding="utf-8") if stt.CORPUS_PATH.exists() else ""
+    pairs = build_corpus()
+    tok = BPETokenizer.train([text or "\n".join(p["reply"] for p in pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
+    longest = max(len(tok.encode(p["prompt"])) + len(tok.encode(p["reply"])) + 2 for p in pairs)
+    assert longest <= stt.BLOCK_SIZE, longest
+
+
 def test_generated_corpus_covers_every_topology():
     pairs = build_corpus()
     unique_replies = {p["reply"] for p in pairs}
@@ -72,13 +83,9 @@ def test_check_design_reports_clean_for_valid_circuit(tmp_path):
     pairs = build_corpus()
     text = pairs[0]["reply"]
     findings = stt.check_design(text, tmp_path / "out.kicad_sch")
-    # No electrical errors. Since 2026-10-27 the checker also reports
-    # overlapping_symbols WARNINGS: these templates' op-amp has zero body
-    # size (every pin is 2.54mm long and meets in the centre), so the power
-    # symbols beside it overlap. Fixing that needs new template coordinates
-    # and retraining the Schmitt model -- left for the user to approve.
-    assert [f for f in findings if f["severity"] == "error"] == []
-    assert {f["rule"] for f in findings} <= {"overlapping_symbols"}
+    # since the 2026-10-27 template redesign: no errors and no
+    # overlapping_symbols warnings either
+    assert findings == []
 
 
 @pytest.mark.skipif(shutil.which("kicad-cli") is None, reason="KiCad not installed")
@@ -86,7 +93,8 @@ def test_templates_wire_the_intended_opamp_pins_in_real_kicad(tmp_path):
     """Real KiCad netlist of the templates. Before 2026-10-27 the library
     pins were written in sheet coordinates, so KiCad (library y-up) swapped
     IN+/IN- and V+/V-, and the power pins had no name, so they joined no net."""
-    from schmitt_trigger_gen import build_comparator, build_opamp_schmitt
+    from schmitt_trigger_gen import (build_comparator, build_inverting_amp, build_noninverting_amp,
+                                     build_opamp_schmitt)
 
     def nets(body, name):
         sch = tmp_path / f"{name}.kicad_sch"
@@ -97,14 +105,26 @@ def test_templates_wire_the_intended_opamp_pins_in_real_kicad(tmp_path):
         return {n: {f"{r}.{p}" for r, p in re.findall(r'ref="([^"]+)" pin="([^"]+)"', b)}
                 for n, b in re.findall(r'<net [^>]*name="([^"]*)"[^>]*>(.*?)</net>', net.read_text(), re.S)}
 
+    def node(n, pin):
+        return next(v for v in n.values() if pin in v)
+
     schmitt = nets(build_opamp_schmitt("10k", "100k"), "schmitt")
-    feedback = next(v for v in schmitt.values() if "R2.1" in v)
-    assert {"R1.1", "R2.1", "U1.1"} == feedback          # positive feedback on IN+ (pin 1)
-    assert "U1.2" in schmitt["GND"] and "U1.5" in schmitt["GND"] and schmitt["VCC"] == {"U1.4"}
+    assert node(schmitt, "R2.1") == {"R1.2", "R2.1", "U1.1"}   # positive feedback on IN+ (pin 1)
+    assert schmitt["/VOUT"] == {"R2.2", "U1.3"} and schmitt["/VIN"] == {"R1.1"}
+    assert schmitt["GND"] == {"U1.2", "U1.5"} and schmitt["VCC"] == {"U1.4"}
+
+    inv = nets(build_inverting_amp("10k", "100k"), "inv")
+    assert node(inv, "R2.1") == {"R1.2", "R2.1", "U1.2"}       # negative feedback on IN- (pin 2)
+    assert inv["GND"] == {"U1.1", "U1.5"}
+
+    noninv = nets(build_noninverting_amp("10k", "100k"), "noninv")
+    assert noninv["/VIN"] == {"U1.1"} and node(noninv, "U1.2") == {"R1.2", "R2.1", "U1.2"}
+    assert noninv["GND"] == {"R1.1", "U1.5"}
 
     comp = nets(build_comparator("10k", "10k"), "comp")
-    assert comp["/VIN"] == {"U1.2"}                       # Vin on IN-
-    assert {"U1.1", "R1.1", "R2.2"} == next(v for v in comp.values() if "U1.1" in v)
+    assert comp["/VIN"] == {"U1.2"}                              # Vin on IN-
+    assert node(comp, "U1.1") == {"U1.1", "R1.1", "R2.2"}       # divider on IN+
+    assert comp["VCC"] == {"R1.2", "U1.4"} and comp["GND"] == {"R2.1", "U1.5"}
 
 
 def test_check_design_reports_unparsable_instead_of_raising(tmp_path):

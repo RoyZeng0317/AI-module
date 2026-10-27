@@ -169,8 +169,10 @@ def _parse_pin_node(node) -> dict:
     number = number_node[1] if number_node else "?"
     name_node = find_child(node, "name")
     name = name_node[1] if name_node else "?"
+    length_node = find_child(node, "length")
+    length = float(length_node[1]) if length_node else None
     return {"number": number, "electrical_type": electrical_type, "x": x, "y": y, "name": name,
-            "angle": pin_angle}
+            "angle": pin_angle, "length": length}
 
 
 def _walk_pins(node, units: dict, current_unit: int) -> None:
@@ -590,6 +592,22 @@ def symbol_box(inst: dict, pins: list) -> tuple:
         return _segment_box(tips[0], tips[1], TWO_PIN_HALF_WIDTH_MM)
     if not tips:
         return _box(inst["x"] - 1, inst["y"] - 1, inst["x"] + 1, inst["y"] + 1)
+    if all(p.get("angle") is not None and p.get("length") is not None for p in pins):
+        # Body = where the pins END (tip moved inward by its length along its
+        # direction), not the box around the tips: an op-amp's V+/V- pins
+        # stick out above/below its triangle, and the power symbol on their
+        # tips is outside the body. Half a pitch of padding along an edge
+        # that has no pins (e.g. above the top pin of a 2-sided DIP).
+        steps = {0: (1, 0), 90: (0, 1), 180: (-1, 0), 270: (0, -1)}
+        ends = []
+        for p in pins:
+            sx, sy = steps.get(int(p["angle"]) % 360, (0, 0))
+            ends.append(transform_point(p["x"] + sx * p["length"], p["y"] + sy * p["length"],
+                                        inst["mirror"], inst["angle"], inst["x"], inst["y"]))
+        xs, ys = [e[0] for e in ends], [e[1] for e in ends]
+        end_columns = {round(e[0], 3) for e in ends}       # 2 columns = a left/right-pinned part
+        pad_y = 1.27 if len(end_columns) <= 2 and len(set(ys)) > 2 else 0.0
+        return _box(min(xs), min(ys) - pad_y, max(xs), max(ys) + pad_y)
     xs, ys = [t[0] for t in tips], [t[1] for t in tips]
     return _box(min(xs), min(ys) - 1.27, max(xs), max(ys) + 1.27)
 

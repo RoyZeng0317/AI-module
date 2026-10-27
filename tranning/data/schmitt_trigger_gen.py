@@ -43,6 +43,7 @@ reusing one symbol library across many sheets.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -53,310 +54,326 @@ from circuit_rule_check import check_schematic  # noqa: E402
 OUT_CORPUS = Path(__file__).resolve().parent / "schmitt_trigger_corpus.txt"
 OUT_PAIRS = Path(__file__).resolve().parent.parent.parent / "data" / "schmitt_trigger_pairs.json"
 
-# Deliberately stripped of every (name ...)/(effects (font ...)) clause a
-# real KiCad file would carry: circuit_rule_check.py's parser only ever reads
-# electrical_type (node[1]), (at x y) and (number "N" ...) off a pin, and
-# only (at x y) / node[1] text off a property/label -- the font/effects
-# clauses exist purely for KiCad's own rendering and would just be dead
-# weight tripling the token count of every example for no training signal
-# (measured: cut the longest example from ~3170 to well under block_size
-# without changing a single check_schematic() result).
-# 2026-10-27: pin y values below are in KiCad LIBRARY coordinates (y up),
-# which circuit_rule_check.transform_point() now flips onto the y-down sheet
-# (checked against KiCad's own demo files). The bodies in this module were
-# laid out with sheet coordinates (IN+ at u_y + 1.27, V+ at u_y + 2.54, ...),
-# so the library pins are written mirrored (IN+ at local y = -1.27, ...) to
-# land exactly there. Before this, real KiCad put the op-amp's IN+/IN- and
-# V+/V- the other way round (supply reversed) even though this repo's own
-# checker saw nothing wrong. Sinco:R's pins are swapped (1 on the right) for
-# the same reason: a horizontal resistor is unaffected (same two end points)
-# and a resistor placed at angle 90 keeps the pin-2-on-the-node layout the
-# bodies below were written for -- so bodies the trained model already
-# generates stay valid; only this re-attached library block changed.
+# Library block re-attached to every body by wrap_kicad() -- never generated
+# by the model, so it can carry real graphics at no cost to the model.
+#
+# 2026-10-27 redesign (to_do_list.md #52). The earlier library had no body
+# graphics and an op-amp whose five 2.54mm pins all met in its centre (a
+# zero-size part), so every power symbol / resistor next to it overlapped,
+# wires ran diagonally through it, and -- because its pins were written in
+# sheet coordinates while KiCad libraries are y-up -- real KiCad swapped
+# IN+/IN- and V+/V-. Now: KiCad-sized parts (the op-amp matches the shape of
+# KiCad's own LM358 symbol: inputs at x=-7.62, output at x=+7.62, supply pins
+# at x=-2.54 reaching y=+-7.62), every pin position in the bodies below is
+# computed from THIS block with circuit_rule_check.transform_point() (the
+# formula verified against KiCad's demo files), wiring is orthogonal, and
+# every body is checked for errors AND overlapping_symbols before training.
+#
+# (name ...)/(effects ...) clauses are still left out where KiCad does not
+# need them; power pins keep their name, which is what KiCad uses to name
+# the GND / VCC net.
 LIB_SYMBOLS = """
 (lib_symbols
-    (symbol "Sinco:R"
-        (property "Reference" "R" (at 0 -3 0))
+    (symbol "Sinco:R" (pin_names hide) (pin_numbers hide)
+        (property "Reference" "R" (at 0 0 0))
+        (symbol "R_0_1"
+            (rectangle (start -2.54 -1.016) (end 2.54 1.016) (stroke (width 0.254)) (fill (type none)))
+        )
         (symbol "R_1_1"
-            (pin passive line (at 2.54 0 180) (length 2.54) (number "1"))
-            (pin passive line (at -2.54 0 0) (length 2.54) (number "2"))
+            (pin passive line (at -3.81 0 0) (length 1.27) (number "1"))
+            (pin passive line (at 3.81 0 180) (length 1.27) (number "2"))
         )
     )
-    (symbol "Sinco:OpAmp"
-        (property "Reference" "U" (at 0 -3 0))
+    (symbol "Sinco:OpAmp" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "OpAmp_0_1"
+            (polyline (pts (xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)) (stroke (width 0.254)) (fill (type background)))
+            (polyline (pts (xy -4.318 2.54) (xy -3.302 2.54)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -3.81 3.048) (xy -3.81 2.032)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -4.318 -2.54) (xy -3.302 -2.54)) (stroke (width 0.1524)) (fill (type none)))
+        )
         (symbol "OpAmp_1_1"
-            (pin input line (at -2.54 -1.27 0) (length 2.54) (number "1"))
-            (pin input line (at -2.54 1.27 0) (length 2.54) (number "2"))
-            (pin output line (at 2.54 0 180) (length 2.54) (number "3"))
-            (pin power_in line (at 0 -2.54 90) (length 2.54) (number "4"))
-            (pin power_in line (at 0 2.54 270) (length 2.54) (number "5"))
+            (pin input line (at -7.62 2.54 0) (length 2.54) (number "1"))
+            (pin input line (at -7.62 -2.54 0) (length 2.54) (number "2"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "3"))
+            (pin power_in line (at -2.54 7.62 270) (length 3.81) (number "4"))
+            (pin power_in line (at -2.54 -7.62 90) (length 3.81) (number "5"))
         )
     )
-    (symbol "Sinco:SchmittInverter"
-        (property "Reference" "U" (at 0 -3 0))
+    (symbol "Sinco:SchmittInverter" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "SchmittInverter_0_1"
+            (polyline (pts (xy -5.08 3.81) (xy 4.064 0) (xy -5.08 -3.81) (xy -5.08 3.81)) (stroke (width 0.254)) (fill (type background)))
+            (circle (center 4.572 0) (radius 0.508) (stroke (width 0.254)) (fill (type none)))
+            (polyline (pts (xy -3.556 -0.762) (xy -2.54 -0.762) (xy -2.032 0.762) (xy -1.016 0.762)) (stroke (width 0.1524)) (fill (type none)))
+        )
         (symbol "SchmittInverter_1_1"
-            (pin input line (at -2.54 0 0) (length 2.54) (number "1"))
-            (pin output line (at 2.54 0 180) (length 2.54) (number "2"))
-            (pin power_in line (at 0 -2.54 90) (length 2.54) (number "14"))
-            (pin power_in line (at 0 2.54 270) (length 2.54) (number "7"))
+            (pin input line (at -7.62 0 0) (length 2.54) (number "1"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "2"))
+            (pin power_in line (at -2.54 7.62 270) (length 5.08) (number "14"))
+            (pin power_in line (at -2.54 -7.62 90) (length 5.08) (number "7"))
         )
     )
-    (symbol "power:GND"
-        (power)
+    (symbol "power:GND" (power) (pin_names hide)
         (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "GND" (at 0 0 0))
-        (symbol "GND_0_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
+        (property "Value" "GND" (at 0 -3.81 0))
+        (symbol "GND_0_1"
+            (polyline (pts (xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "GND_1_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
     )
-    (symbol "power:VCC"
-        (power)
+    (symbol "power:VCC" (power) (pin_names hide)
         (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "VCC" (at 0 0 0))
-        (symbol "VCC_0_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
+        (property "Value" "VCC" (at 0 3.81 0))
+        (symbol "VCC_0_1"
+            (polyline (pts (xy 0 0) (xy 0 1.27)) (stroke (width 0)) (fill (type none)))
+            (polyline (pts (xy -0.762 1.27) (xy 0.762 1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
     )
 )
 """
 
 
-def _sym(lib_id, ref, x, y, angle=0, value=None, uuid_n=1):
-    value_prop = f'(property "Value" "{value}" (at {x} {y - 2} 0))' if value else ""
+def _lib_pins() -> dict:
+    from circuit_rule_check import get_lib_pin_table
+    from kicad_dataset_convert import parse_sexpr
+    table = get_lib_pin_table(parse_sexpr(f"(kicad_sch {LIB_SYMBOLS})"))
+    return {lib_id: {p["number"]: p for unit in units.values() for p in unit} for lib_id, units in table.items()}
+
+
+_PINS = _lib_pins()
+
+
+def _pin(lib_id, number, x, y, angle=0):
+    """Sheet coordinate of a placed part's pin tip (same formula KiCad uses)."""
+    from circuit_rule_check import transform_point
+    p = _PINS[lib_id][str(number)]
+    return transform_point(p["x"], p["y"], None, angle, x, y)
+
+
+def _sym(lib_id, ref, x, y, angle=0, value=None, ref_at=None, value_at=None):
+    """Placed part. Text defaults to centred above the part; a part turned
+    90/270 gets field angle 90 so KiCad still shows its text horizontally
+    (KiCad adds the symbol's rotation to its fields' angle)."""
+    fa = 90 if angle % 180 == 90 else 0
+    hide = " (effects hide)" if lib_id.startswith("power:") else ""   # "#PWR01" is bookkeeping, not shown
+    rx, ry = ref_at or (x, y - 4.064)
+    value_prop = ""
+    if value:
+        vx, vy = value_at or (x, y - 2.286)
+        value_prop = f'(property "Value" "{value}" (at {vx} {vy} {fa}))'
     return (
         f'(symbol (lib_id "{lib_id}") (at {x} {y} {angle}) (unit 1) '
-        f'(uuid "00000000-0000-0000-0000-{uuid_n:012d}")'
-        f'(property "Reference" "{ref}" (at {x} {y - 4} 0)) {value_prop})'
+        f'(property "Reference" "{ref}" (at {rx} {ry} {fa}){hide}) {value_prop})'
     )
+
+
+def _power(net, ref, point, text_at=None):
+    """VCC always points up, GND always points down (angle 0); the net name
+    sits just past the graphic (above VCC / below GND) unless text_at moves it."""
+    default = (point[0], point[1] - 2.54) if net != "GND" else (point[0], point[1] + 3.81)
+    return _sym(f"power:{net}", ref, point[0], point[1], value=net, value_at=text_at or default)
 
 
 def _wire(p1, p2):
     return f'(wire (pts (xy {p1[0]} {p1[1]}) (xy {p2[0]} {p2[1]})))'
 
 
-def _label(text, x, y):
-    return f'(label "{text}" (at {x} {y} 0))'
+def _wires(*points):
+    """Polyline as separate straight wires (every bend is a wire end)."""
+    return "".join(_wire(a, b) for a, b in zip(points, points[1:]))
+
+
+def _label(text, x, y, angle=0):
+    """angle 0: text runs right of the point; 180: text runs left."""
+    return f'(label "{text}" (at {x} {y} {angle}))'
 
 
 def _junction(x, y):
     return f"(junction (at {x} {y}))"
 
 
+def _add_uuids(body: str) -> str:
+    """Every placed symbol gets a deterministic uuid here instead of in the
+    body: they are pure bookkeeping (~90 tokens per circuit the model would
+    otherwise have to reproduce). Bodies that already carry one (output of
+    a model trained before 2026-10-27) are left alone."""
+    count = iter(range(1, 10_000))
+    return re.sub(r'\(unit 1\) (?!\(uuid)',
+                  lambda m: f'(unit 1) (uuid "00000000-0000-0000-0000-{next(count):012d}") ', body)
+
+
 def wrap_kicad(body: str) -> str:
-    return f'(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") {LIB_SYMBOLS} {body})'
+    return f'(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") {LIB_SYMBOLS} {_add_uuids(body)})'
+
+
+# Shared op-amp placement and the points every op-amp template routes to.
+_U = (120.0, 100.0)
+_OPAMP = "Sinco:OpAmp"
+_IN_PLUS = _pin(_OPAMP, 1, *_U)      # (112.38, 97.46)  upper input
+_IN_MINUS = _pin(_OPAMP, 2, *_U)     # (112.38, 102.54) lower input
+_OUT = _pin(_OPAMP, 3, *_U)          # (127.62, 100.0)
+_V_PLUS = _pin(_OPAMP, 4, *_U)       # (117.46, 92.38)  top
+_V_MINUS = _pin(_OPAMP, 5, *_U)      # (117.46, 107.62) bottom
+_OUT_NODE = (132.08, _OUT[1])        # where the feedback leaves the output wire
+_VOUT_PT = (137.16, _OUT[1])
+_FB_TOP_Y = 82.55                    # feedback path above the op-amp (clear of VCC and its text)
+_FB_BOTTOM_Y = 120.65                # feedback path below the op-amp (clear of GND and its text)
+
+
+def _opamp_core():
+    """The op-amp, its supplies and the output wire to VOUT (with the
+    feedback tap at _OUT_NODE)."""
+    return (
+        _sym(_OPAMP, "U1", *_U, value="LM358",
+             ref_at=(_U[0] + 3.81, _U[1] - 7.62), value_at=(_U[0] + 3.81, _U[1] - 5.715))
+        + _power("VCC", "#PWR01", _V_PLUS)
+        + _power("GND", "#PWR02", _V_MINUS)
+        + _wires(_OUT, _OUT_NODE, _VOUT_PT)
+    )
+
+
+def _feedback(node, y, r_value, ref="R2"):
+    """Horizontal resistor from `node` (left) round to _OUT_NODE (right) at
+    height y: node -> up/down -> R -> right -> down/up -> output."""
+    r_x = 115.57
+    p1, p2 = _pin("Sinco:R", 1, r_x, y), _pin("Sinco:R", 2, r_x, y)
+    return (
+        _sym("Sinco:R", ref, r_x, y, value=r_value)
+        + _wires(node, (node[0], y), p1)
+        + _wires(p2, (_OUT_NODE[0], y), _OUT_NODE)
+        + _junction(*_OUT_NODE)
+    )
 
 
 def build_opamp_schmitt(r1_value: str, r2_value: str, in_label="VIN", out_label="VOUT") -> str:
-    """Non-inverting op-amp Schmitt trigger -- see module docstring for the
-    topology. All coordinates are computed, not guessed, so the pins that
-    must coincide (op-amp IN+ / R2 pin2, the ground/VCC power-symbol pins)
-    land on the exact transform_point() result instead of an eyeballed value.
-
-    Returns the BODY only (placed symbols + wires + labels), not a full
-    .kicad_sch file -- LIB_SYMBOLS is identical, fixed boilerplate across
-    every example (~half of a full file's length, see attempt 3/4 in
-    to_do_list.md #29) and is attached separately via wrap_kicad() instead of
-    being something the model has to reproduce from memory on every request.
-    """
-    r1_x, r1_y = 100.0, 100.0                      # R1 instance (horizontal)
-    r1_p1 = (r1_x - 2.54, r1_y)                     # -> Vin side
-    r1_p2 = (r1_x + 2.54, r1_y)                     # -> node A
-
-    u_x, u_y = 110.0, 100.0                         # op-amp instance
-    in_plus = (u_x - 2.54, u_y + 1.27)               # node A
-    in_minus = (u_x - 2.54, u_y - 1.27)              # -> GND
-    out_pin = (u_x + 2.54, u_y)                      # -> node OUT
-    v_plus = (u_x, u_y + 2.54)                       # -> VCC
-    v_minus = (u_x, u_y - 2.54)                      # -> GND
-
-    r2_x, r2_y = in_plus[0] - 2.54, in_plus[1]       # R2 instance: pin2 lands exactly on node A
-    r2_p1 = (r2_x - 2.54, r2_y)                      # -> node OUT
-    r2_p2 = (r2_x + 2.54, r2_y)                      # == in_plus (node A, same point, no wire needed)
-
-    vin_label_pt = (r1_p1[0] - 2.46, r1_p1[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:R", "R1", r1_x, r1_y, value=r1_value, uuid_n=1)
-        + _sym("Sinco:R", "R2", r2_x, r2_y, value=r2_value, uuid_n=2)
-        + _sym("Sinco:OpAmp", "U1", u_x, u_y, value="LM358", uuid_n=3)
-        + _sym("power:GND", "#PWR01", in_minus[0], in_minus[1], angle=90, uuid_n=4)
-        + _sym("power:GND", "#PWR02", v_minus[0], v_minus[1], angle=90, uuid_n=5)
-        + _sym("power:VCC", "#PWR03", v_plus[0], v_plus[1], angle=90, uuid_n=6)
-        + _wire(vin_label_pt, r1_p1)
-        + _wire(r1_p2, in_plus)
-        + _wire(r2_p1, out_pin)
-        + _wire(out_pin, vout_label_pt)
-        + _junction(*in_plus)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Non-inverting op-amp Schmitt trigger: VIN -> R1 -> node A -> IN+,
+    OUT -> R2 -> node A (positive feedback, drawn ABOVE the op-amp),
+    IN- -> GND. Returns the BODY only (wrap_kicad() adds the library)."""
+    r1 = (99.06, _IN_PLUS[1])
+    r1_p1, r1_p2 = _pin("Sinco:R", 1, *r1), _pin("Sinco:R", 2, *r1)
+    node_a = (107.95, _IN_PLUS[1])
+    vin_pt = (r1_p1[0] - 5.08, r1[1])
+    gnd_in = (108.585, _IN_MINUS[1])
+    return (
+        _sym("Sinco:R", "R1", *r1, value=r1_value)
+        + _feedback(node_a, _FB_TOP_Y, r2_value)
+        + _opamp_core()
+        + _power("GND", "#PWR03", gnd_in)
+        + _wires(vin_pt, r1_p1)
+        + _wires(r1_p2, node_a, _IN_PLUS)
+        + _wires(_IN_MINUS, gnd_in)
+        + _junction(*node_a)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *_VOUT_PT)
     )
-    return body
 
 
 def build_inverting_amp(r1_value: str, r2_value: str, in_label="VIN", out_label="VOUT") -> str:
-    """Inverting op-amp amplifier (gain = -R2/R1). Mirror image of
-    build_opamp_schmitt(): the R1/R2 network lands on IN- (pin 2, negative
-    feedback) instead of IN+, and IN+ ties to GND instead of IN-."""
-    r1_x, r1_y = 100.0, 100.0
-    r1_p1 = (r1_x - 2.54, r1_y)
-    r1_p2 = (r1_x + 2.54, r1_y)
-
-    u_x, u_y = 110.0, 100.0
-    in_plus = (u_x - 2.54, u_y + 1.27)               # -> GND
-    in_minus = (u_x - 2.54, u_y - 1.27)              # node A
-    out_pin = (u_x + 2.54, u_y)
-    v_plus = (u_x, u_y + 2.54)
-    v_minus = (u_x, u_y - 2.54)
-
-    r2_x, r2_y = in_minus[0] - 2.54, in_minus[1]
-    r2_p1 = (r2_x - 2.54, r2_y)                      # -> OUT
-
-    vin_label_pt = (r1_p1[0] - 2.46, r1_p1[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:R", "R1", r1_x, r1_y, value=r1_value, uuid_n=1)
-        + _sym("Sinco:R", "R2", r2_x, r2_y, value=r2_value, uuid_n=2)
-        + _sym("Sinco:OpAmp", "U1", u_x, u_y, value="LM358", uuid_n=3)
-        + _sym("power:GND", "#PWR01", in_plus[0], in_plus[1], angle=90, uuid_n=4)
-        + _sym("power:GND", "#PWR02", v_minus[0], v_minus[1], angle=90, uuid_n=5)
-        + _sym("power:VCC", "#PWR03", v_plus[0], v_plus[1], angle=90, uuid_n=6)
-        + _wire(vin_label_pt, r1_p1)
-        + _wire(r1_p2, in_minus)
-        + _wire(r2_p1, out_pin)
-        + _wire(out_pin, vout_label_pt)
-        + _junction(*in_minus)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Inverting amplifier (gain = -R2/R1): VIN -> R1 -> node A -> IN-,
+    OUT -> R2 -> node A (negative feedback, drawn BELOW the op-amp),
+    IN+ -> GND."""
+    r1 = (99.06, _IN_MINUS[1])
+    r1_p1, r1_p2 = _pin("Sinco:R", 1, *r1), _pin("Sinco:R", 2, *r1)
+    node_a = (107.95, _IN_MINUS[1])
+    vin_pt = (r1_p1[0] - 5.08, r1[1])
+    gnd_in = (108.585, _IN_PLUS[1])
+    return (
+        _sym("Sinco:R", "R1", *r1, value=r1_value)
+        + _feedback(node_a, _FB_BOTTOM_Y, r2_value)
+        + _opamp_core()
+        + _power("GND", "#PWR03", gnd_in, text_at=(gnd_in[0] - 3.81, gnd_in[1] + 1.905))
+        + _wires(vin_pt, r1_p1)
+        + _wires(r1_p2, node_a, _IN_MINUS)
+        + _wires(_IN_PLUS, gnd_in)
+        + _junction(*node_a)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *_VOUT_PT)
     )
-    return body
 
 
 def build_noninverting_amp(r1_value: str, r2_value: str, in_label="VIN", out_label="VOUT") -> str:
-    """Non-inverting op-amp amplifier (gain = 1 + R2/R1). Vin drives IN+
-    directly (no series resistor); R1 ties IN- to GND (vertical, angle 90 --
-    _sym()'s angle parameter rotates the library-local horizontal pin
-    offsets, already used for the power symbols) and R2 feeds back
-    OUT -> IN-."""
-    u_x, u_y = 110.0, 100.0
-    in_plus = (u_x - 2.54, u_y + 1.27)                # Vin drives this directly
-    in_minus = (u_x - 2.54, u_y - 1.27)               # node A: R1 (-> GND) / R2 (feedback)
-    out_pin = (u_x + 2.54, u_y)
-    v_plus = (u_x, u_y + 2.54)
-    v_minus = (u_x, u_y - 2.54)
-
-    r1_x, r1_y = in_minus[0], in_minus[1] - 2.54      # vertical: pin2 (top) lands on node A
-    r1_gnd_pt = (r1_x, r1_y - 2.54)                   # pin1 (bottom) -> GND
-
-    r2_x, r2_y = in_minus[0] - 2.54, in_minus[1]      # horizontal: pin2 lands on node A
-    r2_p1 = (r2_x - 2.54, r2_y)                       # -> OUT
-
-    vin_label_pt = (in_plus[0] - 2.46, in_plus[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:R", "R1", r1_x, r1_y, angle=90, value=r1_value, uuid_n=1)
-        + _sym("Sinco:R", "R2", r2_x, r2_y, value=r2_value, uuid_n=2)
-        + _sym("Sinco:OpAmp", "U1", u_x, u_y, value="LM358", uuid_n=3)
-        + _sym("power:GND", "#PWR01", r1_gnd_pt[0], r1_gnd_pt[1], angle=90, uuid_n=4)
-        + _sym("power:GND", "#PWR02", v_minus[0], v_minus[1], angle=90, uuid_n=5)
-        + _sym("power:VCC", "#PWR03", v_plus[0], v_plus[1], angle=90, uuid_n=6)
-        + _wire(vin_label_pt, in_plus)
-        + _wire(r2_p1, out_pin)
-        + _wire(out_pin, vout_label_pt)
-        + _junction(*in_minus)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Non-inverting amplifier (gain = 1 + R2/R1): VIN -> IN+ directly,
+    node A on IN-: R1 (vertical) -> GND, R2 -> OUT (feedback BELOW)."""
+    node_a = (107.95, _IN_MINUS[1])
+    r1_node = (100.33, _IN_MINUS[1])
+    r1 = (r1_node[0], r1_node[1] + 3.81)                  # standing resistor, top pin on r1_node
+    r1_top, r1_bottom = sorted((_pin("Sinco:R", 1, *r1, 90), _pin("Sinco:R", 2, *r1, 90)), key=lambda p: p[1])
+    vin_pt = (r1_node[0] - 5.08, _IN_PLUS[1])
+    return (
+        _sym("Sinco:R", "R1", *r1, angle=90, value=r1_value,
+             ref_at=(r1[0] - 3.81, r1[1] - 1.27), value_at=(r1[0] - 6.35, r1[1] + 1.27))
+        + _feedback(node_a, _FB_BOTTOM_Y, r2_value)
+        + _opamp_core()
+        + _power("GND", "#PWR03", r1_bottom)
+        + _wires(vin_pt, _IN_PLUS)
+        + _wires(r1_top, node_a, _IN_MINUS)
+        + _junction(*node_a)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *_VOUT_PT)
     )
-    return body
 
 
 def build_comparator(r1_value: str, r2_value: str, in_label="VIN", out_label="VOUT") -> str:
-    """Open-loop op-amp comparator: Vin -> IN- directly, a VCC/GND resistor
-    divider (R1 top half, R2 bottom half) sets the reference voltage at IN+,
-    no feedback resistor."""
-    u_x, u_y = 110.0, 100.0
-    in_plus = (u_x - 2.54, u_y + 1.27)                # divider midpoint (Vref)
-    in_minus = (u_x - 2.54, u_y - 1.27)               # Vin drives this directly
-    out_pin = (u_x + 2.54, u_y)
-    v_plus = (u_x, u_y + 2.54)
-    v_minus = (u_x, u_y - 2.54)
-
-    r1_x, r1_y = in_plus[0], in_plus[1] + 2.54        # vertical: pin1 (bottom) lands on node
-    r1_top_pt = (r1_x, r1_y + 2.54)                   # pin2 (top) -> VCC
-    r2_x, r2_y = in_plus[0], in_plus[1] - 2.54        # vertical: pin2 (top) lands on node
-    r2_bottom_pt = (r2_x, r2_y - 2.54)                # pin1 (bottom) -> GND
-
-    vin_label_pt = (in_minus[0] - 2.46, in_minus[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:R", "R1", r1_x, r1_y, angle=90, value=r1_value, uuid_n=1)
-        + _sym("Sinco:R", "R2", r2_x, r2_y, angle=90, value=r2_value, uuid_n=2)
-        + _sym("Sinco:OpAmp", "U1", u_x, u_y, value="LM358", uuid_n=3)
-        + _sym("power:VCC", "#PWR01", r1_top_pt[0], r1_top_pt[1], angle=90, uuid_n=4)
-        + _sym("power:GND", "#PWR02", r2_bottom_pt[0], r2_bottom_pt[1], angle=90, uuid_n=5)
-        + _sym("power:GND", "#PWR03", v_minus[0], v_minus[1], angle=90, uuid_n=6)
-        + _sym("power:VCC", "#PWR04", v_plus[0], v_plus[1], angle=90, uuid_n=7)
-        + _wire(vin_label_pt, in_minus)
-        + _wire(out_pin, vout_label_pt)
-        + _junction(*in_plus)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Open-loop comparator: VIN -> IN- (brought in from below), and a
+    VCC -R1- node -R2- GND divider sets the reference on IN+."""
+    node = (100.33, _IN_PLUS[1])
+    r1 = (node[0], node[1] - 3.81)                         # above the node, to VCC
+    r2 = (node[0], node[1] + 3.81)                         # below the node, to GND
+    r1_top = min((_pin("Sinco:R", 1, *r1, 90), _pin("Sinco:R", 2, *r1, 90)), key=lambda p: p[1])
+    r2_bottom = max((_pin("Sinco:R", 1, *r2, 90), _pin("Sinco:R", 2, *r2, 90)), key=lambda p: p[1])
+    vin_corner = (108.585, _IN_MINUS[1])
+    vin_pt = (vin_corner[0], 113.03)
+    return (
+        _sym("Sinco:R", "R1", *r1, angle=90, value=r1_value,
+             ref_at=(r1[0] - 3.81, r1[1] - 1.27), value_at=(r1[0] - 6.35, r1[1] + 1.27))
+        + _sym("Sinco:R", "R2", *r2, angle=90, value=r2_value,
+               ref_at=(r2[0] - 3.81, r2[1] - 1.27), value_at=(r2[0] - 6.35, r2[1] + 1.27))
+        + _opamp_core()
+        + _power("VCC", "#PWR03", r1_top)
+        + _power("GND", "#PWR04", r2_bottom)
+        + _wires(node, _IN_PLUS)
+        + _wires(vin_pt, vin_corner, _IN_MINUS)
+        + _junction(*node)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *_VOUT_PT)
     )
-    return body
 
 
 def build_schmitt_inverter(gate_label="U1", in_label="VIN", out_label="VOUT") -> str:
-    """Single already-Schmitt-input logic gate (e.g. 74HC14) -- far fewer
-    nets than the op-amp version, included so the corpus isn't one topology
-    repeated with different resistor values. Body only, see build_opamp_schmitt().
-    """
-    u_x, u_y = 100.0, 100.0
-    in_pin = (u_x - 2.54, u_y)
-    out_pin = (u_x + 2.54, u_y)
-    vcc_pin = (u_x, u_y + 2.54)
-    gnd_pin = (u_x, u_y - 2.54)
-    vin_label_pt = (in_pin[0] - 2.46, in_pin[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:SchmittInverter", gate_label, u_x, u_y, value="74HC14", uuid_n=1)
-        + _sym("power:VCC", "#PWR01", vcc_pin[0], vcc_pin[1], angle=90, uuid_n=2)
-        + _sym("power:GND", "#PWR02", gnd_pin[0], gnd_pin[1], angle=90, uuid_n=3)
-        + _wire(vin_label_pt, in_pin)
-        + _wire(out_pin, vout_label_pt)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Single Schmitt-input logic gate (e.g. 74HC14): VIN -> IN, OUT -> VOUT,
+    VCC on top, GND below. Body only, see build_opamp_schmitt()."""
+    u = (110.0, 100.0)
+    gate = "Sinco:SchmittInverter"
+    in_pin, out_pin = _pin(gate, 1, *u), _pin(gate, 2, *u)
+    vin_pt, vout_pt = (in_pin[0] - 5.08, u[1]), (out_pin[0] + 5.08, u[1])
+    return (
+        _sym(gate, gate_label, *u, value="74HC14",
+             ref_at=(u[0] + 3.81, u[1] - 7.62), value_at=(u[0] + 3.81, u[1] - 5.715))
+        + _power("VCC", "#PWR01", _pin(gate, 14, *u))
+        + _power("GND", "#PWR02", _pin(gate, 7, *u))
+        + _wires(vin_pt, in_pin)
+        + _wires(out_pin, vout_pt)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *vout_pt)
     )
-    return body
 
 
 def build_voltage_follower(in_label="VIN", out_label="VOUT") -> str:
-    """Unity-gain op-amp voltage follower / buffer: IN- wired directly to
-    OUT (100% negative feedback, gain = 1), Vin drives IN+ directly -- no
-    resistors, the simplest possible op-amp circuit. Chinese term
-    "電壓隨耦器" confirmed alongside 反相/非反相放大器 in the same real
-    teaching-lab source already cited for those two (opentech.com.tw, see
-    module docstring)."""
-    u_x, u_y = 110.0, 100.0
-    in_plus = (u_x - 2.54, u_y + 1.27)
-    in_minus = (u_x - 2.54, u_y - 1.27)
-    out_pin = (u_x + 2.54, u_y)
-    v_plus = (u_x, u_y + 2.54)
-    v_minus = (u_x, u_y - 2.54)
-
-    vin_label_pt = (in_plus[0] - 2.46, in_plus[1])
-    vout_label_pt = (out_pin[0] + 2.46, out_pin[1])
-
-    body = (
-        _sym("Sinco:OpAmp", "U1", u_x, u_y, value="LM358", uuid_n=1)
-        + _sym("power:GND", "#PWR01", v_minus[0], v_minus[1], angle=90, uuid_n=2)
-        + _sym("power:VCC", "#PWR02", v_plus[0], v_plus[1], angle=90, uuid_n=3)
-        + _wire(vin_label_pt, in_plus)
-        + _wire(in_minus, out_pin)
-        + _wire(out_pin, vout_label_pt)
-        + _label(in_label, *vin_label_pt)
-        + _label(out_label, *vout_label_pt)
+    """Unity-gain voltage follower: VIN -> IN+, IN- wired back to OUT
+    (100% feedback, routed BELOW the op-amp). Not in the training corpus
+    (see build_corpus()), kept as a validated template."""
+    node = (107.95, _IN_MINUS[1])
+    vin_pt = (node[0] - 5.08, _IN_PLUS[1])
+    return (
+        _opamp_core()
+        + _wires(vin_pt, _IN_PLUS)
+        + _wires(_IN_MINUS, node, (node[0], _FB_BOTTOM_Y), (_OUT_NODE[0], _FB_BOTTOM_Y), _OUT_NODE)
+        + _junction(*_OUT_NODE)
+        + _label(in_label, *vin_pt, 180)
+        + _label(out_label, *_VOUT_PT)
     )
-    return body
 
 
 # --- prompt phrasing pools (Chinese, several ways to ask for the same circuit) ---
@@ -480,8 +497,10 @@ def validate_pairs(pairs: list[dict], tmp_dir: Path) -> None:
         path = tmp_dir / f"check_{len(seen)}.kicad_sch"
         path.write_text(wrap_kicad(body), encoding="utf-8")
         findings = check_schematic(path)
-        errors = [f for f in findings if f["severity"] == "error"]
-        assert not errors, f"generated circuit failed circuit_rule_check: {errors}"
+        # errors AND warnings (overlapping_symbols included): since the
+        # 2026-10-27 redesign every template is drawn with nothing on top
+        # of anything else, so the model is never trained on a messy layout
+        assert not findings, f"generated circuit failed circuit_rule_check: {findings}"
 
 
 def main():

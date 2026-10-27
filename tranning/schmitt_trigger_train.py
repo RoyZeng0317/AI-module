@@ -117,7 +117,12 @@ def regenerate_corpus() -> None:
     subprocess.run([sys.executable, str(HERE / "data" / "schmitt_trigger_gen.py")], check=True)
 
 
-def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | None = None) -> None:
+def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | None = None,
+          checkpoint_every: int = 10) -> None:
+    """checkpoint_every: every N epochs the current weights are also saved to
+    <run dir>/checkpoint/ (transformer_chat's crash safety net), so a long
+    CPU run that dies can continue with `finetune --pretrain-dir
+    schmitt_chat_runs/checkpoint` instead of starting over."""
     regenerate_corpus()
 
     print("=== pretrain: learning .kicad_sch S-expression syntax ===", flush=True)
@@ -125,7 +130,7 @@ def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | 
         CORPUS_PATH, out_dir=PRETRAIN_DIR, epochs=pretrain_epochs, batch_size=2,
         block_size=BLOCK_SIZE, n_layer=N_LAYER, n_embd=N_EMBD, n_head=N_HEAD,
         dropout=0.1, lr=3e-4, weight_decay=0.01, vocab_size=VOCAB_SIZE,
-        val_split=0.15, patience=25, device=device,
+        val_split=0.15, patience=25, device=device, checkpoint_every=checkpoint_every,
     )
 
     print("=== finetune: 設計要求 -> 電路 S-expression ===", flush=True)
@@ -151,6 +156,7 @@ def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | 
         PAIRS_PATH, pretrain_dir=PRETRAIN_DIR, out_dir=FINETUNE_DIR,
         epochs=finetune_epochs, batch_size=2, lr=1e-4, weight_decay=0.01,
         dropout=0.1, val_data_path=PAIRS_PATH, patience=40, device=device,
+        checkpoint_every=checkpoint_every,
     )
 
 
@@ -197,6 +203,8 @@ def main():
     p_train.add_argument("--pretrain-epochs", type=int, default=150)
     p_train.add_argument("--finetune-epochs", type=int, default=400)
     p_train.add_argument("--device", default=None)
+    p_train.add_argument("--checkpoint-every", type=int, default=10,
+                         help="also save the current weights to <run dir>/checkpoint every N epochs (0 = off)")
 
     p_design = sub.add_parser("design", help="generate a circuit from a design request and rule-check it")
     p_design.add_argument("--prompt", required=True)
@@ -205,7 +213,8 @@ def main():
 
     args = parser.parse_args()
     if args.command == "train":
-        train(args.pretrain_epochs, args.finetune_epochs, device=args.device)
+        train(args.pretrain_epochs, args.finetune_epochs, device=args.device,
+              checkpoint_every=args.checkpoint_every)
     elif args.command == "design":
         text = design(args.prompt, device=args.device)
         findings = check_design(text, args.out)
