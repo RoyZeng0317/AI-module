@@ -131,6 +131,8 @@ output/transformer-audit/
 output/test_character_review.py
 output/test_character_image_close_review.py
 
-# 基本電學題庫 pytest 測試產生的暫存複本（來源PDF複製+編號資料夾，可重新產生，不進版控）
-output/basic-electricity-tests/
-output/basic-electricity-review-tests/
+# 基本電學原始附件（可重新取得，體積大，不進版控）及工程測試暫存（可重新產生）；
+# 處理後的題庫資料集 data/basic_electricity/v1/ 與正式輸出 output/basic-electricity/ 仍保留追蹤
+/data/basic_electricity/source/
+/output/basic-electricity-tests/
+/output/basic-electricity-review-tests*/
