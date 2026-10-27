@@ -495,7 +495,11 @@ def build_pretrain_corpus(pairs: list[dict]) -> str:
     value variants) could not be told apart by the model at all."""
     unique_bodies = list(dict.fromkeys(p["reply"] for p in pairs))
     prompts = list(dict.fromkeys(p["prompt"] for p in pairs))
-    return "\n\n".join(wrap_kicad(b) for b in unique_bodies) + "\n\n" + "\n".join(prompts) + "\n"
+    # prompts FIRST: pretrain() holds out the corpus TAIL as its validation
+    # stream, which must stay circuit text (with the prompts at the end the
+    # whole held-out part was unseen Chinese and early stopping picked an
+    # undertrained epoch)
+    return "\n".join(prompts) + "\n\n" + "\n\n".join(wrap_kicad(b) for b in unique_bodies) + "\n"
 
 
 def validate_pairs(pairs: list[dict], tmp_dir: Path) -> None:
