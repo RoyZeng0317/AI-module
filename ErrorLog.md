@@ -1,5 +1,9 @@
 # Error Log
 
+## 2026-10-27：電學選項判別訓練器已實作、未執行訓練
+
+新增 `tranning/electricity_finetune.py` 與 `test_electricity_finetune.py`（依 data/basic_electricity/PILOT_PROPOSAL.md）：只更新最後 block＋ln_f、四選項 cross-entropy、不讀 test 鍵、需明確 `--approved`、輸出新目錄。6 項工程測試以微型 GPT 通過；雲端環境無正式 gpt_chat_runs，未做任何真實訓練，仍待使用者逐次核准（#43）。環境備註：pytest 暫存目錄在專案外會觸發 inside_project 檢查，需 `--basetemp` 指到專案內；缺 torch 時 GPTAdapter 缺 checkpoint 測試會失敗。
+
 ## 2026-10-27：基本電學先作答、再核對的資料準備
 
 43檔只讀盤點後僅24題可可靠核對為初始無圖MCQ，106/108掃描卷、圖題／承上、OMML缺失、官方4送分及不可靠試算表公式均未冒充標準題。試算表電荷常數1.602e-22與同表1.602e-19矛盾，保留原檔隔離，未重算公式或執行附件Python。研究時小數誤切題號與一次不完整Unicode正則PatternError已停止；正式題號切分避開小數選項，使用完整原頁及官方表核對。一次查找不存在context模組的rg錯誤已改讀實際context_format.py，未動該檔。
