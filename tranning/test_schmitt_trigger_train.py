@@ -10,8 +10,13 @@ test itself stays fast.
 """
 
 import json
+import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "data"))
 
@@ -67,7 +72,39 @@ def test_check_design_reports_clean_for_valid_circuit(tmp_path):
     pairs = build_corpus()
     text = pairs[0]["reply"]
     findings = stt.check_design(text, tmp_path / "out.kicad_sch")
-    assert findings == []
+    # No electrical errors. Since 2026-10-27 the checker also reports
+    # overlapping_symbols WARNINGS: these templates' op-amp has zero body
+    # size (every pin is 2.54mm long and meets in the centre), so the power
+    # symbols beside it overlap. Fixing that needs new template coordinates
+    # and retraining the Schmitt model -- left for the user to approve.
+    assert [f for f in findings if f["severity"] == "error"] == []
+    assert {f["rule"] for f in findings} <= {"overlapping_symbols"}
+
+
+@pytest.mark.skipif(shutil.which("kicad-cli") is None, reason="KiCad not installed")
+def test_templates_wire_the_intended_opamp_pins_in_real_kicad(tmp_path):
+    """Real KiCad netlist of the templates. Before 2026-10-27 the library
+    pins were written in sheet coordinates, so KiCad (library y-up) swapped
+    IN+/IN- and V+/V-, and the power pins had no name, so they joined no net."""
+    from schmitt_trigger_gen import build_comparator, build_opamp_schmitt
+
+    def nets(body, name):
+        sch = tmp_path / f"{name}.kicad_sch"
+        sch.write_text(wrap_kicad(body).replace("(version 20231120)", "(version 20230121)"), encoding="utf-8")
+        net = tmp_path / f"{name}.net"
+        subprocess.run(["kicad-cli", "sch", "export", "netlist", "--format", "kicadxml", "-o", str(net), str(sch)],
+                       check=True, capture_output=True)
+        return {n: {f"{r}.{p}" for r, p in re.findall(r'ref="([^"]+)" pin="([^"]+)"', b)}
+                for n, b in re.findall(r'<net [^>]*name="([^"]*)"[^>]*>(.*?)</net>', net.read_text(), re.S)}
+
+    schmitt = nets(build_opamp_schmitt("10k", "100k"), "schmitt")
+    feedback = next(v for v in schmitt.values() if "R2.1" in v)
+    assert {"R1.1", "R2.1", "U1.1"} == feedback          # positive feedback on IN+ (pin 1)
+    assert "U1.2" in schmitt["GND"] and "U1.5" in schmitt["GND"] and schmitt["VCC"] == {"U1.4"}
+
+    comp = nets(build_comparator("10k", "10k"), "comp")
+    assert comp["/VIN"] == {"U1.2"}                       # Vin on IN-
+    assert {"U1.1", "R1.1", "R2.2"} == next(v for v in comp.values() if "U1.1" in v)
 
 
 def test_check_design_reports_unparsable_instead_of_raising(tmp_path):

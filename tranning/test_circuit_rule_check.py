@@ -76,10 +76,27 @@ def test_parses_real_touch_led_layout_pin_transform():
     assert {p1, p2} == {(138.43, 53.34), (146.05, 53.34)}
 
 
+def test_transform_flips_library_y_axis_real_kicad_pot():
+    """Regression against KiCad's own demo "pic_programmer.kicad_sch"
+    (eeschema 10): RV1 (a potentiometer) placed at (243.84, 149.86, 90).
+    Its wiper pin 2 is at library-local (0, 3.81) -- NOT symmetric about the
+    origin, unlike the resistor above -- and the sheet's own wire ends at
+    (240.03, 149.86). Library coords are y-up and sheet coords y-down, so
+    without the y flip this pin would land at x=247.65, off the wire."""
+    assert transform_point(0, 3.81, None, 90, 243.84, 149.86) == (240.03, 149.86)
+    assert transform_point(-6.35, 0, None, 90, 243.84, 149.86) == (243.84, 156.21)
+    assert transform_point(6.35, 0, None, 90, 243.84, 149.86) == (243.84, 143.51)
+    # angle 0: a pin above the origin in the library is ABOVE on the sheet (smaller y)
+    assert transform_point(0, 2.54, None, 0, 100, 100) == (100, 97.46)
+
+
 def test_clean_circuit_has_no_findings(tmp_path):
     body = (
         _symbol_instance("Test:R", "R1", 100, 100)
-        + _symbol_instance("power:GND", "#PWR01", 97.46, 100, angle=90)
+        # angle 270: the ground graphic points LEFT, away from R1's body
+        # (at 90 it would point right, into the resistor -- a real overlap
+        # the overlapping_symbols rule reports, see the tests at the end)
+        + _symbol_instance("power:GND", "#PWR01", 97.46, 100, angle=270)
         + _wire(97.46, 100, 100, 100)
         + _wire(102.54, 100, 105, 100)
         + '(label "OUT" (at 105 100 0) (effects (font (size 1.27 1.27))))'
@@ -165,19 +182,22 @@ def test_get_lib_pin_table_reads_unit_1_pins():
 # circuit_rule_check.py is what's actually under test) plus generic
 # "Device:R"/"Device:C" two-pin parts and a "power:+5V" flag alongside the
 # existing "power:GND" fixture.
+# Library coords are y-up (see transform_point): VCC at local y=-5.08 lands
+# at sheet y=+5.08 and XTAL1 at local y=+5.08 lands at sheet y=-5.08 -- the
+# sheet positions the tests below wire to.
 # ---------------------------------------------------------------------------
 
 _LIB_MCU_EXTRAS = """
     (lib_symbols
         (symbol "Test:MCU"
             (symbol "MCU_1_1"
-                (pin power_in line (at -2.54 5.08 180) (length 2.54)
+                (pin power_in line (at -2.54 -5.08 180) (length 2.54)
                     (name "VCC" (effects (font (size 1.27 1.27))))
                     (number "1" (effects (font (size 1.27 1.27)))))
                 (pin input line (at -2.54 0 180) (length 2.54)
                     (name "RESET" (effects (font (size 1.27 1.27))))
                     (number "2" (effects (font (size 1.27 1.27)))))
-                (pin passive line (at -2.54 -5.08 180) (length 2.54)
+                (pin passive line (at -2.54 5.08 180) (length 2.54)
                     (name "XTAL1" (effects (font (size 1.27 1.27))))
                     (number "3" (effects (font (size 1.27 1.27)))))
             )
@@ -284,3 +304,63 @@ def test_missing_crystal_load_caps_flagged_when_xtal_pin_undecoupled(tmp_path):
     )
     findings = check_schematic(_write_mcu_sch(tmp_path, body))
     assert any(f["rule"] == "missing_crystal_load_caps" for f in findings)
+
+
+# ---------------------------------------------------------------------------
+# 2026-10-27: same-name nets + overlapping_symbols
+# ---------------------------------------------------------------------------
+
+def test_same_name_power_symbols_are_one_net(tmp_path):
+    # The cap is NOT wired to the MCU: it sits elsewhere between its own +5V
+    # and GND symbols. KiCad joins every "+5V" on a sheet, so the VCC pin
+    # (which only touches a +5V symbol) IS decoupled.
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _wire(-10, 5.08, -2.54, 5.08)
+        + _symbol_instance("power:+5V", "#PWR01", -10, 5.08, angle=90)
+        + _symbol_instance("Test:MCU", "U2", 0, 0, uuid="00000000-0000-0000-0000-000000000009").replace(
+            '"Test:MCU"', '"Device:C"').replace("(at 0 0 0) (unit", "(at 50 50 90) (unit")
+        + _symbol_instance("power:+5V", "#PWR02", 50, 47.46)
+        + _symbol_instance("power:GND", "#PWR03", 50, 52.54)
+    )
+    rules = [f["rule"] for f in check_schematic(_write_mcu_sch(tmp_path, body))]
+    assert "missing_decoupling_cap" not in rules
+
+
+def test_overlapping_parts_are_reported(tmp_path):
+    # two resistors drawn on top of each other (not connected) -- the
+    # "parts placed on the same spot" problem
+    body = (
+        _symbol_instance("Test:R", "R1", 100, 100)
+        + _symbol_instance("Test:R", "R2", 100.5, 100.3, uuid="00000000-0000-0000-0000-000000000002")
+        + _wire(90, 100, 97.46, 100) + _wire(102.54, 100, 110, 100)
+        + _wire(90, 120, 97.96, 100.3) + _wire(103.04, 100.3, 110, 120)
+    )
+    findings = check_schematic(_write_sch(tmp_path, body))
+    assert any(f["rule"] == "overlapping_symbols" and "R1" in f["message"] and "R2" in f["message"]
+               for f in findings)
+
+
+def test_power_symbol_pointing_into_a_part_is_reported(tmp_path):
+    # GND at R1's left pin rotated 90: its graphic points RIGHT, into R1
+    body = (
+        _symbol_instance("Test:R", "R1", 100, 100)
+        + _symbol_instance("power:GND", "#PWR01", 97.46, 100, angle=90)
+        + _wire(102.54, 100, 105, 100)
+        + '(label "OUT" (at 105 100 0) (effects (font (size 1.27 1.27))))'
+    )
+    rules = [f["rule"] for f in check_schematic(_write_sch(tmp_path, body))]
+    assert "overlapping_symbols" in rules
+
+
+def test_label_text_on_top_of_a_part_is_reported(tmp_path):
+    body = (
+        _symbol_instance("Test:R", "R1", 100, 100)
+        + _symbol_instance("power:GND", "#PWR01", 97.46, 100, angle=270)
+        + _wire(102.54, 100, 105, 100)
+        # label anchored left of R1 with its text running right, across R1's body
+        + _wire(105, 100, 105, 110)
+        + '(label "A_LONG_NET_NAME" (at 98 100 0) (effects (font (size 1.27 1.27))))'
+    )
+    findings = check_schematic(_write_sch(tmp_path, body))
+    assert any(f["rule"] == "overlapping_symbols" and "A_LONG_NET_NAME" in f["message"] for f in findings)

@@ -137,6 +137,10 @@ pytest lib/test_img.py
 pytest web/backend/tests/
 pytest shape-vision/tests/
 
+# MCU 最小系統原理圖（ATmega328P / ATmega2560 / ESP32 / Raspberry Pi 5 排針，無重疊排版，見 to_do_list.md #52）
+python tranning/circuit_ic_generator.py --ic mega2560 --out output/mega.kicad_sch --check --render output/mega.png
+python tranning/circuit_rule_check.py output/mega.kicad_sch      # ERC + overlapping_symbols 重疊檢查
+
 # 打包安裝前置檢查 exe
 pyinstaller --onefile --console --name install_check app/install/install_check.py
 ```

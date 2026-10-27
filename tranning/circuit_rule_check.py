@@ -113,8 +113,8 @@ GND_NAME_HINTS = ("GND", "GNDREF", "VSS", "AGND", "DGND")
 # (name ...) text -- e.g. "VCC", "AVCC", "PC6/RESET", "PB6/XTAL1" -- so they
 # apply to ANY part using these conventional KiCad pin names, not just the
 # parts ic_library.py/circuit_ic_generator.py happens to know about.
-POWER_PIN_NAME_RE = re.compile(r'^A?V(CC|DD)\d*$', re.IGNORECASE)
-RESET_PIN_NAME_RE = re.compile(r'RESET|RST', re.IGNORECASE)
+POWER_PIN_NAME_RE = re.compile(r'^A?V(CC|DD)\d*$|^\+?\d+V\d*$', re.IGNORECASE)  # VCC/AVCC/VDD or 3V3/5V
+RESET_PIN_NAME_RE = re.compile(r'RESET|RST|^EN$|CHIP_PU', re.IGNORECASE)  # ESP32 calls its reset EN / CHIP_PU
 XTAL_PIN_NAME_RE = re.compile(r'XTAL', re.IGNORECASE)
 POWER_NET_NAME_RE = re.compile(r'^\+?\d*\.?\d*V\d*$|^A?V(CC|DD)\d*$', re.IGNORECASE)
 
@@ -140,10 +140,20 @@ def _rotate_point(x: float, y: float, angle_deg: float) -> tuple:
 def transform_point(local_x: float, local_y: float, mirror, angle_deg: float,
                      inst_x: float, inst_y: float) -> tuple:
     """Library-local pin (x, y) -> absolute schematic (x, y), rounded to
-    KiCad's own on-grid precision so equal points compare equal."""
+    KiCad's own on-grid precision so equal points compare equal.
+
+    Library coordinates are Y-UP, sheet coordinates are Y-DOWN, so after
+    mirroring the local y is negated and the rotation runs the other way:
+        sheet = inst + (x cos a - y sin a,  -(x sin a + y cos a))
+    Checked 2026-10-27 against KiCad's own demo schematics (eeschema 9/10
+    output): with this formula 42/42 (ecc83-pp) and 182/182
+    (pic_programmer, 105 parts at 0/90/180/270 deg, mirrored x/y) pins land
+    on a wire end, junction, label or another pin; without the y flip 16 of
+    the 182 did not. The earlier version had no y flip and only looked right
+    on parts whose pins are symmetric about the origin."""
     mx, my = _mirror_point(local_x, local_y, mirror)
     rx, ry = _rotate_point(mx, my, angle_deg)
-    return round(inst_x + rx, 3), round(inst_y + ry, 3)
+    return round(inst_x + rx, 3), round(inst_y - ry, 3)
 
 
 # ---------------------------------------------------------------------------
@@ -154,11 +164,13 @@ def _parse_pin_node(node) -> dict:
     electrical_type = node[1] if len(node) > 1 and isinstance(node[1], str) else "unknown"
     at = find_child(node, "at")
     x, y = (float(at[1]), float(at[2])) if at else (0.0, 0.0)
+    pin_angle = float(at[3]) if at and len(at) > 3 else None   # direction from the tip toward the body
     number_node = find_child(node, "number")
     number = number_node[1] if number_node else "?"
     name_node = find_child(node, "name")
     name = name_node[1] if name_node else "?"
-    return {"number": number, "electrical_type": electrical_type, "x": x, "y": y, "name": name}
+    return {"number": number, "electrical_type": electrical_type, "x": x, "y": y, "name": name,
+            "angle": pin_angle}
 
 
 def _walk_pins(node, units: dict, current_unit: int) -> None:
@@ -222,10 +234,12 @@ def get_placed_instances(root) -> list:
             continue
         unit_node = find_child(node, "unit")
         mirror_node = find_child(node, "mirror")
-        reference = None
+        reference = value = None
         for prop in find_all(node, "property"):
             if len(prop) > 2 and prop[1] == "Reference":
                 reference = prop[2]
+            elif len(prop) > 2 and prop[1] == "Value":
+                value = prop[2]
         instances.append({
             "lib_id": lib_id_node[1],
             "x": float(at_node[1]), "y": float(at_node[2]),
@@ -233,6 +247,7 @@ def get_placed_instances(root) -> list:
             "unit": int(unit_node[1]) if unit_node else 1,
             "mirror": mirror_node[1] if mirror_node else None,
             "reference": reference,
+            "value": value,
         })
     return instances
 
@@ -267,7 +282,8 @@ def get_labels(root) -> list:
             if at is None or not isinstance(node[1], str):
                 continue
             labels.append({"text": node[1], "kind": tag,
-                            "point": (round(float(at[1]), 3), round(float(at[2]), 3))})
+                            "point": (round(float(at[1]), 3), round(float(at[2]), 3)),
+                            "angle": float(at[3]) if len(at) > 3 else 0.0})
     return labels
 
 
@@ -387,6 +403,23 @@ def check_schematic(sch_path: Path) -> list:
         uf.find(label["point"])
         net_labels[uf.find(label["point"])].add(label["text"])
 
+    # Same name = same net, the way KiCad itself connects a sheet: every
+    # "GND" power symbol is one net, and two local labels with the same text
+    # on one sheet are joined without a drawn wire. Without this, a support
+    # circuit drawn off to the side (decoupling caps, crystal, reset) and
+    # tied to the MCU only by matching labels would look disconnected.
+    named_points = defaultdict(list)
+    for net_root, names in list(net_labels.items()):
+        for name in names:
+            named_points[name].append(net_root)
+    for points in named_points.values():
+        for other in points[1:]:
+            uf.union(points[0], other)
+    merged = defaultdict(set)
+    for net_root, names in net_labels.items():
+        merged[uf.find(net_root)] |= names
+    net_labels = merged
+
     # floating_pin / no_connect_conflict
     for point, pin_list in point_pins.items():
         others_here = point_touch[point] + max(0, len(pin_list) - 1)
@@ -487,6 +520,101 @@ def check_schematic(sch_path: Path) -> list:
             "was found -- check this isn't a sheet-boundary false positive (see module docstring)",
             None))
 
+    findings.extend(overlapping_symbol_findings(instances, pin_table, labels))
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Overlap check -- symbols / labels drawn on top of each other
+# ---------------------------------------------------------------------------
+# Approximate body outlines (mm). Exact KiCad graphics are not parsed, so
+# each body is a conservative box: a 2-pin part is the strip between its two
+# pin tips, a multi-pin part is the box spanned by its pin tips, a power
+# symbol is a short stub pointing away from its pin, a label is its text.
+# Each box is shrunk by OVERLAP_TOLERANCE_MM so parts that merely TOUCH at a
+# shared pin (the normal way things connect) are not reported.
+TWO_PIN_HALF_WIDTH_MM = 1.0
+POWER_SYMBOL_LENGTH_MM = 3.81      # stub + graphic + net-name text
+POWER_SYMBOL_HALF_WIDTH_MM = 1.27
+LABEL_CHAR_WIDTH_MM = 1.1
+LABEL_HALF_HEIGHT_MM = 0.8
+OVERLAP_TOLERANCE_MM = 0.3
+
+
+def _rotate_dir(vx: float, vy: float, angle_deg: float) -> tuple:
+    """Rotate a direction counter-clockwise ON SCREEN (KiCad y grows down)."""
+    a = math.radians(angle_deg)
+    c, s = round(math.cos(a), 6), round(math.sin(a), 6)
+    return vx * c + vy * s, -vx * s + vy * c
+
+
+def power_graphic_direction(lib_id: str, angle_deg: float) -> tuple:
+    """Unit vector (sheet coords) the power symbol's graphic points to, away
+    from its pin. In library coords (y up) a supply's graphic is above its
+    pin and a ground's is below; reuse transform_point (verified against a
+    real KiCad file) so the rotation sign matches pin placement exactly."""
+    local_y = -1.0 if _is_ground_name(lib_id.split(":", 1)[-1]) else 1.0
+    return transform_point(0.0, local_y, None, angle_deg, 0.0, 0.0)
+
+
+def _is_ground_name(name: str) -> bool:
+    return any(name.upper().startswith(hint) for hint in GND_NAME_HINTS)
+
+
+def _box(x1, y1, x2, y2, shrink=OVERLAP_TOLERANCE_MM):
+    return (min(x1, x2) + shrink, min(y1, y2) + shrink, max(x1, x2) - shrink, max(y1, y2) - shrink)
+
+
+def _segment_box(p1, p2, half_width):
+    (x1, y1), (x2, y2) = p1, p2
+    if abs(x1 - x2) >= abs(y1 - y2):
+        return _box(x1, y1 - half_width, x2, y2 + half_width)
+    return _box(x1 - half_width, y1, x2 + half_width, y2)
+
+
+def label_box(label: dict) -> tuple:
+    x, y = label["point"]
+    width = len(label["text"]) * LABEL_CHAR_WIDTH_MM + 0.5
+    dx, dy = _rotate_dir(1.0, 0.0, label.get("angle", 0.0))
+    end = (x + dx * width, y + dy * width)
+    return _segment_box((x, y), end, LABEL_HALF_HEIGHT_MM)
+
+
+def symbol_box(inst: dict, pins: list) -> tuple:
+    if inst["lib_id"].startswith("power:"):
+        dx, dy = power_graphic_direction(inst["lib_id"], inst["angle"])
+        end = (inst["x"] + dx * POWER_SYMBOL_LENGTH_MM, inst["y"] + dy * POWER_SYMBOL_LENGTH_MM)
+        return _segment_box((inst["x"], inst["y"]), end, POWER_SYMBOL_HALF_WIDTH_MM)
+    tips = [transform_point(p["x"], p["y"], inst["mirror"], inst["angle"], inst["x"], inst["y"]) for p in pins]
+    if len(tips) == 2:
+        return _segment_box(tips[0], tips[1], TWO_PIN_HALF_WIDTH_MM)
+    if not tips:
+        return _box(inst["x"] - 1, inst["y"] - 1, inst["x"] + 1, inst["y"] + 1)
+    xs, ys = [t[0] for t in tips], [t[1] for t in tips]
+    return _box(min(xs), min(ys) - 1.27, max(xs), max(ys) + 1.27)
+
+
+def _boxes_overlap(a, b) -> bool:
+    return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+
+def overlapping_symbol_findings(instances: list, pin_table: dict, labels: list) -> list:
+    items = []
+    for inst in instances:
+        name = inst["reference"] or inst["lib_id"]
+        if inst["lib_id"].startswith("power:"):
+            name = f'{inst["lib_id"].split(":", 1)[1]} symbol at ({inst["x"]}, {inst["y"]})'
+        items.append((name, symbol_box(inst, pins_for_instance(pin_table, inst["lib_id"], inst["unit"]))))
+    for label in labels:
+        items.append((f'label "{label["text"]}" at {label["point"]}', label_box(label)))
+    findings = []
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            if _boxes_overlap(items[i][1], items[j][1]):
+                findings.append(CircuitFinding(
+                    "overlapping_symbols", "warning",
+                    f'{items[i][0]} overlaps {items[j][0]} -- move one of them so the schematic stays readable',
+                    None))
     return findings
 
 

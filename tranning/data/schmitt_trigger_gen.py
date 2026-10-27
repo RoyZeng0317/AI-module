@@ -61,41 +61,57 @@ OUT_PAIRS = Path(__file__).resolve().parent.parent.parent / "data" / "schmitt_tr
 # weight tripling the token count of every example for no training signal
 # (measured: cut the longest example from ~3170 to well under block_size
 # without changing a single check_schematic() result).
+# 2026-10-27: pin y values below are in KiCad LIBRARY coordinates (y up),
+# which circuit_rule_check.transform_point() now flips onto the y-down sheet
+# (checked against KiCad's own demo files). The bodies in this module were
+# laid out with sheet coordinates (IN+ at u_y + 1.27, V+ at u_y + 2.54, ...),
+# so the library pins are written mirrored (IN+ at local y = -1.27, ...) to
+# land exactly there. Before this, real KiCad put the op-amp's IN+/IN- and
+# V+/V- the other way round (supply reversed) even though this repo's own
+# checker saw nothing wrong. Sinco:R's pins are swapped (1 on the right) for
+# the same reason: a horizontal resistor is unaffected (same two end points)
+# and a resistor placed at angle 90 keeps the pin-2-on-the-node layout the
+# bodies below were written for -- so bodies the trained model already
+# generates stay valid; only this re-attached library block changed.
 LIB_SYMBOLS = """
 (lib_symbols
     (symbol "Sinco:R"
         (property "Reference" "R" (at 0 -3 0))
         (symbol "R_1_1"
-            (pin passive line (at -2.54 0 0) (length 2.54) (number "1"))
-            (pin passive line (at 2.54 0 0) (length 2.54) (number "2"))
+            (pin passive line (at 2.54 0 180) (length 2.54) (number "1"))
+            (pin passive line (at -2.54 0 0) (length 2.54) (number "2"))
         )
     )
     (symbol "Sinco:OpAmp"
         (property "Reference" "U" (at 0 -3 0))
         (symbol "OpAmp_1_1"
-            (pin input line (at -2.54 1.27 180) (length 2.54) (number "1"))
-            (pin input line (at -2.54 -1.27 180) (length 2.54) (number "2"))
-            (pin output line (at 2.54 0 0) (length 2.54) (number "3"))
-            (pin power_in line (at 0 2.54 90) (length 2.54) (number "4"))
-            (pin power_in line (at 0 -2.54 270) (length 2.54) (number "5"))
+            (pin input line (at -2.54 -1.27 0) (length 2.54) (number "1"))
+            (pin input line (at -2.54 1.27 0) (length 2.54) (number "2"))
+            (pin output line (at 2.54 0 180) (length 2.54) (number "3"))
+            (pin power_in line (at 0 -2.54 90) (length 2.54) (number "4"))
+            (pin power_in line (at 0 2.54 270) (length 2.54) (number "5"))
         )
     )
     (symbol "Sinco:SchmittInverter"
         (property "Reference" "U" (at 0 -3 0))
         (symbol "SchmittInverter_1_1"
-            (pin input line (at -2.54 0 180) (length 2.54) (number "1"))
-            (pin output line (at 2.54 0 0) (length 2.54) (number "2"))
-            (pin power_in line (at 0 2.54 90) (length 2.54) (number "14"))
-            (pin power_in line (at 0 -2.54 270) (length 2.54) (number "7"))
+            (pin input line (at -2.54 0 0) (length 2.54) (number "1"))
+            (pin output line (at 2.54 0 180) (length 2.54) (number "2"))
+            (pin power_in line (at 0 -2.54 90) (length 2.54) (number "14"))
+            (pin power_in line (at 0 2.54 270) (length 2.54) (number "7"))
         )
     )
     (symbol "power:GND"
         (power)
-        (symbol "GND_0_1" (pin power_in line (at 0 0 90) (length 0) (number "1")))
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "GND" (at 0 0 0))
+        (symbol "GND_0_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
     )
     (symbol "power:VCC"
         (power)
-        (symbol "VCC_0_1" (pin power_in line (at 0 0 90) (length 0) (number "1")))
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "VCC" (at 0 0 0))
+        (symbol "VCC_0_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
     )
 )
 """

@@ -515,3 +515,24 @@ lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，�
 **修正**：區域改用「k-means 灰階分層（4 層）＋ 每層連通區域」切出；Canny 改依亮度中位數自動門檻，只用來算紋理；碰到 3 個以上邊界的大區域標為「背景」；形狀判斷前先檢查實心度（面積/凸包 ≥ 0.9），不夠實心判為「不規則」。
 
 **驗證**：`pytest lib/test_img_convert_gray.py` 2 項通過（合成圖三種形狀與顏色都正確辨識，original 模式能把灰階還原成對的顏色）；`koala.jpg`、`penguins.jpg` 實際跑過，企鵝的白肚、黑翅膀、藍色海面能分開並還原大致顏色。限制：灰階亮度相同但顏色不同的區域會被分在同一層（灰階本身就失去顏色資訊）。
+
+## 2026-10-27：電路原理圖零件重疊，且在 KiCad 中接到錯的腳位
+
+**回報**：設計 ESP32、Arduino Mega 2560、Pi 5 這類較複雜電路時，原理圖（.kicad_sch）出現零件重疊。
+
+**原因（三個）**：
+1. `tranning/circuit_ic_generator.py` 把去耦電容、電源符號、上拉電阻直接貼在 IC 腳尖。腳距只有 2.54mm，零件和文字都比這大，腳越多疊越嚴重；而且只支援 ATmega328P。
+2. `circuit_rule_check.transform_point()` 少了 y 軸翻轉：KiCad 零件庫座標 y 向上、原理圖 y 向下。專案的產生器與檢查器彼此一致所以測試都過，但用真實 KiCad（7.0.11 kicad-cli）匯出網路表：328P 的 VCC 接到 GND 網路（短路）、+5V 接到第 8 腳 GND、重置上拉接到 PB0、晶振接到 PD3。整張圖還放在座標 (0,0)，大部分在圖框外；零件庫沒有圖形，KiCad 只看得到文字。原本「對照真實檔案」的測試剛好用上下對稱的電阻，看不出錯誤。
+3. 檢查器只做電氣規則，不檢查重疊，重疊的圖也顯示 no ERC findings。
+
+**修正**：
+- `transform_point` 改為 sheet = inst + (x cos a − y sin a, −(x sin a + y cos a))。用 KiCad 官方範例 ecc83-pp（42/42）與 pic_programmer（182/182，含 90/180/270 度與鏡像）驗證每支腳都落在導線、接點或標籤上；舊公式有 16/182 對不上。新增回歸測試（pic_programmer 的 RV1 可變電阻，中間腳不對稱）。
+- 產生器重寫：IC 腳位只拉短線接電源符號（朝外旋轉）或網路標籤；去耦電容、重置、晶振改成獨立區塊，先量好每個區塊（零件＋文字）的範圍再分欄排列，產生前自我檢查重疊；圖移到紙內並自動選 A4/A3/A2；零件庫補圖形、腳位方向；KiCad 會把零件旋轉角度加到文字角度上（以 kicad-cli SVG 實驗確認），所以電阻電容改成直立定義不旋轉，旋轉的電源符號文字角度設 90；相鄰腳位若是電源符號，標籤引線自動拉長避開。
+- 新增腳位資料：ESP32-WROOM-32（38 腳，SD0–SD3/CMD/CLK 標為 NC）、ATmega2560 TQFP-100、Raspberry Pi 5 40-pin 排針（5V/3V3 為供電輸出）。IC 方框依腳位名稱長度加寬。
+- 檢查器：同名電源符號／標籤視為同一網路（KiCad 行為）；新增 `overlapping_symbols`；POWER/RESET 腳名規則補上 3V3、EN。渲染器：畫出標籤、電源符號方向與網名、IC 腳位名稱，側邊判斷改用 KiCad 記錄的腳位方向（原本把 ATmega2560 上下段的腳誤判成頂邊/底邊）。
+- 產生器自我檢查曾抓到晶振「16MHz」與負載電容「22pF」文字重疊 0.8mm，已將晶振文字移到上方；各區塊共用 #PWR 編號計數器，修正重複編號。
+
+**施密特觸發器（同一個 y 軸錯誤）**：`tranning/data/schmitt_trigger_gen.py` 的模板在 KiCad 中運放 IN+/IN−、V+/V− 對調（電源反接），且電源符號腳位沒有名稱，KiCad 不認得 GND/VCC。只修改附加的零件庫（腳位 y 翻轉、電阻兩腳對調、補電源腳名），模型輸出的電路主體與 `schmitt_trigger_pairs.json` 不變，以 KiCad 網路表確認 6 種拓樸接線正確。模板本身的重疊（運放本體為 0 大小）需要重新設計並重訓模型，尚未處理。
+
+**驗證**：tranning/ 相關測試 65 項通過（含 kicad-cli 真實網路表測試）；四種電路 ERC 0 件，KiCad 網路表逐腳核對正確；圖檔與 .kicad_sch 在 output/circuit_minimal_systems/。使用者回報的 output/circuit_edges_source.png 不在 repo 中，由哪支程式產生尚未確認。
+
