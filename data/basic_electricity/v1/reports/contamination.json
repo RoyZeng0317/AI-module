@@ -1,0 +1,62 @@
+{
+  "scanned": [
+    {
+      "file": "data/code_pairs.json",
+      "sha256": "899aaadc2c78d8e209a0d3b26ae5f463374b256db449c725ccaa3b120eccbf5c"
+    },
+    {
+      "file": "data/corpus_code_fullstack.txt",
+      "sha256": "6b3cbd9713184367bffd0e4aecec31fcec433cd4ee38e13024375dd2b4f4c40b"
+    },
+    {
+      "file": "data/corpus_code_html_css.txt",
+      "sha256": "29f7f385315506f3b5b3daf00aa274c003619e536d4cfc456cd0e12b1f5c563c"
+    },
+    {
+      "file": "data/corpus_pretrain_v2.txt",
+      "sha256": "715a7830a587e92aa343ac9656ac5f3fce895e7558fb62e68f5370cd97546e22"
+    },
+    {
+      "file": "data/corpus_zh_starter.txt",
+      "sha256": "f72b453136f03cd8699acae9ebc9024964f4b2cfcc1bd1d26302990e909d9669"
+    },
+    {
+      "file": "data/pairs.json",
+      "sha256": "91f33f1d6617c466edd49f726a105e4f826db3c8e1e722e947a2d5eaf2821ea6"
+    },
+    {
+      "file": "data/pairs_context_draft.json",
+      "sha256": "0668f0d4c4de286d61a97e0e0054b9d9189418ba08d263062b584bb628d6d7e0"
+    },
+    {
+      "file": "data/pairs_emotion_draft.json",
+      "sha256": "1690fa8356ae4ae93542f82c4881cad4d3e9aaf328b2a8d2da4544fce59a29b6"
+    },
+    {
+      "file": "data/pairs_english_smalltalk_draft.json",
+      "sha256": "cbae4d4ed9057035d1c8ece3eccd045ca234a9f028dfc736bcc30dbc0a4eb883"
+    },
+    {
+      "file": "data/pairs_imported_train.json",
+      "sha256": "2c77bdc14c1d3a68390734fd0b6553333fcfff9c6e3f0fa3203b880984cf18a9"
+    },
+    {
+      "file": "data/pairs_imported_val.json",
+      "sha256": "1d94d2257f86dd2cf6b20b1c0f75fb48b1296934179317570ce5e3b759b5d903"
+    },
+    {
+      "file": "data/pairs_negation_contrast_draft.json",
+      "sha256": "f255841261a2295d5421815c6e889d5d43f3f64d1a88fe2c7e3f1380365d20ad"
+    },
+    {
+      "file": "data/schmitt_trigger_pairs.json",
+      "sha256": "a9a6076b1a819c167cdf05bcc0752cd5dae77ffb0e0603d12b47388d21de2396"
+    },
+    {
+      "file": "data/technical_pairs.json",
+      "sha256": "0b12ef2684c1769315a4c5cc3c649227639d8022e53e8cc9b4f1576ed9656f3e"
+    }
+  ],
+  "matches": [],
+  "historical_training_exposure": "unknown; only current listed files checked"
+}

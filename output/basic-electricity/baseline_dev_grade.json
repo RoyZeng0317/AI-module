@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "dataset_sha256": "5ae9b62143406555e3270509295b2541a5429ab36b7abfabe2a53f1bc898cdf7",
+  "attempts_sha256": "dcc43a925a9366b5ae5f391302e57953eb7a5c788318f65d75ab6e7537b34413",
+  "summary": {
+    "eligible": 3,
+    "attempted": 3,
+    "correct": 0,
+    "incorrect": 0,
+    "unparseable": 3,
+    "needs_manual_review": 0,
+    "not_attempted_context_limit": 0,
+    "not_attempted_encoding": 0,
+    "generation_failed": 0,
+    "first_pass_accuracy": 0.0,
+    "coverage": 1.0,
+    "denominator": "all completed first attempts, including unparseable/manual-review outputs"
+  },
+  "results": [
+    {
+      "attempt_id": "9960ed11d4ca4ff98200b2e1714b69fd",
+      "question_id": "exam-109-q26",
+      "split": "dev",
+      "verdict": "unparseable",
+      "error_type": "missing_or_ambiguous_final_answer"
+    },
+    {
+      "attempt_id": "be492e22fdac49ec93acd88b5316a6ef",
+      "question_id": "exam-109-q27",
+      "split": "dev",
+      "verdict": "unparseable",
+      "error_type": "missing_or_ambiguous_final_answer"
+    },
+    {
+      "attempt_id": "157e93cfd82e480d95934b83d48c7291",
+      "question_id": "exam-109-q29",
+      "split": "dev",
+      "verdict": "unparseable",
+      "error_type": "missing_or_ambiguous_final_answer"
+    }
+  ]
+}

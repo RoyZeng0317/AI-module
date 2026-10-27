@@ -1,5 +1,11 @@
 # AI Module
 
+## 基本電學題目與評分隔離（2026-10-27）
+
+使用者提供的43份原檔已只讀盤點，人工核對24題無圖選擇題，按來源群切為train18／dev3／test3。`tranning/electricity_dataset.py`準備版本化資料；`electricity_practice.py attempt`只給題目、直接呼叫本機GPT並先存原始作答，另一個`grade`指令才讀評分鍵，只有train能產生不含正解的糾錯提示。
+
+真實基準train9＋dev3共12題皆偏題／未輸出合法唯一答案，0/12；不是已學會電學。test未作答，沒有更新正式權重或改既有使用者修改。操作、來源限制與待核准下一步見[基本電學說明](data/basic_electricity/README.md)。
+
 ## 網路圖片搜尋與中文連結（2026-10-26）
 
 CLI 可直接輸入「你尋找有關周柯宇的圖片」「搜尋周柯宇的照片」或 `find images of cats`。共用後端查公開圖片資料、下載最多八張候選，以現有 `tranning/yolo_runs/custom/weights/characters.pt` 篩選同名人物類別；每輪最多回傳三張圖片與來源，Python CLI 另開獨立圖片預覽，桌面 GUI 可點圖片附件標籤預覽。

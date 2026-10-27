@@ -1,0 +1,264 @@
+{
+  "archive": "C:\\Users\\roy\\Downloads\\Basic electricity.zip",
+  "archive_sha256": "f14e5f547e0c82b2f65189d888e5fbe59d263777294b950e453797c041c4685b",
+  "files": [
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第二章平時測驗卷.docx",
+      "archive_member": "Basic electricity/基本電學上學期-108課綱-第二章平時測驗卷.docx",
+      "bytes": 23647,
+      "sha256": "7e49f737a58bef80875a25f8e0c671aa38e846499fec671d908f875fa1fa5c9d"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第一章平時測驗卷.docx",
+      "archive_member": "Basic electricity/基本電學上學期-108課綱-第一章平時測驗卷.docx",
+      "bytes": 25345,
+      "sha256": "c93f4c9262f56dd55c4468afd9c935e176ef75d3d61707b7cae66de77aa27051"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第三章平時測驗卷.docx",
+      "archive_member": "Basic electricity/基本電學上學期-108課綱-第三章平時測驗卷.docx",
+      "bytes": 16818,
+      "sha256": "bbfd5e407d36c9ca8f61a46387cc2fc595cd4080ec1d71b64c3b751001c33c50"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/106-4y-04-1-standard.pdf",
+      "archive_member": "Basic electricity/106-4y-04-1-standard.pdf",
+      "bytes": 72239,
+      "sha256": "a8b702b3bf8285956d41fdceb4fd3b6ed3c4b943eaec79f91deb103e5b569e7a"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學計算機.xlsx",
+      "archive_member": "Basic electricity/基本電學計算機.xlsx",
+      "bytes": 23638,
+      "sha256": "1e28f3a6f549b1cf242f777a64d56028af4f702348067246c816386774623174"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/106-4y-04-1.pdf",
+      "archive_member": "Basic electricity/106-4y-04-1.pdf",
+      "bytes": 2120123,
+      "sha256": "45821bb60bea9b62a8e274bcea220008bcf392e4fdee5e4430c39fc8d19de972"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/107-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/107-4y-03-1-standard.pdf",
+      "bytes": 115508,
+      "sha256": "2c5f42a856abb7a72ec518da16e7a8091a4a86ef1dd9358a53302de50caefdcb"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/107-4y-04-1.pdf",
+      "archive_member": "Basic electricity/107-4y-04-1.pdf",
+      "bytes": 1414198,
+      "sha256": "d8097ba913368b02e2b412ea2f5dcc2a83eafb477288d14a3cccd120e8ba702b"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學-題庫系統-108課綱-下學期.docx",
+      "archive_member": "Basic electricity/基本電學-題庫系統-108課綱-下學期.docx",
+      "bytes": 17896,
+      "sha256": "d2a833548257f156e0994b31341917be1f6d5e0721b3526764c3884e6a0c103e"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學-題庫系統.xlsx",
+      "archive_member": "Basic electricity/基本電學-題庫系統.xlsx",
+      "bytes": 14945,
+      "sha256": "cce7cb1d096892e0676330bd812501c9822f3b445d1393e6f4e5f8e250e10709"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學-題庫系統-108課綱-上學期.docx",
+      "archive_member": "Basic electricity/基本電學-題庫系統-108課綱-上學期.docx",
+      "bytes": 25554,
+      "sha256": "2c2d8eeadf5af47de37ab2e020a8cb2e1e051590a061b67b6d880d65533d38b9"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/108-4y-04-1-standard.pdf",
+      "archive_member": "Basic electricity/108-4y-04-1-standard.pdf",
+      "bytes": 49316,
+      "sha256": "458189d217d1bec5d4c55660e41e4ee10525a001580e2da8df18c6305f8c48ad"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/Basic Electricity-Statistical-Test-Previous-Test-Questions.docx",
+      "archive_member": "Basic electricity/Basic Electricity-Statistical-Test-Previous-Test-Questions.docx",
+      "bytes": 47285,
+      "sha256": "b7087dd40ae3e2b9e2da558469907ef6b090b0bc29959d408f9cf3316d5bcaa9"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/110-4y-04-1.docx",
+      "archive_member": "Basic electricity/110-4y-04-1.docx",
+      "bytes": 364487,
+      "sha256": "a8738a9b1bc10d5ffef96ea6ca418c2cfa0630d8f2616fc63339caf40b036a3a"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/110-4y-04-1-standard.pdf",
+      "archive_member": "Basic electricity/110-4y-04-1-standard.pdf",
+      "bytes": 122491,
+      "sha256": "6f3c105573da56234f9813f0df1c302fe55135878563d15c96497be125967da5"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/111-4y-04-1-confirm.pdf",
+      "archive_member": "Basic electricity/111-4y-04-1-confirm.pdf",
+      "bytes": 262856,
+      "sha256": "91340cfd3ec6276dda172679752153f59c26da5e7824a07c99f46919aaaad8a2"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/108-4y-04-1.pdf",
+      "archive_member": "Basic electricity/108-4y-04-1.pdf",
+      "bytes": 2340533,
+      "sha256": "982bdfd79d3c0356f324aefce6a1b315dd45339ad5249eb248571f459914c299"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/109-4y-04-1-standard.pdf",
+      "archive_member": "Basic electricity/109-4y-04-1-standard.pdf",
+      "bytes": 255683,
+      "sha256": "afc28e47da54c870e0a252cab6145b89ece8a1527fdc7122eb291c18eb562e3a"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/100-4y-04-1.pdf",
+      "archive_member": "Basic electricity/100-4y-04-1.pdf",
+      "bytes": 928832,
+      "sha256": "0452ba205ff9bde96f1fa65416b9da4c2453919231f15a87917ea1c363107a72"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/109-4y-04-1.pdf",
+      "archive_member": "Basic electricity/109-4y-04-1.pdf",
+      "bytes": 1044776,
+      "sha256": "7e873ef5593aa777a0eb77895cffc21a3c04e956f0623885ed6fe3c44090ab7f"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/100-4y-04-1-standard.pdf",
+      "archive_member": "Basic electricity/100-4y-04-1-standard.pdf",
+      "bytes": 196327,
+      "sha256": "3fe764a71486d834aadf9e0866e280b174b10b8491f720daa2f7fc3f22e1ec38"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/101-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/101-4y-03-1-standard.pdf",
+      "bytes": 213376,
+      "sha256": "7124872c16ac443372d3bf30956a7e698eaf12643cded199ef31cb36e7f052c9"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/101-4y-04-1.pdf",
+      "archive_member": "Basic electricity/101-4y-04-1.pdf",
+      "bytes": 980709,
+      "sha256": "cc8d3cbc52e13a94baaa8f0d8bba3f3e80374cb3a8d719f34fad312fe256fc6b"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/102-4y-04-1.pdf",
+      "archive_member": "Basic electricity/102-4y-04-1.pdf",
+      "bytes": 940419,
+      "sha256": "9e5e23c91459b69982a81caf0bff9d9ee160192132f0d17ea1c480b7cd38beb4"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/102-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/102-4y-03-1-standard.pdf",
+      "bytes": 206994,
+      "sha256": "27bebb1d556467bfea181dcd25fcba5bbada711006ecad28a881bf58a55d329d"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/103-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/103-4y-03-1-standard.pdf",
+      "bytes": 184068,
+      "sha256": "7bc20f99eb30c77a243723dd1dbad4107788f4631bd9333ba404ae69b62c2392"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/103-4y-04-1.pdf",
+      "archive_member": "Basic electricity/103-4y-04-1.pdf",
+      "bytes": 667146,
+      "sha256": "500cfc76e584831d287e77016e4725c32453bd3eaaa4908b027f6bb45dafa084"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/104-4y-03-1-standard.pdf",
+      "bytes": 77007,
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "archive_member": "Basic electricity/104-4y-04-1.pdf",
+      "bytes": 603375,
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "archive_member": "Basic electricity/105-4y-04-1.pdf",
+      "bytes": 831498,
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "archive_member": "Basic electricity/105-4y-03-1-standard.pdf",
+      "bytes": 72233,
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/Basic Electricity Quiz.py",
+      "archive_member": "Basic electricity/Basic Electricity Quiz.py",
+      "bytes": 1318,
+      "sha256": "2c7b5e0dccefcdcee577932fedb6dbaaf77a110f6e198ccda769ab77e42731f8"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/基本電學-下學期習作-詳解.pdf",
+      "archive_member": "Basic electricity/基本電學-下學期習作-詳解.pdf",
+      "bytes": 2833681,
+      "sha256": "3023f67546e8272a582c3a004e15fcfc2fbcd9f1a901798c3868e4ad759e402d"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/100-109-四技二專-統測-專業科目(一)-題目.pdf",
+      "archive_member": "Basic electricity/100-109-四技二專-統測-專業科目(一)-題目.pdf",
+      "bytes": 11056237,
+      "sha256": "5d09d3e85c86c03aae8c5e3fb720547c38e8f4939f694177537d1394b70f5127"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第七章-詳解.pdf",
+      "archive_member": "Basic electricity/習作解答/基本電學-下學期習作-第七章-詳解.pdf",
+      "bytes": 697816,
+      "sha256": "88cc3233a88284799d25e16c74c53021e85ce6dd5d0c4f0149dd9e1b0fd6540d"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第九章-詳解.pdf",
+      "archive_member": "Basic electricity/習作解答/基本電學-下學期習作-第九章-詳解.pdf",
+      "bytes": 819329,
+      "sha256": "d359ebfe9afd53c21b241a76c143a14a64664d56ca153de8156ef07077e15e7f"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "archive_member": "Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "bytes": 557237,
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第十章-詳解.pdf",
+      "archive_member": "Basic electricity/習作解答/基本電學-下學期習作-第十章-詳解.pdf",
+      "bytes": 705061,
+      "sha256": "6ae0298954ebf33a8a18feee85ea042c7e568da79589b7bfe0bc239e0686b44c"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/sAC10110_基本電學(上)_練習題與隨堂練習簡答_習題解答.pdf",
+      "archive_member": "Basic electricity/習作解答/sAC10110_基本電學(上)_練習題與隨堂練習簡答_習題解答.pdf",
+      "bytes": 173411,
+      "sha256": "e33ead7e0d9b173dc4b2f8fb7dcc230f02f9363c23e37c6fa05923a4260c96e8"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/sAC10110_基本電學(上)_習題簡答_習題解答.pdf",
+      "archive_member": "Basic electricity/習作解答/sAC10110_基本電學(上)_習題簡答_習題解答.pdf",
+      "bytes": 1468589,
+      "sha256": "951bce436f535feb7961db84a1742065e9a5282969c876e0c4d029c02cf30c91"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/習作解答/sAC10210_基本電學(下)_練習題與隨堂練習簡答_習題解答.pdf",
+      "archive_member": "Basic electricity/習作解答/sAC10210_基本電學(下)_練習題與隨堂練習簡答_習題解答.pdf",
+      "bytes": 205031,
+      "sha256": "1685c5bb0856bbe61d5ab32a80b4dea034fdb4eafa7c00577355daf9def2609e"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/1111基本電學期末考題庫(ch1~5)_(1).pdf",
+      "archive_member": "Basic electricity/1111基本電學期末考題庫(ch1~5)_(1).pdf",
+      "bytes": 891575,
+      "sha256": "3953d3fd512ac6c13ee5a620fa26c0d80ed73ca1e29d798974f1220fa68066f6"
+    },
+    {
+      "path": "data/basic_electricity/source/Basic electricity/iAC15101_基本電學上主題式學習講義_解析本.pdf",
+      "archive_member": "Basic electricity/iAC15101_基本電學上主題式學習講義_解析本.pdf",
+      "bytes": 11442096,
+      "sha256": "2c519d5fdbb391fe5d21e246bed1fea82a2585ed7463fb0e99177d6e8a5969c8"
+    }
+  ]
+}

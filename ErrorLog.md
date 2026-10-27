@@ -1,5 +1,13 @@
 # Error Log
 
+## 2026-10-27：基本電學先作答、再核對的資料準備
+
+43檔只讀盤點後僅24題可可靠核對為初始無圖MCQ，106/108掃描卷、圖題／承上、OMML缺失、官方4送分及不可靠試算表公式均未冒充標準題。試算表電荷常數1.602e-22與同表1.602e-19矛盾，保留原檔隔離，未重算公式或執行附件Python。研究時小數誤切題號與一次不完整Unicode正則PatternError已停止；正式題號切分避開小數選項，使用完整原頁及官方表核對。一次查找不存在context模組的rg錯誤已改讀實際context_format.py，未動該檔。
+
+早期審查指出correct_option空值／多字元、衝突重複只留第一筆、重排選項未同群及devfeedback風險，已在正式產檔前修正。資料v1為18train／3dev／3test；推論不讀keys，原始作答先fsync，再由獨立評分步驟讀鍵；列舉／矛盾不給分，非MCQ待人工，feedback限train且無正解。61項工程測試通過。
+
+直接正式GPT首答train9＋dev3共12題，UNK0／無截斷，全12偏題且無合法末行，分數0/12；三筆一般聊天原文另存，test未用。這是現有模型能力缺口，不以工具代答或把格式修正當物理推理。既有GRPO子字串reward與全組零分無有效相對信號，不直接套用。6份受保護檔hash相同，沒有optimizer更新。證據見team-run/basic-electricity/BUILD_LOG.md與output/basic-electricity；待使用者確認下一輪，未寫已驗收成功日誌。
+
 ## 2026-10-26：圖片搜尋誤入聊天與中文網址百分比碼
 
 最終獨立審查：英文圖片搜尋處理紀錄已改依輸入語言顯示；Reviewer重跑六組測試160項全部通過、零略過，先前Tk初始化略過未在此輪重現。詳見team-run/image-search/REVIEW.md。
