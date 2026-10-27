@@ -160,7 +160,7 @@ def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | 
     )
 
 
-def design(prompt: str, max_new_tokens: int = 900, temperature: float = 0.2, device: str | None = None) -> str:
+def design(prompt: str, max_new_tokens: int = BLOCK_SIZE, temperature: float = 0.2, device: str | None = None) -> str:
     """Returns the model's generated BODY text (placed symbols/wires/labels
     only) -- the fixed lib_symbols preamble is never part of what the model
     has to reproduce (see schmitt_trigger_gen.build_opamp_schmitt() and
@@ -169,6 +169,10 @@ def design(prompt: str, max_new_tokens: int = 900, temperature: float = 0.2, dev
     top_k: with only a few dozen training examples the goal is
     near-memorization (see train()'s comment), so generation should stay
     close to the model's most-confident path rather than sampling broadly.
+
+    max_new_tokens defaults to the whole context: the longest template is
+    947 tokens since the 2026-10-27 redesign, and the old 900 cap would cut
+    it off; generation stops at <eos> anyway.
 
     fill_values() runs on the raw output before returning: the model only
     ever has to generate PLACEHOLDER_R1/PLACEHOLDER_R2 (build_corpus()'s

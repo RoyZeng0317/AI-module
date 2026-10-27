@@ -58,6 +58,130 @@
         (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
     )
 )
+ (symbol (lib_id "Sinco:R") (at 99.06 97.46 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "R1" (at 99.06 93.39599999999999 0)) (property "Value" "R1_VALUE" (at 99.06 95.17399999999999 0)))(symbol (lib_id "Sinco:R") (at 115.57 82.55 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "R2" (at 115.57 78.48599999999999 0)) (property "Value" "R2_VALUE" (at 115.57 80.264 0)))(wire (pts (xy 107.95 97.46) (xy 107.95 82.55)))(wire (pts (xy 107.95 82.55) (xy 111.76 82.55)))(wire (pts (xy 119.38 82.55) (xy 132.08 82.55)))(wire (pts (xy 132.08 82.55) (xy 132.08 100.0)))(junction (at 132.08 100.0))(symbol (lib_id "Sinco:OpAmp") (at 120.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "U1" (at 123.81 92.38 0)) (property "Value" "LM358" (at 123.81 94.285 0)))(symbol (lib_id "power:VCC") (at 117.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000004") (property "Reference" "#PWR01" (at 117.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 117.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 117.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000005") (property "Reference" "#PWR02" (at 117.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 117.46 111.43 0)))(wire (pts (xy 127.62 100.0) (xy 132.08 100.0)))(wire (pts (xy 132.08 100.0) (xy 137.16 100.0)))(symbol (lib_id "power:GND") (at 108.585 102.54 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000006") (property "Reference" "#PWR03" (at 108.585 98.476 0) (effects hide)) (property "Value" "GND" (at 108.585 106.35000000000001 0)))(wire (pts (xy 90.17 97.46) (xy 95.25 97.46)))(wire (pts (xy 102.87 97.46) (xy 107.95 97.46)))(wire (pts (xy 107.95 97.46) (xy 112.38 97.46)))(wire (pts (xy 112.38 102.54) (xy 108.585 102.54)))(junction (at 107.95 97.46))(label "VIN" (at 90.17 97.46 180))(label "VOUT" (at 137.16 100.0 0)))
+
+(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
+(lib_symbols
+    (symbol "Sinco:R" (pin_names hide) (pin_numbers hide)
+        (property "Reference" "R" (at 0 0 0))
+        (symbol "R_0_1"
+            (rectangle (start -2.54 -1.016) (end 2.54 1.016) (stroke (width 0.254)) (fill (type none)))
+        )
+        (symbol "R_1_1"
+            (pin passive line (at -3.81 0 0) (length 1.27) (number "1"))
+            (pin passive line (at 3.81 0 180) (length 1.27) (number "2"))
+        )
+    )
+    (symbol "Sinco:OpAmp" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "OpAmp_0_1"
+            (polyline (pts (xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)) (stroke (width 0.254)) (fill (type background)))
+            (polyline (pts (xy -4.318 2.54) (xy -3.302 2.54)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -3.81 3.048) (xy -3.81 2.032)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -4.318 -2.54) (xy -3.302 -2.54)) (stroke (width 0.1524)) (fill (type none)))
+        )
+        (symbol "OpAmp_1_1"
+            (pin input line (at -7.62 2.54 0) (length 2.54) (number "1"))
+            (pin input line (at -7.62 -2.54 0) (length 2.54) (number "2"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "3"))
+            (pin power_in line (at -2.54 7.62 270) (length 3.81) (number "4"))
+            (pin power_in line (at -2.54 -7.62 90) (length 3.81) (number "5"))
+        )
+    )
+    (symbol "Sinco:SchmittInverter" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "SchmittInverter_0_1"
+            (polyline (pts (xy -5.08 3.81) (xy 4.064 0) (xy -5.08 -3.81) (xy -5.08 3.81)) (stroke (width 0.254)) (fill (type background)))
+            (circle (center 4.572 0) (radius 0.508) (stroke (width 0.254)) (fill (type none)))
+            (polyline (pts (xy -3.556 -0.762) (xy -2.54 -0.762) (xy -2.032 0.762) (xy -1.016 0.762)) (stroke (width 0.1524)) (fill (type none)))
+        )
+        (symbol "SchmittInverter_1_1"
+            (pin input line (at -7.62 0 0) (length 2.54) (number "1"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "2"))
+            (pin power_in line (at -2.54 7.62 270) (length 5.08) (number "14"))
+            (pin power_in line (at -2.54 -7.62 90) (length 5.08) (number "7"))
+        )
+    )
+    (symbol "power:GND" (power) (pin_names hide)
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "GND" (at 0 -3.81 0))
+        (symbol "GND_0_1"
+            (polyline (pts (xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "GND_1_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
+    )
+    (symbol "power:VCC" (power) (pin_names hide)
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "VCC" (at 0 3.81 0))
+        (symbol "VCC_0_1"
+            (polyline (pts (xy 0 0) (xy 0 1.27)) (stroke (width 0)) (fill (type none)))
+            (polyline (pts (xy -0.762 1.27) (xy 0.762 1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
+    )
+)
+ (symbol (lib_id "Sinco:R") (at 99.06 102.54 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "R1" (at 99.06 98.476 0)) (property "Value" "R1_VALUE" (at 99.06 100.254 0)))(symbol (lib_id "Sinco:R") (at 115.57 120.65 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "R2" (at 115.57 116.58600000000001 0)) (property "Value" "R2_VALUE" (at 115.57 118.364 0)))(wire (pts (xy 107.95 102.54) (xy 107.95 120.65)))(wire (pts (xy 107.95 120.65) (xy 111.76 120.65)))(wire (pts (xy 119.38 120.65) (xy 132.08 120.65)))(wire (pts (xy 132.08 120.65) (xy 132.08 100.0)))(junction (at 132.08 100.0))(symbol (lib_id "Sinco:OpAmp") (at 120.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "U1" (at 123.81 92.38 0)) (property "Value" "LM358" (at 123.81 94.285 0)))(symbol (lib_id "power:VCC") (at 117.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000004") (property "Reference" "#PWR01" (at 117.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 117.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 117.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000005") (property "Reference" "#PWR02" (at 117.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 117.46 111.43 0)))(wire (pts (xy 127.62 100.0) (xy 132.08 100.0)))(wire (pts (xy 132.08 100.0) (xy 137.16 100.0)))(symbol (lib_id "power:GND") (at 108.585 97.46 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000006") (property "Reference" "#PWR03" (at 108.585 93.39599999999999 0) (effects hide)) (property "Value" "GND" (at 104.77499999999999 99.365 0)))(wire (pts (xy 90.17 102.54) (xy 95.25 102.54)))(wire (pts (xy 102.87 102.54) (xy 107.95 102.54)))(wire (pts (xy 107.95 102.54) (xy 112.38 102.54)))(wire (pts (xy 112.38 97.46) (xy 108.585 97.46)))(junction (at 107.95 102.54))(label "VIN" (at 90.17 102.54 180))(label "VOUT" (at 137.16 100.0 0)))
+
+(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
+(lib_symbols
+    (symbol "Sinco:R" (pin_names hide) (pin_numbers hide)
+        (property "Reference" "R" (at 0 0 0))
+        (symbol "R_0_1"
+            (rectangle (start -2.54 -1.016) (end 2.54 1.016) (stroke (width 0.254)) (fill (type none)))
+        )
+        (symbol "R_1_1"
+            (pin passive line (at -3.81 0 0) (length 1.27) (number "1"))
+            (pin passive line (at 3.81 0 180) (length 1.27) (number "2"))
+        )
+    )
+    (symbol "Sinco:OpAmp" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "OpAmp_0_1"
+            (polyline (pts (xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)) (stroke (width 0.254)) (fill (type background)))
+            (polyline (pts (xy -4.318 2.54) (xy -3.302 2.54)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -3.81 3.048) (xy -3.81 2.032)) (stroke (width 0.1524)) (fill (type none)))
+            (polyline (pts (xy -4.318 -2.54) (xy -3.302 -2.54)) (stroke (width 0.1524)) (fill (type none)))
+        )
+        (symbol "OpAmp_1_1"
+            (pin input line (at -7.62 2.54 0) (length 2.54) (number "1"))
+            (pin input line (at -7.62 -2.54 0) (length 2.54) (number "2"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "3"))
+            (pin power_in line (at -2.54 7.62 270) (length 3.81) (number "4"))
+            (pin power_in line (at -2.54 -7.62 90) (length 3.81) (number "5"))
+        )
+    )
+    (symbol "Sinco:SchmittInverter" (pin_names hide)
+        (property "Reference" "U" (at 0 0 0))
+        (symbol "SchmittInverter_0_1"
+            (polyline (pts (xy -5.08 3.81) (xy 4.064 0) (xy -5.08 -3.81) (xy -5.08 3.81)) (stroke (width 0.254)) (fill (type background)))
+            (circle (center 4.572 0) (radius 0.508) (stroke (width 0.254)) (fill (type none)))
+            (polyline (pts (xy -3.556 -0.762) (xy -2.54 -0.762) (xy -2.032 0.762) (xy -1.016 0.762)) (stroke (width 0.1524)) (fill (type none)))
+        )
+        (symbol "SchmittInverter_1_1"
+            (pin input line (at -7.62 0 0) (length 2.54) (number "1"))
+            (pin output line (at 7.62 0 180) (length 2.54) (number "2"))
+            (pin power_in line (at -2.54 7.62 270) (length 5.08) (number "14"))
+            (pin power_in line (at -2.54 -7.62 90) (length 5.08) (number "7"))
+        )
+    )
+    (symbol "power:GND" (power) (pin_names hide)
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "GND" (at 0 -3.81 0))
+        (symbol "GND_0_1"
+            (polyline (pts (xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "GND_1_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
+    )
+    (symbol "power:VCC" (power) (pin_names hide)
+        (property "Reference" "#PWR" (at 0 0 0))
+        (property "Value" "VCC" (at 0 3.81 0))
+        (symbol "VCC_0_1"
+            (polyline (pts (xy 0 0) (xy 0 1.27)) (stroke (width 0)) (fill (type none)))
+            (polyline (pts (xy -0.762 1.27) (xy 0.762 1.27)) (stroke (width 0)) (fill (type none)))
+        )
+        (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
+    )
+)
  (symbol (lib_id "Sinco:R") (at 100.33 106.35000000000001 90) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "R1" (at 96.52 105.08000000000001 90)) (property "Value" "R1_VALUE" (at 93.98 107.62 90)))(symbol (lib_id "Sinco:R") (at 115.57 120.65 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "R2" (at 115.57 116.58600000000001 0)) (property "Value" "R2_VALUE" (at 115.57 118.364 0)))(wire (pts (xy 107.95 102.54) (xy 107.95 120.65)))(wire (pts (xy 107.95 120.65) (xy 111.76 120.65)))(wire (pts (xy 119.38 120.65) (xy 132.08 120.65)))(wire (pts (xy 132.08 120.65) (xy 132.08 100.0)))(junction (at 132.08 100.0))(symbol (lib_id "Sinco:OpAmp") (at 120.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "U1" (at 123.81 92.38 0)) (property "Value" "LM358" (at 123.81 94.285 0)))(symbol (lib_id "power:VCC") (at 117.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000004") (property "Reference" "#PWR01" (at 117.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 117.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 117.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000005") (property "Reference" "#PWR02" (at 117.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 117.46 111.43 0)))(wire (pts (xy 127.62 100.0) (xy 132.08 100.0)))(wire (pts (xy 132.08 100.0) (xy 137.16 100.0)))(symbol (lib_id "power:GND") (at 100.33 110.16 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000006") (property "Reference" "#PWR03" (at 100.33 106.096 0) (effects hide)) (property "Value" "GND" (at 100.33 113.97 0)))(wire (pts (xy 95.25 97.46) (xy 112.38 97.46)))(wire (pts (xy 100.33 102.54) (xy 107.95 102.54)))(wire (pts (xy 107.95 102.54) (xy 112.38 102.54)))(junction (at 107.95 102.54))(label "VIN" (at 95.25 97.46 180))(label "VOUT" (at 137.16 100.0 0)))
 
 (kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
@@ -182,128 +306,59 @@
         (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
     )
 )
- (symbol (lib_id "Sinco:R") (at 99.06 97.46 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "R1" (at 99.06 93.39599999999999 0)) (property "Value" "R1_VALUE" (at 99.06 95.17399999999999 0)))(symbol (lib_id "Sinco:R") (at 115.57 82.55 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "R2" (at 115.57 78.48599999999999 0)) (property "Value" "R2_VALUE" (at 115.57 80.264 0)))(wire (pts (xy 107.95 97.46) (xy 107.95 82.55)))(wire (pts (xy 107.95 82.55) (xy 111.76 82.55)))(wire (pts (xy 119.38 82.55) (xy 132.08 82.55)))(wire (pts (xy 132.08 82.55) (xy 132.08 100.0)))(junction (at 132.08 100.0))(symbol (lib_id "Sinco:OpAmp") (at 120.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "U1" (at 123.81 92.38 0)) (property "Value" "LM358" (at 123.81 94.285 0)))(symbol (lib_id "power:VCC") (at 117.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000004") (property "Reference" "#PWR01" (at 117.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 117.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 117.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000005") (property "Reference" "#PWR02" (at 117.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 117.46 111.43 0)))(wire (pts (xy 127.62 100.0) (xy 132.08 100.0)))(wire (pts (xy 132.08 100.0) (xy 137.16 100.0)))(symbol (lib_id "power:GND") (at 108.585 102.54 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000006") (property "Reference" "#PWR03" (at 108.585 98.476 0) (effects hide)) (property "Value" "GND" (at 108.585 106.35000000000001 0)))(wire (pts (xy 90.17 97.46) (xy 95.25 97.46)))(wire (pts (xy 102.87 97.46) (xy 107.95 97.46)))(wire (pts (xy 107.95 97.46) (xy 112.38 97.46)))(wire (pts (xy 112.38 102.54) (xy 108.585 102.54)))(junction (at 107.95 97.46))(label "VIN" (at 90.17 97.46 180))(label "VOUT" (at 137.16 100.0 0)))
-
-(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
-(lib_symbols
-    (symbol "Sinco:R" (pin_names hide) (pin_numbers hide)
-        (property "Reference" "R" (at 0 0 0))
-        (symbol "R_0_1"
-            (rectangle (start -2.54 -1.016) (end 2.54 1.016) (stroke (width 0.254)) (fill (type none)))
-        )
-        (symbol "R_1_1"
-            (pin passive line (at -3.81 0 0) (length 1.27) (number "1"))
-            (pin passive line (at 3.81 0 180) (length 1.27) (number "2"))
-        )
-    )
-    (symbol "Sinco:OpAmp" (pin_names hide)
-        (property "Reference" "U" (at 0 0 0))
-        (symbol "OpAmp_0_1"
-            (polyline (pts (xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)) (stroke (width 0.254)) (fill (type background)))
-            (polyline (pts (xy -4.318 2.54) (xy -3.302 2.54)) (stroke (width 0.1524)) (fill (type none)))
-            (polyline (pts (xy -3.81 3.048) (xy -3.81 2.032)) (stroke (width 0.1524)) (fill (type none)))
-            (polyline (pts (xy -4.318 -2.54) (xy -3.302 -2.54)) (stroke (width 0.1524)) (fill (type none)))
-        )
-        (symbol "OpAmp_1_1"
-            (pin input line (at -7.62 2.54 0) (length 2.54) (number "1"))
-            (pin input line (at -7.62 -2.54 0) (length 2.54) (number "2"))
-            (pin output line (at 7.62 0 180) (length 2.54) (number "3"))
-            (pin power_in line (at -2.54 7.62 270) (length 3.81) (number "4"))
-            (pin power_in line (at -2.54 -7.62 90) (length 3.81) (number "5"))
-        )
-    )
-    (symbol "Sinco:SchmittInverter" (pin_names hide)
-        (property "Reference" "U" (at 0 0 0))
-        (symbol "SchmittInverter_0_1"
-            (polyline (pts (xy -5.08 3.81) (xy 4.064 0) (xy -5.08 -3.81) (xy -5.08 3.81)) (stroke (width 0.254)) (fill (type background)))
-            (circle (center 4.572 0) (radius 0.508) (stroke (width 0.254)) (fill (type none)))
-            (polyline (pts (xy -3.556 -0.762) (xy -2.54 -0.762) (xy -2.032 0.762) (xy -1.016 0.762)) (stroke (width 0.1524)) (fill (type none)))
-        )
-        (symbol "SchmittInverter_1_1"
-            (pin input line (at -7.62 0 0) (length 2.54) (number "1"))
-            (pin output line (at 7.62 0 180) (length 2.54) (number "2"))
-            (pin power_in line (at -2.54 7.62 270) (length 5.08) (number "14"))
-            (pin power_in line (at -2.54 -7.62 90) (length 5.08) (number "7"))
-        )
-    )
-    (symbol "power:GND" (power) (pin_names hide)
-        (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "GND" (at 0 -3.81 0))
-        (symbol "GND_0_1"
-            (polyline (pts (xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)) (stroke (width 0)) (fill (type none)))
-        )
-        (symbol "GND_1_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
-    )
-    (symbol "power:VCC" (power) (pin_names hide)
-        (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "VCC" (at 0 3.81 0))
-        (symbol "VCC_0_1"
-            (polyline (pts (xy 0 0) (xy 0 1.27)) (stroke (width 0)) (fill (type none)))
-            (polyline (pts (xy -0.762 1.27) (xy 0.762 1.27)) (stroke (width 0)) (fill (type none)))
-        )
-        (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
-    )
-)
  (symbol (lib_id "Sinco:SchmittInverter") (at 110.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "U1" (at 113.81 92.38 0)) (property "Value" "74HC14" (at 113.81 94.285 0)))(symbol (lib_id "power:VCC") (at 107.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "#PWR01" (at 107.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 107.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 107.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "#PWR02" (at 107.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 107.46 111.43 0)))(wire (pts (xy 97.3 100.0) (xy 102.38 100.0)))(wire (pts (xy 117.62 100.0) (xy 122.7 100.0)))(label "VIN" (at 97.3 100.0 180))(label "VOUT" (at 122.7 100.0 0)))
 
-(kicad_sch (version 20231120) (generator sinco_schmitt_gen) (paper "A4") 
-(lib_symbols
-    (symbol "Sinco:R" (pin_names hide) (pin_numbers hide)
-        (property "Reference" "R" (at 0 0 0))
-        (symbol "R_0_1"
-            (rectangle (start -2.54 -1.016) (end 2.54 1.016) (stroke (width 0.254)) (fill (type none)))
-        )
-        (symbol "R_1_1"
-            (pin passive line (at -3.81 0 0) (length 1.27) (number "1"))
-            (pin passive line (at 3.81 0 180) (length 1.27) (number "2"))
-        )
-    )
-    (symbol "Sinco:OpAmp" (pin_names hide)
-        (property "Reference" "U" (at 0 0 0))
-        (symbol "OpAmp_0_1"
-            (polyline (pts (xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)) (stroke (width 0.254)) (fill (type background)))
-            (polyline (pts (xy -4.318 2.54) (xy -3.302 2.54)) (stroke (width 0.1524)) (fill (type none)))
-            (polyline (pts (xy -3.81 3.048) (xy -3.81 2.032)) (stroke (width 0.1524)) (fill (type none)))
-            (polyline (pts (xy -4.318 -2.54) (xy -3.302 -2.54)) (stroke (width 0.1524)) (fill (type none)))
-        )
-        (symbol "OpAmp_1_1"
-            (pin input line (at -7.62 2.54 0) (length 2.54) (number "1"))
-            (pin input line (at -7.62 -2.54 0) (length 2.54) (number "2"))
-            (pin output line (at 7.62 0 180) (length 2.54) (number "3"))
-            (pin power_in line (at -2.54 7.62 270) (length 3.81) (number "4"))
-            (pin power_in line (at -2.54 -7.62 90) (length 3.81) (number "5"))
-        )
-    )
-    (symbol "Sinco:SchmittInverter" (pin_names hide)
-        (property "Reference" "U" (at 0 0 0))
-        (symbol "SchmittInverter_0_1"
-            (polyline (pts (xy -5.08 3.81) (xy 4.064 0) (xy -5.08 -3.81) (xy -5.08 3.81)) (stroke (width 0.254)) (fill (type background)))
-            (circle (center 4.572 0) (radius 0.508) (stroke (width 0.254)) (fill (type none)))
-            (polyline (pts (xy -3.556 -0.762) (xy -2.54 -0.762) (xy -2.032 0.762) (xy -1.016 0.762)) (stroke (width 0.1524)) (fill (type none)))
-        )
-        (symbol "SchmittInverter_1_1"
-            (pin input line (at -7.62 0 0) (length 2.54) (number "1"))
-            (pin output line (at 7.62 0 180) (length 2.54) (number "2"))
-            (pin power_in line (at -2.54 7.62 270) (length 5.08) (number "14"))
-            (pin power_in line (at -2.54 -7.62 90) (length 5.08) (number "7"))
-        )
-    )
-    (symbol "power:GND" (power) (pin_names hide)
-        (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "GND" (at 0 -3.81 0))
-        (symbol "GND_0_1"
-            (polyline (pts (xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)) (stroke (width 0)) (fill (type none)))
-        )
-        (symbol "GND_1_1" (pin power_in line (at 0 0 270) (length 0) hide (name "GND") (number "1")))
-    )
-    (symbol "power:VCC" (power) (pin_names hide)
-        (property "Reference" "#PWR" (at 0 0 0))
-        (property "Value" "VCC" (at 0 3.81 0))
-        (symbol "VCC_0_1"
-            (polyline (pts (xy 0 0) (xy 0 1.27)) (stroke (width 0)) (fill (type none)))
-            (polyline (pts (xy -0.762 1.27) (xy 0.762 1.27)) (stroke (width 0)) (fill (type none)))
-        )
-        (symbol "VCC_1_1" (pin power_in line (at 0 0 90) (length 0) hide (name "VCC") (number "1")))
-    )
-)
- (symbol (lib_id "Sinco:R") (at 99.06 102.54 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000001") (property "Reference" "R1" (at 99.06 98.476 0)) (property "Value" "R1_VALUE" (at 99.06 100.254 0)))(symbol (lib_id "Sinco:R") (at 115.57 120.65 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000002") (property "Reference" "R2" (at 115.57 116.58600000000001 0)) (property "Value" "R2_VALUE" (at 115.57 118.364 0)))(wire (pts (xy 107.95 102.54) (xy 107.95 120.65)))(wire (pts (xy 107.95 120.65) (xy 111.76 120.65)))(wire (pts (xy 119.38 120.65) (xy 132.08 120.65)))(wire (pts (xy 132.08 120.65) (xy 132.08 100.0)))(junction (at 132.08 100.0))(symbol (lib_id "Sinco:OpAmp") (at 120.0 100.0 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000003") (property "Reference" "U1" (at 123.81 92.38 0)) (property "Value" "LM358" (at 123.81 94.285 0)))(symbol (lib_id "power:VCC") (at 117.46 92.38 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000004") (property "Reference" "#PWR01" (at 117.46 88.316 0) (effects hide)) (property "Value" "VCC" (at 117.46 89.83999999999999 0)))(symbol (lib_id "power:GND") (at 117.46 107.62 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000005") (property "Reference" "#PWR02" (at 117.46 103.55600000000001 0) (effects hide)) (property "Value" "GND" (at 117.46 111.43 0)))(wire (pts (xy 127.62 100.0) (xy 132.08 100.0)))(wire (pts (xy 132.08 100.0) (xy 137.16 100.0)))(symbol (lib_id "power:GND") (at 108.585 97.46 0) (unit 1) (uuid "00000000-0000-0000-0000-000000000006") (property "Reference" "#PWR03" (at 108.585 93.39599999999999 0) (effects hide)) (property "Value" "GND" (at 104.77499999999999 99.365 0)))(wire (pts (xy 90.17 102.54) (xy 95.25 102.54)))(wire (pts (xy 102.87 102.54) (xy 107.95 102.54)))(wire (pts (xy 107.95 102.54) (xy 112.38 102.54)))(wire (pts (xy 112.38 97.46) (xy 108.585 97.46)))(junction (at 107.95 102.54))(label "VIN" (at 90.17 102.54 180))(label "VOUT" (at 137.16 100.0 0)))
+幫我設計一個史密特觸發電路，R1 用 10k，R2 用 100k
+用運算放大器設計史密特觸發器，正回授電阻 R2 = 100k，輸入電阻 R1 = 10k
+我要一個 op-amp 史密特觸發電路的 KiCad 電路圖，R1=10k R2=100k
+幫我設計一個史密特觸發電路，R1 用 10k，R2 用 47k
+用運算放大器設計史密特觸發器，正回授電阻 R2 = 47k，輸入電阻 R1 = 10k
+我要一個 op-amp 史密特觸發電路的 KiCad 電路圖，R1=10k R2=47k
+幫我設計一個史密特觸發電路，R1 用 4.7k，R2 用 100k
+用運算放大器設計史密特觸發器，正回授電阻 R2 = 100k，輸入電阻 R1 = 4.7k
+我要一個 op-amp 史密特觸發電路的 KiCad 電路圖，R1=4.7k R2=100k
+幫我設計一個史密特觸發電路，R1 用 22k，R2 用 220k
+用運算放大器設計史密特觸發器，正回授電阻 R2 = 220k，輸入電阻 R1 = 22k
+我要一個 op-amp 史密特觸發電路的 KiCad 電路圖，R1=22k R2=220k
+幫我設計一個史密特觸發電路，R1 用 10k，R2 用 220k
+用運算放大器設計史密特觸發器，正回授電阻 R2 = 220k，輸入電阻 R1 = 10k
+我要一個 op-amp 史密特觸發電路的 KiCad 電路圖，R1=10k R2=220k
+幫我設計一個反相放大器電路，R1 用 10k，R2 用 100k
+用運算放大器做一個反相放大電路，輸入電阻 R1=10k，回授電阻 R2=100k
+我要一個 op-amp 反相放大器的 KiCad 電路圖，R1=10k R2=100k
+幫我設計一個反相放大器電路，R1 用 10k，R2 用 47k
+用運算放大器做一個反相放大電路，輸入電阻 R1=10k，回授電阻 R2=47k
+我要一個 op-amp 反相放大器的 KiCad 電路圖，R1=10k R2=47k
+幫我設計一個反相放大器電路，R1 用 4.7k，R2 用 100k
+用運算放大器做一個反相放大電路，輸入電阻 R1=4.7k，回授電阻 R2=100k
+我要一個 op-amp 反相放大器的 KiCad 電路圖，R1=4.7k R2=100k
+幫我設計一個反相放大器電路，R1 用 22k，R2 用 220k
+用運算放大器做一個反相放大電路，輸入電阻 R1=22k，回授電阻 R2=220k
+我要一個 op-amp 反相放大器的 KiCad 電路圖，R1=22k R2=220k
+幫我設計一個同相放大器電路，R1 用 10k，R2 用 100k
+用運算放大器做一個同相放大電路，接地電阻 R1=10k，回授電阻 R2=100k
+我要一個 op-amp 同相放大器的 KiCad 電路圖，R1=10k R2=100k
+幫我設計一個同相放大器電路，R1 用 10k，R2 用 47k
+用運算放大器做一個同相放大電路，接地電阻 R1=10k，回授電阻 R2=47k
+我要一個 op-amp 同相放大器的 KiCad 電路圖，R1=10k R2=47k
+幫我設計一個同相放大器電路，R1 用 4.7k，R2 用 100k
+用運算放大器做一個同相放大電路，接地電阻 R1=4.7k，回授電阻 R2=100k
+我要一個 op-amp 同相放大器的 KiCad 電路圖，R1=4.7k R2=100k
+幫我設計一個同相放大器電路，R1 用 22k，R2 用 220k
+用運算放大器做一個同相放大電路，接地電阻 R1=22k，回授電阻 R2=220k
+我要一個 op-amp 同相放大器的 KiCad 電路圖，R1=22k R2=220k
+幫我設計一個電壓比較器電路，分壓電阻 R1 用 10k，R2 用 10k
+用運算放大器做一個比較器電路，參考電壓分壓電阻 R1=10k，R2=10k
+我要一個 op-amp comparator 的 KiCad 電路圖，R1=10k R2=10k
+幫我設計一個電壓比較器電路，分壓電阻 R1 用 10k，R2 用 20k
+用運算放大器做一個比較器電路，參考電壓分壓電阻 R1=10k，R2=20k
+我要一個 op-amp comparator 的 KiCad 電路圖，R1=10k R2=20k
+幫我設計一個電壓比較器電路，分壓電阻 R1 用 22k，R2 用 10k
+用運算放大器做一個比較器電路，參考電壓分壓電阻 R1=22k，R2=10k
+我要一個 op-amp comparator 的 KiCad 電路圖，R1=22k R2=10k
+幫我設計一個電壓比較器電路，分壓電阻 R1 用 47k，R2 用 47k
+用運算放大器做一個比較器電路，參考電壓分壓電阻 R1=47k，R2=47k
+我要一個 op-amp comparator 的 KiCad 電路圖，R1=47k R2=47k
+用 74HC14 邏輯閘設計一個簡單的史密特觸發反相器電路
+幫我畫一個史密特觸發反相器（Schmitt trigger inverter）電路圖
+設計一個單閘史密特觸發電路，輸入 VIN 輸出 VOUT

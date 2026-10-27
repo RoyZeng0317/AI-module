@@ -44,11 +44,26 @@ def test_every_pair_fits_the_model_context():
     # prompt + <sep> + reply + <eos> must fit BLOCK_SIZE or the tail of the
     # circuit is silently cut off before it reaches the loss
     from bpe_tokenizer import BPETokenizer
-    text = stt.CORPUS_PATH.read_text(encoding="utf-8") if stt.CORPUS_PATH.exists() else ""
+    from schmitt_trigger_gen import build_pretrain_corpus
     pairs = build_corpus()
-    tok = BPETokenizer.train([text or "\n".join(p["reply"] for p in pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
+    tok = BPETokenizer.train([build_pretrain_corpus(pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
     longest = max(len(tok.encode(p["prompt"])) + len(tok.encode(p["reply"])) + 2 for p in pairs)
     assert longest <= stt.BLOCK_SIZE, longest
+
+
+def test_prompts_are_not_unknown_tokens():
+    # the tokenizer is trained on the pretrain corpus only; if the prompts
+    # are not in it, every Chinese character becomes <unk> and different
+    # circuit requests encode to identical ids (the 2026-10-27 bug)
+    from bpe_tokenizer import UNK, BPETokenizer
+    from schmitt_trigger_gen import build_pretrain_corpus
+    pairs = build_corpus()
+    tok = BPETokenizer.train([build_pretrain_corpus(pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
+    encoded = {p["prompt"]: tok.encode(p["prompt"]) for p in pairs}
+    assert all(UNK not in ids for ids in encoded.values())
+    a = encoded["幫我設計一個反相放大器電路，R1 用 10k，R2 用 100k"]
+    b = encoded["幫我設計一個同相放大器電路，R1 用 10k，R2 用 100k"]
+    assert a != b
 
 
 def test_generated_corpus_covers_every_topology():

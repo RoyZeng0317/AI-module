@@ -482,6 +482,22 @@ def build_corpus() -> list[dict]:
     return pairs
 
 
+def build_pretrain_corpus(pairs: list[dict]) -> str:
+    """Full wrapped files (lib_symbols included) so pretraining still teaches
+    general .kicad_sch syntax, PLUS every prompt.
+
+    The prompts are here for the tokenizer: transformer_chat.pretrain()
+    builds its BPE vocabulary from this text alone, and before 2026-10-27
+    the corpus held only circuit files -- so every Chinese character was
+    <unk>. "幫我設計一個反相放大器電路，R1 用 10k，R2 用 100k" and the same
+    sentence with 同相 or 史密特觸發 encoded to the SAME token ids, and the
+    inverting / non-inverting / Schmitt templates (which share their R1/R2
+    value variants) could not be told apart by the model at all."""
+    unique_bodies = list(dict.fromkeys(p["reply"] for p in pairs))
+    prompts = list(dict.fromkeys(p["prompt"] for p in pairs))
+    return "\n\n".join(wrap_kicad(b) for b in unique_bodies) + "\n\n" + "\n".join(prompts) + "\n"
+
+
 def validate_pairs(pairs: list[dict], tmp_dir: Path) -> None:
     """Wraps each unique body with wrap_kicad(), writes it to a temp
     .kicad_sch, and runs circuit_rule_check over it -- raises AssertionError
@@ -510,11 +526,8 @@ def main():
     OUT_PAIRS.parent.mkdir(parents=True, exist_ok=True)
     OUT_PAIRS.write_text(json.dumps(pairs, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    # pretrain corpus stays FULL wrapped files (lib_symbols included) so that
-    # stage still teaches the model general .kicad_sch syntax; only the SFT
-    # pairs' reply is body-only (see build_corpus()'s docstring).
+    OUT_CORPUS.write_text(build_pretrain_corpus(pairs), encoding="utf-8")
     unique_bodies = list({p["reply"] for p in pairs})
-    OUT_CORPUS.write_text("\n\n".join(wrap_kicad(b) for b in unique_bodies), encoding="utf-8")
 
     print(f"{len(pairs)} pairs ({len(unique_bodies)} unique circuits) -> {OUT_PAIRS}")
     print(f"pretrain corpus ({len(unique_bodies)} unique circuits) -> {OUT_CORPUS}")
