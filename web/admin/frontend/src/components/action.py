@@ -41,6 +41,14 @@ COMMANDS_URL = _api_url("api/commands")
 DETECT_INTERVAL_MS = 500
 CAPTURE_WIDTH = 640
 
+# PayPal 訂閱按鈕：client-id/plan_id 本來就是要嵌進前端頁面原始碼讓瀏覽器
+# 讀取的公開參數（PayPal 官方按鈕產生器給的就是這種寫法），不是 .env 那種
+# 密鑰，所以直接寫在這裡；只做畫面顯示，onApprove 目前只 alert 訂閱 ID，
+# 沒有呼叫任何後端驗證或寫入會員狀態。
+PAYPAL_CLIENT_ID = "BAA828nDkdN5Y0G6ycLfME3lKXaabP1Vnwaq517jj9sh2SWAw2PwZ18uvBbCwEs2xgh6iMIQpuJI0vRQeI"
+PAYPAL_PLAN_ID = "P-04G02444S95683939NLPYFPI"
+PAYPAL_CONTAINER_ID = f"paypal-button-container-{PAYPAL_PLAN_ID}"
+
 
 def _detect_ws_url():
     """算出 /ws/detect 的 ws(s) 網址。
@@ -138,6 +146,11 @@ ICONS = {
         ' stroke-linecap="round" stroke-linejoin="round">'
         '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>'
         '<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'
+    ),
+    "membership": (
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
+        ' stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M12 3l2.5 5 5.5.8-4 4 1 5.4L12 15.8 6.9 18.2l1-5.4-4-4 5.5-.8Z"/></svg>'
     ),
     "clear": (
         '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"'
@@ -1634,6 +1647,7 @@ def _build_sidebar():
     tools_section.appendChild(icon_button("character", "角色", on_click=lambda _: _on_character_click()))
     tools_section.appendChild(icon_button("memory", "記憶", on_click=lambda _: asyncio.ensure_future(_on_memory_click())))
     tools_section.appendChild(icon_button("learn", "學習", on_click=lambda _: asyncio.ensure_future(_on_learn_click())))
+    tools_section.appendChild(icon_button("membership", "會員訂閱", on_click=lambda _: toggle_membership_modal()))
     aside.appendChild(tools_section)
 
     # ── 頁尾：清除對話 + 設定（模型／物件偵測信心值彙整到設定彈窗）+ 版權 ──
@@ -1700,6 +1714,53 @@ def toggle_notify_composer():
     else:
         box.classList.add("is-open")
         _dom["notify_composer_input"].focus()
+
+
+def _render_paypal_button():
+    """實際畫出 PayPal 按鈕——只做一次，重複開關彈窗不會重複 render。"""
+    if _state.get("paypal_rendered"):
+        return
+    _state["paypal_rendered"] = True
+
+    def _create_subscription(_data, actions):
+        return actions.subscription.create(to_js(
+            {"plan_id": PAYPAL_PLAN_ID}, dict_converter=Object.fromEntries
+        ))
+
+    def _on_approve(data, _actions):
+        window.alert(str(data.subscriptionID))
+
+    opts = to_js({
+        "style": {"shape": "pill", "color": "gold", "layout": "vertical", "label": "subscribe"},
+        "createSubscription": create_proxy(_create_subscription),
+        "onApprove": create_proxy(_on_approve),
+    }, dict_converter=Object.fromEntries)
+    window.paypal.Buttons(opts).render(f"#{PAYPAL_CONTAINER_ID}")
+
+
+def _load_paypal_sdk():
+    """PayPal SDK 不在 index.html 裡預先載入，第一次打開會員彈窗才動態插入
+    <script> 標籤——沒訂閱功能的人完全不會多載這段第三方 JS。"""
+    if _state.get("paypal_sdk_loading"):
+        return
+    _state["paypal_sdk_loading"] = True
+    script = document.createElement("script")
+    script.src = f"https://www.paypal.com/sdk/js?client-id={PAYPAL_CLIENT_ID}&vault=true&intent=subscription"
+    script.setAttribute("data-sdk-integration-source", "button-factory")
+    script.addEventListener("load", create_proxy(lambda _evt: _render_paypal_button()))
+    document.head.appendChild(script)
+
+
+def toggle_membership_modal():
+    box = _dom["membership_modal"]
+    if box.classList.contains("is-open"):
+        box.classList.remove("is-open")
+        return
+    box.classList.add("is-open")
+    if window.paypal:
+        _render_paypal_button()
+    else:
+        _load_paypal_sdk()
 
 
 async def _send_notification():
@@ -1890,6 +1951,34 @@ def _build_notify_composer_modal():
     box.addEventListener("click", create_proxy(_close_on_backdrop(box)))
 
     _dom["notify_composer"] = box
+    return box
+
+
+def _build_membership_modal():
+    """會員訂閱彈窗：只放 PayPal 訂閱按鈕，不接後端——目前範圍只是「放上去
+    顯示」，onApprove 之後要不要驗證訂閱/解鎖用量上限是後續另一個任務。"""
+    box = el("div", cls="box", id="membershipModal")
+
+    panel = el("div", cls="overlay-panel")
+
+    head = el("div", cls="overlay-head")
+    head.appendChild(svg_span(ICONS["membership"].replace('viewBox', 'style="width:18px;height:18px;stroke:var(--accent);flex-shrink:0" viewBox')))
+    ht = el("div")
+    ht.appendChild(el("h2", text="會員訂閱"))
+    ht.appendChild(el("p", text="訂閱 AI 會員方案"))
+    head.appendChild(ht)
+    close_btn = el("button", cls="overlay-close", title="關閉", html=ICONS["close"])
+    close_btn.addEventListener("click", create_proxy(lambda _: toggle_membership_modal()))
+    head.appendChild(close_btn)
+    panel.appendChild(head)
+
+    body = el("div", cls="overlay-body")
+    body.appendChild(el("div", id=PAYPAL_CONTAINER_ID))
+    panel.appendChild(body)
+    box.appendChild(panel)
+    box.addEventListener("click", create_proxy(_close_on_backdrop(box)))
+
+    _dom["membership_modal"] = box
     return box
 
 
@@ -2111,6 +2200,7 @@ def build_ui():
     _sync_sidebar_accessibility()
     root.appendChild(_build_settings_modal())
     root.appendChild(_build_notify_composer_modal())
+    root.appendChild(_build_membership_modal())
 
     # 物件偵測介面掛在 index.html 既有的 `<div class="box" id="box">` 上，
     # 不是 #root 底下——build_ui() 每次重繪 #root 都不會動到它。
