@@ -136,3 +136,7 @@ output/test_character_image_close_review.py
 /data/basic_electricity/source/
 /output/basic-electricity-tests/
 /output/basic-electricity-review-tests*/
+
+# 施密特觸發器訓練的中途存檔點（--checkpoint-every，只用於中斷後接續訓練；正式模型在 run 目錄本身）
+tranning/schmitt_pretrain_runs/checkpoint/
+tranning/schmitt_chat_runs/checkpoint/
