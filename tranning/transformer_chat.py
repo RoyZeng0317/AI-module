@@ -114,6 +114,7 @@ import json
 import math
 import random
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -207,7 +208,7 @@ class CausalSelfAttention(nn.Module):
         out = out.transpose(1, 2).contiguous().view(B, T, C)
         return self.resid_dropout(self.proj(out))
 
-
+"""
 class MLP(nn.Module):
     def __init__(self, n_embd: int, dropout: float):
         super().__init__()
@@ -220,6 +221,19 @@ class MLP(nn.Module):
         self.net[2].RESIDUAL_SCALE_INIT = True  # see GPT._init_weights
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+"""
+class MLP(nn.Module):
+    def __init__(self, n_embd: int, dropout: float):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4 * n_embd),
+            nn.GELU(),
+            nn.Linear(4 * n_embd, n_embd),
+            nn.Dropout(dropout),
+        )
+        self.net[2].RESIDUAL_SCALE_INIT = True  # see GPT._init_weights
+    def forward(self, x):
         return self.net(x)
 
 
