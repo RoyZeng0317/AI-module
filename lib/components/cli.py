@@ -62,6 +62,7 @@ from rich.text import Text
 from chats import DEFAULT_OUT_DIR, is_code_request, smart_reply_traced, tokenize
 import lib.components.conversation_store as convo_store
 from lib.components.function import read_as_chat_content
+from lib.components.image_search_viewer import open_previews
 from lib.components.memory_store import CATEGORIES as MEMORY_CATEGORIES
 from lib.components.memory_store import add_memory, delete_memory, format_memories, list_memories
 from lib.components.session_store import (
@@ -514,6 +515,10 @@ def ask_model(message: str, state: dict, check_code: bool = False):
     # /model nvidia 也能立刻拿到這一輪當上下文，不用先 /resume 才補得回來。
     state["history"].append((message, reply))
     del state["history"][:-RESUME_HISTORY_CAP]
+    try:
+        open_previews(reply)
+    except OSError as exc:
+        console.print(Text(f"圖片預覽無法開啟：{exc}", style="yellow"))
 
 
 def process_input(text: str, state: dict) -> bool:
