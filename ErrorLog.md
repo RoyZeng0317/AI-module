@@ -1,5 +1,17 @@
 # Error Log
 
+## 2026-10-26：圖片搜尋誤入聊天與中文網址百分比碼
+
+最終獨立審查：英文圖片搜尋處理紀錄已改依輸入語言顯示；Reviewer重跑六組測試160項全部通過、零略過，先前Tk初始化略過未在此輪重現。詳見team-run/image-search/REVIEW.md。
+
+使用者輸入「你尋找有關周柯宇的圖片」時，既有路由只支援「辨識圖片＋路徑／網址」，沒有圖片搜尋分支，因而落入舊聊天模型並回覆無關文字。新增共用網路圖片搜尋、現有 characters.pt 目標篩選與獨立圖片預覽；未知姓名、零匹配、缺模型或推論失敗的搜尋候選均標明未確認，沒有重訓。既有維基及搜尋來源網址另以可讀中文標籤顯示，點擊仍用原始網址，保留 %2F／%26 與簽名。
+
+探測 Bing 頁面曾有圖片資料，後續只回 script；DuckDuckGo 驗證頁、Baidu antiFlag、Yahoo500均未繞過。改採實測成功的360公開圖片JSON優先、Bing備援；部分第三方圖片403會略過。第一次探測輸出遇 Windows cp950 UnicodeEncodeError，後續探測設定 PYTHONIOENCODING=utf-8；產品CLI原有UTF-8設定保留。一次讀取不存在的 image_renderer.py 索引路徑失敗，確認既有檔案實為 detection_overlay.py，未建立錯誤路徑或修改該檔。
+
+新增Tk連結測試首次以錯誤的Text.tag_bind查詢簽名造成TypeError，已顯式傳None修正並重跑；反覆建立Tk root仍會偶發既有初始化skip。相關測試159 passed／1 skipped；兩項新增GUI渲染測試通過。真實網路共用路由31.7秒取得三張候選、YOLO目標匹配0張且明示未確認；真Tk三分頁預覽開關煙測通過。權重SHA前後相同，不將工程測試當人物身份準確率驗收。證據見team-run/image-search/BUILD_LOG.md、PROBE.md、LIVE_REPLY.md；尚待使用者實際操作確認，不寫入已驗收修正日誌。
+
+獨立審查PASS，指出新增英文圖片搜尋trace仍為中文的小項；已依輸入語言切換簡單英文trace並加斷言，最後同六組測試仍159 passed／1 skipped（既有Tk初始化），沒有其他範圍變更。
+
 ## 2026-10-26：人物單圖入口補上Tkinter結果主視窗
 
 上一版img_character_predict.py僅選圖對話框與終端機姓名輸出，未滿足使用者要Tkinter顯示圖片結果的要求。已改預設開啟主視窗，含匯入、門檻、重新辨識、等比例預覽、繁體中文框／名稱／分數與無結果提示；--no-gui保留文字模式。推論在worker，queue由主Tk處理，關閉等待worker，錯誤移除舊圖避免誤讀。共享renderer只新增可選空結果文字，物品預設不變，MNIST未改。

@@ -121,6 +121,7 @@ tranning/gpt_context_runs/pilot_v2/checkpoint/model.pt
 /models/bge-small-zh-v1.5/
 /models/.hf-cache/
 /output/word-sense-tests/
+/output/image-search/
 /tranning/gpt_word_sense_runs/**/model.pt
 
 # 人物標註／多輪上下文開發過程中的測試與demo暫存輸出（可重新產生，不進版控）
@@ -129,3 +130,7 @@ output/context-*
 output/transformer-audit/
 output/test_character_review.py
 output/test_character_image_close_review.py
+
+# 基本電學題庫 pytest 測試產生的暫存複本（來源PDF複製+編號資料夾，可重新產生，不進版控）
+output/basic-electricity-tests/
+output/basic-electricity-review-tests/
