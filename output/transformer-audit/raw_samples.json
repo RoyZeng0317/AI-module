@@ -1,0 +1,44 @@
+{
+  "parameters": 17465088,
+  "vocab": 8000,
+  "block_size": 512,
+  "device": "cuda",
+  "samples": [
+    {
+      "input": "我叫小明，請記住我的名字。",
+      "raw_reply": "好，謝謝你提醒，你也要說過去看，",
+      "rule_reply": null,
+      "output_issue": null
+    },
+    {
+      "input": "我叫什麼名字？",
+      "raw_reply": "我叫 sinco",
+      "rule_reply": null,
+      "output_issue": null
+    },
+    {
+      "input": "請只回答一個中文字：好",
+      "raw_reply": "好的,我盡量都用中文回覆",
+      "rule_reply": null,
+      "output_issue": null
+    },
+    {
+      "input": "請用繁體中文，分成兩點說明什麼是機器學習。",
+      "raw_reply": "我也是的名字，別把文字切成模型給自己、最適合、最好的文字,如I'ly inco",
+      "rule_reply": null,
+      "output_issue": null
+    },
+    {
+      "input": "今天先討論橡皮擦，接下來都用繁體中文回答。",
+      "raw_reply": "當然可以，允許自己隨處、尋找距離好的話或資料看著時候，我就把所有的選項放在你身上。",
+      "rule_reply": null,
+      "output_issue": null
+    },
+    {
+      "input": "它可以做什麼？",
+      "raw_reply": "當然，我的想法幫你了，要不管遇到問題就好。",
+      "rule_reply": null,
+      "output_issue": null
+    }
+  ]
+}

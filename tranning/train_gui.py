@@ -1,7 +1,7 @@
 """Training GUI — pick a task, point at your data, tune hyperparameters, and
 launch/monitor training without memorizing each script's CLI flags.
 
-Wraps road_sign_train.py, OCR.py, circuit_diagram_train.py, speech_to_text.py,
+Wraps road_sign_train.py, OCR.py, yolo_custom.py, circuit_diagram_train.py, speech_to_text.py,
 chats.py, character_model.py, voice_clone.py, kicad_dataset_convert.py,
 code_snippet_import.py, image_classifier_bnn.py and data_split.py. Each "開始訓練"/"匯入" button runs the *exact* command
 line that script's own module docstring documents under "Usage" — as a real
@@ -478,6 +478,85 @@ CIRCUIT_COMMON_FIELDS = [
 ]
 
 
+PCB_PREP_YOLO_FIELDS = [
+    Field("images", "PCB 圖片資料夾", "dir", "--images", required=True),
+    Field("annotations", "VOC XML 標註資料夾", "dir", "--annotations", required=True),
+    Field("yolo_out", "輸出資料夾（YOLO 格式）", "dir", "--yolo-out", required=True,
+          hint="完成後把 <這個資料夾>/data.yaml 貼到下方「開始訓練」的 data.yaml 欄位。"),
+    Field("val_ratio", "驗證集比例 (val ratio)", "float", "--val-ratio", default=0.2),
+    Field("seed", "隨機種子", "int", "--seed", default=0),
+]
+
+PCB_DEFECT_FIELDS = [
+    Field("data", "data.yaml 路徑（上面步驟一輸出的）", "file", "--data", required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="pcb_defect_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+ROAD_SIGN_YOLO_FIELDS = [
+    Field("data", "data.yaml 路徑（真實標註資料集；目前沒有現成資料集時，"
+          "可先用終端機 --dataset-dir + --classes 模式，見腳本 Usage）", "file", "--data",
+          required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="road_sign_yolo_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+MATERIALS_YOLO_FIELDS = [
+    Field("data", "data.yaml 路徑（真實標註資料集；目前沒有現成資料集時，"
+          "可先用終端機 --dataset-dir 模式，--classes 預設 resistor capacitor）", "file", "--data",
+          required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="materials_yolo_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+
+YOLO_CUSTOM_MAKE_DATA_FIELDS = [
+    Field("make_data", "輸出資料夾（合成資料，測試管線用）", "dir", "--make-data", required=True),
+    Field("n", "每類張數 (n)", "int", "--n", default=200),
+]
+
+YOLO_CUSTOM_TRAIN_FIELDS = [
+    Field("train", "data.yaml 路徑（上面步驟一輸出的，或自己準備的真實資料集）", "file", "--train",
+          required=True, filetypes=YAML_FT),
+    Field("epochs", "Epochs", "int", "--epochs", default=30),
+    Field("hsv_h", "色調增強 (hsv-h)", "float", "--hsv-h", default=0.015),
+    Field("hsv_s", "飽和度增強 (hsv-s)", "float", "--hsv-s", default=0.7),
+    Field("hsv_v", "明度增強 (hsv-v)", "float", "--hsv-v", default=0.4),
+    Field("degrees", "旋轉角度 (degrees)", "float", "--degrees", default=0.0),
+    Field("translate", "平移比例 (translate)", "float", "--translate", default=0.1),
+    Field("scale", "縮放比例 (scale)", "float", "--scale", default=0.5),
+    Field("mosaic", "Mosaic 機率", "float", "--mosaic", default=1.0),
+    Field("fliplr", "水平翻轉機率（物件有方向性時設 0）", "float", "--fliplr", default=0.5),
+    Field("flipud", "垂直翻轉機率", "float", "--flipud", default=0.0),
+    Field("detach", "背景執行（關閉視窗不中斷，進度見「總控台」或終端機 --status）", "bool",
+          "--detach", default=False),
+]
+
+
 IMAGE_SPLIT_FIELDS = [
     Field("source", "來源資料夾（每個子資料夾一個類別）", "dir", "--source", required=True),
     Field("output", "輸出資料夾", "dir", "--output", required=True,
@@ -536,7 +615,11 @@ class TrainGUI:
         self._build_road_sign_tab(notebook)
         self._build_image_bnn_tab(notebook)
         self._build_ocr_tab(notebook)
+        self._build_yolo_custom_tab(notebook)
         self._build_circuit_tab(notebook)
+        self._build_pcb_defect_tab(notebook)
+        self._build_road_sign_yolo_tab(notebook)
+        self._build_materials_yolo_tab(notebook)
         self._build_speech_tab(notebook)
         self._build_chat_tab(notebook)
         self._build_code_tab(notebook)
@@ -953,6 +1036,34 @@ class TrainGUI:
         btn.pack(pady=10)
         self.start_buttons.append(btn)
 
+    def _build_yolo_custom_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "YOLO 通用偵測",
+            "通用 YOLO 遷移學習偵測器 (yolo_custom.py)，拿不到真實標註資料集時可以先用"
+            "「步驟一」產生圓/方/三角合成資料跑通整條管線（不代表真實準確度）；有真實 YOLO 格式"
+            "資料集（images/labels 各 train/val + data.yaml）時可以跳過步驟一，直接用「步驟二」訓練。",
+        )
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：產生合成資料（選用，測試管線用） ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(step1, YOLO_CUSTOM_MAKE_DATA_FIELDS)
+        make_data_btn = ttk.Button(
+            step1, text="產生合成資料",
+            command=lambda: self._start("YOLO 合成資料", "yolo_custom.py", YOLO_CUSTOM_MAKE_DATA_FIELDS),
+        )
+        make_data_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(make_data_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (yolo_custom.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step2, YOLO_CUSTOM_TRAIN_FIELDS)
+        btn = ttk.Button(step2, text="開始訓練",
+                          command=lambda: self._start("YOLO 通用偵測訓練", "yolo_custom.py", YOLO_CUSTOM_TRAIN_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
     def _build_circuit_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "電路圖偵測",
@@ -1101,6 +1212,68 @@ class TrainGUI:
             argv += ["--dataset-dir", values["dataset_dir"], "--classes", *classes]
 
         self._launch("電路圖偵測訓練", ["circuit_diagram_train.py"] + argv)
+
+    def _build_pcb_defect_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "PCB 缺陷偵測",
+            "本機 YOLO 遷移學習偵測器 (pcb_defect_train.py)，直接在完整 PCB 照片上框出缺陷"
+            "（missing_hole/mouse_bite/open_circuit/short/spur/spurious_copper），跟原本"
+            "「圖像分類（貝氏）」分頁的裁圖分類路徑並存、互不影響。VOC XML 標註資料集（如"
+            "PKU-Market-PCB）先用「步驟一」轉成 YOLO 格式，再用「步驟二」訓練。",
+        )
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：VOC 標註轉 YOLO 格式 (pcb_dataset_prep.py --yolo-out) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(step1, PCB_PREP_YOLO_FIELDS)
+        prep_btn = ttk.Button(
+            step1, text="轉換成 YOLO 格式",
+            command=lambda: self._start("PCB 標註轉換", "pcb_dataset_prep.py", PCB_PREP_YOLO_FIELDS),
+        )
+        prep_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(prep_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (pcb_defect_train.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step2, PCB_DEFECT_FIELDS)
+        btn = ttk.Button(step2, text="開始訓練",
+                          command=lambda: self._start("PCB 缺陷偵測訓練", "pcb_defect_train.py", PCB_DEFECT_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
+    def _build_road_sign_yolo_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "路牌偵測 (YOLO)",
+            "本機 YOLO 遷移學習偵測器 (road_sign_yolo_train.py)，在一張可能有多個路牌、位置"
+            "未知的畫面上直接框出每個路牌，跟原本「路牌辨識」分頁（假設一張照片已裁好、只有"
+            "一個路牌）並存、互不影響。目前沒有任何標好框的真實路牌資料集，這裡只能先用已經"
+            "準備好的 data.yaml 測試；要自己指定資料夾＋類別清單，請改用終端機（見腳本 Usage）。",
+        )
+        frame = tk.LabelFrame(outer, text=" 訓練模型 (road_sign_yolo_train.py) ", bg=PANEL_BG, fg=FG, bd=1)
+        frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(frame, ROAD_SIGN_YOLO_FIELDS)
+        btn = ttk.Button(frame, text="開始訓練",
+                          command=lambda: self._start("路牌偵測訓練", "road_sign_yolo_train.py", ROAD_SIGN_YOLO_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
+    def _build_materials_yolo_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "電阻/電容定位 (YOLO)",
+            "本機 YOLO 遷移學習偵測器 (materials_yolo_train.py)，自動找出畫面裡電阻/電容的"
+            "位置，取代 materials_recongizion/main.py 原本手動 cv2.selectROI 框選那一步"
+            "（偵測到的框會接 materials_recongizion/detect_and_read.py，呼叫既有的色碼/數字"
+            "代碼判讀，判讀邏輯完全沒變）。目前沒有任何標好框的真實資料集，這裡只能先用已經"
+            "準備好的 data.yaml 測試；要自己指定資料夾，請改用終端機（見腳本 Usage）。",
+        )
+        frame = tk.LabelFrame(outer, text=" 訓練模型 (materials_yolo_train.py) ", bg=PANEL_BG, fg=FG, bd=1)
+        frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(frame, MATERIALS_YOLO_FIELDS)
+        btn = ttk.Button(frame, text="開始訓練",
+                          command=lambda: self._start("電阻/電容定位訓練", "materials_yolo_train.py", MATERIALS_YOLO_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
 
     # -- shared start/stop/log -----------------------------------------
 

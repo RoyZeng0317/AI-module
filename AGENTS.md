@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## 使用者偏好與本次語意需求記憶（2026-10-26）
+
+- 中文或中英混合需求以繁體中文回覆；僅全英文輸入才以 A2+ 英文回覆。先閱讀專案規則與 README，大任務先拆分；程式碼盡量簡短清楚，保留禁止刪除的註解，修改限本專案，不碰 `.env`。
+- 本次目標是依上下文分辨同詞異義，例如通訊行一台「蘋果」指手機、水果行一斤「蘋果」指水果；用途含聊天、分類與語意搜尋。
+- 使用者明確同意沿用原有 Transformer 並使用中文預訓練詞向量與模型，作為此次 Rule 06 的本機預訓練資源例外，不擴張為雲端 AI API 授權。正式訓練仍沿用待辦 #43 的逐次確認約定。
+- 本次計畫與證據：[字詞語意工作目錄](team-run/word-sense/PLAN.md)。工程測試不能當成已學會消歧；未見資料的品質與保留聊天能力須另驗證。
+
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## AI-module.

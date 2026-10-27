@@ -13,7 +13,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from circuit_diagram_train import DEFAULT_WEIGHTS, build_data_yaml, train
+from circuit_diagram_train import DEFAULT_WEIGHTS, build_data_yaml, status, train
 
 CLASSES = ["component_a", "component_b"]
 IMG_SIZE = 64
@@ -56,8 +56,14 @@ def test_training_loop_runs_end_to_end(tmp_path):
     model, save_dir = train(
         data=data_yaml, out_dir=out_dir, epochs=1, batch=4, imgsz=IMG_SIZE, patience=1,
         freeze=0, lr0=1e-3, weight_decay=5e-4, device="cpu", weights=DEFAULT_WEIGHTS,
+        mosaic=0.5, copy_paste=0.1,
     )
 
     assert save_dir.exists()
     assert (save_dir / "results.csv").exists()
     assert model.trainer.best.exists()
+    assert "epoch 1/1" in status(save_dir)
+
+
+def test_status_before_training_starts(tmp_path):
+    assert "尚無訓練紀錄" in status(tmp_path / "no_such_dir")

@@ -95,6 +95,8 @@ import calculus_solver
 import logic_reasoning_generator
 import terminal_exec
 import word_problem_generator
+from image_search import image_query, search_images
+from url_display import source_link
 
 if getattr(sys, "frozen", False):
     # PyInstaller onefile (nova.exe, built to live at the project root): see
@@ -536,7 +538,8 @@ def _technical_definition(message: str, lang: str) -> tuple[str, str] | None:
 
 
 def _with_source(text: str, url) -> str:
-    return f"{text}\n{url}" if isinstance(url, str) and url.startswith(("https://", "http://")) else text
+    link = source_link(url)
+    return f"{text}\n{link}" if link else text
 
 
 def _bing_rss_search(query: str, max_results: int = 3) -> str | None:
@@ -638,9 +641,10 @@ def general_web_search(query: str, max_results: int = 3, lang: str = "zh") -> st
         # URL 時，部分終端機/GUI 的自動辨識連結功能會把括號一併算進網址或在
         # 括號處提前截斷，點開就只拿到部分網址。獨立成行且該行只有網址本身
         # 才能保證點開時取得完整 URL。
+        # 中文百分比編碼另由 _with_source() 以可讀標籤顯示，點擊目標保留原 URL。
         entry = text
         if link:
-            entry = f"{entry}\n{link}" if entry else link
+            entry = _with_source(entry, link)
         if entry and _search_relevant(query, text):
             entries.append(entry)
     return "\n\n".join(entries) or None
@@ -922,6 +926,13 @@ def route_reply(message: str) -> tuple[str, str] | None:
     # 依提問語言（繁體中文／美式英文）決定下面這些 sinco 自己組的固定字串要
     # 用哪個語言版本——見上方 _detect_lang()/_bilingual() 的說明。
     lang = _detect_lang(message)
+
+    image_subject = image_query(message)
+    if image_subject is not None:
+        reason = _bilingual(lang,
+            f'偵測到網路圖片搜尋請求「{image_subject}」，取得圖片後以本機人物 YOLO 篩選；未支援的姓名明示為未確認候選',
+            f'Image search for "{image_subject}": get web images and check them with the local person YOLO model. Images that cannot be checked are clearly marked.')
+        return reason, search_images(image_subject, lang=lang)
 
     capability = re.match(r"^(?:那)?你(?:會|懂得?|了解|能|可以).*嗎[?？!！]*$", message) or re.match(r"^(?:can|could) you\b|^do you (?:understand|know how to)\b", message, re.I)
     search_message = _normalize_search_request(message)

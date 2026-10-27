@@ -19,9 +19,11 @@ rich 表格用純文字框線畫表格是同一個折衷。
 import re
 import tkinter as tk
 import unicodedata
+import html, webbrowser
 
 _INLINE_RE = re.compile(
-    r"(?P<bold>\*\*(?P<bold_a>.+?)\*\*|__(?P<bold_b>.+?)__)"
+    r"(?P<link>!?\[(?P<link_txt>(?:\\.|[^\]\\])*)\]\(<(?P<link_url>[^<>\r\n]+)>\))"
+    r"|(?P<bold>\*\*(?P<bold_a>.+?)\*\*|__(?P<bold_b>.+?)__)"
     r"|(?P<code>`(?P<code_txt>[^`]+)`)"
     r"|(?P<italic>(?<!\*)\*(?P<italic_a>[^*\n]+?)\*(?!\*)|(?<!_)_(?P<italic_b>[^_\n]+?)_(?!_))"
 )
@@ -82,7 +84,18 @@ def _insert_inline(widget: tk.Text, line: str, base_tags: tuple[str, ...]) -> No
     for m in _INLINE_RE.finditer(line):
         if m.start() > pos:
             widget.insert(tk.INSERT, line[pos:m.start()], base_tags)
-        if m.group("bold") is not None:
+        if m.group("link") is not None:
+            label = html.unescape(re.sub(r"\\([\\\[\]*_`])", r"\1", m.group("link_txt")))
+            target = m.group("link_url")
+            tag = f"md_link_{len(widget.tag_names())}"
+            widget.tag_configure(tag, foreground="#62b5ff", underline=True)
+            widget.insert(tk.INSERT, label, base_tags + (tag,))
+            if target.startswith(("https://", "http://")):
+                widget.tag_bind(tag, "<Button-1>", lambda event, url=target: webbrowser.open(url))
+            elif m.group("link").startswith("!"):
+                from lib.components.image_search_viewer import open_previews
+                widget.tag_bind(tag, "<Button-1>", lambda event, reply=m.group("link"): open_previews(reply))
+        elif m.group("bold") is not None:
             content = m.group("bold_a") if m.group("bold_a") is not None else m.group("bold_b")
             widget.insert(tk.INSERT, content, base_tags + ("md_bold",))
         elif m.group("code") is not None:

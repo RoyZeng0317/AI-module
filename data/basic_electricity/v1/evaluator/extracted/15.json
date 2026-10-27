@@ -1,0 +1,22 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/111-4y-04-1-confirm.pdf",
+  "parts": [
+    {
+      "page": 1,
+      "text": "111 年統測試題或答案確認說明 \n考科名稱 \n四技二專-電機與電子群專(一)-基本電學、基本電學實習、電子學、電子學實習 \n試題題號 \n7 \n試題內容 \n(含選項) \n如圖(六)所示電路，由a、b 兩端看入之諾頓等效電流源IN及等效電阻RN分別為何？ \n圖(六)\n \n(A) IN = 5A，RN = 3Ω       (B) IN = 5A，RN = 6Ω \n(C) IN = 2A，RN = 3Ω       (D) IN = 2A，RN = 6Ω \n公告答案 \nA \n意見回覆 \n1. 依題意由a、b 兩端看入，其諾頓等效電流源IN 與等效電阻RN 計算如下。 \n(1) 將a、b 短路，利用重疊定理，18V 電壓源短路，Iab = 2A；2A 電流源斷路，\nIab = 18V/(18//9)Ω=3A，則諾頓等效電流源IN = 2A+3A=5A。 \n(2) 18V 電壓源短路，2A 電流源開路，則諾頓等效電阻RN = 6Ω//9Ω//18Ω＝3Ω \n2. 故本題最適當答案為(A)。 \n \n \n \n18 V\n9 Ω \n2 A\n18 Ω \nb\na\n6 Ω \na\nb\nIN\nRN\n",
+      "images": 0,
+      "drawings": 119,
+      "text_sha256": "2b01bc68bb578533d10aad3c35b5f5928d75e71b41738d27fd718c5704e1e2bb"
+    },
+    {
+      "page": 2,
+      "text": "考科名稱 \n四技二專-電機與電子群專(一)-基本電學、基本電學實習、電子學、電子學實習 \n試題題號 \n22 \n試題內容 \n(含選項) \n示波器操作面板上LEVEL 鈕之功能為何？ \n(A) 調整亮度 (B) 調整觸發準位 (C) 調整水平位置 (D) 調整垂直位置 \n公告答案 \nB \n意見回覆 \n1. 示波器面板上LEVEL 鈕之功能為調整觸發準位，調整此鈕是在設定一個電壓\n值與觸發源比對，且實際操作示波器時調整LEVEL 旋鈕，並不會改變信號的\n水平位置和垂直位置。 \n2. 故本題最適當答案為(B)。 \n \n \n",
+      "images": 0,
+      "drawings": 52,
+      "text_sha256": "c8816f14951ff123213087d986d2277baa3d6ac42224ecfffb3f87a5487a82fa"
+    }
+  ],
+  "risks": [
+    "diagrams_or_formula_layout_not_reconstructed"
+  ]
+}

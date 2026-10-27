@@ -1,0 +1,110 @@
+[
+  {
+    "id": "comparison_question_0",
+    "family": "comparison_question",
+    "term": "蘋果",
+    "text": "水果攤老闆說這台蘋果拍照清楚；他談的是哪類東西？",
+    "span": [
+      8,
+      10
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "comparison_question_1",
+    "family": "comparison_question",
+    "term": "蘋果",
+    "text": "手機店員說這顆蘋果煮成果醬很香；他談的是哪類東西？",
+    "span": [
+      7,
+      9
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "comparison_question_2",
+    "family": "comparison_question",
+    "term": "鼠",
+    "text": "獸醫詢問這個鼠是否支援藍牙和滾輪；談的是哪類東西？",
+    "span": [
+      6,
+      7
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "comparison_question_3",
+    "family": "comparison_question",
+    "term": "鼠",
+    "text": "工程師問這隻鼠為什麼會生幼崽；談的是哪類東西？",
+    "span": [
+      6,
+      7
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "comparison_question_4",
+    "family": "comparison_question",
+    "term": "病毒",
+    "text": "診所說病毒使伺服器跳出勒索畫面；感染的是什麼？",
+    "span": [
+      3,
+      5
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "comparison_question_5",
+    "family": "comparison_question",
+    "term": "病毒",
+    "text": "軟體公司說病毒使呼吸道發炎；感染的是什麼？",
+    "span": [
+      5,
+      7
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "comparison_question_6",
+    "family": "comparison_question",
+    "term": "蘋果",
+    "text": "同事說蘋果很好，能確定是水果或手機嗎？",
+    "span": [
+      3,
+      5
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "comparison_question_7",
+    "family": "comparison_question",
+    "term": "鼠",
+    "text": "只聽到鼠這個詞，能確定是動物或裝置嗎？",
+    "span": [
+      3,
+      4
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "comparison_question_8",
+    "family": "comparison_question",
+    "term": "病毒",
+    "text": "沒有其他描述時，病毒是病原或惡意程式？",
+    "span": [
+      8,
+      10
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  }
+]

@@ -74,6 +74,30 @@ def test_chat_endpoint_rejects_empty_message():
     assert r.status_code == 400
 
 
+def test_local_context_history_is_conversation_scoped_without_current_turn(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module.convo_store, "CONVERSATIONS_PATH", tmp_path / "context_conversations.json")
+    monkeypatch.setattr(app_module.session_store, "SESSION_PATH", tmp_path / "context_session.json")
+    first = client.post("/api/conversations").json()["id"]
+    second = client.post("/api/conversations").json()["id"]
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "你好，小明")):
+        client.post("/api/chat", json={"message": "我叫小明", "conversation_id": first})
+    with patch("web.backend.app.smart_reply_traced", return_value=("trace", "小明")) as generated:
+        response = client.post("/api/chat", json={"message": "我叫什麼", "conversation_id": first})
+    assert response.status_code == 200
+    assert generated.call_args.kwargs["history"] == [("我叫小明", "你好，小明")]
+    assert app_module._build_chat_history(second, "testclient") == []
+    assert app_module._build_chat_history(first, "other-owner") == []
+
+
+def test_context_history_ignores_orphans_and_uses_latest_complete_pair(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module.convo_store, "CONVERSATIONS_PATH", tmp_path / "context_orphans.json")
+    conv = app_module.convo_store.create_conversation("owner")["id"]
+    for role, content in (("assistant", "孤立回覆"), ("user", "失敗的問題"), ("user", "有效問題"),
+                          ("assistant", "有效回答"), ("user", "當輪未回答")):
+        app_module.convo_store.append_message(conv, role, content)
+    assert app_module._build_chat_history(conv, "owner") == [("有效問題", "有效回答")]
+
+
 def test_chat_endpoint_returns_reply_from_self_built_model(tmp_path, monkeypatch):
     monkeypatch.setattr("web.backend.app.session_store.SESSION_PATH", tmp_path / "session.json")
     with patch("web.backend.app.smart_reply_traced", return_value=("trace", "hi there")) as mock_smart_reply:

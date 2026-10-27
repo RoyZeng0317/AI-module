@@ -211,7 +211,7 @@ def test_character_opens_browser_with_windows_and_conversation(palette, monkeypa
         captured["conversation"] = conversation
         return None
 
-    monkeypatch.setattr("character_browser.open_character_browser", fake_open)
+    monkeypatch.setattr("lib.components.character_browser.open_character_browser", fake_open)
 
     palette.run("character")
 
@@ -291,11 +291,24 @@ def test_resume_replays_recorded_turns_and_restores_history(palette):
 
 def test_resume_clear_wipes_recorded_session(palette):
     session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+    palette.conversation.history = [("舊問題", "舊回答")]
 
     palette.run("resume clear")
 
     assert "已清除" in _chat_text(palette)
     assert session_store.load_session(path=session_store.SESSION_PATH) == []
+    assert palette.conversation.history == []
+
+
+def test_context_switch_waits_for_inflight_reply(palette):
+    palette.conversation.busy = True
+    palette.conversation.history = [("目前聊天", "不能串到其他聊天")]
+    original_id = palette.conversation.conversation_id
+    palette.run("conversations new")
+    palette.run("resume clear")
+    assert palette.conversation.conversation_id == original_id
+    assert palette.conversation.history == [("目前聊天", "不能串到其他聊天")]
+    assert "等待" in _chat_text(palette)
 
 
 def test_resume_arg_suggestions_registered():
@@ -422,10 +435,12 @@ def test_unknown_command_still_reports_error(palette):
 
 
 def test_clear_still_wipes_chat_display(palette):
+    palette.conversation.history = [("前文", "保留")]
     palette.run("memory")  # 先寫一些東西進去
     assert _chat_text(palette).strip() != ""
     palette.run("clear")
     assert _chat_text(palette).strip() == ""
+    assert palette.conversation.history == [("前文", "保留")]
 
 
 # ---------------------------------------------------------------------------

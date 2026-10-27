@@ -1,0 +1,15 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/108-4y-04-1-standard.pdf",
+  "parts": [
+    {
+      "page": 1,
+      "text": "公 告 \n答 案\n108 學年度科技校院四年制與專科學校二年制 \n統一入學測驗公告答案 \n考科代碼：4-03-1、4-04-1 \n類  別：電機與電子群電機類、電機與電子群資電類 \n考  科：電子學、基本電學 \n \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n1 \nC \n11 \nB \n21 \nA \n31 \nB \n41 \nD \n51 \n  \n2 \nA \n12 \nC \n22 \nA \n32 \nC \n42 \nC \n52 \n  \n3 \nC \n13 \nB \n23 \nC \n33 \nB \n43 \nD \n53 \n  \n4 \nB \n14 \nD \n24 \nA \n34 \nC \n44 \nA \n54 \n  \n5 \nB \n15 \nD \n25 \nB \n35 \nA \n45 \nC \n55 \n  \n6 \nD \n16 \nA \n26 \nA \n36 \nD \n46 \nB \n56 \n  \n7 \nD \n17 \nD \n27 \nA \n37 \nA \n47 \nB \n57 \n  \n8 \nC \n18 \nC \n28 \nC \n38 \nC \n48 \nA \n58 \n  \n9 \nA \n19 \nB \n29 \nD \n39 \nB \n49 \nD \n59 \n  \n10 \nD \n20 \nC \n30 \nA \n40 \nC \n50 \nA \n60 \n  \n \n",
+      "images": 0,
+      "drawings": 1680,
+      "text_sha256": "f9b353ff054891f1d6c894f433876affabcb62f76b436f7f57e6175af12fd23d"
+    }
+  ],
+  "risks": [
+    "diagrams_or_formula_layout_not_reconstructed"
+  ]
+}

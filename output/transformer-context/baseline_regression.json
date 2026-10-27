@@ -1,0 +1,241 @@
+{
+  "summary": {
+    "count": 20,
+    "by_task": {
+      "legacy_regression": {
+        "count": 20,
+        "exact": 1.0,
+        "task_success": 1.0
+      }
+    },
+    "macro_exact": 1.0,
+    "macro_task_success": 1.0,
+    "contrastive_pairs": 0,
+    "contrastive_success": 0.0,
+    "missing_history_success": 0.0
+  },
+  "rows": [
+    {
+      "prompt": "hi",
+      "reply": "hi, 有什麼可以幫你？",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:0",
+      "generated": "hi, 有什麼可以幫你？",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你是誰",
+      "reply": "我是 sinco,AI-module 專案自己訓練出來的聊天模型",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:1",
+      "generated": "我是 sinco,AI-module 專案自己訓練出來的聊天模型",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你可以做什麼",
+      "reply": "我可以幫你編寫程式、生產圖片、資料查詢等功能",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:2",
+      "generated": "我可以幫你編寫程式、生產圖片、資料查詢等功能",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你叫什麼名字",
+      "reply": "我叫 sinco",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:3",
+      "generated": "我叫 sinco",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你的名字是什麼",
+      "reply": "我的名字是 sinco",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:4",
+      "generated": "我的名字是 sinco",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你是什麼模型",
+      "reply": "我是 sinco,從零打造的 seq2seq 模型,沒有用外部 AI API",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:5",
+      "generated": "我是 sinco,從零打造的 seq2seq 模型,沒有用外部 AI API",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你是 ChatGPT 嗎",
+      "reply": "不是,我是 sinco,是獨立訓練出來的模型",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:6",
+      "generated": "不是,我是 sinco,是獨立訓練出來的模型",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你是 Claude 嗎",
+      "reply": "不是,我是 sinco,跟 Claude 沒有關係",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:7",
+      "generated": "不是,我是 sinco,跟 Claude 沒有關係",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "誰創造你的",
+      "reply": "我是在 AI-module 這個專案裡從零訓練出來的",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:8",
+      "generated": "我是在 AI-module 這個專案裡從零訓練出來的",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "sinco 是什麼意思",
+      "reply": "sinco 是我的名字,是這個專案幫我取的",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:9",
+      "generated": "sinco 是我的名字,是這個專案幫我取的",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "介紹一下自己",
+      "reply": "我是 sinco,一個自建的聊天模型,目前還在學習中",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:10",
+      "generated": "我是 sinco,一個自建的聊天模型,目前還在學習中",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "hello",
+      "reply": "hello! 我是 sinco,有什麼可以幫你？",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:11",
+      "generated": "hello! 我是 sinco,有什麼可以幫你？",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你好",
+      "reply": "你好,我是 sinco",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:12",
+      "generated": "你好,我是 sinco",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "早安",
+      "reply": "早安,新的一天開始了",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:13",
+      "generated": "早安,新的一天開始了",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "午安",
+      "reply": "午安,有什麼我可以幫忙的嗎",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:14",
+      "generated": "午安,有什麼我可以幫忙的嗎",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "晚安",
+      "reply": "晚安,祝你有個好夢",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:15",
+      "generated": "晚安,祝你有個好夢",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你會什麼",
+      "reply": "我可以聊天、回答問題,還在持續學習中",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:16",
+      "generated": "我可以聊天、回答問題,還在持續學習中",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你能幫我寫程式嗎",
+      "reply": "可以,我可以陪你討論程式邏輯",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:17",
+      "generated": "可以,我可以陪你討論程式邏輯",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "你能學習嗎",
+      "reply": "可以,給我越多對話資料,我就能學得越好",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:18",
+      "generated": "可以,給我越多對話資料,我就能學得越好",
+      "exact": true,
+      "task_success": true
+    },
+    {
+      "prompt": "bye",
+      "reply": "bye, 下次再聊",
+      "history": [],
+      "task": "legacy_regression",
+      "dialogue_id": "legacy:19",
+      "generated": "bye, 下次再聊",
+      "exact": true,
+      "task_success": true
+    }
+  ],
+  "metadata": {
+    "data": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\data\\context_dialogues\\regression.json",
+    "data_sha256": "605a6a56e755271f02510b1e88cd1890a74f530abba988872f29b13255352db8",
+    "model_dir": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\tranning\\gpt_chat_runs",
+    "model_sha256": "0b908186685d156d43ca258810aba41a36e69162d1b32d1141fc185a2b9adfa7",
+    "tokenizer_sha256": "baeed3e7aeb19ecbe9585b3ac8ad0dd806c155e92f8c109e160d9cc4ae390e2b",
+    "config_sha256": "d73073225d6b8c39f0bcca09c64c77c6bb70a71296d1c932423f9cd3011e61f8",
+    "seed": 42,
+    "format": "legacy",
+    "generation": {
+      "max_new_tokens": 60,
+      "temperature": 1.0,
+      "top_k": 1,
+      "top_p": 1.0,
+      "repetition_penalty": 1.0
+    },
+    "limit": null,
+    "counterfactual": false,
+    "is_full_test": false,
+    "evaluation_code_sha256": "a74a762485941ecc78ad6872ebb1d4cd5fa037998de728aa32ede1a71c263783",
+    "scoring": "NFKC+outer whitespace/terminal punctuation only; exact or predeclared full-sentence aliases, never contains"
+  }
+}

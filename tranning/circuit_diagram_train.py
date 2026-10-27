@@ -50,14 +50,19 @@ Usage:
 
     # or point straight at an existing Ultralytics data.yaml
     python circuit_diagram_train.py --data path/to/data.yaml --epochs 50 --freeze 0
+
+    # 背景訓練（關掉終端機不中斷）+ 查進度，跟 yolo_custom.py 同一套做法
+    python circuit_diagram_train.py --data path/to/data.yaml --detach
+    python circuit_diagram_train.py --status --out-dir circuit_diagram_runs/train
 """
 
 import argparse
-import csv
 from pathlib import Path
 
 import yaml
 from ultralytics import YOLO
+
+from yolo_train_utils import summarize_overfitting
 
 DEFAULT_WEIGHTS = Path(__file__).resolve().parents[1] / "web" / "backend" / "yolo11n.pt"
 
@@ -91,53 +96,53 @@ def build_data_yaml(dataset_dir: Path, classes: list) -> Path:
     return data_yaml
 
 
-def summarize_overfitting(results_csv: Path) -> None:
-    """Print a final train/val loss-gap check from Ultralytics' own
-    results.csv (always written after training) — no fragile mid-training
-    callback needed since Ultralytics already logs every epoch itself.
-    """
-    if not results_csv.exists():
-        return
-    with results_csv.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-    if not rows:
-        return
-    last = {k.strip(): v.strip() for k, v in rows[-1].items()}
-
-    def _loss_sum(prefix: str) -> float:
-        return sum(float(last[k]) for k in last if k.startswith(prefix) and k.endswith("_loss"))
-
-    train_loss, val_loss = _loss_sum("train/"), _loss_sum("val/")
-    map_key = next((k for k in last if k.startswith("metrics/mAP50-95")), None)
-    map50_95 = float(last[map_key]) if map_key else None
-
-    summary = f"final epoch: train_loss={train_loss:.4f} val_loss={val_loss:.4f}"
-    if map50_95 is not None:
-        summary += f" mAP50-95={map50_95:.3f}"
-    print(summary)
-
-    if train_loss > 0 and val_loss > train_loss * 1.5:
-        print("  [warning: val loss well above train loss — possible overfitting; "
-              "try a higher --freeze or more augmentation]")
-    if map50_95 is not None and map50_95 < 0.1:
-        print("  [warning: mAP50-95 still very low — possible underfitting; "
-              "try --freeze 0 (unfreeze backbone) or more epochs]")
-
-
 def train(data: Path, out_dir: Path, epochs: int, batch: int, imgsz: int, patience: int,
-          freeze: int, lr0: float, weight_decay: float, device, weights: Path):
+          freeze: int, lr0: float, weight_decay: float, device, weights: Path,
+          mosaic: float = 1.0, copy_paste: float = 0.0):
     model = YOLO(str(weights))
     model.train(
         data=str(data), epochs=epochs, batch=batch, imgsz=imgsz, patience=patience,
         freeze=freeze if freeze > 0 else None, lr0=lr0, weight_decay=weight_decay,
-        cos_lr=True, fliplr=0.0, flipud=0.0, degrees=10.0,
+        cos_lr=True, fliplr=0.0, flipud=0.0, degrees=10.0, mosaic=mosaic, copy_paste=copy_paste,
         device=device, project=str(out_dir.parent), name=out_dir.name,
         exist_ok=True, verbose=False, plots=False,
     )
     save_dir = Path(model.trainer.save_dir)
-    summarize_overfitting(save_dir / "results.csv")
+    summary = summarize_overfitting(save_dir / "results.csv")
+    if summary:
+        print(summary)
     print(f"best weights: {model.trainer.best}")
     return model, save_dir
+
+
+def detach_train(argv: list[str]) -> int:
+    """把同一條訓練指令丟到獨立子程序（關掉 VSCode／終端機也不會中斷），跟
+    yolo_custom.py 的 detach_train() 同一套做法，輸出寫 <out-dir>/../train.log。"""
+    import subprocess
+    import sys
+    root = Path(__file__).resolve().parent
+    log_path = root / "circuit_diagram_runs" / "train.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    flags = 0x00000008 | 0x00000200 if sys.platform == "win32" else 0  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+    with open(log_path, "ab") as log:
+        return subprocess.Popen([sys.executable, __file__, *[a for a in argv if a != "--detach"]],
+                                 stdin=subprocess.DEVNULL, stdout=log, stderr=log,
+                                 creationflags=flags, cwd=str(root.parent)).pid
+
+
+def status(out_dir: Path) -> str:
+    """讀 <out_dir>/results.csv + args.yaml 回報目前 epoch / 總 epoch / 最新 mAP50，
+    跟 yolo_custom.py 的 status() 同一套格式，方便 train_gui.py 用同一種方式顯示進度。"""
+    import csv
+
+    import yaml as _yaml
+    csv_path, args_path = out_dir / "results.csv", out_dir / "args.yaml"
+    if not csv_path.exists():
+        return "尚無訓練紀錄（還沒開始，或第一個 epoch 還沒跑完）。"
+    rows = [{k.strip(): v.strip() for k, v in r.items()} for r in csv.DictReader(open(csv_path, encoding="utf-8"))]
+    total = _yaml.safe_load(open(args_path, encoding="utf-8")).get("epochs", "?") if args_path.exists() else "?"
+    last = rows[-1]
+    return f"epoch {last['epoch']}/{total}  mAP50={float(last['metrics/mAP50(B)']):.3f}  mAP50-95={float(last['metrics/mAP50-95(B)']):.3f}"
 
 
 def main():
@@ -157,7 +162,15 @@ def main():
     parser.add_argument("--lr0", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=5e-4)
     parser.add_argument("--device", default=None, help="'0' for first CUDA GPU, 'cpu', or leave unset to auto-pick")
+    parser.add_argument("--mosaic", type=float, default=1.0, help="mosaic augmentation probability")
+    parser.add_argument("--copy-paste", type=float, default=0.0, help="copy-paste augmentation probability")
+    parser.add_argument("--detach", action="store_true", help="背景執行訓練（log: <out-dir>/../train.log）")
+    parser.add_argument("--status", action="store_true", help="查看訓練進度，不開始新訓練")
     args = parser.parse_args()
+
+    if args.status:
+        print(status(args.out_dir))
+        return
 
     if args.data:
         data_path = args.data
@@ -166,8 +179,14 @@ def main():
     else:
         parser.error("pass either --data <data.yaml> or both --dataset-dir and --classes")
 
+    if args.detach:
+        import sys
+        print(f"已在背景啟動（PID {detach_train(sys.argv[1:])}），用 --status 查看進度")
+        return
+
     train(data_path, args.out_dir, args.epochs, args.batch, args.imgsz, args.patience,
-          args.freeze, args.lr0, args.weight_decay, args.device, args.weights)
+          args.freeze, args.lr0, args.weight_decay, args.device, args.weights,
+          args.mosaic, args.copy_paste)
 
 
 if __name__ == "__main__":

@@ -645,10 +645,9 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     行為不變；只影響 sinco/sinco-code 兩個生成分支，不影響 route_reply() 或
     code_retrieval 命中既有範例原文那兩條路徑（沒有「生成」這回事可調）。
 
-    history 只有在 force_mode="nvidia" 時才會被用到（轉交給 _nvidia_reply()
-    組成多輪 messages）。sinco/sinco-code 這兩個字元級模型故意不吃歷史（見
-    lib/components/conversation.py 開頭的說明——塞歷史字串反而會把回覆拉走），
-    所以其餘分支完全忽略這個參數，呼叫端可以無條件傳，不用依模式判斷要不要帶。
+    history交給一般Transformer，及force_mode="nvidia"時的_nvidia_reply()。
+    本地多輪格式由checkpoint metadata啟用；舊單輪權重明確提示未啟用。
+    程式碼、工具與角色分支維持原路由，不把聊天歷史當成新的任務訊息。
 
     character（2026-09-30，to_do_list.md #45）：/character 選到的角色名字，
     None 或 "sinco" = 一般模式。有值且找得到角色卡時，一般聊天分支改走
@@ -706,15 +705,21 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
         if card is not None:
             trace, reply = persona_chat.persona_reply(message, card)
             return trace + _emotion_trace_suffix(message), reply
-    known_reply = chat_quality.dialogue_reply(message)
+    use_context = bool(history) and transformer_chat.context_enabled()
+    known_reply = chat_quality.dialogue_reply(message) if not use_context else None
     if known_reply is not None:
         return "一般對話：精確比對已審核句型（非模型生成）", known_reply
-    reply = transformer_chat.reply(message)
+    try:
+        reply = transformer_chat.reply(message, history=history) if history else transformer_chat.reply(message)
+    except ValueError as exc:
+        return "一般聊天上下文輸入檢查", f"無法處理這段上下文：{exc}"
     issue = chat_quality.output_issue(message, reply)
     if issue:
         return f"一般聊天模型輸出檢查：{issue}；請使用者補充內容", chat_quality.clarification(message)
     reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
               "沒有比對到即時查詢或程式碼請求的句型")
+    if history and not transformer_chat.context_enabled():
+        reason += "；歷史已轉交，但現行舊權重尚未啟用多輪格式"
     return (
         f"{reason} → 交給 sinco 一般聊天模型（Transformer，2026-09-10 上線）" + _emotion_trace_suffix(message),
         reply,

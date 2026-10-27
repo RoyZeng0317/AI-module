@@ -1,0 +1,794 @@
+[
+  {
+    "id": "exam-103-q02",
+    "question": "某系統的輸出功率為20 kW，效率為0.8，若連續使用10 小時，則系統的輸入能量為何？",
+    "options": {
+      "A": "250 kWH",
+      "B": "200 kWH",
+      "C": "180 kWH",
+      "D": "160 kWH"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 103,
+    "group_id": "exam-103",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/103-4y-04-1.pdf",
+      "page": 2,
+      "question_number": 2,
+      "year": 103,
+      "subject": "電子學、基本電學",
+      "sha256": "500cfc76e584831d287e77016e4725c32453bd3eaaa4908b027f6bb45dafa084"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/103-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 2,
+      "year": 103,
+      "subject": "電子學、基本電學",
+      "sha256": "7bc20f99eb30c77a243723dd1dbad4107788f4631bd9333ba404ae69b62c2392",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-103-q10",
+    "question": "四個相同的電容器串聯，若每個電容量為20 μF，則串聯的總電容量為何？",
+    "options": {
+      "A": "5 μF",
+      "B": "10 μF",
+      "C": "20 μF",
+      "D": "80 μF"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 103,
+    "group_id": "exam-103",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/103-4y-04-1.pdf",
+      "page": 3,
+      "question_number": 10,
+      "year": 103,
+      "subject": "電子學、基本電學",
+      "sha256": "500cfc76e584831d287e77016e4725c32453bd3eaaa4908b027f6bb45dafa084"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/103-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 10,
+      "year": 103,
+      "subject": "電子學、基本電學",
+      "sha256": "7bc20f99eb30c77a243723dd1dbad4107788f4631bd9333ba404ae69b62c2392",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-104-q26",
+    "question": "在 3 秒內將 10 庫侖的電荷由電位 10 V 處移動到 50 V 處，再從 50 V 處移動到 30 V 處，則總共 作功多少焦耳？",
+    "options": {
+      "A": "200",
+      "B": "400",
+      "C": "500",
+      "D": "600"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 104,
+    "group_id": "exam-104",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 26,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 26,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-104-q28",
+    "question": "將長度為 100 公尺且電阻為 1 Ω 的某金屬導體，在維持體積不變情況下，均勻拉長後的電阻 變為 9 Ω，則拉長後該金屬導體長度為多少公尺？",
+    "options": {
+      "A": "200",
+      "B": "300",
+      "C": "600",
+      "D": "900"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 104,
+    "group_id": "exam-104",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 28,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 28,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-104-q29",
+    "question": "將電阻值分別為 2 Ω、3 Ω 及 4 Ω 的三個電阻串聯後，接於 E 伏特的直流電源，若 2 Ω 電阻 消耗功率為 18 W，則 E 值為何？",
+    "options": {
+      "A": "18",
+      "B": "27",
+      "C": "32",
+      "D": "36"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 104,
+    "group_id": "exam-104",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 29,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 29,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-104-q36",
+    "question": "某電感值為 0.5 H 的線圈，若通過 4 A 電流可產生 0.01 韋柏 ( Wb ) 磁通，則該線圈的匝數與 儲存磁能分別為何？",
+    "options": {
+      "A": "200 匝，4 焦耳",
+      "B": "200 匝，2 焦耳",
+      "C": "100 匝，4 焦耳",
+      "D": "100 匝，2 焦耳"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 104,
+    "group_id": "exam-104",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "page": 6,
+      "question_number": 36,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 36,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-104-q47",
+    "question": "R LC 串聯電路發生諧振時，下列敘述何者正確？",
+    "options": {
+      "A": "阻抗最小，功率因數 0.707",
+      "B": "阻抗最小，功率因數 1.0",
+      "C": "阻抗最大，功率因數 0.707",
+      "D": "阻抗最大，功率因數 1.0"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 104,
+    "group_id": "exam-104",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-04-1.pdf",
+      "page": 8,
+      "question_number": 47,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "02794414da5d39604114d1d0773671f2a679285f7dedc438630c5d5f461f4a3f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/104-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 47,
+      "year": 104,
+      "subject": "電子學、基本電學",
+      "sha256": "7f7afb8fb760cc7e96d382eac444a7deb82ae36cd1b7c6dc5f74ef56ca97b71e",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q27",
+    "question": "某地有一部額定 800 kW 的風力發電機及一套額定 400 kW 的太陽能發電設備，若風力發電機 平均每日以額定容量運轉 8 小時，而太陽能設備平均每日以額定容量發電 4 小時。假設 1 度電的經濟效益為 5 元，每月平均運轉 24 天，則每月可獲得的經濟效益為多少元？",
+    "options": {
+      "A": "40,000",
+      "B": "96,000",
+      "C": "260,000",
+      "D": "960,000"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 27,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 27,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q28",
+    "question": "將 60 kΩ 及 30 kΩ 的電阻器並聯在一起，其總電阻可用下列哪一種色碼排列之電阻來替代？",
+    "options": {
+      "A": "紅黑橙金",
+      "B": "紅棕黃金",
+      "C": "白黑橙金",
+      "D": "白棕黃金"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 28,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 28,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q37",
+    "question": "有兩電感器 L 1 = 16 mH 及L 2 = 9 mH ，且考慮兩電感間的互感，則下列敘述何者可能正確？",
+    "options": {
+      "A": "互感 M 12 = 15 mH",
+      "B": "串聯後等效電感為 L eq = 60 mH",
+      "C": "並聯後等效電感為 L eq = 9 mH",
+      "D": "並聯後等效電感為 L eq = 16 mH"
+    },
+    "correct_option": "C",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 37,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 37,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q42",
+    "question": "有一週期性電壓波形，其週期為 20 ms，每一週期中有 10 ms 的固定直流電壓 100 V、 5 ms 的固定直流電壓 – 40 V 及 5 ms 的 0 V 電壓，請問此電壓波形之平均值為何？",
+    "options": {
+      "A": "100 V",
+      "B": "70 V",
+      "C": "50 V",
+      "D": "40 V"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 42,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 42,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q48",
+    "question": "有一 RLC 串聯電路，若電源電壓 V = 100 V、R = 10 Ω、L = 20 mH、C = 200 μ F，當電路諧振 時，則下列敘述何者正確？",
+    "options": {
+      "A": "功率因數為 1，諧振頻率為 800 Hz",
+      "B": "品質因數為 1，頻帶寬度為 8 Hz",
+      "C": "電阻器兩端的電壓大小為 100 V，電容器兩端的電壓大小為 100 V",
+      "D": "電源電流為 10 A，平均功率為 100 W"
+    },
+    "correct_option": "C",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 8,
+      "question_number": 48,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 48,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q49",
+    "question": "有一 LC 並聯電路，若電源電壓 V = 100 V、C = 40 μ F，當電源角頻率為 5000 rad / s 時電路 諧振，則下列敘述何者正確？",
+    "options": {
+      "A": "電感 L = 10 mH，諧振時電源電流為零",
+      "B": "電感 L = 1 mH，諧振時電源電流為零",
+      "C": "電感 L = 10 mH，諧振時電源電流為無限大",
+      "D": "電感 L = 1 mH，諧振時電源電流為無限大"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 8,
+      "question_number": 49,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 49,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-105-q50",
+    "question": "有一三相發電機供應 220 V 的電源電壓給一Δ 接之三相平衡負載，已知每相負載阻抗為 5 + j 8.66 Ω，試求此三相負載消耗的總平均功率為何？",
+    "options": {
+      "A": "2420 W",
+      "B": "4192 W",
+      "C": "5134 W",
+      "D": "7260 W"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 105,
+    "group_id": "exam-105",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-04-1.pdf",
+      "page": 8,
+      "question_number": 50,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "e04fb570dae9f08b9211477d81442f3075c8b39b164f23b4df6334c92a81cbf1"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/105-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 50,
+      "year": 105,
+      "subject": "電子學、基本電學",
+      "sha256": "352a94a5dbd848f8a498ddfb5a1a530c94d9d3af2c5833f3819602d2db8bc5c9",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-107-q26",
+    "question": "某手機的電池容量為 3200 mAh，只考慮手機使用在待機及通話情況下，待機時消耗電力 的電流為 10 mA，通話時消耗電力的電流為 200 mA。若電池充飽後至電力消耗完畢期間， 手機的總通話時間為 10 小時，則理想上總待機時間應為多少小時？",
+    "options": {
+      "A": "96",
+      "B": "120",
+      "C": "144",
+      "D": "168"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 107,
+    "group_id": "exam-107",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-04-1.pdf",
+      "page": 5,
+      "question_number": 26,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "d8097ba913368b02e2b412ea2f5dcc2a83eafb477288d14a3cccd120e8ba702b"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 26,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "2c5f42a856abb7a72ec518da16e7a8091a4a86ef1dd9358a53302de50caefdcb",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-107-q36",
+    "question": "兩電極板相距 3 mm，其間的介質為空氣，介質強度為 30 kV / cm，則兩電極板間不會導致 絕緣破壞的最高電壓不得超過多少 kV？",
+    "options": {
+      "A": "12",
+      "B": "11",
+      "C": "10",
+      "D": "9"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 107,
+    "group_id": "exam-107",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 36,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "d8097ba913368b02e2b412ea2f5dcc2a83eafb477288d14a3cccd120e8ba702b"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 36,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "2c5f42a856abb7a72ec518da16e7a8091a4a86ef1dd9358a53302de50caefdcb",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-107-q38",
+    "question": "在空氣中之兩平行且直的導線，線長皆為 8 公尺，兩導線相距 2 公分，導線各通以電流 I 1 及 I 2，使得兩導線間的作用力為 0.016 牛頓，若 I 1為 I 2的 2 倍，則 I 1及 I 2分別為多少安培？",
+    "options": {
+      "A": "40，20",
+      "B": "30，15",
+      "C": "24，12",
+      "D": "20，10"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 107,
+    "group_id": "exam-107",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 38,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "d8097ba913368b02e2b412ea2f5dcc2a83eafb477288d14a3cccd120e8ba702b"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 38,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "2c5f42a856abb7a72ec518da16e7a8091a4a86ef1dd9358a53302de50caefdcb",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-107-q39",
+    "question": "一電阻 R 與一無初始電荷的電容 C 串聯接於直流電源電壓 E 之 RC 充電暫態電路，若開始 充電的時間是 t = 0，則下列敘述何者錯誤？",
+    "options": {
+      "A": "在時間 t = RC 時，電容的端電壓約為 0.368 E",
+      "B": "電容兩端的電壓隨時間增加會愈來愈大，穩態時達定值 E",
+      "C": "在時間 t = 3 RC 時，電阻的端電壓約為 0.05 E",
+      "D": "電阻兩端的電壓隨時間增加會愈來愈小，穩態時為零"
+    },
+    "correct_option": "A",
+    "subject": "基本電學",
+    "year": 107,
+    "group_id": "exam-107",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 39,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "d8097ba913368b02e2b412ea2f5dcc2a83eafb477288d14a3cccd120e8ba702b"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/107-4y-03-1-standard.pdf",
+      "page": 1,
+      "question_number": 39,
+      "year": 107,
+      "subject": "電子學、基本電學",
+      "sha256": "2c5f42a856abb7a72ec518da16e7a8091a4a86ef1dd9358a53302de50caefdcb",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-109-q26",
+    "question": "電容器 C 1 = 2 μ F 耐壓 300 V，電容器 C 2 = 6 μ F 耐壓 500 V。若將 C 1及 C 2串聯，則其總耐壓 為何？",
+    "options": {
+      "A": "800 V",
+      "B": "600 V",
+      "C": "500 V",
+      "D": "400 V"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 109,
+    "group_id": "exam-109",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 26,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "7e873ef5593aa777a0eb77895cffc21a3c04e956f0623885ed6fe3c44090ab7f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1-standard.pdf",
+      "page": 1,
+      "question_number": 26,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "afc28e47da54c870e0a252cab6145b89ece8a1527fdc7122eb291c18eb562e3a",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-109-q27",
+    "question": "有一介質的厚度為 2 mm，其耐壓為 100 kV，則該介質的介質強度為何？",
+    "options": {
+      "A": "5 kV / m",
+      "B": "50 kV / m",
+      "C": "5 MV / m",
+      "D": "50 MV / m"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": 109,
+    "group_id": "exam-109",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1.pdf",
+      "page": 7,
+      "question_number": 27,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "7e873ef5593aa777a0eb77895cffc21a3c04e956f0623885ed6fe3c44090ab7f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1-standard.pdf",
+      "page": 1,
+      "question_number": 27,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "afc28e47da54c870e0a252cab6145b89ece8a1527fdc7122eb291c18eb562e3a",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "exam-109-q29",
+    "question": "兩電感 L 1、 L 2為並聯互消連接，若將耦合係數 K 提高，則其總電感量變化為何？",
+    "options": {
+      "A": "不變",
+      "B": "減少",
+      "C": "線性增加",
+      "D": "平方增加"
+    },
+    "correct_option": "B",
+    "subject": "基本電學",
+    "year": 109,
+    "group_id": "exam-109",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1.pdf",
+      "page": 8,
+      "question_number": 29,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "7e873ef5593aa777a0eb77895cffc21a3c04e956f0623885ed6fe3c44090ab7f"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/109-4y-04-1-standard.pdf",
+      "page": 1,
+      "question_number": 29,
+      "year": 109,
+      "subject": "電子學、基本電學",
+      "sha256": "afc28e47da54c870e0a252cab6145b89ece8a1527fdc7122eb291c18eb562e3a",
+      "method": "official_key"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "workbook-ch8-q01",
+    "question": "下列何者不是交流電的特性？",
+    "options": {
+      "A": "電壓可以升降",
+      "B": "電壓極性會隨時間改變",
+      "C": "可以儲存在電池",
+      "D": "為一般家用電器所使用。"
+    },
+    "correct_option": "C",
+    "subject": "基本電學",
+    "year": null,
+    "group_id": "workbook-ch8",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 1,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 1,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692",
+      "method": "inline_marker"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "workbook-ch8-q02",
+    "question": "下列何者不是高壓輸電的優點？",
+    "options": {
+      "A": "減少電壓降落",
+      "B": "減少線路損失",
+      "C": "節省導線成本",
+      "D": "節省絕緣保護設備。"
+    },
+    "correct_option": "D",
+    "subject": "基本電學",
+    "year": null,
+    "group_id": "workbook-ch8",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 2,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 2,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692",
+      "method": "inline_marker"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  },
+  {
+    "id": "workbook-ch8-q03",
+    "question": "下列有關正弦波的敘述，何者正確？",
+    "options": {
+      "A": "波形因數為√2",
+      "B": "波形因數為√3",
+      "C": "波峰因數為√2",
+      "D": "波峰因數為√3。"
+    },
+    "correct_option": "C",
+    "subject": "基本電學",
+    "year": null,
+    "group_id": "workbook-ch8",
+    "reviewed": true,
+    "source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 3,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692"
+    },
+    "answer_source": {
+      "file": "data/basic_electricity/source/Basic electricity/習作解答/基本電學-下學期習作-第八章-詳解.pdf",
+      "page": 1,
+      "question_number": 3,
+      "year": null,
+      "subject": "基本電學 下 習作本 Chapter 8 交流電",
+      "sha256": "d92742b713f997d607c502e27b22f66aec9bade6a4551dc53dc490e6cd254692",
+      "method": "inline_marker"
+    },
+    "review_note": "題幹及四選項完整；無圖、承上、送分或缺失分數結構；答案只供評分端。原題/鍵頁已抽取核對。"
+  }
+]

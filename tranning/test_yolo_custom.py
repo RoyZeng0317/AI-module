@@ -17,11 +17,12 @@ def test_apply_rules_ok_missing_and_unsure():
     assert not r["ok"] and "缺少 1" in r["issues"][0] and len(r["unsure"]) == 1  # 低信心不計數
 
 
-def test_train_and_inspect_smoke(tmp_path, monkeypatch):
+def test_train_and_inspect_smoke(tmp_path, monkeypatch, capsys):
     """1 epoch 冒煙測試：只驗管線跑得完，不驗準確度。"""
     monkeypatch.setattr(yc, "RUNS", tmp_path / "runs"); monkeypatch.setattr(yc, "BEST", tmp_path / "runs" / "custom" / "weights" / "best.pt")
-    best = yc.train(yc.make_synthetic(tmp_path / "d", n=16), epochs=1)
+    best = yc.train(yc.make_synthetic(tmp_path / "d", n=16), epochs=1, mosaic=0.5, fliplr=0.0)
     assert best.exists()
+    assert "final epoch:" in capsys.readouterr().out
     img = tmp_path / "d" / "images" / "val" / "0.jpg"
     assert "判定：" in yc.inspect(img, {"circle": 1}, weights=str(best))
 

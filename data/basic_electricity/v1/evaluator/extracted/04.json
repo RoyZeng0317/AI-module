@@ -1,0 +1,2014 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/基本電學計算機.xlsx",
+  "parts": [
+    {
+      "sheet_xml": "xl/worksheets/sheet1.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "計算一覽表",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "換算儀器",
+          "formula": ""
+        },
+        {
+          "cell": "B2",
+          "cached_value": "工作表1!A1",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "電位計算",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "電位計算!A1",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "電能計算",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "電能計算!A1",
+          "formula": ""
+        },
+        {
+          "cell": "A5",
+          "cached_value": "電功率計算",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "電功率計算!A1",
+          "formula": ""
+        },
+        {
+          "cell": "A6",
+          "cached_value": "電阻計算",
+          "formula": ""
+        },
+        {
+          "cell": "B6",
+          "cached_value": "電阻計算!A1",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "惠斯登電橋",
+          "formula": ""
+        },
+        {
+          "cell": "B7",
+          "cached_value": "惠斯登電橋!A1",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet2.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "換算儀器",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "截面積換算",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "截面積A(cm^2)",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "截面積A(cm^2)換算A(m^2)",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "0.04",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "3.9999999999999998E-6",
+          "formula": "A4/10000"
+        },
+        {
+          "cell": "A5",
+          "cached_value": "截面積(mm^2)",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "截面積A(mm^2)換算A(m^2)",
+          "formula": ""
+        },
+        {
+          "cell": "A6",
+          "cached_value": "5.5",
+          "formula": ""
+        },
+        {
+          "cell": "B6",
+          "cached_value": "5.4999999999999999E-6",
+          "formula": "A6/1000000"
+        },
+        {
+          "cell": "A7",
+          "cached_value": "時間換算",
+          "formula": ""
+        },
+        {
+          "cell": "A8",
+          "cached_value": "分鐘",
+          "formula": ""
+        },
+        {
+          "cell": "B8",
+          "cached_value": "分鐘(min)換算秒(s)",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "B9",
+          "cached_value": "600",
+          "formula": "A9*60"
+        },
+        {
+          "cell": "A10",
+          "cached_value": "小時",
+          "formula": ""
+        },
+        {
+          "cell": "B10",
+          "cached_value": "小時(hr)換算秒(s)",
+          "formula": ""
+        },
+        {
+          "cell": "A11",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "B11",
+          "cached_value": "7200",
+          "formula": "A11*3600"
+        },
+        {
+          "cell": "A12",
+          "cached_value": "電功率換算",
+          "formula": ""
+        },
+        {
+          "cell": "A13",
+          "cached_value": "馬力",
+          "formula": ""
+        },
+        {
+          "cell": "B13",
+          "cached_value": "馬力(hp)換算電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "A14",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "B14",
+          "cached_value": "1492",
+          "formula": "A14*746"
+        },
+        {
+          "cell": "A15",
+          "cached_value": "馬力",
+          "formula": ""
+        },
+        {
+          "cell": "B15",
+          "cached_value": "馬力(hp)換算電功率P(kWh)",
+          "formula": ""
+        },
+        {
+          "cell": "A16",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "B16",
+          "cached_value": "3.75",
+          "formula": "A16*3/4"
+        },
+        {
+          "cell": "A17",
+          "cached_value": "電能換算",
+          "formula": ""
+        },
+        {
+          "cell": "A18",
+          "cached_value": "電能",
+          "formula": ""
+        },
+        {
+          "cell": "B18",
+          "cached_value": "電能(W)換算電功率P(kWh)",
+          "formula": ""
+        },
+        {
+          "cell": "A19",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B19",
+          "cached_value": "1",
+          "formula": "A19"
+        },
+        {
+          "cell": "A20",
+          "cached_value": "電能",
+          "formula": ""
+        },
+        {
+          "cell": "B20",
+          "cached_value": "電能(W)換算電功率P(W/s)",
+          "formula": ""
+        },
+        {
+          "cell": "A21",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B21",
+          "cached_value": "3600",
+          "formula": "A21*3600"
+        },
+        {
+          "cell": "A22",
+          "cached_value": "電能",
+          "formula": ""
+        },
+        {
+          "cell": "B22",
+          "cached_value": "電能(W)換算電能W(J)",
+          "formula": ""
+        },
+        {
+          "cell": "A23",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B23",
+          "cached_value": "3600000",
+          "formula": "1000*3600"
+        },
+        {
+          "cell": "A25",
+          "cached_value": "",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet3.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "電荷計算",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "質子",
+          "formula": ""
+        },
+        {
+          "cell": "B2",
+          "cached_value": "一個質子數",
+          "formula": ""
+        },
+        {
+          "cell": "C2",
+          "cached_value": "多少帶電量",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "1.6020000000000001E-22",
+          "formula": ""
+        },
+        {
+          "cell": "C3",
+          "cached_value": "9.6120000000000008E-22",
+          "formula": "A3*B3"
+        },
+        {
+          "cell": "I3",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "電子",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "一個電子數",
+          "formula": ""
+        },
+        {
+          "cell": "I4",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A5",
+          "cached_value": "4",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "-1.6020000000000001E-22",
+          "formula": ""
+        },
+        {
+          "cell": "C5",
+          "cached_value": "-6.4080000000000003E-22",
+          "formula": "A5*B5"
+        },
+        {
+          "cell": "B6",
+          "cached_value": "一庫侖有多少電子",
+          "formula": ""
+        },
+        {
+          "cell": "C6",
+          "cached_value": "共多少帶電量",
+          "formula": ""
+        },
+        {
+          "cell": "I6",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "B7",
+          "cached_value": "6.25E+18",
+          "formula": ""
+        },
+        {
+          "cell": "C7",
+          "cached_value": "9.6120000000000008E-22",
+          "formula": "SUM(C3+C4)"
+        },
+        {
+          "cell": "D7",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "G7",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A18",
+          "cached_value": "電流計算",
+          "formula": ""
+        },
+        {
+          "cell": "A19",
+          "cached_value": "導體電流",
+          "formula": ""
+        },
+        {
+          "cell": "D19",
+          "cached_value": "非導體電流",
+          "formula": ""
+        },
+        {
+          "cell": "A20",
+          "cached_value": "求平均速度",
+          "formula": ""
+        },
+        {
+          "cell": "B20",
+          "cached_value": "求電流(1)",
+          "formula": ""
+        },
+        {
+          "cell": "C20",
+          "cached_value": "求電流(2)",
+          "formula": ""
+        },
+        {
+          "cell": "D20",
+          "cached_value": "求電流(3)",
+          "formula": ""
+        },
+        {
+          "cell": "E20",
+          "cached_value": "求電流(4)",
+          "formula": ""
+        },
+        {
+          "cell": "F20",
+          "cached_value": "求電流(5)",
+          "formula": ""
+        },
+        {
+          "cell": "G20",
+          "cached_value": "求電流(6)",
+          "formula": ""
+        },
+        {
+          "cell": "A21",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "B21",
+          "cached_value": "截面積A(m^2)",
+          "formula": ""
+        },
+        {
+          "cell": "C21",
+          "cached_value": "截面積A(m^2)",
+          "formula": ""
+        },
+        {
+          "cell": "D21",
+          "cached_value": "電阻R",
+          "formula": ""
+        },
+        {
+          "cell": "E21",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "F21",
+          "cached_value": "電荷",
+          "formula": ""
+        },
+        {
+          "cell": "G21",
+          "cached_value": "電功率",
+          "formula": ""
+        },
+        {
+          "cell": "A22",
+          "cached_value": "1.6000000000000001E-3",
+          "formula": ""
+        },
+        {
+          "cell": "B22",
+          "cached_value": "3.9999999999999998E-6",
+          "formula": "0.000004"
+        },
+        {
+          "cell": "C22",
+          "cached_value": "5.4999999999999999E-6",
+          "formula": ""
+        },
+        {
+          "cell": "D22",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "E22",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "F22",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "G22",
+          "cached_value": "1000",
+          "formula": ""
+        },
+        {
+          "cell": "A23",
+          "cached_value": "截面積A(m^2)",
+          "formula": ""
+        },
+        {
+          "cell": "B23",
+          "cached_value": "平均速度",
+          "formula": ""
+        },
+        {
+          "cell": "C23",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "D23",
+          "cached_value": "電壓V",
+          "formula": ""
+        },
+        {
+          "cell": "E23",
+          "cached_value": "電阻R",
+          "formula": ""
+        },
+        {
+          "cell": "F23",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "G23",
+          "cached_value": "電壓",
+          "formula": ""
+        },
+        {
+          "cell": "A24",
+          "cached_value": "1.0000000000000001E-5",
+          "formula": ""
+        },
+        {
+          "cell": "B24",
+          "cached_value": "2.34E-4",
+          "formula": ""
+        },
+        {
+          "cell": "C24",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "D24",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "E24",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "F24",
+          "cached_value": "30",
+          "formula": ""
+        },
+        {
+          "cell": "G24",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "A25",
+          "cached_value": "電子密度(電子/m^3)",
+          "formula": ""
+        },
+        {
+          "cell": "B25",
+          "cached_value": "電子密度(電子/m^3)",
+          "formula": ""
+        },
+        {
+          "cell": "C25",
+          "cached_value": "電荷Q",
+          "formula": ""
+        },
+        {
+          "cell": "D25",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "E25",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "F25",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "G25",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "A26",
+          "cached_value": "9.9999999999999991E+28",
+          "formula": ""
+        },
+        {
+          "cell": "B26",
+          "cached_value": "9.9999999999999996E+27",
+          "formula": ""
+        },
+        {
+          "cell": "C26",
+          "cached_value": "600",
+          "formula": ""
+        },
+        {
+          "cell": "D26",
+          "cached_value": "0.5",
+          "formula": "D24/D22"
+        },
+        {
+          "cell": "E26",
+          "cached_value": "1.4142135623730951",
+          "formula": "SQRT(E22/E24)"
+        },
+        {
+          "cell": "F26",
+          "cached_value": "2",
+          "formula": "F22/F24"
+        },
+        {
+          "cell": "G26",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "A27",
+          "cached_value": "電子(e)",
+          "formula": ""
+        },
+        {
+          "cell": "B27",
+          "cached_value": "電子(e)",
+          "formula": ""
+        },
+        {
+          "cell": "C27",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "G27",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "A28",
+          "cached_value": "1.6020000000000001E-22",
+          "formula": ""
+        },
+        {
+          "cell": "B28",
+          "cached_value": "1.5999999999999999E-19",
+          "formula": ""
+        },
+        {
+          "cell": "C28",
+          "cached_value": "10",
+          "formula": "C26/C24"
+        },
+        {
+          "cell": "G28",
+          "cached_value": "100",
+          "formula": "G22/G24"
+        },
+        {
+          "cell": "A29",
+          "cached_value": "平均速度",
+          "formula": ""
+        },
+        {
+          "cell": "B29",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "A30",
+          "cached_value": "9.9875156054931335E-6",
+          "formula": "A22/(A26*A24*A28)"
+        },
+        {
+          "cell": "B30",
+          "cached_value": "1.4975999999999996",
+          "formula": "B22*B24*B26*B28"
+        },
+        {
+          "cell": "A32",
+          "cached_value": "1.602E-19",
+          "formula": ""
+        },
+        {
+          "cell": "A33",
+          "cached_value": "2.4968789013732835E+19",
+          "formula": "4/A32"
+        },
+        {
+          "cell": "A34",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A41",
+          "cached_value": "電阻值計算",
+          "formula": ""
+        },
+        {
+          "cell": "D41",
+          "cached_value": "顏色",
+          "formula": ""
+        },
+        {
+          "cell": "A42",
+          "cached_value": "黑",
+          "formula": ""
+        },
+        {
+          "cell": "B42",
+          "cached_value": "0",
+          "formula": ""
+        },
+        {
+          "cell": "A43",
+          "cached_value": "棕",
+          "formula": ""
+        },
+        {
+          "cell": "B43",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "A44",
+          "cached_value": "紅",
+          "formula": ""
+        },
+        {
+          "cell": "B44",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "A45",
+          "cached_value": "橙",
+          "formula": ""
+        },
+        {
+          "cell": "B45",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "A46",
+          "cached_value": "黃",
+          "formula": ""
+        },
+        {
+          "cell": "B46",
+          "cached_value": "4",
+          "formula": ""
+        },
+        {
+          "cell": "A47",
+          "cached_value": "綠",
+          "formula": ""
+        },
+        {
+          "cell": "B47",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "A48",
+          "cached_value": "藍",
+          "formula": ""
+        },
+        {
+          "cell": "B48",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "A49",
+          "cached_value": "紫",
+          "formula": ""
+        },
+        {
+          "cell": "B49",
+          "cached_value": "7",
+          "formula": ""
+        },
+        {
+          "cell": "A50",
+          "cached_value": "灰",
+          "formula": ""
+        },
+        {
+          "cell": "B50",
+          "cached_value": "8",
+          "formula": ""
+        },
+        {
+          "cell": "A51",
+          "cached_value": "白",
+          "formula": ""
+        },
+        {
+          "cell": "B51",
+          "cached_value": "9",
+          "formula": ""
+        },
+        {
+          "cell": "A52",
+          "cached_value": "金",
+          "formula": ""
+        },
+        {
+          "cell": "B52",
+          "cached_value": "0.05",
+          "formula": ""
+        },
+        {
+          "cell": "C52",
+          "cached_value": "-0.05",
+          "formula": ""
+        },
+        {
+          "cell": "A53",
+          "cached_value": "銀",
+          "formula": ""
+        },
+        {
+          "cell": "B53",
+          "cached_value": "0.1",
+          "formula": ""
+        },
+        {
+          "cell": "C53",
+          "cached_value": "-0.1",
+          "formula": ""
+        },
+        {
+          "cell": "A54",
+          "cached_value": "無",
+          "formula": ""
+        },
+        {
+          "cell": "B54",
+          "cached_value": "0.2",
+          "formula": ""
+        },
+        {
+          "cell": "C54",
+          "cached_value": "-0.2",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet4.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "電位計算",
+          "formula": ""
+        },
+        {
+          "cell": "C1",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "求電能",
+          "formula": ""
+        },
+        {
+          "cell": "C2",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "D2",
+          "cached_value": "求電荷",
+          "formula": ""
+        },
+        {
+          "cell": "E2",
+          "cached_value": "求電位",
+          "formula": ""
+        },
+        {
+          "cell": "H2",
+          "cached_value": "求電壓",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "電荷Q",
+          "formula": ""
+        },
+        {
+          "cell": "D3",
+          "cached_value": "電壓V",
+          "formula": ""
+        },
+        {
+          "cell": "E3",
+          "cached_value": "電荷Q",
+          "formula": ""
+        },
+        {
+          "cell": "H3",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "30",
+          "formula": ""
+        },
+        {
+          "cell": "D4",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "E4",
+          "cached_value": "0.03",
+          "formula": ""
+        },
+        {
+          "cell": "H4",
+          "cached_value": "1492",
+          "formula": ""
+        },
+        {
+          "cell": "A5",
+          "cached_value": "電壓V(有高低電位差)",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "最高電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "C5",
+          "cached_value": "最低電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "D5",
+          "cached_value": "電能W",
+          "formula": ""
+        },
+        {
+          "cell": "E5",
+          "cached_value": "電能W",
+          "formula": ""
+        },
+        {
+          "cell": "H5",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "A6",
+          "cached_value": "80",
+          "formula": "B6-C6"
+        },
+        {
+          "cell": "B6",
+          "cached_value": "100",
+          "formula": ""
+        },
+        {
+          "cell": "C6",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "D6",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "E6",
+          "cached_value": "1.2",
+          "formula": ""
+        },
+        {
+          "cell": "H6",
+          "cached_value": "600",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "電壓V(電位差)",
+          "formula": ""
+        },
+        {
+          "cell": "D7",
+          "cached_value": "電荷Q",
+          "formula": ""
+        },
+        {
+          "cell": "E7",
+          "cached_value": "電壓V(有高低電位差)",
+          "formula": ""
+        },
+        {
+          "cell": "F7",
+          "cached_value": "最高電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "G7",
+          "cached_value": "最低電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "H7",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "D8",
+          "cached_value": "4",
+          "formula": "D6/D4"
+        },
+        {
+          "cell": "F8",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "G8",
+          "cached_value": "20",
+          "formula": "電位計算!F8-電位計算!E10"
+        },
+        {
+          "cell": "H8",
+          "cached_value": "6.78",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "電能W(自動計算)",
+          "formula": ""
+        },
+        {
+          "cell": "B9",
+          "cached_value": "電能W(非自動計算)",
+          "formula": ""
+        },
+        {
+          "cell": "D9",
+          "cached_value": "電子",
+          "formula": ""
+        },
+        {
+          "cell": "E9",
+          "cached_value": "電壓V(電位差)",
+          "formula": ""
+        },
+        {
+          "cell": "F9",
+          "cached_value": "最高電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "G9",
+          "cached_value": "最低電壓值",
+          "formula": ""
+        },
+        {
+          "cell": "H9",
+          "cached_value": "電壓",
+          "formula": ""
+        },
+        {
+          "cell": "A10",
+          "cached_value": "2400",
+          "formula": "A4*A6"
+        },
+        {
+          "cell": "B10",
+          "cached_value": "0",
+          "formula": "A4*A8"
+        },
+        {
+          "cell": "D10",
+          "cached_value": "2.4968789013732832E+22",
+          "formula": "D8/工作表1!B3"
+        },
+        {
+          "cell": "E10",
+          "cached_value": "40",
+          "formula": "E6/E4"
+        },
+        {
+          "cell": "F10",
+          "cached_value": "60",
+          "formula": "E10+電位計算!G10"
+        },
+        {
+          "cell": "G10",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "H10",
+          "cached_value": "220.0589970501475",
+          "formula": "H4/H8"
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet5.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "電功率計算",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "求電功率",
+          "formula": ""
+        },
+        {
+          "cell": "F2",
+          "cached_value": "W,t",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "電能W",
+          "formula": ""
+        },
+        {
+          "cell": "C3",
+          "cached_value": "電阻R",
+          "formula": ""
+        },
+        {
+          "cell": "D3",
+          "cached_value": "電壓V",
+          "formula": ""
+        },
+        {
+          "cell": "E3",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "F3",
+          "cached_value": "電能W",
+          "formula": "IF(F2=\"t,V,I\",\"時間t(s)\",IF(F2=\"W,t\",\"電能W\",IF(F2=\"R,V\",\"電阻R\",IF(F2=\"V,I\",\"電壓V\",IF(F2=\"I,R\",\"電流I\")))))"
+        },
+        {
+          "cell": "A4",
+          "cached_value": "7200",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "60000",
+          "formula": ""
+        },
+        {
+          "cell": "C4",
+          "cached_value": "100",
+          "formula": ""
+        },
+        {
+          "cell": "D4",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "E4",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "F4",
+          "cached_value": "7200",
+          "formula": ""
+        },
+        {
+          "cell": "A5",
+          "cached_value": "電壓V",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "時間t(s)",
+          "formula": ""
+        },
+        {
+          "cell": "C5",
+          "cached_value": "電壓V",
+          "formula": ""
+        },
+        {
+          "cell": "D5",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "E5",
+          "cached_value": "電阻R",
+          "formula": ""
+        },
+        {
+          "cell": "F5",
+          "cached_value": "時間t(s)",
+          "formula": "IF(F2=\"t,V,I\",\"電壓V\",IF(F2=\"W,t\",\"時間t(s)\",IF(F2=\"R,V\",\"電壓V\",IF(F2=\"V,I\",\"電流I\",IF(F2=\"I,R\",\"電阻R\")))))"
+        },
+        {
+          "cell": "A6",
+          "cached_value": "110",
+          "formula": ""
+        },
+        {
+          "cell": "B6",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "C6",
+          "cached_value": "110",
+          "formula": ""
+        },
+        {
+          "cell": "D6",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "E6",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "F6",
+          "cached_value": "110",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "電流I",
+          "formula": ""
+        },
+        {
+          "cell": "B7",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "C7",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "D7",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "E7",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "F7",
+          "cached_value": "電功率P",
+          "formula": "IF(F2=\"t,V,I\",\"電流I\",IF(F2=\"W,t\",\"電功率P\",IF(F2=\"R,V\",\"電功率P\",IF(F2=\"V,I\",\"電功率P\",IF(F2=\"I,R\",\"電功率P\")))))"
+        },
+        {
+          "cell": "A8",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "B8",
+          "cached_value": "1000",
+          "formula": "B4/B6"
+        },
+        {
+          "cell": "C8",
+          "cached_value": "121",
+          "formula": "(C6^2)/C4"
+        },
+        {
+          "cell": "D8",
+          "cached_value": "10",
+          "formula": "D4*D6"
+        },
+        {
+          "cell": "E8",
+          "cached_value": "2.5",
+          "formula": "(E4^2)/E6"
+        },
+        {
+          "cell": "F8",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "電功率P",
+          "formula": ""
+        },
+        {
+          "cell": "F9",
+          "cached_value": "",
+          "formula": "IF(F2=\"t,V,I\",\"電功率P\",IF(F2=\"W,t\",\"\",IF(F2=\"R,V\",\"\",IF(F2=\"V,I\",\"\",IF(F2=\"I,R\",\"\")))))"
+        },
+        {
+          "cell": "A10",
+          "cached_value": "550",
+          "formula": "(A4*A6*A8)/A4"
+        },
+        {
+          "cell": "F10",
+          "cached_value": "",
+          "formula": "IF(F2=\"t,V,I\",(F4*F6*F8)/F4,\"\")"
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet6.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "電能計算",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet7.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "電阻計算",
+          "formula": ""
+        },
+        {
+          "cell": "E1",
+          "cached_value": "四碼電阻",
+          "formula": ""
+        },
+        {
+          "cell": "F1",
+          "cached_value": "色碼數值",
+          "formula": ""
+        },
+        {
+          "cell": "G1",
+          "cached_value": "計算數值",
+          "formula": ""
+        },
+        {
+          "cell": "H1",
+          "cached_value": "三碼電阻",
+          "formula": ""
+        },
+        {
+          "cell": "K1",
+          "cached_value": "五碼電阻",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "多個電阻",
+          "formula": ""
+        },
+        {
+          "cell": "B2",
+          "cached_value": "電阻串聯",
+          "formula": ""
+        },
+        {
+          "cell": "C2",
+          "cached_value": "電阻並聯",
+          "formula": ""
+        },
+        {
+          "cell": "D2",
+          "cached_value": "黑",
+          "formula": ""
+        },
+        {
+          "cell": "E2",
+          "cached_value": "棕",
+          "formula": ""
+        },
+        {
+          "cell": "F2",
+          "cached_value": "1",
+          "formula": "IF(E2=\"黑\",0,IF(E2=\"棕\",1,IF(E2=\"紅\",2,IF(E2=\"橙\",3,IF(E2=\"黃\",4,IF(E2=\"綠\",5,IF(E2=\"藍\",6,IF(E2=\"紫\",7,IF(E2=\"灰\",8,IF(E2=\"白\",9))))))))))"
+        },
+        {
+          "cell": "G2",
+          "cached_value": "1050",
+          "formula": "(F2&F3)*10^F4+F6"
+        },
+        {
+          "cell": "H2",
+          "cached_value": "黃",
+          "formula": ""
+        },
+        {
+          "cell": "I2",
+          "cached_value": "4",
+          "formula": "IF(H2=\"黑\",0,IF(H2=\"棕\",1,IF(H2=\"紅\",2,IF(H2=\"橙\",3,IF(H2=\"黃\",4,IF(H2=\"綠\",5,IF(H2=\"藍\",6,IF(H2=\"紫\",7,IF(H2=\"灰\",8,IF(H2=\"白\",9))))))))))"
+        },
+        {
+          "cell": "J2",
+          "cached_value": "87.35",
+          "formula": "(I2&I3)+I5"
+        },
+        {
+          "cell": "A3",
+          "cached_value": "電阻值",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "總電阻",
+          "formula": ""
+        },
+        {
+          "cell": "C3",
+          "cached_value": "總電阻",
+          "formula": ""
+        },
+        {
+          "cell": "E3",
+          "cached_value": "黑",
+          "formula": ""
+        },
+        {
+          "cell": "F3",
+          "cached_value": "0",
+          "formula": "IF(E3=\"黑\",0,IF(E3=\"棕\",1,IF(E3=\"紅\",2,IF(E3=\"橙\",3,IF(E3=\"黃\",4,IF(E3=\"綠\",5,IF(E3=\"藍\",6,IF(E3=\"紫\",7,IF(E3=\"灰\",8,IF(E3=\"白\",9,))))))))))"
+        },
+        {
+          "cell": "G3",
+          "cached_value": "|",
+          "formula": ""
+        },
+        {
+          "cell": "H3",
+          "cached_value": "紫",
+          "formula": ""
+        },
+        {
+          "cell": "I3",
+          "cached_value": "7",
+          "formula": "IF(H3=\"黑\",0,IF(H3=\"棕\",1,IF(H3=\"紅\",2,IF(H3=\"橙\",3,IF(H3=\"黃\",4,IF(H3=\"綠\",5,IF(H3=\"藍\",6,IF(H3=\"紫\",7,IF(H3=\"灰\",8,IF(H3=\"白\",9,))))))))))"
+        },
+        {
+          "cell": "J3",
+          "cached_value": "|",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "55",
+          "formula": "A4+A5+A6+A7+A8+A9+A10+A11+A12+A13"
+        },
+        {
+          "cell": "C4",
+          "cached_value": "2.9289682539682538",
+          "formula": "(1/A4)+(1/A5)+(1/A6)+(1/A7)+(1/A8)+(1/A9)+(1/A10)+(1/A11)+(1/A12)+(1/A13)"
+        },
+        {
+          "cell": "E4",
+          "cached_value": "紅",
+          "formula": ""
+        },
+        {
+          "cell": "F4",
+          "cached_value": "2",
+          "formula": "IF(E4=\"黑\",0,IF(E4=\"棕\",1,IF(E4=\"紅\",2,IF(E4=\"橙\",3,IF(E4=\"黃\",4,IF(E4=\"綠\",5,IF(E4=\"藍\",6,IF(E4=\"紫\",7,IF(E4=\"灰\",8,IF(E4=\"白\",9,))))))))))"
+        },
+        {
+          "cell": "G4",
+          "cached_value": "950",
+          "formula": "(F2&F3)*10^F4-F6"
+        },
+        {
+          "cell": "H4",
+          "cached_value": "金",
+          "formula": ""
+        },
+        {
+          "cell": "I4",
+          "cached_value": "0.05",
+          "formula": "IF(H4=\"黑\",0,IF(H4=\"棕\",1,IF(H4=\"紅\",2,IF(H4=\"橙\",3,IF(H4=\"黃\",4,IF(H4=\"綠\",5,IF(H4=\"藍\",6,IF(H4=\"紫\",7,IF(H4=\"灰\",8,IF(H4=\"白\",9,IF(H4=\"金\",5%,IF(H4=\"銀\",10%,IF(H4=\"無\",20%)))))))))))))"
+        },
+        {
+          "cell": "J4",
+          "cached_value": "6.6499999999999986",
+          "formula": "(I2&I3)-I5"
+        },
+        {
+          "cell": "A5",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "E5",
+          "cached_value": "金",
+          "formula": ""
+        },
+        {
+          "cell": "F5",
+          "cached_value": "0.05",
+          "formula": "IF(E5=\"金\",5%,IF(E5=\"銀\",10%,IF(E5=\"無\",20%)))"
+        },
+        {
+          "cell": "G5",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "I5",
+          "cached_value": "40.35",
+          "formula": "I2&I3*I4"
+        },
+        {
+          "cell": "A6",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "E6",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "F6",
+          "cached_value": "50",
+          "formula": "(F2&F3)*10^F4*F5"
+        },
+        {
+          "cell": "G6",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "I6",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "4",
+          "formula": ""
+        },
+        {
+          "cell": "E7",
+          "cached_value": "n個電阻",
+          "formula": ""
+        },
+        {
+          "cell": "F7",
+          "cached_value": "電阻串聯總電阻",
+          "formula": ""
+        },
+        {
+          "cell": "G7",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A8",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "E8",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "F8",
+          "cached_value": "電阻並聯總電阻",
+          "formula": ""
+        },
+        {
+          "cell": "G8",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "E9",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "F9",
+          "cached_value": "電阻值",
+          "formula": ""
+        },
+        {
+          "cell": "A10",
+          "cached_value": "7",
+          "formula": ""
+        },
+        {
+          "cell": "E10",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A11",
+          "cached_value": "8",
+          "formula": ""
+        },
+        {
+          "cell": "E11",
+          "cached_value": "",
+          "formula": "IF(E10=5, \"R\" & ROW(E12)-ROW($E$10)+1, \"\")"
+        },
+        {
+          "cell": "A12",
+          "cached_value": "9",
+          "formula": ""
+        },
+        {
+          "cell": "E12",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A13",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "E13",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A14",
+          "cached_value": "兩個電阻",
+          "formula": ""
+        },
+        {
+          "cell": "B14",
+          "cached_value": "電阻值",
+          "formula": ""
+        },
+        {
+          "cell": "C14",
+          "cached_value": "電阻串聯",
+          "formula": ""
+        },
+        {
+          "cell": "D14",
+          "cached_value": "電組並聯",
+          "formula": ""
+        },
+        {
+          "cell": "E14",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A15",
+          "cached_value": "R1",
+          "formula": ""
+        },
+        {
+          "cell": "B15",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "C15",
+          "cached_value": "9",
+          "formula": "B15+B16"
+        },
+        {
+          "cell": "D15",
+          "cached_value": "2",
+          "formula": "(B15*B16)/(B15+B16)"
+        },
+        {
+          "cell": "E15",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A16",
+          "cached_value": "R2",
+          "formula": ""
+        },
+        {
+          "cell": "B16",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "E16",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A17",
+          "cached_value": "三個電阻",
+          "formula": ""
+        },
+        {
+          "cell": "B17",
+          "cached_value": "電阻值",
+          "formula": ""
+        },
+        {
+          "cell": "C17",
+          "cached_value": "電阻串聯",
+          "formula": ""
+        },
+        {
+          "cell": "D17",
+          "cached_value": "電組並聯",
+          "formula": ""
+        },
+        {
+          "cell": "E17",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A18",
+          "cached_value": "R1",
+          "formula": ""
+        },
+        {
+          "cell": "B18",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "C18",
+          "cached_value": "6",
+          "formula": "B18+B19+B20"
+        },
+        {
+          "cell": "D18",
+          "cached_value": "1.5",
+          "formula": "(1/B18)+(1/B19)+(1/B20)"
+        },
+        {
+          "cell": "E18",
+          "cached_value": "",
+          "formula": ""
+        },
+        {
+          "cell": "A19",
+          "cached_value": "R2",
+          "formula": ""
+        },
+        {
+          "cell": "B19",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "D19",
+          "cached_value": "1.5",
+          "formula": "(1/B18)+(1/B19)+(1/B20)"
+        },
+        {
+          "cell": "A20",
+          "cached_value": "R3",
+          "formula": ""
+        },
+        {
+          "cell": "B20",
+          "cached_value": "2",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet8.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "惠斯登電橋",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "電阻編號",
+          "formula": ""
+        },
+        {
+          "cell": "C2",
+          "cached_value": "電阻值",
+          "formula": ""
+        },
+        {
+          "cell": "D2",
+          "cached_value": "電阻編號",
+          "formula": ""
+        },
+        {
+          "cell": "F2",
+          "cached_value": "電橋中的電流",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "R1",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "左上",
+          "formula": ""
+        },
+        {
+          "cell": "C3",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "D3",
+          "cached_value": "Ra",
+          "formula": ""
+        },
+        {
+          "cell": "E3",
+          "cached_value": "2",
+          "formula": "(C3*C4)/(C3+C4+C7)"
+        },
+        {
+          "cell": "F3",
+          "cached_value": "相同",
+          "formula": ""
+        },
+        {
+          "cell": "G3",
+          "cached_value": "60",
+          "formula": "(C3*C6)"
+        },
+        {
+          "cell": "H3",
+          "cached_value": "0A",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "R2",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "右上",
+          "formula": ""
+        },
+        {
+          "cell": "C4",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "D4",
+          "cached_value": "Rb",
+          "formula": ""
+        },
+        {
+          "cell": "E4",
+          "cached_value": "0.4",
+          "formula": "(C3*C7)/(C3+C4+C7)"
+        },
+        {
+          "cell": "G4",
+          "cached_value": "60",
+          "formula": "C4*C5"
+        },
+        {
+          "cell": "A5",
+          "cached_value": "R3",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "左下",
+          "formula": ""
+        },
+        {
+          "cell": "C5",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "D5",
+          "cached_value": "Rc",
+          "formula": ""
+        },
+        {
+          "cell": "E5",
+          "cached_value": "1.3333333333333333",
+          "formula": "(C4*C7)/(C3+C4+C7)"
+        },
+        {
+          "cell": "A6",
+          "cached_value": "R4",
+          "formula": ""
+        },
+        {
+          "cell": "B6",
+          "cached_value": "右下",
+          "formula": ""
+        },
+        {
+          "cell": "C6",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "R5",
+          "formula": ""
+        },
+        {
+          "cell": "B7",
+          "cached_value": "中間",
+          "formula": ""
+        },
+        {
+          "cell": "C7",
+          "cached_value": "2",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    }
+  ],
+  "risks": [
+    "spreadsheet_formulas_not_executed_not_verified_answer_keys"
+  ]
+}

@@ -112,5 +112,95 @@
     "category": "developer_preference",
     "text": "使用者規則：含中文輸入一律以繁體中文回應；只有全英文輸入才以 A2+ 英文回應。先讀 AGENTS.md、README 與相關紀錄再修改；只在 AI-module 內修改、不碰 .env、不刪禁止刪除的註解；大任務先拆分，必要問題一次問齊，程式碼保持簡短易讀。",
     "created_at": "2026-10-12T05:04:59+00:00"
+  },
+  {
+    "id": "821cecde",
+    "category": "project",
+    "text": "2026-10-20：照片處理需求：支援一般照片，以灰階擷取特徵、學習不同角度與判定是否旋轉，依文字修改後輸出彩色；先提供獨立 Python 示範與各階段圖片。自建本地模型，不使用外部 AI 或預訓練權重，算力上限 RTX 4060 8GB。",
+    "created_at": "2026-10-20T04:51:30+00:00"
+  },
+  {
+    "id": "9f8683de",
+    "category": "project",
+    "text": "2026-10-20：照片灰階／邊緣處理與獨立 Python 示範也必須包含電路圖；保留細線與斷線，區分邊緣特徵和真正元件／電路連接理解。",
+    "created_at": "2026-10-20T05:16:33+00:00"
+  },
+  {
+    "id": "f39a36bc",
+    "category": "project",
+    "text": "2026-10-20：影像處理範圍必須包含真實麵包板實拍電路，含杜邦線、電阻與其他插接元件，不限於繪製的原理圖；應保留彩色原圖供線色、色環等後續分析，不能以合成原理圖冒充實拍處理成果。",
+    "created_at": "2026-10-20T05:27:20+00:00"
+  },
+  {
+    "id": "fad5c6a7",
+    "category": "business_rule",
+    "text": "2026-10-20 使用者要求限制中國大陸、香港、澳門、臺灣地區；拒絕裝置定位本身仍可使用，其他文字判定途徑保留，但門檻待確認。帳戶一經封禁須維持，僅提交申訴並經人工核准才可解除。此為待實作政策，不代表現有 observe_only 已封禁；帳戶身分與適用介面尚待確認。",
+    "created_at": "2026-10-20T06:33:16+00:00"
+  },
+  {
+    "id": "1e082fbc",
+    "category": "project",
+    "text": "2026-10-20：使用者確認麵包板目標為接線理解（追蹤接點、還原電路、檢查接線）；正確自有資料在 C:/Users/roy/Downloads/電路資料集/，8照片7影片，先前專題測試結果是誤傳必須排除。原資料唯讀，輸出在AI-module；資料已整理為29資產，尚缺預期電路及元件腳序確認，不能將前處理或未標註資料宣稱為接線理解完成。",
+    "created_at": "2026-10-20T07:58:59+00:00"
+  },
+  {
+    "id": "cb0b1021",
+    "category": "project",
+    "text": "2026-10-25：物品標註功能要求完成本地照片／攝影機人工框選工具、YOLO 訓練入口與即時偵測串接；使用者明確允許本次物品偵測使用現有 YOLO 預訓練權重微調。類別須可自訂，不將通用 COCO 模型誤稱為已學會橡皮擦；真實辨識效果待標註資料與訓練驗證。",
+    "created_at": "2026-10-25T06:58:38+00:00"
+  },
+  {
+    "id": "9cfa7885",
+    "category": "task_progress",
+    "text": "2026-10-25：物品資料已擴充50張，真實加強比較後攝影機載入 tranning/object_detection_runs/expanded_50_transfer11/weights/best.pt，conf=.25；工具微調預設YOLO11n、150epochs、batch4、nbs=batch、AdamW .001、warmup0、freeze10、degrees15、mosaic.2、scale.3。原模型保留；截圖可辨識橡皮擦與直尺但指甲剪仍漏，缺獨立橡皮擦val，不能宣稱全類泛化已通過。",
+    "created_at": "2026-10-25T15:33:54+00:00"
+  },
+  {
+    "id": "a0be27b7",
+    "category": "task_progress",
+    "text": "2026-10-25：使用者確認本次YOLO加強後「準確率很高了」，並要求記錄問題原因。已寫入 Agent/ErrorLog/Success/2026-10-25-YOLO物品標記與小資料訓練修正.md，區分舊權重、小資料有效更新不足與顯示問題；保留量化評估及泛化限制，不把使用者正向回饋換算成未測準確率。",
+    "created_at": "2026-10-25T15:37:48+00:00"
+  },
+  {
+    "id": "4bf6dc59",
+    "category": "task_progress",
+    "text": "2026-10-26：Transformer多輪工程已完成dialogue_v1及三前端history串接、mask和隔離；兩次本地實訓未達gate（test去重macro14.71%、單輪20/20→3/20），正式gpt_chat_runs未切換。pilot_v2只供明確選用實驗，不能宣稱理解已完成；後續優先補多樣上下文/指令與知識保留，用新獨立測試驗收。詳team-run/transformer-context/EXPERIMENT.md。",
+    "created_at": "2026-10-25T16:49:10+00:00"
+  },
+  {
+    "id": "2ed03cc7",
+    "category": "project",
+    "text": "2026-10-26：使用者要求人物特徵標註用獨立characters.pt，自行按人物標記。既有路徑tranning/yolo_runs/custom/weights/characters.pt為空檔；新增lib.yolo.character_labeler，獨立data/character_detection與character_detection_runs，訓練成功後備份發布characters.pt，不覆蓋物品模型。尚待人物照片與訓練，不等同完整人臉身份驗證。",
+    "created_at": "2026-10-26T04:38:39+00:00"
+  },
+  {
+    "id": "7824ae07",
+    "category": "task_progress",
+    "text": "2026-10-26：人物已獨立data/character_detection（136張、84reviewed），run d15bd93e0eed427d84a9ae9e0f74e6a7已訓練，characters.pt不是空檔。val30張31框比較後以last.pt發布到tranning/yolo_runs/custom/weights/characters.pt（備份原best），門檻.25可TP24/31且FP1；人物GUI新增best/last選擇與conf欄位、發布清cache。人物用python -m lib.yolo.character_labeler及使用自訂模型按鈕，原Instant Image Reconginizion.py仍是物品入口。52pending照片保留，不混物品資料，尚未驗收真實身份辨識。",
+    "created_at": "2026-10-26T05:57:05+00:00"
+  },
+  {
+    "id": "3f082c1a",
+    "category": "developer_preference",
+    "text": "2026-10-26：使用者明確要求人物單張圖片識別要有Tkinter結果主視窗，不能只有選檔對話框或終端機輸出。img_character_predict.py現在預設GUI，含匯入、預覽、中文框/姓名/分數、門檻與重試；--no-gui才走純文字。仍讀獨立characters.pt，MNIST原檔保留。",
+    "created_at": "2026-10-26T06:24:05+00:00"
+  },
+  {
+    "id": "5a79e06b",
+    "category": "developer_preference",
+    "text": "中文或中英混合需求使用繁體中文回覆；僅全英文輸入使用A2+英文。先讀AGENTS.md與README，大任務先拆分，僅修改本專案，不碰.env。",
+    "created_at": "2026-10-26T13:17:45+00:00"
+  },
+  {
+    "id": "a9a58c27",
+    "category": "project",
+    "text": "2026-10-26：聊天支援網路圖片搜尋，使用既有characters.pt YOLO篩選人物候選，CLI獨立視窗預覽。附件與來源連結顯示可讀UTF-8中文，保留原始網址作為點擊目標；不自動訓練或呼叫雲端AI。",
+    "created_at": "2026-10-26T13:17:45+00:00"
+  },
+  {
+    "id": "4a29541f",
+    "category": "project",
+    "text": "2026-10-27：基本電學題庫用於提升自建模型解題；模型先只看題目與必要選項獨立作答，解答僅由評分端保管用於檢查與糾錯，不先填入模型提示讓其照抄。保留獨立測試題與原始作答記錄，不把資料整理或工程測試當作已學會解題；正式訓練仍依既有#43逐輪確認。",
+    "created_at": "2026-10-27T05:01:02+00:00"
   }
 ]

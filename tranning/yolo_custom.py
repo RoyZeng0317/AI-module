@@ -9,6 +9,9 @@ Usage:
     python yolo_custom.py --make-data tranning/yolo_data --n 200
     python yolo_custom.py --train tranning/yolo_data/data.yaml --epochs 30
     python yolo_custom.py --inspect photo.jpg --rules '{"circle": 2, "square": 1}'
+
+    # 真實資料集增強強度跟合成資料不一樣，可覆寫（預設值 = Ultralytics 原預設）
+    python yolo_custom.py --train data.yaml --mosaic 0.5 --degrees 10 --fliplr 0
 """
 import argparse, json, random, sys
 from pathlib import Path
@@ -18,6 +21,7 @@ sys.path[:0] = [str(_ROOT / "web" / "backend"), str(Path(__file__).resolve().par
 
 import cv2, numpy as np  # noqa: E402
 from bayesian_utils import low_confidence_warning  # noqa: E402
+from yolo_train_utils import summarize_overfitting  # noqa: E402
 
 CLASSES = ["circle", "square", "triangle"]
 RUNS = Path(__file__).resolve().parent / "yolo_runs"
@@ -48,16 +52,26 @@ def make_synthetic(out: Path, n: int = 200, size: int = 320, seed: int = 0) -> P
     return yaml
 
 
-def train(data_yaml: Path = None, epochs: int = 30, imgsz: int = 320, base: str = "yolo26n.pt", resume: bool = False) -> Path:
+def train(data_yaml: Path = None, epochs: int = 30, imgsz: int = 320, base: str = "yolo26n.pt", resume: bool = False,
+          hsv_h: float = 0.015, hsv_s: float = 0.7, hsv_v: float = 0.4, degrees: float = 0.0,
+          translate: float = 0.1, scale: float = 0.5, mosaic: float = 1.0,
+          fliplr: float = 0.5, flipud: float = 0.0) -> Path:
     """以預訓練 yolo26n 為起點微調專屬類別（RTX 4060 8G 綽綽有餘）；回傳 best.pt。
-    resume=True 從 last.pt（Ultralytics 每個 epoch 都會存）接續，資料集/epochs 沿用上次的設定。"""
+    resume=True 從 last.pt（Ultralytics 每個 epoch 都會存）接續，資料集/epochs/增強參數沿用上次的設定。
+    其餘增強參數預設值跟 Ultralytics 自己的預設一樣，不傳就等於原本行為，開放覆寫是給真實資料集
+    （不像合成資料那麼乾淨）需要調增強強度時用。"""
     from ultralytics import YOLO
     from detector import _device
     if resume:
         YOLO(str(BEST.with_name("last.pt"))).train(resume=True)
-        return BEST
-    YOLO(base).train(data=str(data_yaml), epochs=epochs, imgsz=imgsz, device=_device(), workers=0,
-                     project=str(RUNS), name="custom", exist_ok=True, verbose=False)
+    else:
+        YOLO(base).train(data=str(data_yaml), epochs=epochs, imgsz=imgsz, device=_device(), workers=0,
+                         project=str(RUNS), name="custom", exist_ok=True, verbose=False,
+                         hsv_h=hsv_h, hsv_s=hsv_s, hsv_v=hsv_v, degrees=degrees,
+                         translate=translate, scale=scale, mosaic=mosaic, fliplr=fliplr, flipud=flipud)
+    summary = summarize_overfitting(RUNS / "custom" / "results.csv")
+    if summary:
+        print(summary)
     return BEST
 
 
@@ -121,10 +135,19 @@ def main():
     p.add_argument("--detach", action="store_true", help="背景執行訓練（log: yolo_runs/train.log）")
     p.add_argument("--resume", action="store_true", help="從 last.pt 接續上次訓練")
     p.add_argument("--status", action="store_true", help="查看訓練進度")
+    p.add_argument("--hsv-h", type=float, default=0.015); p.add_argument("--hsv-s", type=float, default=0.7)
+    p.add_argument("--hsv-v", type=float, default=0.4); p.add_argument("--degrees", type=float, default=0.0)
+    p.add_argument("--translate", type=float, default=0.1); p.add_argument("--scale", type=float, default=0.5)
+    p.add_argument("--mosaic", type=float, default=1.0); p.add_argument("--fliplr", type=float, default=0.5)
+    p.add_argument("--flipud", type=float, default=0.0)
     a = p.parse_args()
     if a.make_data: print("資料集：", make_synthetic(a.make_data, a.n))
     if (a.train or a.resume) and a.detach: print(f"已在背景啟動（PID {detach_train(sys.argv[1:])}），用 --status 查看進度，log：{RUNS / 'train.log'}")
-    elif a.train or a.resume: print("權重：", train(a.train, a.epochs, resume=a.resume))
+    elif a.train or a.resume:
+        print("權重：", train(a.train, a.epochs, resume=a.resume,
+                             hsv_h=a.hsv_h, hsv_s=a.hsv_s, hsv_v=a.hsv_v, degrees=a.degrees,
+                             translate=a.translate, scale=a.scale, mosaic=a.mosaic,
+                             fliplr=a.fliplr, flipud=a.flipud))
     if a.status: print(status())
     if a.inspect: print(inspect(a.inspect, parse_rules(a.rules)))
 

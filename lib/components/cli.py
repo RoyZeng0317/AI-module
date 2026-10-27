@@ -62,6 +62,7 @@ from rich.text import Text
 from chats import DEFAULT_OUT_DIR, is_code_request, smart_reply_traced, tokenize
 import lib.components.conversation_store as convo_store
 from lib.components.function import read_as_chat_content
+from lib.components.image_search_viewer import open_previews
 from lib.components.memory_store import CATEGORIES as MEMORY_CATEGORIES
 from lib.components.memory_store import add_memory, delete_memory, format_memories, list_memories
 from lib.components.session_store import (
@@ -332,14 +333,15 @@ def run_model(arg: str, state: dict):
 # ask_model() 拿到回覆的當下就已經用 session_store.record_turn() 落地到
 # memory/session.json（不是等程式正常關閉才存），所以就算不是正常退出這支
 # CLI，重開機後 /resume 仍讀得到最後聊到哪。重播內容本身只是唸給你看，不會
-# 重新送進 sinco（sinco 字元級模型故意不吃歷史，見 conversation.py 開頭說明）；
-# 但同時把 state["history"] 補回去，讓 /model nvidia 能接上這段還原的歷史當
+# 重新生成答案；同時把state["history"]補回去，讓本地多輪checkpoint或
+# 明確選用的NVIDIA模式能接上這段還原的歷史當
 # 多輪對話上下文（見 chats.smart_reply_traced()）——跟 GUI（command.py 的
 # CommandPalette._run_resume）同一套 session_store.py、同一份檔案，兩邊互通。
 def run_resume(arg: str, state: dict):
     sub = arg.strip().lower()
     if sub in ("clear", "reset"):
         clear_session()
+        state["history"] = []
         console.print("[dim]已清除記錄下的對話（下次聊出新內容後，主旨會依新內容重新產生）[/dim]")
         return
 
@@ -513,6 +515,10 @@ def ask_model(message: str, state: dict, check_code: bool = False):
     # /model nvidia 也能立刻拿到這一輪當上下文，不用先 /resume 才補得回來。
     state["history"].append((message, reply))
     del state["history"][:-RESUME_HISTORY_CAP]
+    try:
+        open_previews(reply)
+    except OSError as exc:
+        console.print(Text(f"圖片預覽無法開啟：{exc}", style="yellow"))
 
 
 def process_input(text: str, state: dict) -> bool:
