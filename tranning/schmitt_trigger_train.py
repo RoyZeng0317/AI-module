@@ -56,6 +56,19 @@ n_layer/n_embd raised to 6/192 (from 4/128) now that block_size dropped from
 2048 to 1024 leaves headroom in the 8GB budget (attention memory is
 O(block_size^2), see Rule 06 / DEFAULT_GPU_MEM_FRACTION in transformer_chat.py).
 
+attempt 5 (2026-10-27/28): templates redesigned so nothing overlaps (KiCad-
+sized op-amp, orthogonal wiring, see schmitt_trigger_gen.py) and two
+latent bugs fixed. (a) The prompts were never in the pretrain corpus the
+BPE tokenizer is built from, so every Chinese character was <unk> and the
+inverting / non-inverting / Schmitt requests (which share their R1/R2
+values) encoded to IDENTICAL ids -- the first retrain topped out at 36/54
+with only topology mix-ups left. (b) design() capped generation at 900
+tokens; the longest redesigned template is 947. Result (CPU, pretrain best
+epoch 30, finetune 140 epochs + 40 resumed from the epoch-140 checkpoint,
+val_loss 0.00087): under design()'s exact sampling settings every one of
+the 54 training prompts has the template token as the top choice at every
+step (teacher-forced check, reproduction probability 1.0).
+
 Honest scope even after attempt 4: 18 pairs over 6 unique hand-designed
 circuits (5 op-amp hysteresis-value variants + 1 logic-gate inverter) is a
 training-pipeline validation, not a claim that this generalizes to

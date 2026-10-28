@@ -3,5 +3,13 @@
   "n_layer": 6,
   "n_embd": 192,
   "n_head": 6,
-  "dropout": 0.1
+  "dropout": 0.1,
+  "finetune_regularization": {
+    "freeze_embeddings": false,
+    "freeze_layers": 0,
+    "label_smoothing": 0.0,
+    "typo_noise_prob": 0.0,
+    "lm_corpus": null,
+    "lm_mix_ratio": 0.0
+  }
 }
