@@ -927,6 +927,11 @@ def route_reply(message: str) -> tuple[str, str] | None:
     # 用哪個語言版本——見上方 _detect_lang()/_bilingual() 的說明。
     lang = _detect_lang(message)
 
+    from electrical_solver import electrical_reply
+    electrical = electrical_reply(message)
+    if electrical is not None:
+        return electrical
+
     image_subject = image_query(message)
     if image_subject is not None:
         reason = _bilingual(lang,

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "seed": 43,
+  "source": "explicit synthetic generator, not archive extraction",
+  "generator_sha256": "5536a09aee1214c179a347d9d35a197f11ae32eda2c672d66237b6f3c3fdbea6",
+  "files": {
+    "dev.questions.jsonl": "28aef3084f75bd6e9140207922bd79c179cfd33d7dcbe80dc275b85b148c0c6f",
+    "test.questions.jsonl": "1b465db5f218aa67048ca26ff965c8ee4f07c8ec06f3ae4a0b455df3e2b51362",
+    "train.questions.jsonl": "9a4c5971d9051aad5997b022158d1e096ec06e84d72f74dc5668e25d3966adff",
+    "private\\dev.keys.jsonl": "7afd0e8939887f56591615be9952987634c755e365b43af473ce8c90f09a3b18",
+    "private\\test.keys.jsonl": "6812a7e9d7e2f987b91c860d5b129c9b782e1c7027251cc99a844fb5bba72f6b",
+    "private\\train.keys.jsonl": "4d4b12614c2d537dce51e2b9d3c548a189e1fa6d27163147114aab85047900ab"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "weights_unchanged": {
+    "tranning\\gpt_chat_runs": true,
+    "tranning\\gpt_electricity_open_runs\\pilot_v1": true
+  },
+  "dataset_sha256": "4ee171e8774a4af2aff21cabe3fee4d2d346c4dce94f09613f1b9b8b64cf3805",
+  "evaluation_code_sha256": "5c01a498e3d2658d2eae6edc70538d85d6cab2a33fbe8d90dde5d00801678337",
+  "note": "Same decoder/seed per question for base and candidate; test candidate only, no retries or training."
+}

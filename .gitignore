@@ -136,3 +136,13 @@ output/test_character_image_close_review.py
 /data/basic_electricity/source/
 /output/basic-electricity-tests/
 /output/basic-electricity-review-tests*/
+/output/electricity-open-tests*/
+/output/electricity-open-review-tests*/
+/tranning/gpt_electricity_open_runs/**/model.pt
+/output/image-processing/
+/output/image-processing-tests*/
+/output/image-processing-review-tests*/
+
+# 新手大禮包內的MNIST原始資料集與壓縮檔（體積大、可重新取得，不進版控）
+/新手大禮包/123/MNIST_Dataset/
+/新手大禮包/123/MNIST_Dataset.rar
