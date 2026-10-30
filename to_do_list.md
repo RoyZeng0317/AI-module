@@ -413,6 +413,15 @@
     - [ ] `output/circuit_edges_source.png`（使用者電腦上、未推送）由哪支程式產生尚未確認，需要使用者提供該圖或產生方式。
 
 
+53. [ ] 語音對話：語音辨識＋語音合成（2026-10-29～30，使用者選擇：開放式辨識改用音節／先拼接音節之後再訓練／按下說話自動唸回覆）
+    - [x] 舊辨識模型失敗原因：每段音訊只取前 200 幀×8ms＝**前 1.6 秒**，但 Common Voice 句子約 4～5 秒，模型要從句子開頭猜整句；再加上 3000+ 個字元類別、沒有音量正規化、padding 被當成語音長度，結果塌縮成只輸出「路」。詳見 ErrorLog 2026-10-29 條目。
+    - [x] `tranning/speech_to_text.py` 重寫：80 維 log-mel（自己用 numpy 算濾波器組）＋每段正規化；**整段音訊不裁切**（超過 `--max-seconds` 的整段跳過）、依長度分批、CTC 用真實長度；輸出改成約 400 個無聲調**拼音音節**（`pinyin_units.py`），2 層卷積（每 40ms 一幀）＋3 層雙向 GRU，SpecAugment／AdamW／提前停止，每輪印出音節錯誤率 val_ser。檢查點在 `tranning/speech_syllable_runs/`。
+    - [x] `tranning/syllable_lm.py`：音節→漢字語言模型（像注音輸入法選字），用專案自己的中文語料＋聊天資料數出來的 bigram＋Viterbi，不是 AI 模型。已建好 `tranning/syllable_lm_runs/lm.json.gz`（6187 字）。在 200 句聊天提問上，給正確音節時 171/200 整句全對、字錯誤率 2%；剩下的錯誤都是同音字（誰→水、領錢→零錢）。
+    - [x] `tranning/syllable_tts.py`：用你自己錄的音節拼接成句子（切靜音、音量一致、15ms 交叉淡化、標點停頓），缺的聲調自動借同音節其他聲調；`--record` 依 sinco 回覆最常用的音節排序錄音（先錄約 400 個就每個音節都唸得出來），`--import-dir` 匯入 ni3.wav 格式的檔案。之後 `voice_clone.py` 訓練好可改用 `synthesize(backend="clone")`。
+    - [x] 接上介面：桌面 GUI 麥克風按鈕說完話後，sinco 的回覆會自動唸出來；CLI 新增 `/voice` 語音對話模式（Enter 開始／結束錄音，回覆唸完才能再錄，避免錄到自己）。尚未訓練／尚未錄音時顯示提示而不是當掉。
+    - [x] 測試：`test_speech_to_text.py`（合成音調、只驗證訓練流程）、`test_syllable_lm.py`、`test_syllable_tts.py`、`test_cli.py` 的 /voice 測試，共通過。**沒有任何辨識準確度或音質的宣稱**——雲端環境沒有你的語音資料與麥克風。
+    - [ ] **你在自己電腦上要做的事**：① `pip install pypinyin opencc-python-reimplemented sounddevice`；② 用 Common Voice 等資料訓練辨識模型（指令見 CLAUDE.md「常用指令」）；③ `python tranning/syllable_tts.py --record` 錄音節；④ 實際用麥克風對話驗收。
+
 ## 2026-10-28：開放式電學首輪試驗
 
 - [x] 使用者核准後完成3 epochs／66更新，另存pilot_v1；原始dev0/10、首次test0/10，未啟用候選。詳見[試驗報告](data/electricity_open/PILOT_V1_RESULT.md)。
