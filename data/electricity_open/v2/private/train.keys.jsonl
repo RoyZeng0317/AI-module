@@ -1,0 +1,22 @@
+{"grading": "numeric", "id": "train-ohm-0-0", "target": "依歐姆定律，I=V/R=2/10=1/5 A（200 mA）。"}
+{"grading": "numeric", "id": "train-ohm-0-1", "target": "依歐姆定律，V=IR=(1/5)*10=2 V。"}
+{"grading": "numeric", "id": "train-ohm-0-2", "target": "依歐姆定律，R=V/I=2/(1/5)=10 歐姆。"}
+{"grading": "numeric", "id": "train-ohm-1-0", "target": "依歐姆定律，I=V/R=9/30=3/10 A（300 mA）。"}
+{"grading": "numeric", "id": "train-ohm-1-1", "target": "依歐姆定律，V=IR=(3/10)*30=9 V。"}
+{"grading": "numeric", "id": "train-ohm-1-2", "target": "依歐姆定律，R=V/I=9/(3/10)=30 歐姆。"}
+{"grading": "numeric", "id": "train-ohm-2-0", "target": "依歐姆定律，I=V/R=5/40=1/8 A（125 mA）。"}
+{"grading": "numeric", "id": "train-ohm-2-1", "target": "依歐姆定律，V=IR=(1/8)*40=5 V。"}
+{"grading": "numeric", "id": "train-ohm-2-2", "target": "依歐姆定律，R=V/I=5/(1/8)=40 歐姆。"}
+{"grading": "numeric", "id": "train-ohm-3-0", "target": "依歐姆定律，I=V/R=3/60=1/20 A（50 mA）。"}
+{"grading": "numeric", "id": "train-ohm-3-1", "target": "依歐姆定律，V=IR=(1/20)*60=3 V。"}
+{"grading": "numeric", "id": "train-ohm-3-2", "target": "依歐姆定律，R=V/I=3/(1/20)=60 歐姆。"}
+{"grading": "numeric", "id": "train-ohm-4-0", "target": "依歐姆定律，I=V/R=12/80=3/20 A（150 mA）。"}
+{"grading": "numeric", "id": "train-ohm-4-1", "target": "依歐姆定律，V=IR=(3/20)*80=12 V。"}
+{"grading": "numeric", "id": "train-ohm-4-2", "target": "依歐姆定律，R=V/I=12/(3/20)=80 歐姆。"}
+{"grading": "numeric", "id": "train-ohm-5-0", "target": "依歐姆定律，I=V/R=30/120=1/4 A（250 mA）。"}
+{"grading": "numeric", "id": "train-ohm-5-1", "target": "依歐姆定律，V=IR=(1/4)*120=30 V。"}
+{"grading": "numeric", "id": "train-ohm-5-2", "target": "依歐姆定律，R=V/I=30/(1/4)=120 歐姆。"}
+{"grading": "numeric", "id": "train-units", "target": "先換算電阻為2000歐姆。I=V/R=6/2000=3/1000 A（3 mA）。"}
+{"grading": "manual", "id": "train-invalid-0", "target": "資訊不足，請補充另一個已知的電壓、電流或電阻數值。"}
+{"grading": "manual", "id": "train-invalid-1", "target": "零電阻不能用有限電流的歐姆定律直接相除；理想電源短路，需提供實際內阻。"}
+{"grading": "worked", "id": "train-mesh", "target": "節點法：(X-12)/2+(X-6)/4+X/3=0，X=90/13 V。左右順時針電流I1、I2，共用支路向下電流I1-I2。網目式：5I1-3I2=12；-3I1+7I2=-6。I1=(12-X)/2=33/13 A，I2=(X-6)/4=3/13 A，共用電流=30/13 A。"}

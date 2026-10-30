@@ -1,0 +1,32 @@
+{
+  "seed": 43,
+  "epochs": 3,
+  "updates": {
+    "steps": 66
+  },
+  "preflight": {
+    "train": {
+      "count": 22,
+      "max_tokens": 199
+    },
+    "dev": {
+      "count": 10,
+      "max_tokens": 203
+    },
+    "test": {
+      "count": 10,
+      "max_tokens": 205
+    }
+  },
+  "replay_count": 22,
+  "replay_source_sha256": "91f33f1d6617c466edd49f726a105e4f826db3c8e1e722e947a2d5eaf2821ea6",
+  "checkpoint_sha256": "ea38c91f5bed483affbea0cb3191b9089cc338512b165738e11089e6c013eb02",
+  "base_sha256": "0b908186685d156d43ca258810aba41a36e69162d1b32d1141fc185a2b9adfa7",
+  "best_epoch": 3,
+  "best_metrics": {
+    "epoch": 3,
+    "train_loss": 3.7697110203179447,
+    "val_loss": 5.404408359527588
+  },
+  "quality": "尚須未見開放題與聊天回歸評估"
+}

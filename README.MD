@@ -1,5 +1,29 @@
 # AI Module
 
+## 使用者確認的進度與品質狀態（2026-10-28）
+
+| 項目 | 狀態 |
+|---|---|
+| 二值化 | 尚未進行 |
+| 卷積（Convolution） | 已新增純for迴圈獨立範例，測試通過；效果待驗收 |
+| 直方圖／均衡化 | 已新增Y/Cb/Cr、Y直方圖與CDF均衡化範例；效果待驗收 |
+| Transformer | 表現未達標，仍需改善 |
+| 其餘模型／功能 | 表現待定，尚未完成效果驗收 |
+
+以上依使用者本次確認記錄。既有程式中的門檻處理、卷積層或相關範例，不作為上述專項已完成的證據；工程測試通過也不等於實際效果已通過驗收。後續待辦見[進度清單](to_do_list.md)。
+
+檔案核對：使用者指出的 `CNN-MNIST_Classification.py` 目前實作灰階MNIST的CNN分類，含 `Rescaling(1./255)` 正規化與 `Conv2D` 卷積層；繪製的是accuracy／loss曲線，未見直方圖均衡化運算。匯入 `cv2` 不代表已執行均衡化。該檔本次沒有修改或啟動訓練；使用者後續確認另做獨立Lenna練習。
+
+## for迴圈影像處理（2026-10-28）
+
+新增 `lib/opencv2/convolution.py` 及 `histogram_equalization.py`：依練習文件處理MatrixA與三種卷積核、RGB／灰階圖、Y/Cb/Cr及Y的直方圖均衡化。像素運算皆用Python迴圈，不使用NumPy或內建濾鏡。已用使用者提供的兩張WebP產生卷積結果，並對RGB圖產生均衡化前後對照；保持原尺寸，原始帶符號矩陣與顯示映射分開。20項測試及獨立審查通過，操作與限制見[影像處理說明](lib/opencv2/IMAGE_PROCESSING.md)。
+
+## 開放式電學與節點／網目教學（2026-10-28）
+
+共用聊天後端可用本機公式回答單一正值電阻的歐姆定律題，例如「一個100歐姆的電阻，供應20V的電壓，其電流為多少？使用歐姆定律進行計算」回覆 `I=V/R=20/100=0.2 A（200 mA）`。處理紀錄與正文會標示不是模型生成；交流、模糊接線、缺值與不支援單位不猜答。「說明節點電壓法與網目法的轉換」會展示固定接線的 KCL／KVL 及支路電流驗算，不代表可解析任意電路圖。
+
+Transformer 原始盲答仍有偏題。42題開放式候選資料（22 train／10 dev／10 test）已經核准完成首輪3 epochs／66次更新，另存新權重；但dev與首次test均0/10，未切換正式模型。使用題目作輸入，正確步驟作評分／監督目標。操作與結果見[開放式電學說明](data/electricity_open/README.md)及[首輪報告](data/electricity_open/PILOT_V1_RESULT.md)，轉換教學見[節點與網目範例](data/electricity_open/NODAL_MESH_GUIDE.md)。此生成式方案與尚未完成審查的舊四選一草稿 `electricity_train.py` 不同；不以工具結果、工程測試或loss下降宣稱模型已學會。
+
 ## 基本電學題目與評分隔離（2026-10-27）
 
 使用者提供的43份原檔已只讀盤點，人工核對24題無圖選擇題，按來源群切為train18／dev3／test3。`tranning/electricity_dataset.py`準備版本化資料；`electricity_practice.py attempt`只給題目、直接呼叫本機GPT並先存原始作答，另一個`grade`指令才讀評分鍵，只有train能產生不含正解的糾錯提示。

@@ -140,3 +140,14 @@ output/test_character_image_close_review.py
 # 施密特觸發器訓練的中途存檔點（--checkpoint-every，只用於中斷後接續訓練；正式模型在 run 目錄本身）
 tranning/schmitt_pretrain_runs/checkpoint/
 tranning/schmitt_chat_runs/checkpoint/
+
+/output/electricity-open-tests*/
+/output/electricity-open-review-tests*/
+/tranning/gpt_electricity_open_runs/**/model.pt
+/output/image-processing/
+/output/image-processing-tests*/
+/output/image-processing-review-tests*/
+
+# 新手大禮包內的MNIST原始資料集與壓縮檔（體積大、可重新取得，不進版控）
+/新手大禮包/123/MNIST_Dataset/
+/新手大禮包/123/MNIST_Dataset.rar
