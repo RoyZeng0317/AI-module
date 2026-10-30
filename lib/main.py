@@ -97,7 +97,7 @@ def voice():
             gui.chat_display.configure(state="disabled")
             gui.chat_display.see(tk.END)
             return
-        conversation.send_message(text)
+        conversation.send_message(text, speak_reply=True)
     else:
         try:
             start_recording(on_level=_on_mic_level)

@@ -123,6 +123,7 @@ def _character_names() -> list[str]:
 
 _BUILTIN_SLASH_COMMANDS = {
     "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "see",
+    "voice",
 }
 
 
@@ -216,6 +217,8 @@ def print_help(state: dict):
     lines.append("<路徑>     把目前記錄的對話下載成 Markdown 檔案（不帶路徑＝存到 output/chats/）\n")
     lines.append("  /conversations ", style="bold")
     lines.append("<list|new|open <id>>  多筆對話紀錄，跟 GUI／網頁共用（不帶引數＝list）\n")
+    lines.append("  /voice", style="bold")
+    lines.append("             語音對話模式：Enter 開始/結束錄音，sinco 會唸出回覆（q 離開）\n")
     lines.append("  exit / quit", style="bold")
     lines.append("       離開\n")
 
@@ -460,7 +463,7 @@ def run_preview(arg: str):
     console.print()
 
 
-def ask_model(message: str, state: dict, check_code: bool = False):
+def ask_model(message: str, state: dict, check_code: bool = False, speak: bool = False):
     # 輸入的 token 數在送進模型前就已經知道，所以在「思考中」狀態列上就先顯示，
     # 不用等模型回覆完成；輸出 token 數要等 smart_reply_traced() 回傳才算得出來
     # （見下面 out_tokens），這部分還是只能在思考完成後才印出。
@@ -498,6 +501,8 @@ def ask_model(message: str, state: dict, check_code: bool = False):
         # 顯示（Markdown 對沒有語法的內容就當成一般段落），所以不用另外判斷。
         console.print(Markdown(reply))
     console.print()
+    if speak:
+        _speak_reply(reply, state)
 
     # 落地到 session.json，讓 /resume 能在電腦意外斷電/關機後還原到這一輪
     # （不是等這支 CLI 正常執行到 exit/quit 那行才存）。
@@ -519,6 +524,72 @@ def ask_model(message: str, state: dict, check_code: bool = False):
         open_previews(reply)
     except OSError as exc:
         console.print(Text(f"圖片預覽無法開啟：{exc}", style="yellow"))
+
+
+# --- /voice：語音對話（按 Enter 說話，自動唸回覆）---------------------------
+# 錄音/辨識/合成都是自訓模型（speech_to_text.py 音節 CTC + syllable_lm.py、
+# syllable_tts.py 自己錄的音節），沒有雲端語音 API（Rule 06）。sounddevice 與
+# 語音模組都延後到第一次用 /voice 才 import，沒裝麥克風套件也不影響文字聊天。
+MIN_UTTERANCE_SECONDS = 0.2
+
+
+def record_until_enter():
+    """Enter 開始前已經按過；這裡錄到下一次 Enter 為止，回傳 16kHz 單聲道波形。"""
+    import numpy as np
+    import sounddevice as sd
+    from speech_to_text import SAMPLE_RATE
+
+    frames: list = []
+    with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, dtype="float32",
+                        callback=lambda indata, *_: frames.append(indata.copy())):
+        input()
+    if not frames:
+        return None
+    waveform = np.concatenate(frames, axis=0).flatten()
+    return waveform if waveform.size >= SAMPLE_RATE * MIN_UTTERANCE_SECONDS else None
+
+
+def _speak_reply(reply: str, state: dict):
+    from syllable_tts import speak
+    try:
+        msg = speak(reply, block=True)    # 唸完才回到錄音，避免把自己的聲音錄進去
+    except Exception as exc:              # 音效裝置錯誤不能讓 CLI 崩潰
+        msg = f"語音播放失敗：{exc}"
+    if msg and not state.get("speech_notice_shown"):
+        state["speech_notice_shown"] = True
+        console.print(Text(f"[語音] {msg}", style="yellow"))
+
+
+def run_voice(state: dict):
+    try:
+        from speech_to_text import recognize_waveform
+    except ImportError as exc:
+        console.print(f"[red]語音模組無法載入：{escape(str(exc))}[/red]")
+        return
+    console.print("[dim]語音對話模式：按 Enter 開始說話，說完再按 Enter；輸入 q 再按 Enter 離開。[/dim]")
+    while True:
+        if input("🎤 Enter 開始錄音（q 離開）› ").strip().lower() in {"q", "quit", "exit"}:
+            console.print("[dim]已離開語音模式[/dim]")
+            return
+        console.print("[red]● 錄音中…說完按 Enter[/red]")
+        try:
+            waveform = record_until_enter()
+        except Exception as exc:
+            console.print(f"[red]無法開啟麥克風：{escape(str(exc))}[/red]")
+            return
+        if waveform is None:
+            console.print("[dim]（沒錄到聲音）[/dim]")
+            continue
+        with console.status("[dim]辨識中...[/dim]", spinner="dots"):
+            text = recognize_waveform(waveform)
+        if "尚未訓練" in text:
+            console.print(Text(f"[語音] {text}", style="yellow"))
+            return
+        if not text:
+            console.print("[dim]（沒聽出內容，再說一次）[/dim]")
+            continue
+        console.print(Text(f"You (語音) › {text}", style="bold green"))
+        ask_model(text, state, speak=True)
 
 
 def process_input(text: str, state: dict) -> bool:
@@ -579,6 +650,9 @@ def process_input(text: str, state: dict) -> bool:
         return True
     if cmd == "conversations":
         run_conversations(arg, state)
+        return True
+    if cmd == "voice":
+        run_voice(state)
         return True
 
     md_path = COMMAND_DIR / f"{cmd}.md"

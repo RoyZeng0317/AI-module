@@ -424,3 +424,39 @@ def test_run_conversations_open_unknown_id_reports_error(tmp_path, monkeypatch, 
     _isolate_conversations(tmp_path, monkeypatch)
     cli.run_conversations("open not-a-real-id", _state())
     assert "找不到對話" in _printed(capsys)
+
+
+def test_voice_mode_recognizes_replies_and_speaks(tmp_path, monkeypatch, capsys):
+    """/voice: Enter -> record -> recognize -> ask sinco -> reply spoken; q leaves.
+    Microphone, recognizer and speaker are all faked (no audio device needed)."""
+    import numpy as np
+    import speech_to_text
+    import syllable_tts
+
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "你好，我是 sinco"))
+    monkeypatch.setattr(cli, "open_previews", lambda reply: None)
+    answers = iter(["", "q"])
+    monkeypatch.setattr("builtins.input", lambda *a: next(answers))
+    monkeypatch.setattr(cli, "record_until_enter", lambda: np.zeros(16000, dtype=np.float32))
+    monkeypatch.setattr(speech_to_text, "recognize_waveform", lambda w: "你好")
+    spoken = []
+    monkeypatch.setattr(syllable_tts, "speak", lambda text, block=False: spoken.append(text))
+
+    state = _state()
+    assert cli.process_input("/voice", state) is True
+    assert state["history"] == [("你好", "你好，我是 sinco")]
+    assert spoken == ["你好，我是 sinco"]
+    assert "You (語音) › 你好" in _printed(capsys)
+
+
+def test_voice_mode_stops_with_untrained_message(monkeypatch, capsys):
+    import numpy as np
+    import speech_to_text
+
+    monkeypatch.setattr("builtins.input", lambda *a: "")
+    monkeypatch.setattr(cli, "record_until_enter", lambda: np.zeros(16000, dtype=np.float32))
+    monkeypatch.setattr(speech_to_text, "recognize_waveform", lambda w: "語音辨識模型尚未訓練，請先…")
+    cli.run_voice(_state())
+    assert "尚未訓練" in _printed(capsys)
