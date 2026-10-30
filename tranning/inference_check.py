@@ -1,48 +1,30 @@
-"""Quick inference test on trained speech model."""
-import json, sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+"""Quick check of the trained syllable speech model on speech_data/train_clean.json:
+prints target text, heard syllables and the final (language-model) text."""
+import io
+import json
+import sys
 from pathlib import Path
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from speech_to_text import _load, load_waveform, waveform_to_spectrogram, _fit_time_frames, DEFAULT_OUT_DIR
-
-loaded = _load(DEFAULT_OUT_DIR)
-if loaded is None:
-    print("No checkpoint found")
-    sys.exit(1)
-
-model, config, idx_to_char = loaded
-print(f"Model: {len(idx_to_char)} chars, max_frames={config['max_frames']}")
-
-import torch
+from pinyin_units import to_syllables  # noqa: E402
+from speech_to_text import (DEFAULT_OUT_DIR, load_waveform, recognize_syllables,  # noqa: E402
+                            recognize_waveform, syllable_error_rate)
 
 data_dir = Path(__file__).resolve().parent / "speech_data"
 records = json.loads((data_dir / "train_clean.json").read_text(encoding="utf-8"))
 
 for r in records[:5]:
     wav_path = data_dir / r["audio"]
+    if not wav_path.exists():
+        continue
     waveform = load_waveform(wav_path)
-    spec = waveform_to_spectrogram(waveform)
-    spec = _fit_time_frames(spec, config["max_frames"]).unsqueeze(0).unsqueeze(0)
-    with torch.no_grad():
-        log_probs = model(spec)
-
-    pred_indices = log_probs.argmax(dim=-1).squeeze(0).tolist()
-    pred = []
-    prev = -1
-    for idx in pred_indices:
-        if isinstance(idx, list):
-            idx = idx[0] if idx else 0
-        if idx != prev and idx != 0:
-            key = int(idx)
-            if key in idx_to_char:
-                pred.append(idx_to_char[key])
-        prev = idx
-    pred_text = "".join(pred)
-
-    target = r["text"]
-    print(f"Audio:   {r['audio']}")
-    print(f"Target:  {target[:80]}")
-    print(f"Predict: {pred_text[:80]}")
-    print(f"Match:   {'YES' if pred_text == target else 'NO'}")
+    heard = recognize_syllables(waveform, DEFAULT_OUT_DIR)
+    if heard is None:
+        print("No checkpoint found -- train speech_to_text.py first")
+        sys.exit(1)
+    target = to_syllables(r["text"], tones=False)
+    print(f"Target:    {r['text'][:60]}")
+    print(f"Syllables: {' '.join(heard)[:80]}  (SER {syllable_error_rate(heard, target):.2f})")
+    print(f"Predict:   {recognize_waveform(waveform, DEFAULT_OUT_DIR)[:60]}")
     print()
