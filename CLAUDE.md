@@ -116,10 +116,14 @@ python lib/img.py --edit before.png "make it blue"
 python lib/img.py --train-deblur path/to/sharp_photos/ --epochs 100
 python lib/img.py --deblur blurry.jpg
 
+# 影像處理練習（純 for 迴圈，無 NumPy／OpenCV，見 lib/opencv2/IMAGE_PROCESSING.md）
+python lib/opencv2/binarization.py --threshold 128    # 固定門檻 + Otsu 二值化
+
 # 語音對話（音節辨識 + 音節拼接合成，見 to_do_list.md #53；需要 pip install pypinyin opencc-python-reimplemented sounddevice）
 python tranning/speech_to_text.py --train-manifest <資料夾>/train.json --val-manifest <資料夾>/val.json
 python tranning/speech_to_text.py --recognize clip.wav
 python tranning/syllable_lm.py --build --extra-text <資料夾>/train.json   # 重建音節→漢字語言模型
+python tranning/aishell_import.py --aishell-dir <data_aishell> --to-traditional   # AISHELL-1 轉 manifest
 python tranning/syllable_tts.py --record        # 錄自己的音節（--coverage 查還缺哪些）
 python tranning/syllable_tts.py --say "你好"
 python lib/components/cli.py                   # 進去後輸入 /voice 開始語音對話
@@ -242,7 +246,7 @@ AI-module/
 │   ├── cv_inference_check.py  inference_check.py
 │   ├── speech_to_text.py  pinyin_units.py  syllable_lm.py  syllable_tts.py   # 語音辨識／合成（#53）
 │   ├── voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py
-│   ├── download_commonvoice.py  diagnose_stt.py
+│   ├── download_commonvoice.py  aishell_import.py  diagnose_stt.py
 │   ├── schmitt_trigger_train.py  circuit_diagram_train.py  circuit_kicad_to_schemdraw.py
 │   ├── circuit_rule_check.py  circuit_schemdraw_render.py
 │   ├── calculus_generator.py  calculus_solver.py  logic_reasoning_generator.py  word_problem_generator.py

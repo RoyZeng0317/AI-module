@@ -34,6 +34,10 @@ tranning/gpt_code_pretrain_runs/
 tranning/dist/
 tranning/speech_runs/
 tranning/speech_data/
+tranning/speech_syllable_runs/
+tranning/aishell1/
+tranning/aishell1_zhTW/
+data/voice_syllables/
 tranning/Tranning/
 
 # 大型訓練 checkpoint 權重檔（可重新訓練、單檔近 70MB，不進版控；history.json/config.json 等中繼資料仍保留追蹤）
