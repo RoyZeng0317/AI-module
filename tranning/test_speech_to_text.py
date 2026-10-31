@@ -1,12 +1,12 @@
-"""Pipeline smoke test for speech_to_text.py.
+"""Pipeline smoke test for speech_to_text.py (syllable CTC recognizer).
 
-Does NOT claim any recognition accuracy — there is no real speech dataset
-yet. Only proves the CRNN+CTC training loop (WAV loading, spectrogram
-extraction, dataset, CTC loss, early stopping, checkpoint + charset/config
-output) and both recognize() entry points run end-to-end without crashing,
-using a handful of tiny synthetic sine-wave "utterances" (each text label
-mapped to its own fixed tone+duration so the mapping is at least
-deterministic, not real speech).
+Does NOT claim any recognition accuracy -- there is no real speech dataset
+in this repo. It only proves the training loop (WAV loading, log-mel
+features, syllable targets, length-bucketed batches, CTC loss with real
+lengths, early stopping, checkpoint + units/config output) and the
+recognize() entry points run end-to-end, using tiny synthetic tone clips:
+each Chinese label gets its own fixed tone pattern (one tone per syllable),
+so the mapping is deterministic but is not real speech.
 """
 
 import json
@@ -15,15 +15,16 @@ from pathlib import Path
 
 import numpy as np
 
-from speech_to_text import SAMPLE_RATE, recognize, recognize_waveform, remove_fillers, train
+from speech_to_text import (SAMPLE_RATE, recognize, recognize_waveform, remove_fillers, subsampled_length,
+                            train, waveform_to_logmel)
 
-TEXTS = ["12", "AB", "9X"]
-TONES = {"12": 220.0, "AB": 440.0, "9X": 660.0}
+TEXTS = ["你好", "謝謝", "再見"]
+TONES = {"你好": (220.0, 330.0), "謝謝": (440.0, 440.0), "再見": (550.0, 660.0)}
 
 
-def _make_tone(text: str, duration: float = 0.3) -> np.ndarray:
-    t = np.linspace(0, duration, int(SAMPLE_RATE * duration), endpoint=False)
-    return (0.5 * np.sin(2 * np.pi * TONES[text] * t)).astype(np.float32)
+def _make_tone(text: str, seconds_per_syllable: float = 0.3) -> np.ndarray:
+    t = np.linspace(0, seconds_per_syllable, int(SAMPLE_RATE * seconds_per_syllable), endpoint=False)
+    return np.concatenate([0.5 * np.sin(2 * np.pi * f * t) for f in TONES[text]]).astype(np.float32)
 
 
 def _write_wav(path: Path, waveform: np.ndarray):
@@ -38,42 +39,53 @@ def _write_wav(path: Path, waveform: np.ndarray):
 def _make_manifest(audio_dir: Path, prefix: str, repeats: int) -> list[dict]:
     audio_dir.mkdir(parents=True, exist_ok=True)
     records = []
-    for text in TEXTS:
+    for k, text in enumerate(TEXTS):
         for i in range(repeats):
-            name = f"{prefix}_{text}_{i}.wav"
+            name = f"{prefix}_{k}_{i}.wav"
             _write_wav(audio_dir / name, _make_tone(text))
             records.append({"audio": name, "text": text})
     return records
+
+
+def test_logmel_keeps_the_whole_clip():
+    # the old model cropped every clip to its first 1.6 s; features must now cover all of it
+    feats = waveform_to_logmel(np.zeros(SAMPLE_RATE * 5, dtype=np.float32))
+    assert feats.shape[1] == 80
+    assert feats.shape[0] >= 5 * 100 - 2              # one frame per 10 ms
+    assert subsampled_length(feats.shape[0]) >= 120   # ~40 ms per output frame
 
 
 def test_training_and_recognize_run_end_to_end(tmp_path):
     audio_dir = tmp_path / "audio"
     train_records = _make_manifest(audio_dir, "train", repeats=6)
     val_records = _make_manifest(audio_dir, "val", repeats=2)
+    # a clip longer than max_seconds is skipped, not cropped
+    _write_wav(audio_dir / "long.wav", np.zeros(SAMPLE_RATE * 3, dtype=np.float32))
+    train_records.append({"audio": "long.wav", "text": "很長的句子"})
 
     train_manifest = tmp_path / "train.json"
     val_manifest = tmp_path / "val.json"
-    train_manifest.write_text(json.dumps(train_records), encoding="utf-8")
-    val_manifest.write_text(json.dumps(val_records), encoding="utf-8")
+    train_manifest.write_text(json.dumps(train_records, ensure_ascii=False), encoding="utf-8")
+    val_manifest.write_text(json.dumps(val_records, ensure_ascii=False), encoding="utf-8")
 
     out_dir = tmp_path / "runs"
-    model, charset, history = train(
+    model, units, history = train(
         train_manifest=train_manifest, val_manifest=val_manifest, audio_root=audio_dir,
         out_dir=out_dir, epochs=2, batch_size=4, lr=1e-3, patience=5,
-        max_frames=40, hidden_size=32, dropout=0.1, weight_decay=1e-4,
+        max_seconds=2.0, hidden_size=32, num_layers=1, dropout=0.1, weight_decay=1e-4, device="cpu",
     )
 
-    assert set(charset) == set("".join(TEXTS))
+    assert set(units) == {"ni", "hao", "xie", "zai", "jian"}   # toneless syllables, not characters
     assert len(history) == 2
     assert (out_dir / "best_model.pt").exists()
-    assert json.loads((out_dir / "charset.json").read_text(encoding="utf-8")) == charset
-    assert all(h["val_cer"] >= 0.0 for h in history)
+    assert json.loads((out_dir / "units.json").read_text(encoding="utf-8")) == units
+    assert json.loads((out_dir / "config.json").read_text(encoding="utf-8"))["kind"] == "syllable_ctc"
+    assert all(h["val_ser"] >= 0.0 for h in history)
 
-    sample_audio = audio_dir / f"train_{TEXTS[0]}_0.wav"
-    result = recognize(sample_audio, out_dir=out_dir)
-    assert isinstance(result, str)
+    result = recognize(audio_dir / "train_0_0.wav", out_dir=out_dir)
+    assert isinstance(result, str) and "尚未訓練" not in result
 
-    live_result = recognize_waveform(_make_tone(TEXTS[0]), out_dir=out_dir)
+    live_result = recognize_waveform(_make_tone(TEXTS[0]), out_dir=out_dir, lm_dir=tmp_path / "no_lm")
     assert isinstance(live_result, str)
 
 

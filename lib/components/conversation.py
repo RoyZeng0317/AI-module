@@ -8,9 +8,10 @@ seconds), then swaps the placeholder for the real trace + reply.
 
 is_recording()/start_recording()/stop_recording() are the mic-capture side:
 record from the default microphone, then run the from-scratch STT model
-(tranning/speech_to_text.py, a CRNN+CTC model — same architecture as
-tranning/OCR.py, just fed a spectrogram instead of a text-line image) to
-turn the recording into text. No cloud speech API (Rule 06). Kept free of
+(tranning/speech_to_text.py: syllable CTC acoustic model + syllable_lm.py
+language model) to turn the recording into text. A reply to a spoken
+message is read aloud by tranning/syllable_tts.py (your own recorded
+syllables). No cloud speech API (Rule 06). Kept free of
 any Tkinter drawing logic on purpose — home_screen.py owns the waveform
 canvas and decides how recording state gets shown; this module only knows
 about audio in/out and text.
@@ -38,6 +39,7 @@ from lib.components.markdown_view import insert_markdown  # noqa: E402
 import lib.components.conversation_store as convo_store  # noqa: E402
 from lib.components.session_store import record_turn  # noqa: E402
 from speech_to_text import SAMPLE_RATE, recognize_waveform  # noqa: E402
+from syllable_tts import speak_async  # noqa: E402
 
 # shorter than this is almost certainly an accidental click, not real speech
 MIN_UTTERANCE_SECONDS = 0.2
@@ -134,13 +136,15 @@ class Conversation:
         # character_browser.py 選好角色後會呼叫 set_persona() 改這兩個值。
         self.out_dir = DEFAULT_OUT_DIR
         self.persona = "sinco"
+        # 「尚未錄製音節」這類語音播放提示只顯示一次，不要每句都洗版
+        self._speech_notice_shown = False
 
     def set_persona(self, out_dir, name: str):
         self.out_dir = out_dir
         self.persona = name
 
     def ask(self, header: str, model_input: str, record_as: Optional[str] = None,
-            header_tag: str = "user_bubble"):
+            header_tag: str = "user_bubble", speak_reply: bool = False):
         if self.busy:
             return
         self.busy = True
@@ -189,6 +193,8 @@ class Conversation:
                 chat_display.configure(state="disabled")
                 chat_display.see(tk.END)
                 self.busy = False
+                if speak_reply:
+                    self.speak(reply)
                 if record_as is not None:
                     self.history.append((record_as, reply))
                     del self.history[:-MAX_HISTORY_TURNS]
@@ -211,8 +217,27 @@ class Conversation:
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def send_message(self, user_text: str):
-        self.ask(user_text, user_text, record_as=user_text)
+    def send_message(self, user_text: str, speak_reply: bool = False):
+        """speak_reply=True (used for messages that came from the microphone)
+        also reads sinco's reply aloud -- 按下說話，自動唸回覆."""
+        self.ask(user_text, user_text, record_as=user_text, speak_reply=speak_reply)
+
+    def speak(self, reply: str):
+        """Play `reply` in the background; if it cannot be played (no
+        syllables recorded yet, no audio device) say why once in the chat."""
+        def on_error(msg: str):
+            if self._speech_notice_shown:
+                return
+            self._speech_notice_shown = True
+
+            def show():
+                self.chat_display.configure(state="normal")
+                self.chat_display.insert(tk.END, f"[語音] {msg}\n\n", "system")
+                self.chat_display.configure(state="disabled")
+                self.chat_display.see(tk.END)
+            self.windows.after(0, show)
+
+        speak_async(reply, on_error=on_error)
 
     def open_file(self):
         path = filedialog.askopenfilename(

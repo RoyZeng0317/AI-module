@@ -56,6 +56,19 @@ n_layer/n_embd raised to 6/192 (from 4/128) now that block_size dropped from
 2048 to 1024 leaves headroom in the 8GB budget (attention memory is
 O(block_size^2), see Rule 06 / DEFAULT_GPU_MEM_FRACTION in transformer_chat.py).
 
+attempt 5 (2026-10-27/28): templates redesigned so nothing overlaps (KiCad-
+sized op-amp, orthogonal wiring, see schmitt_trigger_gen.py) and two
+latent bugs fixed. (a) The prompts were never in the pretrain corpus the
+BPE tokenizer is built from, so every Chinese character was <unk> and the
+inverting / non-inverting / Schmitt requests (which share their R1/R2
+values) encoded to IDENTICAL ids -- the first retrain topped out at 36/54
+with only topology mix-ups left. (b) design() capped generation at 900
+tokens; the longest redesigned template is 947. Result (CPU, pretrain best
+epoch 30, finetune 140 epochs + 40 resumed from the epoch-140 checkpoint,
+val_loss 0.00087): under design()'s exact sampling settings every one of
+the 54 training prompts has the template token as the top choice at every
+step (teacher-forced check, reproduction probability 1.0).
+
 Honest scope even after attempt 4: 18 pairs over 6 unique hand-designed
 circuits (5 op-amp hysteresis-value variants + 1 logic-gate inverter) is a
 training-pipeline validation, not a claim that this generalizes to
@@ -117,7 +130,12 @@ def regenerate_corpus() -> None:
     subprocess.run([sys.executable, str(HERE / "data" / "schmitt_trigger_gen.py")], check=True)
 
 
-def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | None = None) -> None:
+def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | None = None,
+          checkpoint_every: int = 10) -> None:
+    """checkpoint_every: every N epochs the current weights are also saved to
+    <run dir>/checkpoint/ (transformer_chat's crash safety net), so a long
+    CPU run that dies can continue with `finetune --pretrain-dir
+    schmitt_chat_runs/checkpoint` instead of starting over."""
     regenerate_corpus()
 
     print("=== pretrain: learning .kicad_sch S-expression syntax ===", flush=True)
@@ -125,7 +143,7 @@ def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | 
         CORPUS_PATH, out_dir=PRETRAIN_DIR, epochs=pretrain_epochs, batch_size=2,
         block_size=BLOCK_SIZE, n_layer=N_LAYER, n_embd=N_EMBD, n_head=N_HEAD,
         dropout=0.1, lr=3e-4, weight_decay=0.01, vocab_size=VOCAB_SIZE,
-        val_split=0.15, patience=25, device=device,
+        val_split=0.15, patience=25, device=device, checkpoint_every=checkpoint_every,
     )
 
     print("=== finetune: 設計要求 -> 電路 S-expression ===", flush=True)
@@ -151,10 +169,11 @@ def train(pretrain_epochs: int = 150, finetune_epochs: int = 400, device: str | 
         PAIRS_PATH, pretrain_dir=PRETRAIN_DIR, out_dir=FINETUNE_DIR,
         epochs=finetune_epochs, batch_size=2, lr=1e-4, weight_decay=0.01,
         dropout=0.1, val_data_path=PAIRS_PATH, patience=40, device=device,
+        checkpoint_every=checkpoint_every,
     )
 
 
-def design(prompt: str, max_new_tokens: int = 900, temperature: float = 0.2, device: str | None = None) -> str:
+def design(prompt: str, max_new_tokens: int = BLOCK_SIZE, temperature: float = 0.2, device: str | None = None) -> str:
     """Returns the model's generated BODY text (placed symbols/wires/labels
     only) -- the fixed lib_symbols preamble is never part of what the model
     has to reproduce (see schmitt_trigger_gen.build_opamp_schmitt() and
@@ -163,6 +182,10 @@ def design(prompt: str, max_new_tokens: int = 900, temperature: float = 0.2, dev
     top_k: with only a few dozen training examples the goal is
     near-memorization (see train()'s comment), so generation should stay
     close to the model's most-confident path rather than sampling broadly.
+
+    max_new_tokens defaults to the whole context: the longest template is
+    947 tokens since the 2026-10-27 redesign, and the old 900 cap would cut
+    it off; generation stops at <eos> anyway.
 
     fill_values() runs on the raw output before returning: the model only
     ever has to generate PLACEHOLDER_R1/PLACEHOLDER_R2 (build_corpus()'s
@@ -197,6 +220,8 @@ def main():
     p_train.add_argument("--pretrain-epochs", type=int, default=150)
     p_train.add_argument("--finetune-epochs", type=int, default=400)
     p_train.add_argument("--device", default=None)
+    p_train.add_argument("--checkpoint-every", type=int, default=10,
+                         help="also save the current weights to <run dir>/checkpoint every N epochs (0 = off)")
 
     p_design = sub.add_parser("design", help="generate a circuit from a design request and rule-check it")
     p_design.add_argument("--prompt", required=True)
@@ -205,7 +230,8 @@ def main():
 
     args = parser.parse_args()
     if args.command == "train":
-        train(args.pretrain_epochs, args.finetune_epochs, device=args.device)
+        train(args.pretrain_epochs, args.finetune_epochs, device=args.device,
+              checkpoint_every=args.checkpoint_every)
     elif args.command == "design":
         text = design(args.prompt, device=args.device)
         findings = check_design(text, args.out)

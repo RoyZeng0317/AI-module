@@ -62,8 +62,10 @@ from pathlib import Path
 import schemdraw
 import schemdraw.elements as elm
 
-from circuit_rule_check import (get_junctions, get_lib_pin_table, get_placed_instances,
-                                 get_wires, pins_for_instance, transform_point)
+import math
+
+from circuit_rule_check import (get_junctions, get_labels, get_lib_pin_table, get_placed_instances,
+                                 get_wires, pins_for_instance, power_graphic_direction, transform_point)
 from kicad_dataset_convert import parse_sexpr
 
 MM_PER_UNIT = 5.0  # 1 schemdraw unit per 5mm of real schematic -> comfortably spaced canvas
@@ -101,6 +103,15 @@ def _ic_body_point(pin: dict) -> tuple:
     whichever axis it points, as a stand-in body-edge point (see module
     docstring for why this is a fixed stub, not the pin's real length)."""
     x, y = pin["x"], pin["y"]
+    angle = pin.get("angle")
+    if angle is not None:
+        # KiCad stores each pin's direction (tip -> body, library y-up):
+        # use it instead of guessing the side from the coordinates, which
+        # put the top/bottom pins of a TALL 2-sided part (ATmega2560: pins
+        # at y=+-62mm but x=+-15mm) on the wrong edge.
+        step = {0: (1, 0), 90: (0, 1), 180: (-1, 0), 270: (0, -1)}.get(int(angle) % 360)
+        if step:
+            return x + IC_LEAD_INSET_MM * step[0], y + IC_LEAD_INSET_MM * step[1]
     if abs(x) >= abs(y):
         return x - IC_LEAD_INSET_MM * (1 if x > 0 else -1), y
     return x, y - IC_LEAD_INSET_MM * (1 if y > 0 else -1)
@@ -113,6 +124,9 @@ def _draw_box(d, corner1: tuple, corner2: tuple) -> None:
         d += elm.Line().at(p1).to(p2)
 
 
+PIN_NAME_FONTSIZE = 7
+
+
 def _draw_ic(d, xy, pins: list, inst: dict, label: str) -> None:
     bodies_world = []
     for pin in pins:
@@ -121,9 +135,19 @@ def _draw_ic(d, xy, pins: list, inst: dict, label: str) -> None:
                                       inst["x"], inst["y"])
         bodies_world.append(body_world)
         d += elm.Line().at(xy(*body_world)).to(xy(*tip_world))
+        name = pin.get("name")
+        if name and name not in ("~", "?"):   # "?" = no (name ...) in the file
+            # pin name just inside the body edge, reading away from the pin
+            inward = 1 if tip_world[0] < body_world[0] else -1
+            inside = (body_world[0] + inward * 0.6, body_world[1])
+            d += elm.Label().at(xy(*inside)).label(
+                name, halign="left" if inward > 0 else "right", fontsize=PIN_NAME_FONTSIZE)
 
     xs, ys = [p[0] for p in bodies_world], [p[1] for p in bodies_world]
-    _draw_box(d, xy(min(xs), min(ys)), xy(max(xs), max(ys)))
+    # pins on the left/right edges: leave half a pin pitch above the first
+    # and below the last pin so their names are inside the box, not on its edge
+    pad = 1.27 if all(p.get("angle") in (0, 180, 0.0, 180.0) for p in pins) else 0.0
+    _draw_box(d, xy(min(xs), min(ys) - pad), xy(max(xs), max(ys) + pad))
     d += elm.Label(label).at(xy((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2))
 
 
@@ -150,7 +174,15 @@ def kicad_to_drawing(root, class_map: dict = None) -> tuple:
     for point in junctions:
         d += elm.Dot().at(xy(*point))
 
+    for lb in get_labels(root):
+        # net label: text above its wire, running away from the wire end
+        d += elm.Label().at(xy(*lb["point"])).label(
+            lb["text"], halign="left" if lb.get("angle", 0) == 0 else "right", valign="bottom")
+
     for inst in instances:
+        if inst["lib_id"].startswith("power:"):
+            _draw_power(d, xy, inst)
+            continue
         element_cls = _lookup_element(inst["lib_id"], class_map)
         label = inst["reference"] or inst["lib_id"]
         if element_cls is None:
@@ -159,7 +191,8 @@ def kicad_to_drawing(root, class_map: dict = None) -> tuple:
         pins = pins_for_instance(pin_table, inst["lib_id"], inst["unit"])
         if element_cls and len(pins) == 2:
             p1, p2 = _tip_world(pins[0], inst), _tip_world(pins[1], inst)
-            d += element_cls().at(xy(*p1)).to(xy(*p2)).label(label)
+            text = f'{label}\n{inst["value"]}' if inst.get("value") else label
+            d += element_cls().at(xy(*p1)).to(xy(*p2)).label(text)
         elif element_cls and len(pins) == 1:
             d += element_cls().at(xy(*_tip_world(pins[0], inst))).label(label)
         elif len(pins) > 2:
@@ -171,6 +204,24 @@ def kicad_to_drawing(root, class_map: dict = None) -> tuple:
             d += placeholder_cls().at(xy(inst["x"], inst["y"])).theta(-inst["angle"]).label(label)
 
     return d, unmapped, imprecise
+
+
+def _draw_power(d, xy, inst: dict) -> None:
+    """Power flag drawn at its pin, pointing the way it points in the file
+    (circuit_rule_check.power_graphic_direction), labelled with its net --
+    instead of a dot carrying the hidden "#PWR.." reference."""
+    net = inst["lib_id"].split(":", 1)[1]
+    dx, dy = power_graphic_direction(inst["lib_id"], inst["angle"])
+    target = math.degrees(math.atan2(-dy, dx))           # sheet y-down -> drawing y-up
+    is_ground = net.upper().startswith(("GND", "VSS", "AGND", "DGND"))
+    base = -90.0 if is_ground else 90.0                  # schemdraw Ground hangs down, Vdd stands up
+    d += (elm.Ground if is_ground else elm.Vdd)().at(xy(inst["x"], inst["y"])).theta(target - base)
+    if not is_ground:
+        # net name just past the flag, reading away from it (a schemdraw
+        # element label would rotate/sit on the wire for sideways flags)
+        end = (inst["x"] + dx * 4.5, inst["y"] + dy * 4.5)
+        halign = "center" if abs(dx) < 0.5 else ("left" if dx > 0 else "right")
+        d += elm.Label().at(xy(*end)).label(net, halign=halign, valign="bottom" if dy < -0.5 else "center")
 
 
 def render_file(sch_path: Path, out_path: Path, class_map: dict = None) -> tuple:

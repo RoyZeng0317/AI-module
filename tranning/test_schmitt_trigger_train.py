@@ -10,8 +10,13 @@ test itself stays fast.
 """
 
 import json
+import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "data"))
 
@@ -33,6 +38,32 @@ def test_generated_corpus_has_no_rule_check_errors(tmp_path):
         path.write_text(wrap_kicad(body), encoding="utf-8")
         errors = [f for f in check_schematic(path) if f["severity"] == "error"]
         assert errors == []
+
+
+def test_every_pair_fits_the_model_context():
+    # prompt + <sep> + reply + <eos> must fit BLOCK_SIZE or the tail of the
+    # circuit is silently cut off before it reaches the loss
+    from bpe_tokenizer import BPETokenizer
+    from schmitt_trigger_gen import build_pretrain_corpus
+    pairs = build_corpus()
+    tok = BPETokenizer.train([build_pretrain_corpus(pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
+    longest = max(len(tok.encode(p["prompt"])) + len(tok.encode(p["reply"])) + 2 for p in pairs)
+    assert longest <= stt.BLOCK_SIZE, longest
+
+
+def test_prompts_are_not_unknown_tokens():
+    # the tokenizer is trained on the pretrain corpus only; if the prompts
+    # are not in it, every Chinese character becomes <unk> and different
+    # circuit requests encode to identical ids (the 2026-10-27 bug)
+    from bpe_tokenizer import UNK, BPETokenizer
+    from schmitt_trigger_gen import build_pretrain_corpus
+    pairs = build_corpus()
+    tok = BPETokenizer.train([build_pretrain_corpus(pairs)], vocab_size=stt.VOCAB_SIZE, verbose=False)
+    encoded = {p["prompt"]: tok.encode(p["prompt"]) for p in pairs}
+    assert all(UNK not in ids for ids in encoded.values())
+    a = encoded["幫我設計一個反相放大器電路，R1 用 10k，R2 用 100k"]
+    b = encoded["幫我設計一個同相放大器電路，R1 用 10k，R2 用 100k"]
+    assert a != b
 
 
 def test_generated_corpus_covers_every_topology():
@@ -67,7 +98,48 @@ def test_check_design_reports_clean_for_valid_circuit(tmp_path):
     pairs = build_corpus()
     text = pairs[0]["reply"]
     findings = stt.check_design(text, tmp_path / "out.kicad_sch")
+    # since the 2026-10-27 template redesign: no errors and no
+    # overlapping_symbols warnings either
     assert findings == []
+
+
+@pytest.mark.skipif(shutil.which("kicad-cli") is None, reason="KiCad not installed")
+def test_templates_wire_the_intended_opamp_pins_in_real_kicad(tmp_path):
+    """Real KiCad netlist of the templates. Before 2026-10-27 the library
+    pins were written in sheet coordinates, so KiCad (library y-up) swapped
+    IN+/IN- and V+/V-, and the power pins had no name, so they joined no net."""
+    from schmitt_trigger_gen import (build_comparator, build_inverting_amp, build_noninverting_amp,
+                                     build_opamp_schmitt)
+
+    def nets(body, name):
+        sch = tmp_path / f"{name}.kicad_sch"
+        sch.write_text(wrap_kicad(body).replace("(version 20231120)", "(version 20230121)"), encoding="utf-8")
+        net = tmp_path / f"{name}.net"
+        subprocess.run(["kicad-cli", "sch", "export", "netlist", "--format", "kicadxml", "-o", str(net), str(sch)],
+                       check=True, capture_output=True)
+        return {n: {f"{r}.{p}" for r, p in re.findall(r'ref="([^"]+)" pin="([^"]+)"', b)}
+                for n, b in re.findall(r'<net [^>]*name="([^"]*)"[^>]*>(.*?)</net>', net.read_text(), re.S)}
+
+    def node(n, pin):
+        return next(v for v in n.values() if pin in v)
+
+    schmitt = nets(build_opamp_schmitt("10k", "100k"), "schmitt")
+    assert node(schmitt, "R2.1") == {"R1.2", "R2.1", "U1.1"}   # positive feedback on IN+ (pin 1)
+    assert schmitt["/VOUT"] == {"R2.2", "U1.3"} and schmitt["/VIN"] == {"R1.1"}
+    assert schmitt["GND"] == {"U1.2", "U1.5"} and schmitt["VCC"] == {"U1.4"}
+
+    inv = nets(build_inverting_amp("10k", "100k"), "inv")
+    assert node(inv, "R2.1") == {"R1.2", "R2.1", "U1.2"}       # negative feedback on IN- (pin 2)
+    assert inv["GND"] == {"U1.1", "U1.5"}
+
+    noninv = nets(build_noninverting_amp("10k", "100k"), "noninv")
+    assert noninv["/VIN"] == {"U1.1"} and node(noninv, "U1.2") == {"R1.2", "R2.1", "U1.2"}
+    assert noninv["GND"] == {"R1.1", "U1.5"}
+
+    comp = nets(build_comparator("10k", "10k"), "comp")
+    assert comp["/VIN"] == {"U1.2"}                              # Vin on IN-
+    assert node(comp, "U1.1") == {"U1.1", "R1.1", "R2.2"}       # divider on IN+
+    assert comp["VCC"] == {"R1.2", "U1.4"} and comp["GND"] == {"R2.1", "U1.5"}
 
 
 def test_check_design_reports_unparsable_instead_of_raising(tmp_path):

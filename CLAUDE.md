@@ -116,6 +116,18 @@ python lib/img.py --edit before.png "make it blue"
 python lib/img.py --train-deblur path/to/sharp_photos/ --epochs 100
 python lib/img.py --deblur blurry.jpg
 
+# 影像處理練習（純 for 迴圈，無 NumPy／OpenCV，見 lib/opencv2/IMAGE_PROCESSING.md）
+python lib/opencv2/binarization.py --threshold 128    # 固定門檻 + Otsu 二值化
+
+# 語音對話（音節辨識 + 音節拼接合成，見 to_do_list.md #53；需要 pip install pypinyin opencc-python-reimplemented sounddevice）
+python tranning/speech_to_text.py --train-manifest <資料夾>/train.json --val-manifest <資料夾>/val.json
+python tranning/speech_to_text.py --recognize clip.wav
+python tranning/syllable_lm.py --build --extra-text <資料夾>/train.json   # 重建音節→漢字語言模型
+python tranning/aishell_import.py --aishell-dir <data_aishell> --to-traditional   # AISHELL-1 轉 manifest
+python tranning/syllable_tts.py --record        # 錄自己的音節（--coverage 查還缺哪些）
+python tranning/syllable_tts.py --say "你好"
+python lib/components/cli.py                   # 進去後輸入 /voice 開始語音對話
+
 # YOLO 偵測訓練（yolo_custom.py 通用骨架、circuit_diagram_train.py/pcb_defect_train.py/
 # road_sign_yolo_train.py/materials_yolo_train.py 各自領域，--detach 背景訓練 + --status 查進度）
 python tranning/yolo_custom.py --make-data tranning/yolo_data --n 200
@@ -136,6 +148,10 @@ pytest lib/components/
 pytest lib/test_img.py
 pytest web/backend/tests/
 pytest shape-vision/tests/
+
+# MCU 最小系統原理圖（ATmega328P / ATmega2560 / ESP32 / Raspberry Pi 5 排針，無重疊排版，見 to_do_list.md #52）
+python tranning/circuit_ic_generator.py --ic mega2560 --out output/mega.kicad_sch --check --render output/mega.png
+python tranning/circuit_rule_check.py output/mega.kicad_sch      # ERC + overlapping_symbols 重疊檢查
 
 # 打包安裝前置檢查 exe
 pyinstaller --onefile --console --name install_check app/install/install_check.py
@@ -228,8 +244,9 @@ AI-module/
 │   ├── materials_yolo_train.py  region_refer.py
 │   ├── CNN.py  OCR.py  RNN.py  RNN.md  image_analysis.py  image_classifier_bnn.py  road_sign_train.py
 │   ├── cv_inference_check.py  inference_check.py
-│   ├── speech_to_text.py  voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py
-│   ├── download_commonvoice.py  diagnose_stt.py
+│   ├── speech_to_text.py  pinyin_units.py  syllable_lm.py  syllable_tts.py   # 語音辨識／合成（#53）
+│   ├── voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py
+│   ├── download_commonvoice.py  aishell_import.py  diagnose_stt.py
 │   ├── schmitt_trigger_train.py  circuit_diagram_train.py  circuit_kicad_to_schemdraw.py
 │   ├── circuit_rule_check.py  circuit_schemdraw_render.py
 │   ├── calculus_generator.py  calculus_solver.py  logic_reasoning_generator.py  word_problem_generator.py

@@ -34,6 +34,10 @@ tranning/gpt_code_pretrain_runs/
 tranning/dist/
 tranning/speech_runs/
 tranning/speech_data/
+tranning/speech_syllable_runs/
+tranning/aishell1/
+tranning/aishell1_zhTW/
+data/voice_syllables/
 tranning/Tranning/
 
 # 大型訓練 checkpoint 權重檔（可重新訓練、單檔近 70MB，不進版控；history.json/config.json 等中繼資料仍保留追蹤）
@@ -136,6 +140,11 @@ output/test_character_image_close_review.py
 /data/basic_electricity/source/
 /output/basic-electricity-tests/
 /output/basic-electricity-review-tests*/
+
+# 施密特觸發器訓練的中途存檔點（--checkpoint-every，只用於中斷後接續訓練；正式模型在 run 目錄本身）
+tranning/schmitt_pretrain_runs/checkpoint/
+tranning/schmitt_chat_runs/checkpoint/
+
 /output/electricity-open-tests*/
 /output/electricity-open-review-tests*/
 /tranning/gpt_electricity_open_runs/**/model.pt
