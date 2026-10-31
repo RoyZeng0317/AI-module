@@ -65,3 +65,44 @@ new_y = round_half_up((CDF[y] - CDF_min) * 255 / (像素總數 - CDF_min))
 ```
 
 20項測試通過，含非對稱核、Sobel正負值、邊界、通道獨立、已知YCbCr像素、手算CDF與常數圖。獨立審查另核對Word OMML內的Filter2、實際圖片與原始JSON；單獨載入兩模組不會匯入NumPy／cv2／SciPy。工程與實際輸出檢查通過，視覺效果仍待使用者驗收。
+
+## 二值化
+
+同樣是獨立練習：Pillow只負責讀寫、像素容器與圖表組裝；灰階、直方圖、門檻判斷與Otsu均為Python迴圈，沒有NumPy、OpenCV、SciPy，也沒有呼叫Pillow的 `point`、`convert('1')`、`convert('L')` 或內建濾鏡。直方圖統計與圖表直接重用 `histogram_equalization.py` 的 `histogram()`／`histogram_chart()`。
+
+```powershell
+# 省略圖片時採卷積練習的Lenna_RGB.tif；可一次給多張
+.venv/Scripts/python.exe lib/opencv2/binarization.py
+.venv/Scripts/python.exe lib/opencv2/binarization.py lib/opencv2/koala.jpg "C:/Users/roy/Downloads/Lenna_RGB.webp" --threshold 100
+```
+
+**灰階**採卷積練習同一組係數，但這裡逐像素四捨五入（.5進位）成0–255整數，以整數 `(299R+587G+114B+500)//1000` 計算避免浮點誤差；不是直方圖練習的有限範圍Y（16–235）。灰階輸入直接沿用原值，RGBA忽略alpha。
+
+**固定門檻**（預設128，`--threshold` 可改，允許0–256）：
+
+```text
+binary = 255  若 gray >= T
+binary = 0    若 gray <  T
+```
+
+T本身算白（>=）。T=0全白、T=256全黑。
+
+**Otsu**：用256個bins的直方圖，對每個T把 `[0, T-1]` 當背景、`[T, 255]` 當前景（與上面 >= 慣例一致），計算類間變異數：
+
+```text
+σ²_B(T) = w0·w1·(μ0 − μ1)² = (S0·N − S·n0)² / (n0·n1·N²)
+```
+
+n0/S0為背景像素數與灰階總和，N/S為全體。以 `fractions.Fraction` 精確比較，取σ²_B最大的T；**同分取最小T**。因為慣例是 >= T，此處的T比OpenCV（`> T`）的Otsu門檻大1。任一類為空時σ²_B定義為0、不做除法，所以**常數圖片**的256個σ²_B全為0，T=0，輸出全白。
+
+輸出位於 `output/image-processing/binarization/<圖片檔名>/`：`gray.png`、`fixed_T<值>.png`、`otsu_T<值>.png`、`histogram.png`（紅線固定門檻、綠線Otsu）、`histogram.csv`（bin、count、以該bin為T時的類間變異數）、`comparison.png`（灰階／固定／Otsu並排）及 `report.json`。
+
+本次實測Otsu門檻：Lenna_RGB.tif（512×512）T=118、Lenna_Gray.tif（850×846）T=120、koala.jpg（451×680）T=120。
+
+已知限制：只做全域單一門檻，不是自適應（區域）門檻，光照不均時同一個T不適用整張圖；Otsu假設直方圖大致雙峰，Lenna實際是多峰，門檻只代表類間變異數最大的切點，不保證切出想要的物體。
+
+```powershell
+.venv/Scripts/python.exe -m pytest lib/opencv2/test_binarization.py --basetemp output/image-processing-tests -q
+```
+
+測試含手算灰階進位、門檻邊界（值恰為T）、雙峰矩陣的手算Otsu（T=21、σ²_B=1740²/324）、與逐T直接用定義計算的變異數比對、常數圖與小圖端到端輸出；並檢查原始碼沒有匯入NumPy／cv2／SciPy。工程測試通過，視覺效果仍待使用者驗收。
