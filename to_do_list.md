@@ -431,4 +431,5 @@
     - [x] 新增 `tranning/kfold.py`：分層＋分組 k-fold，近似重複圖片自動歸成同一群組、整組只落在同一 fold；罕見類別群組不足 k 個時警告，不硬拆群組。
     - [x] `image_classifier_bnn.py`：新增 `--kfold K`（`--data-dir` 給未分割資料集，每個 fold 從頭訓練，輸出 `fold_<i>/` 與 `kfold_summary.json` 的 val_acc 平均±標準差）；一般訓練前自動跑洩漏檢查（只警告，`--skip-leakage-check` 關閉）。訓練迴圈抽成 `_fit()` 共用，原 `train()` 行為不變。
     - [x] 測試：`test_leakage_check.py`、`test_kfold.py`、`test_image_classifier_bnn.py` 新增 k-fold／洩漏警告案例（合成雜訊圖，只證明流程與偵測邏輯，不代表準確率）。
-    - [ ] 用真實資料集（例如 `data/dataset/` 2400 張或 PCB 資料）實際跑 `leakage_check.py` 與 `--kfold 5`，由你確認結果；dHash 抓不到大幅裁切／翻轉版本，報告為必要檢查而非保證。
+    - [x] 2026-11-11 實跑 `leakage_check.py --data-dir data/dataset`（train 2000／val 400）：0 處完全相同、0 處近似重複、0 筆標註衝突，2.7 秒。注意這批是 #35 的合成色塊資料，不代表真實照片的情況。
+    - [ ] 用真實照片資料集（例如 PCB 資料）實際跑 `leakage_check.py` 與 `--kfold 5`，由你確認結果；dHash 抓不到大幅裁切／翻轉版本，報告為必要檢查而非保證。
