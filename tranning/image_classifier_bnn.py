@@ -39,6 +39,12 @@ Usage:
     python image_classifier_bnn.py --data-dir path/to/split_output --epochs 30
     python image_classifier_bnn.py --data-dir path/to/split_output --no-hflip --epochs 30
     python image_classifier_bnn.py --classify path/to/image.jpg --out-dir image_classifier_runs
+    python image_classifier_bnn.py --data-dir path/to/unsplit_dataset --kfold 5 --out-dir image_classifier_kfold_runs
+
+一般訓練前會自動用 leakage_check.py 檢查 train/val/test 之間的重複／近似重複
+圖片（只警告不中止，--skip-leakage-check 可關閉）。--kfold 使用 kfold.py 的分層
+＋分組分配，近似重複圖片整組放在同一 fold。Normalize 用固定的 ImageNet 常數，
+不從資料集估計，所以前處理本身不會把驗證集統計量洩漏進訓練。
 """
 
 import argparse
@@ -48,9 +54,11 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 from PIL import Image
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torchvision import datasets, models, transforms
 
+from kfold import fold_split, make_folds
+from leakage_check import DEFAULT_THRESHOLD, check_split_leakage
 from bayesian_utils import low_confidence_warning, mc_predict_classification, predictive_entropy
 from train_utils import EarlyStopper, accuracy_gap_warning, plateau_scheduler, save_checkpoint
 
@@ -180,24 +188,14 @@ def plot_history(out_dir: Path) -> Path:
     return path
 
 
-def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float,
-          patience: int, image_size: int, freeze_backbone: bool, dropout: float,
-          weight_decay: float, hflip: bool = True, device: str | None = None, grayscale: bool = False):
-    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    train_loader, val_loader, classes = build_dataloaders(data_dir, image_size, batch_size, hflip, grayscale)
-    model = build_model(len(classes), freeze_backbone, dropout).to(device)
-
+def _fit(model, train_loader, val_loader, epochs: int, lr: float, weight_decay: float,
+         patience: int, device: str, log_prefix: str = ""):
+    """共用的訓練迴圈：AdamW + plateau scheduler + early stopping，結束時還原最佳權重。"""
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
     optimizer = torch.optim.AdamW(
         (p for p in model.parameters() if p.requires_grad), lr=lr, weight_decay=weight_decay
     )
     scheduler = plateau_scheduler(optimizer)
-
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "classes.json").write_text(json.dumps(classes, ensure_ascii=False, indent=2))
-    (out_dir / "config.json").write_text(json.dumps({"image_size": image_size, "dropout": dropout, "grayscale": grayscale, "architecture": "feature_cnn"}, indent=2))
-
     stopper = EarlyStopper(patience)
     history = []
 
@@ -208,7 +206,7 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
 
         warning = accuracy_gap_warning(train_acc, val_acc, epoch, epochs, underfit_hint="--unfreeze-backbone")
 
-        print(f"epoch {epoch:3d}  train_loss={train_loss:.4f} train_acc={train_acc:.3f}  "
+        print(f"{log_prefix}epoch {epoch:3d}  train_loss={train_loss:.4f} train_acc={train_acc:.3f}  "
               f"val_loss={val_loss:.4f} val_acc={val_acc:.3f}{warning}")
         history.append({"epoch": epoch, "train_loss": train_loss, "train_acc": train_acc,
                          "val_loss": val_loss, "val_acc": val_acc})
@@ -217,9 +215,120 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
             break
 
     stopper.restore_best(model)
+    return history
+
+
+def _warn_split_leakage(data_dir: Path) -> dict | None:
+    """訓練前檢查 train/val/test 是否有重複或近似重複圖片；只警告，不中止訓練。"""
+    try:
+        report = check_split_leakage(data_dir)
+    except (OSError, ValueError) as exc:
+        print(f"⚠️ 資料洩漏檢查略過：{exc}")
+        return None
+    if report["leak_count"]:
+        print(f"⚠️ 偵測到 {report['leak_count']} 處 train/val/test 資料洩漏（重複或近似重複圖片），"
+              f"驗證分數可能偏高；詳情請執行 python leakage_check.py --data-dir {data_dir}")
+    return report
+
+
+def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float,
+          patience: int, image_size: int, freeze_backbone: bool, dropout: float,
+          weight_decay: float, hflip: bool = True, device: str | None = None, grayscale: bool = False,
+          check_leakage: bool = True):
+    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    if check_leakage:
+        _warn_split_leakage(data_dir)
+    train_loader, val_loader, classes = build_dataloaders(data_dir, image_size, batch_size, hflip, grayscale)
+    model = build_model(len(classes), freeze_backbone, dropout).to(device)
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "classes.json").write_text(json.dumps(classes, ensure_ascii=False, indent=2))
+    (out_dir / "config.json").write_text(json.dumps({"image_size": image_size, "dropout": dropout, "grayscale": grayscale, "architecture": "feature_cnn"}, indent=2))
+
+    history = _fit(model, train_loader, val_loader, epochs, lr, weight_decay, patience, device)
     save_checkpoint(model, out_dir, history)
     print(f"Training curves: {plot_history(out_dir)}")
     return model, classes, history
+
+
+class _FileListDataset(Dataset):
+    """k-fold 用：直接讀 [(path, label)] 清單，不需要把檔案複製成 train/val 資料夾。"""
+
+    def __init__(self, items: list[dict], class_to_idx: dict, transform):
+        self.items = items
+        self.class_to_idx = class_to_idx
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.items)
+
+    def __getitem__(self, idx):
+        item = self.items[idx]
+        with Image.open(item["path"]) as img:
+            image = self.transform(img.convert("RGB"))
+        return image, self.class_to_idx[item["label"]]
+
+
+def train_kfold(source: Path, out_dir: Path, k: int, epochs: int, batch_size: int, lr: float,
+                patience: int, image_size: int, dropout: float, weight_decay: float,
+                hflip: bool = True, device: str | None = None, grayscale: bool = False,
+                seed: int = 42, threshold: int = DEFAULT_THRESHOLD, group_regex: str | None = None) -> dict:
+    """分層＋分組 k-fold 交叉驗證：每個 fold 從頭訓練一顆新模型，回報平均與標準差。
+
+    `source` 是未分割的資料集（每類一個子資料夾，data_split.py 的輸入，不是輸出）。
+    近似重複圖片會先被歸成同一群組、整組放在同一 fold（見 kfold.py），所以每個
+    fold 的驗證分數不會被重複圖片灌水。最終模型仍請用一般 train() 訓練；
+    k-fold 的用途是可靠地估計泛化表現與比較超參數，不是產生部署用 checkpoint。
+    各 fold 輸出到 out_dir/fold_<i>/，彙整寫在 out_dir/kfold_summary.json。
+    """
+    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    folds = make_folds(source, k, seed, threshold, group_regex)
+    for w in folds["warnings"]:
+        print(f"⚠️ {w}")
+    classes = folds["classes"]
+    class_to_idx = {c: i for i, c in enumerate(classes)}
+    train_tf, eval_tf = build_transforms(image_size, hflip, grayscale)
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "folds.json").write_text(json.dumps(folds, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    results = []
+    for fold in range(k):
+        train_items, val_items = fold_split(folds, fold)
+        # 防呆：群組分配保證不跨 fold，這裡再驗一次
+        overlap = {it["group"] for it in train_items} & {it["group"] for it in val_items}
+        if overlap:
+            raise RuntimeError(f"fold {fold} 有 {len(overlap)} 個群組同時出現在 train/val")
+        torch.manual_seed(seed + fold)
+        train_loader = DataLoader(_FileListDataset(train_items, class_to_idx, train_tf),
+                                  batch_size=batch_size, shuffle=True, num_workers=0)
+        val_loader = DataLoader(_FileListDataset(val_items, class_to_idx, eval_tf),
+                                batch_size=batch_size, shuffle=False, num_workers=0)
+        model = build_model(len(classes), dropout=dropout).to(device)
+        print(f"=== fold {fold + 1}/{k}: train={len(train_items)} val={len(val_items)} ===")
+        history = _fit(model, train_loader, val_loader, epochs, lr, weight_decay, patience, device,
+                       log_prefix=f"[fold {fold + 1}] ")
+        best = min(history, key=lambda h: h["val_loss"])
+        fold_dir = out_dir / f"fold_{fold}"
+        fold_dir.mkdir(exist_ok=True)
+        save_checkpoint(model, fold_dir, history)
+        results.append({"fold": fold, "n_train": len(train_items), "n_val": len(val_items),
+                        "best_epoch": best["epoch"], "val_loss": best["val_loss"], "val_acc": best["val_acc"]})
+
+    accs = torch.tensor([r["val_acc"] for r in results])
+    losses = torch.tensor([r["val_loss"] for r in results])
+    summary = {
+        "k": k, "classes": classes, "folds": results,
+        "val_acc_mean": accs.mean().item(), "val_acc_std": accs.std(unbiased=False).item(),
+        "val_loss_mean": losses.mean().item(), "val_loss_std": losses.std(unbiased=False).item(),
+        "warnings": folds["warnings"],
+    }
+    (out_dir / "kfold_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"k-fold 結果：val_acc = {summary['val_acc_mean']:.3f} ± {summary['val_acc_std']:.3f}  "
+          f"val_loss = {summary['val_loss_mean']:.4f} ± {summary['val_loss_std']:.4f}")
+    return summary
 
 
 _loaded_models: dict = {}
@@ -338,6 +447,16 @@ def main():
     parser.set_defaults(hflip=True)
     parser.add_argument("--mc-samples", type=int, default=DEFAULT_MC_SAMPLES,
                         help="number of MC Dropout forward passes for --classify's confidence/entropy")
+    parser.add_argument("--kfold", type=int, metavar="K",
+                        help="分層＋分組 K-fold 交叉驗證；此時 --data-dir 是未分割的資料集（每類一個子資料夾）")
+    parser.add_argument("--seed", type=int, default=42, help="k-fold 分配與初始化的亂數種子")
+    parser.add_argument("--leak-threshold", type=int, default=DEFAULT_THRESHOLD,
+                        help="k-fold 分組用的 dHash 近似門檻；-1 只合併完全相同檔案")
+    parser.add_argument("--group-regex", default=None,
+                        help="k-fold 分組：從檔名擷取群組鍵（第 1 個擷取群組），例如 '^(.+?)_aug\\d+'")
+    parser.add_argument("--skip-leakage-check", dest="check_leakage", action="store_false",
+                        help="一般訓練前不檢查 train/val/test 重複圖片")
+    parser.set_defaults(check_leakage=True)
     parser.add_argument("--classify", type=Path,
                         help="skip training; classify a single image against --out-dir's checkpoint")
     args = parser.parse_args()
@@ -362,9 +481,16 @@ def main():
     if not args.data_dir:
         parser.error("--data-dir is required unless --classify is given")
 
+    if args.kfold:
+        train_kfold(args.data_dir, args.out_dir, args.kfold, args.epochs, args.batch_size, args.lr,
+                    args.patience, args.image_size, args.dropout, args.weight_decay, args.hflip,
+                    grayscale=args.grayscale, seed=args.seed, threshold=args.leak_threshold,
+                    group_regex=args.group_regex)
+        return
+
     train(args.data_dir, args.out_dir, args.epochs, args.batch_size, args.lr,
           args.patience, args.image_size, args.freeze_backbone, args.dropout,
-          args.weight_decay, args.hflip, grayscale=args.grayscale)
+          args.weight_decay, args.hflip, grayscale=args.grayscale, check_leakage=args.check_leakage)
 
 
 if __name__ == "__main__":

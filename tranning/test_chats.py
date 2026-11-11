@@ -214,3 +214,12 @@ def test_chat_pairs_dataset_typo_prob_augments_prompt_not_reply():
         src_variants.add(tuple(src.tolist()))
 
     assert len(src_variants) > 1  # 每次抽到不同的錯字版本，不是同一個固定結果
+
+
+def test_truncation_warning_counts_long_replies():
+    from chats import truncation_warning
+
+    pairs = [{"prompt": "嗨", "reply": "短"}, {"prompt": "嗨", "reply": "長" * 50}]
+    msg = truncation_warning(pairs, max_len=40)
+    assert "1/2 筆 reply" in msg and "--max-len 51" in msg
+    assert truncation_warning(pairs, max_len=51) == ""

@@ -186,3 +186,50 @@ def test_features_missing_image_reports_path_before_model_loading(tmp_path, monk
     monkeypatch.setattr(classifier, "_load", unexpected_load)
     with pytest.raises(FileNotFoundError, match="missing.jpg"):
         classifier.export_features(tmp_path / "missing.jpg", tmp_path)
+
+
+def _make_noise_dataset(root: Path, per_class: int = 6):
+    seed = 0
+    for name, base in {"cat": (200, 30, 30), "dog": (30, 30, 200)}.items():
+        class_dir = root / name
+        class_dir.mkdir(parents=True)
+        for i in range(per_class):
+            seed += 1
+            rng = np.random.default_rng(seed)
+            noise = rng.integers(-40, 40, (48, 48, 3))
+            arr = np.clip(np.array(base) + noise, 0, 255).astype(np.uint8)
+            Image.fromarray(arr).save(class_dir / f"{name}_{i}.png")
+
+
+def test_kfold_trains_each_fold_and_writes_summary(tmp_path):
+    from image_classifier_bnn import train_kfold
+
+    source = tmp_path / "source"
+    out_dir = tmp_path / "kfold_runs"
+    _make_noise_dataset(source)
+
+    summary = train_kfold(source, out_dir, k=3, epochs=1, batch_size=4, lr=1e-3, patience=3,
+                          image_size=32, dropout=0.3, weight_decay=1e-4)
+
+    assert summary["k"] == 3 and len(summary["folds"]) == 3
+    assert sum(r["n_val"] for r in summary["folds"]) == 12
+    assert 0.0 <= summary["val_acc_mean"] <= 1.0
+    assert json.loads((out_dir / "kfold_summary.json").read_text(encoding="utf-8"))["k"] == 3
+    for f in range(3):
+        assert (out_dir / f"fold_{f}" / "best_model.pt").exists()
+
+
+def test_train_warns_when_split_has_duplicate(tmp_path, capsys):
+    import shutil
+    from image_classifier_bnn import _warn_split_leakage
+
+    source = tmp_path / "source"
+    split_dir = tmp_path / "split"
+    _make_noise_dataset(source)
+    split_dataset(source, split_dir, train=0.5, val=0.25, test=0.25, seed=1)
+    leaked = next((split_dir / "train" / "cat").iterdir())
+    shutil.copy(leaked, split_dir / "val" / "cat" / "copy.png")
+
+    report = _warn_split_leakage(split_dir)
+    assert report["leak_count"] >= 1
+    assert "資料洩漏" in capsys.readouterr().out

@@ -152,6 +152,19 @@ def tokenize(text: str) -> list[str]:
     return list(text.strip())
 
 
+def truncation_warning(pairs: list[dict], max_len: int) -> str:
+    """encode() 只保留前 max_len-1 個字（最後一格給 <eos>），超過的尾巴會被靜默截斷；
+    訓練前把被截斷的筆數印出來（to-do #43-1b），回傳空字串代表沒有截斷。"""
+    limit = max_len - 1
+    long_prompts = sum(len(tokenize(p["prompt"])) > limit for p in pairs)
+    long_replies = [len(tokenize(p["reply"])) for p in pairs if len(tokenize(p["reply"])) > limit]
+    if not long_prompts and not long_replies:
+        return ""
+    longest = max([len(tokenize(p["prompt"])) for p in pairs] + [len(tokenize(p["reply"])) for p in pairs])
+    return (f"⚠️ --max-len {max_len} 會截斷 {len(long_replies)}/{len(pairs)} 筆 reply、"
+            f"{long_prompts} 筆 prompt（最長 {longest} 字，需要 --max-len {longest + 1} 才不截斷）")
+
+
 def build_vocab(pairs: list[dict]) -> dict[str, int]:
     vocab = dict(SPECIAL_TOKENS)
     for pair in pairs:
@@ -325,6 +338,7 @@ def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
     if device.startswith("cuda") and torch.cuda.is_available():
         torch.cuda.set_per_process_memory_fraction(gpu_mem_fraction, torch.cuda.current_device())
     pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
+    print(truncation_warning(pairs, max_len) or f"所有 prompt/reply 都在 --max-len {max_len} 以內")
     vocab = build_vocab(pairs)
     typo_char_pool = [tok for tok in vocab if tok not in SPECIAL_TOKENS]
 

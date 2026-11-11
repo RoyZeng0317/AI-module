@@ -125,6 +125,11 @@ python tranning/pcb_defect_train.py --data data/pcb_yolo/data.yaml --detach
 python tranning/road_sign_yolo_train.py --dataset-dir <資料夾> --classes stop yield no-entry
 python tranning/materials_yolo_train.py --data <data.yaml>
 
+# 影像分類 data leakage 檢查與分層＋分組 k-fold（見 to_do_list.md #52）
+python tranning/leakage_check.py --data-dir <data_split.py 輸出>
+python tranning/kfold.py --source <未分割資料集> --k 5
+python tranning/image_classifier_bnn.py --data-dir <未分割資料集> --kfold 5 --out-dir tranning/image_classifier_kfold_runs
+
 # 區域指稱模型（YOLO 候選框 + 自訓視覺/文字對比學習，見 to_do_list 區域指稱相關條目）
 python tranning/region_refer.py --make-data tranning/region_refer_data --n 300
 python tranning/region_refer.py --train tranning/region_refer_data --epochs 30
