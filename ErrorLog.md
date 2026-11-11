@@ -514,3 +514,9 @@ lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，�
 
 ## 2026-10-26：字詞語意資料建置工具問題
 資料Builder首次用PowerShell管線傳送含中文Python程式，系統編碼將文字轉成問號；已改為UTF-8原始檔build_fixtures.py重建六個word_sense JSON，新增span、無問號與SFT對齊測試。首次rg對tranning/gpt*路徑在Windows回報os error123，改明確檔名。三個新測試通過；pytest cache因WinError183無法建立，僅快取警告，不更改專案外環境。未執行模型訓練。
+
+
+## 2026-11-11：leakage_check／k-fold 指令在 PowerShell 報「'<' 運算子保留供未來使用」
+- 現象：照回覆／CLAUDE.md 範例執行 `python tranning/leakage_check.py --data-dir <data_split.py 輸出>` 與 `image_classifier_bnn.py --data-dir <data_unsplit> --kfold 5`，PowerShell 在解析階段就報 `RedirectionNotSupported`，Python 沒有被執行。
+- 原因：範例裡的 `<...>` 是「請換成實際路徑」的佔位符，PowerShell 會把 `<` 當成重新導向運算子。另外文件沒說清楚兩個指令要的資料夾結構不同。
+- 修正：CLAUDE.md 範例改成專案內真實存在的路徑（`data/dataset`、`data/dataset/train`）並註明資料夾結構：leakage_check 吃已分割（train/val/test → 類別），k-fold 吃未分割（直接是類別資料夾）。

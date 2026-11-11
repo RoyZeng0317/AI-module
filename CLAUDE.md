@@ -126,9 +126,12 @@ python tranning/road_sign_yolo_train.py --dataset-dir <資料夾> --classes stop
 python tranning/materials_yolo_train.py --data <data.yaml>
 
 # 影像分類 data leakage 檢查與分層＋分組 k-fold（見 to_do_list.md #52）
-python tranning/leakage_check.py --data-dir <data_split.py 輸出>
-python tranning/kfold.py --source <未分割資料集> --k 5
-python tranning/image_classifier_bnn.py --data-dir <未分割資料集> --kfold 5 --out-dir tranning/image_classifier_kfold_runs
+# 路徑請直接寫實際資料夾，不要保留角括號（PowerShell 會把 < 當運算子報錯，見 ErrorLog 2026-11-11）
+# 洩漏檢查：給「已分割」資料夾，底下是 train/ val/ (test/)，各自再分類別子資料夾
+python tranning/leakage_check.py --data-dir data/dataset
+# k-fold：給「未分割」資料夾，底下直接是類別子資料夾（class_a/ class_b/ ...）
+python tranning/kfold.py --source data/dataset/train --k 5
+python tranning/image_classifier_bnn.py --data-dir data/dataset/train --kfold 5 --epochs 30 --out-dir tranning/image_classifier_kfold_runs
 
 # 區域指稱模型（YOLO 候選框 + 自訓視覺/文字對比學習，見 to_do_list 區域指稱相關條目）
 python tranning/region_refer.py --make-data tranning/region_refer_data --n 300
