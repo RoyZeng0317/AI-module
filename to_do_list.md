@@ -382,6 +382,11 @@
     - [x] 共用dialogue_v1訓練／推論格式、512token預算、完整輪裁切、answer-only mask、動態padding與GUI／CLI／Web歷史隔離已實作；舊模型維持legacy格式，持久memory未自動注入。
     - [x] 建立四類多輪資料及去重／反事實raw評估，完成兩次有界本地微調與獨立測試；原正式權重保留。[實驗與切換決策](team-run/transformer-context/EXPERIMENT.md)。
     - [ ] 模型尚未達標：獨立test去重macro14.71%，偏好／格式0%，單輪保留能力退步；需更多多樣多輪／引用資料與保留舊能力策略，再用新的獨立測試集驗收，不把程式串接當理解。
+    - [x] 2026-11-17 找到 v1 資料集的切分缺陷：train/val/test 用名單索引區段切，名單又依字形排序，test 答案字形在訓練中完全沒出現（顏色 train 單色、test 全是深／淺色；物品 train 2–3 字、test 全是 1 字；名字 train 小X、test 阿X）。偏好／格式 0% 很可能主要是這個偏差，而不只是多輪記憶本身。
+    - [x] 新增 `tranning/context_dialogues_v2.py`，輸出 `data/context_dialogues_v2/`（v1 凍結測試保留不動）：實體依字形分層 3:1:1 切分且不跨 split；實體池擴大到每類 30–53 個；開頭／提問各 10 句型、更正 5 句型、閒聊 12 句，都依 split 隔離；加入 0–3 輪閒聊、另一任務的干擾事實、「有歷史但沒提過」要回缺資訊。train 4098／val 392／test 397 筆，0 UNK（用 pilot_v2 的 tokenizer 檢查）。
+    - [x] 保留舊能力：`context_training.py` CLI 開放 `--no-freeze-embeddings`／`--dropout`／`--weight-decay`／`--label-smoothing`／`--patience`／`--seed`／`--gpu-mem-fraction`，新增 `--replay-repeat N`（舊單輪 replay 重複 N 次加重比重）。
+    - [x] 驗收工具：新增 `tranning/context_validate.py`，一次跑 v2 test（含反事實）、v1 test（只對照）、單輪 regression（候選 vs 基準），依預先宣告的門檻判定並輸出 `validation_summary.md`。**門檻為建議值待你確認**：v2 四任務平均 ≥80%、任一任務 ≥60%、任一字形 ≥50%、缺資訊 ≥80%、換歷史答案要跟著換 ≥70%、拿掉歷史回缺資訊 ≥80%、單輪 exact 比基準最多掉 5 個百分點。新增 `test_context_v2.py`（11 項，用假模型驗證判定邏輯，不代表模型能力）。
+    - [ ] 訓練（未執行，雲端無 GPU，依 #43 需你核准）：建議從正式權重出發、輸出新資料夾，不覆蓋舊版。跑完用 `context_validate.py` 驗收，未通過不切換正式模型。
 
 
 51. [ ] 獨立人物YOLO模型characters.pt（2026-10-26）

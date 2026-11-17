@@ -1,0 +1,181 @@
+{
+  "format": "dialogue_v1",
+  "version": "context_dialogues_v2",
+  "response_budget": 60,
+  "seed": 42,
+  "files": {
+    "train.json": {
+      "sha256": "abb1ac258ddcc18265cc3630e3d7893ed4747559fed69fd3fca6999c8454db65",
+      "records": 4098,
+      "tasks": {
+        "name": 1027,
+        "preference": 1026,
+        "format": 1022,
+        "object": 1023
+      },
+      "kinds": {
+        "missing_irrelevant": 470,
+        "recall": 1800,
+        "corrected": 1804,
+        "missing_empty": 24
+      }
+    },
+    "val.json": {
+      "sha256": "2c15d17099c99a9e6f4e66f67b2fb31ac5c623b7be30f46aa164c4a4245cb1c2",
+      "records": 392,
+      "tasks": {
+        "preference": 98,
+        "name": 100,
+        "object": 97,
+        "format": 97
+      },
+      "kinds": {
+        "corrected": 160,
+        "recall": 160,
+        "missing_irrelevant": 64,
+        "missing_empty": 8
+      }
+    },
+    "test.json": {
+      "sha256": "7682568acb01eccc6429654b17bf8d9ddbf53fdd1fdd6f7c2d80edad979127d7",
+      "records": 397,
+      "tasks": {
+        "format": 98,
+        "preference": 100,
+        "name": 100,
+        "object": 99
+      },
+      "kinds": {
+        "corrected": 160,
+        "recall": 160,
+        "missing_irrelevant": 69,
+        "missing_empty": 8
+      }
+    },
+    "regression.json": {
+      "sha256": "145aa2856e93498e4914a35e947ce4e36c8bc4ddd15508847a9ce6528d3e29c7",
+      "records": 20,
+      "tasks": {
+        "legacy_regression": 20
+      },
+      "kinds": {
+        "legacy_regression": 20
+      }
+    },
+    "replay.json": {
+      "sha256": "b4c324343143c2a3d577c022887c7e4baedf1e967911723df8d395290ff15565",
+      "records": 722,
+      "tasks": {
+        "legacy_replay": 722
+      },
+      "kinds": {
+        "legacy_replay": 722
+      }
+    }
+  },
+  "groups": {
+    "dialogue_id": {
+      "train": 2298,
+      "val": 217,
+      "test": 220
+    },
+    "template_id": {
+      "train": 475,
+      "val": 32,
+      "test": 32
+    },
+    "entity_group": {
+      "train": 1914,
+      "val": 195,
+      "test": 193
+    }
+  },
+  "entity_form_coverage": {
+    "name": {
+      "train": [
+        "全名",
+        "小X",
+        "老X",
+        "阿X",
+        "雙字名"
+      ],
+      "val": [
+        "全名",
+        "小X",
+        "老X",
+        "阿X",
+        "雙字名"
+      ],
+      "test": [
+        "全名",
+        "小X",
+        "老X",
+        "阿X",
+        "雙字名"
+      ]
+    },
+    "object": {
+      "train": [
+        "1字",
+        "2字",
+        "3字以上"
+      ],
+      "val": [
+        "1字",
+        "2字",
+        "3字以上"
+      ],
+      "test": [
+        "1字",
+        "2字",
+        "3字以上"
+      ]
+    },
+    "preference": {
+      "train": [
+        "單色",
+        "複合色"
+      ],
+      "val": [
+        "單色",
+        "複合色"
+      ],
+      "test": [
+        "單色",
+        "複合色"
+      ]
+    },
+    "format": {
+      "train": [
+        "1字",
+        "2字",
+        "3字以上"
+      ],
+      "val": [
+        "1字",
+        "2字",
+        "3字以上"
+      ],
+      "test": [
+        "1字",
+        "2字",
+        "3字以上"
+      ]
+    }
+  },
+  "tokenizer_sha256": "f71647113a1cbd755fe66356788cd776dc9d56da483e63e11a29edbd339e90f5",
+  "unk_tokens": 0,
+  "total_tokens": 586958,
+  "max_prompt_tokens": 262,
+  "max_reply_tokens_with_eos": 13,
+  "fixes_vs_v1": [
+    "實體依字形分層切分，test 不再只含訓練沒見過的字形",
+    "實體池與句型擴大，句型依 split 隔離",
+    "加入閒聊、干擾事實與『有歷史但沒提過』的缺資訊樣本"
+  ],
+  "limitations": [
+    "仍是模板任務，只證明抄回前文指定欄位，不代表一般語意理解",
+    "字元與任務類型仍跨 split 共用；實體與句型不共用",
+    "regression 與 v1 相同（pairs 前 20 筆），不是新的世界知識測試"
+  ]
+}

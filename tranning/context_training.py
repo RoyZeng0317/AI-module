@@ -64,13 +64,15 @@ def _hash(path):
 def finetune_context(train_path, val_path, source_dir, out_dir, epochs=5, batch_size=8, lr=1e-4,
                      freeze_layers=4, freeze_embeddings=True, seed=42, response_budget=RESPONSE_BUDGET,
                      replay_path=None, dropout=.1, weight_decay=.01, label_smoothing=.05,
-                     patience=5, device=None, gpu_mem_fraction=.85, checkpoint_every=1):
+                     patience=5, device=None, gpu_mem_fraction=.85, checkpoint_every=1, replay_repeat=1):
     from transformer_chat import GPT, _cap_gpu_memory, _freeze_for_finetune, _resolve_device, _run_epochs
     out_dir, source_dir = Path(out_dir).resolve(), Path(source_dir).resolve()
     if not out_dir.is_relative_to(ROOT) or out_dir == ROOT or out_dir.exists():
         raise ValueError("多輪模型必須輸出到專案內尚不存在的新目錄，不可覆寫正式權重。")
     if min(epochs, batch_size, lr) <= 0:
         raise ValueError("epochs、batch_size、lr必須大於零。")
+    if not isinstance(replay_repeat, int) or isinstance(replay_repeat, bool) or replay_repeat < 1:
+        raise ValueError("replay_repeat必須為正整數。")
     train_records, val_records = _read(train_path), _read(val_path)
     train_ids = {r["dialogue_id"] for r in train_records}
     if train_ids & {r["dialogue_id"] for r in val_records}:
@@ -91,7 +93,8 @@ def finetune_context(train_path, val_path, source_dir, out_dir, epochs=5, batch_
             raise ValueError("replay與val有重複的完整樣本。")
         replay = ContextDataset(replay_records, tokenizer, config["block_size"], response_budget, skip_long=True)
         replay_skipped = replay.skipped
-        train_data.examples.extend(replay.examples)
+        # 重複加入舊單輪資料，提高它在每個 epoch 的比重，減少多輪微調洗掉單輪能力（to-do #50）
+        train_data.examples.extend(replay.examples * replay_repeat)
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, collate_fn=collate_context)
     val_loader = DataLoader(val_data, batch_size=batch_size, collate_fn=collate_context)
     model = GPT(tokenizer.vocab_size, config["block_size"], config["n_layer"], config["n_embd"], config["n_head"], dropout).to(device)
@@ -108,6 +111,7 @@ def finetune_context(train_path, val_path, source_dir, out_dir, epochs=5, batch_
                                     "seed": seed, "epochs": epochs, "batch_size": batch_size, "lr": lr,
                                     "freeze_layers": freeze_layers, "freeze_embeddings": freeze_embeddings,
                                     "weight_decay": weight_decay, "label_smoothing": label_smoothing,
+                                    "dropout": dropout, "patience": patience, "replay_repeat": replay_repeat,
                                     "train_examples": len(train_data), "val_examples": len(val_data), "replay_skipped": replay_skipped})
     out_dir.mkdir(parents=True)
     def save(folder, history):
@@ -134,9 +138,24 @@ def main():
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--freeze-layers", type=int, default=4)
+    parser.add_argument("--no-freeze-embeddings", dest="freeze_embeddings", action="store_false",
+                        help="解凍 token/position embedding（預設凍結）")
+    parser.set_defaults(freeze_embeddings=True)
+    parser.add_argument("--dropout", type=float, default=.1)
+    parser.add_argument("--weight-decay", type=float, default=.01)
+    parser.add_argument("--label-smoothing", type=float, default=.05)
+    parser.add_argument("--patience", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--gpu-mem-fraction", type=float, default=.85)
+    parser.add_argument("--replay-repeat", type=int, default=1,
+                        help="--replay 的舊單輪資料重複幾次加入訓練集，用來保留單輪能力")
     args = parser.parse_args()
     finetune_context(args.train, args.val, args.source_dir, args.out_dir, args.epochs, args.batch_size,
-                     args.lr, freeze_layers=args.freeze_layers, replay_path=args.replay)
+                     args.lr, freeze_layers=args.freeze_layers, freeze_embeddings=args.freeze_embeddings,
+                     seed=args.seed, replay_path=args.replay, dropout=args.dropout,
+                     weight_decay=args.weight_decay, label_smoothing=args.label_smoothing,
+                     patience=args.patience, gpu_mem_fraction=args.gpu_mem_fraction,
+                     replay_repeat=args.replay_repeat)
 
 
 if __name__ == "__main__":
