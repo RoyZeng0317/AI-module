@@ -675,6 +675,11 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     routed = route_reply(message)
     if routed is not None:
         return routed
+    # 資料分析／拆分（to-do #53）：提到存在的資料檔＋分析/拆分字眼才觸發，數字由程式計算
+    import data_analysis
+    routed = data_analysis.route_data_request(message)
+    if routed is not None:
+        return routed
     if force_mode == "nvidia":
         reasoning, reply = _nvidia_reply(message, history=history)
         trace = "已手動切換為 NVIDIA 雲端模型（nemotron-3-ultra，外部 API，非本專案自訓練）"

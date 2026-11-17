@@ -122,7 +122,7 @@ def _character_names() -> list[str]:
 
 
 _BUILTIN_SLASH_COMMANDS = {
-    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "see",
+    "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "see", "data",
 }
 
 
@@ -145,6 +145,8 @@ def _arg_suggestions(name: str) -> list[str] | None:
         return ["clear"]
     if name == "conversations":
         return ["list", "new", "open"]
+    if name == "data":
+        return ["analyze", "split", "kfold"]
     return None
 
 
@@ -204,6 +206,8 @@ def print_help(state: dict):
     lines.append("<路徑>   直接把檔案當 markdown 渲染出來看，不會送進模型\n")
     lines.append("  /see ", style="bold")
     lines.append("<圖片>      YOLO 偵測圖片內容並回報（不送進模型）\n")
+    lines.append("  /data ", style="bold")
+    lines.append("<動作> <路徑> 資料分析／拆分／k-fold（analyze/split/kfold，數字由程式計算）\n")
     lines.append("  /model ", style="bold")
     lines.append("<模式>    切換 auto/sinco/code/nvidia（不帶模式＝查看目前模式）\n")
     lines.append("  /character ", style="bold")
@@ -561,6 +565,12 @@ def process_input(text: str, state: dict) -> bool:
     if cmd == "see":
         from lib.components.see_image import see_image
         console.print(escape(see_image(arg)))
+        return True
+    if cmd == "data":
+        from lib.components.data_tools import run_data
+        with console.status("資料處理中…"):
+            result = run_data(arg)
+        console.print(Markdown(result) if result.startswith("#") else escape(result))
         return True
     if cmd == "character":
         switch_character(arg, state)

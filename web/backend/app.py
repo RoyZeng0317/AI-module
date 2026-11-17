@@ -489,6 +489,10 @@ def _run_local_command(message: str) -> tuple[str, str] | None:
         from lib.components.see_image import see_image
         return "reply", see_image(arg)
 
+    if name == "data":
+        from lib.components.data_tools import run_data
+        return "reply", run_data(arg)
+
     if name == "open":
         if not arg:
             return "reply", "用法：/open <伺服器上的檔案路徑>"

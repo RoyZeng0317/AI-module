@@ -1,0 +1,48 @@
+{
+  "kind": "table",
+  "source": "data/mental.csv",
+  "out_dir": "output/data_analysis/mental_split_demo",
+  "seed": 42,
+  "ratios": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "target": "score",
+  "group": null,
+  "counts": {
+    "train": 309,
+    "val": 65,
+    "test": 69
+  },
+  "target_distribution": {
+    "train": {
+      "2": 133,
+      "4": 132,
+      "1": 34,
+      "5": 5,
+      "3": 4,
+      "0": 1
+    },
+    "val": {
+      "4": 28,
+      "2": 27,
+      "1": 8,
+      "5": 1,
+      "3": 1
+    },
+    "test": {
+      "4": 30,
+      "2": 29,
+      "1": 8,
+      "5": 1,
+      "3": 1
+    }
+  },
+  "leakage": {
+    "exact_duplicates_across_splits": 0,
+    "same_features_across_splits": 0,
+    "group_leaks": 0,
+    "leak_count": 0
+  }
+}

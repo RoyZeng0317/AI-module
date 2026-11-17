@@ -36,7 +36,7 @@ from lib.components.session_store import (
 # .md 指令定義檔跟這支程式檔不是同一個資料夾：這支在 app/components/，
 # 指令檔在旁邊的 app/command/ 底下
 COMMAND_DIR = Path(__file__).resolve().parent.parent / "command"
-BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume", "chat", "conversations", "see"}
+BUILTIN_COMMANDS = {"clear", "model", "memory", "init", "character", "learn", "resume", "chat", "conversations", "see", "data"}
 COMMANDS = sorted(BUILTIN_COMMANDS | {p.stem for p in COMMAND_DIR.glob("*.md")})
 
 # @ 檔案附加：預設候選清單以整個專案資料夾為根，打相對路徑、即使打出 "../"
@@ -76,7 +76,8 @@ MODEL_LABELS = {
 # 輸入「/指令 」（帶一個空格）之後，還能針對特定指令跳出「引數」選項框
 # （需求 #01：「選項框顯示，一樣可以 tab 快速鍵入」），用跟指令名稱建議
 # 完全相同的 Listbox/Tab/上下鍵機制，不是另外做一套 UI。
-ARG_SUGGESTIONS = {"model": MODEL_MODES, "resume": ["clear"], "conversations": ["list", "new", "open"]}
+ARG_SUGGESTIONS = {"model": MODEL_MODES, "resume": ["clear"], "conversations": ["list", "new", "open"],
+                   "data": ["analyze", "split", "kfold"]}
 
 # /resume 還原歷史時，補回 self.conversation.history 要跟 conversation.py 的
 # MAX_HISTORY_TURNS 保持同一個上限——這裡不直接 import conversation.py 是
@@ -231,6 +232,9 @@ class CommandPalette:
         if name == "conversations":
             self._run_conversations(arg)
             return
+        if name == "data":
+            self._run_data(arg)
+            return
         if name == "see":
             self._run_see(arg)
             return
@@ -348,6 +352,14 @@ class CommandPalette:
         from lib.components.see_image import see_image
         self._system_message("分析圖片中…")
         threading.Thread(target=lambda: self.windows.after(0, self._system_message, see_image(arg)), daemon=True).start()
+
+    # /data analyze|split|kfold <路徑>：資料分析與拆分（見 data_tools.py）。大檔案或影像資料夾
+    # 可能要幾秒，放背景執行緒避免卡住 Tk，跟 /see 同一個做法。
+    def _run_data(self, arg: str):
+        import threading
+        from lib.components.data_tools import run_data
+        self._system_message("資料處理中…")
+        threading.Thread(target=lambda: self.windows.after(0, self._system_message, run_data(arg)), daemon=True).start()
 
     # /character：開啟獨立的角色卡瀏覽器視窗（需求 #02：不是 home_screen.py
     # 這個 GUI 本身），選好角色後回呼切換 self.conversation 的 persona。

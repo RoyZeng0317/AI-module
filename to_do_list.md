@@ -438,3 +438,10 @@
     - [x] 測試：`test_leakage_check.py`、`test_kfold.py`、`test_image_classifier_bnn.py` 新增 k-fold／洩漏警告案例（合成雜訊圖，只證明流程與偵測邏輯，不代表準確率）。
     - [x] 2026-11-11 實跑 `leakage_check.py --data-dir data/dataset`（train 2000／val 400）：0 處完全相同、0 處近似重複、0 筆標註衝突，2.7 秒。注意這批是 #35 的合成色塊資料，不代表真實照片的情況。
     - [ ] 用真實照片資料集（例如 PCB 資料）實際跑 `leakage_check.py` 與 `--kfold 5`，由你確認結果；dHash 抓不到大幅裁切／翻轉版本，報告為必要檢查而非保證。
+
+53. [ ] 資料拆分與分析能力（2026-11-17，基礎架構完成，後續細修）
+    - [x] 新增 `tranning/data_analysis.py`（只用標準庫、確定性計算，不交給模型生成數字）：讀 csv/tsv/json/jsonl/xlsx/txt 與影像資料夾；分析型別、缺值、數值統計、IQR 離群、類別分佈與不平衡、標籤衝突、相關係數和自動提醒；依比例拆分（分層、分組，重複列自動同組不洩漏）與 k-fold；輸出只寫 `output/data_analysis/`。
+    - [x] 三個前端都加了 `/data analyze|split|kfold`（GUI／CLI 的 Tab 選項、網頁 `_run_local_command`），共用 `lib/components/data_tools.py`；`smart_reply_traced()` 加自然語言路由（有分析／拆分字眼，且提到存在的資料檔才觸發）。
+    - [x] 測試 15 項新增，連同既有 CLI／chats／網頁共 97 項通過；用專案真實資料產出報告，發現 `data/mental.csv` 有 45 列重複，score 類別相差 190 倍。完整紀錄：[output/data_analysis/README.md](output/data_analysis/README.md)。
+    - [ ] 你在本機開 GUI 實際打一次 `/data`（雲端沒有 tkinter，只做了原始碼檢查）。
+    - [ ] 細修候選（見紀錄的「已知限制」）：日期型別、口語比例、類別與數值的關聯、文字高頻詞、大檔效能。

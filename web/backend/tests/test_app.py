@@ -285,3 +285,11 @@ def test_chat_trace_for_local_commands_does_not_invent_web_lookup():
         response = client.post("/api/chat", json={"message": "/help"})
     model.assert_not_called()
     assert response.json()["trace"] == "本機指令處理"
+
+
+def test_local_command_data_usage_and_missing(tmp_path):
+    from app import _run_local_command
+    kind, text = _run_local_command("/data")
+    assert kind == "reply" and text.startswith("用法")
+    kind, text = _run_local_command(f"/data analyze {tmp_path / 'nope.csv'}")
+    assert kind == "reply" and "找不到" in text

@@ -520,3 +520,10 @@ lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，�
 - 現象：照回覆／CLAUDE.md 範例執行 `python tranning/leakage_check.py --data-dir <data_split.py 輸出>` 與 `image_classifier_bnn.py --data-dir <data_unsplit> --kfold 5`，PowerShell 在解析階段就報 `RedirectionNotSupported`，Python 沒有被執行。
 - 原因：範例裡的 `<...>` 是「請換成實際路徑」的佔位符，PowerShell 會把 `<` 當成重新導向運算子。另外文件沒說清楚兩個指令要的資料夾結構不同。
 - 修正：CLAUDE.md 範例改成專案內真實存在的路徑（`data/dataset`、`data/dataset/train`）並註明資料夾結構：leakage_check 吃已分割（train/val/test → 類別），k-fold 吃未分割（直接是類別資料夾）。
+
+
+## 2026-11-17：資料拆分功能開發中發現的問題（都已修正）
+- 拆分 `data/mental.csv` 時出現 23 處跨 split 洩漏。原因是檔案有 45 列完全重複，第一版拆分以「單列」為單位。修正：沒給 `--group` 時，特徵相同的列自動視為同組；k-fold 也一樣。修正後洩漏 0 處。
+- 報告檔名只用檔名主幹，`context_dialogues_v2/train.json` 會存成籠統的 `train_analyze_report.md`，不同資料夾的同名檔會互相覆蓋。修正：檔名加上上層資料夾名。
+- 第一版測試把報告寫進真正的 `output/` 資料夾。修正：測試改寫到暫存資料夾。
+- 雲端環境的 Python 沒有 tkinter，`lib/components/test_command.py` 在收集階段就失敗（不是這次改壞的）；GUI 接線改用讀原始碼的測試確認，仍需要在本機實際開 GUI 驗證。

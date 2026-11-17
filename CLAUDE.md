@@ -138,6 +138,11 @@ python tranning/context_dialogues_v2.py --out-dir data/context_dialogues_v2 --to
 python tranning/context_training.py --train data/context_dialogues_v2/train.json --val data/context_dialogues_v2/val.json --source-dir tranning/gpt_chat_runs --out-dir tranning/gpt_context_runs/v3 --replay data/context_dialogues_v2/replay.json --replay-repeat 2 --epochs 8 --lr 1e-4 --freeze-layers 2
 python tranning/context_validate.py --model-dir tranning/gpt_context_runs/v3 --baseline-dir tranning/gpt_chat_runs
 
+# 資料分析／拆分／k-fold（見 to_do_list.md #53；GUI/CLI/網頁也可用 /data analyze|split|kfold）
+python tranning/data_analysis.py analyze data/mental.csv --save-report
+python tranning/data_analysis.py split data/mental.csv --target score --ratios 0.7 0.15 0.15
+python tranning/data_analysis.py kfold data/mental.csv --target score --k 5
+
 # 區域指稱模型（YOLO 候選框 + 自訓視覺/文字對比學習，見 to_do_list 區域指稱相關條目）
 python tranning/region_refer.py --make-data tranning/region_refer_data --n 300
 python tranning/region_refer.py --train tranning/region_refer_data --epochs 30
