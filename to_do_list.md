@@ -413,7 +413,7 @@
 
 ## 2026-10-28：使用者確認尚未進行項目與表現狀態
 
-- [ ] 二值化：尚未進行。
+- [ ] 二值化：2026-11-21已新增 `lib/opencv2/binarization.py`（固定門檻＋Otsu，純for迴圈，無NumPy/OpenCV）與 `test_binarization.py`（7項通過，`lib/opencv2` 共27項通過），說明見[實作與操作](lib/opencv2/IMAGE_PROCESSING.md)；待使用者用Lenna實測並驗收效果。
 - [ ] 卷積（Convolution）：已新增純for迴圈的MatrixA／三核／RGB與灰階獨立範例，工程測試通過；待使用者驗收實際效果。
 - [ ] 直方圖／均衡化：已新增獨立Lenna的Y/Cb/Cr、Y直方圖、CDF-min均衡化及前後對照，工程測試通過；待使用者驗收效果。
 - [ ] Transformer：表現未達標，需繼續改善，不以loss下降或工具代答當成已學會。

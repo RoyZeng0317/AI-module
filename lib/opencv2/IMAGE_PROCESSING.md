@@ -58,6 +58,18 @@ new_y = round_half_up((CDF[y] - CDF_min) * 255 / (像素總數 - CDF_min))
 
 本次Lenna_RGB.webp實測：262144個像素、Y範圍34–224，均衡化後0–255。
 
+## 二值化
+
+`lib/opencv2/binarization.py`：同樣只用Python迴圈（Pillow僅讀寫像素），沒有NumPy、OpenCV、SciPy。灰階用0.299R+0.587G+0.114B手動計算；`binarize(image, t)` 規則為灰階 > t 輸出255，否則0。提供固定門檻（預設127，`--threshold` 可改）與Otsu自動門檻（最大化類間變異數，同分取最小門檻；單一灰階回傳該灰階值）。
+
+```powershell
+.venv/Scripts/python.exe lib/opencv2/binarization.py "C:/Users/roy/Downloads/Lenna_RGB.webp" --threshold 127
+```
+
+輸出到 `output/image-processing/binarization/`：`*_gray.png`、`*_fixed_<t>.png`、`*_otsu_<t>.png`、`*_histogram.csv`、`*_report.json`（含兩種方法的白點數）。Otsu是全域單一門檻，光線不均的照片可能效果不佳（需要區域自適應門檻，目前未做）。
+
+驗證：`pytest lib/opencv2/test_binarization.py`，7項（手算灰階、嚴格大於邊界、雙峰Otsu、常數圖、錯誤輸入、輸出檔、不匯入NumPy/cv2）通過；另用 `penguins.jpg` 實跑（固定127白點106327、Otsu門檻116）。尚未用Lenna實測，視覺效果待使用者驗收。
+
 ## 驗證
 
 ```powershell
