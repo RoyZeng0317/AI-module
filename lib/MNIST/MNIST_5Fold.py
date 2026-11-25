@@ -93,4 +93,5 @@ for seed in seeds:
         train_items = [item for item in all_items if item[0] not in val_paths]
         if len(train_items) != 800 or len(val_items) != 200:
             raise RuntimeError(f"Seed {seed} Fold {fold_idx} of data amount is incorrect.")
-        
+        if val_paths.intersection(path for path, _ in train_items):
+            raise RuntimeError(f"Seed {seed} Fold {fold_idx} of traning and validition data are ")
