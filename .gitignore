@@ -146,3 +146,24 @@ output/test_character_image_close_review.py
 # 新手大禮包內的MNIST原始資料集與壓縮檔（體積大、可重新取得，不進版控）
 /新手大禮包/123/MNIST_Dataset/
 /新手大禮包/123/MNIST_Dataset.rar
+
+# 影像處理網頁/XSS安全測試/圖片生成開發過程中的測試暫存輸出（可重新產生，不進版控）
+/output/stt-alignment-test-v1/
+/output/stt-alignment-test-v2/
+/output/convolution-practice/
+/output/imagegen-shapes-v2/
+/output/imagegen-shapes-review-tests/
+/output/imagegen-shapes-v2-review-tests/
+/output/image-processing-web/
+/output/image-web-review-tests/
+/output/image-web-tests-backend/
+/output/xss-tests/
+/output/xss-review-tests/
+/output/xss-fixtures.json
+
+# 圖片生成/語音對齊 pilot 的大型訓練 checkpoint（可重新訓練，不進版控；config/history等中繼資料仍保留追蹤）
+/lib/img_runs/t2i_shapes/**/model.pt
+/tranning/speech_pilot_runs/**/*.pt
+
+# 旋積運算專題測試結果中 for 迴圈大量輸出圖（可重新產生，不進版控；文件與範例圖仍保留追蹤）
+/專題測試結果/旋積運算/for_loop_results/
