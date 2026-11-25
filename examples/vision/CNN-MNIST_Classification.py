@@ -26,7 +26,7 @@ from keras import backend as K
 # ------------------------------------------------------------------------
 # read the dataset
 # 讀取資料集
-project_dir = Path(__file__).resolve().parents[1]
+project_dir = Path(__file__).resolve().parents[2]
 train_data_dir = project_dir / "MNIST_Dataset/MNIST_Training"   # also can enter absolute location (也可以輸入絕對路徑)
 validation_data_dir = train_data_dir  # 從同一資料夾切出 20% 作為驗證集
 
