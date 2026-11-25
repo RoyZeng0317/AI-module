@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>影像處理實驗室</title><link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="影像處理實驗室首頁"><span class="brand-icon" aria-hidden="true">◈</span> 影像處理實驗室</a><span class="local-badge"><i></i> 本機運算 · 不需 API key</span></header>
+<main>
+  <section class="intro"><div class="eyebrow">IMAGE PROCESSING / 影像練習</div><h1>從像素，看見變化。</h1><p>上傳一張圖片，探索卷積與直方圖均衡化。每一步都在本機，以 Python 迴圈計算。</p></section>
+  <div class="workspace">
+    <aside class="controls panel">
+      <div class="section-heading"><span class="step">01</span><h2>準備圖片</h2><button type="button" id="clear-button" class="text-button">清除</button></div>
+      <label class="drop-zone" id="drop-zone" for="file-input"><span class="upload-icon" aria-hidden="true">↑</span><strong id="upload-title">拖放圖片到這裡</strong><span>或點選瀏覽檔案</span><small>PNG / JPG / WebP / TIFF / BMP</small><input id="file-input" type="file" accept=".png,.jpg,.jpeg,.webp,.tif,.tiff,.bmp,image/png,image/jpeg,image/webp,image/tiff,image/bmp"></label>
+      <div id="selection" class="selection" hidden><span id="filename"></span><small id="filesize"></small></div>
+      <p class="hint">上限 10 MiB、1,048,576 像素；保持原尺寸。僅處理第一影格，透明區合成白底，不套用 EXIF 旋轉。</p>
+      <div class="section-heading settings-heading"><span class="step">02</span><h2>選擇處理</h2></div>
+      <fieldset class="mode-group"><legend class="sr-only">處理方式</legend><label><input type="radio" name="operation" value="convolution" checked><span>卷積</span></label><label><input type="radio" name="operation" value="histogram"><span>直方圖均衡化</span></label></fieldset>
+      <div id="convolution-options">
+        <label class="field" for="filter">卷積核<select id="filter"><option value="filter1">Filter 1 · 原係數增強</option><option value="filter2">Filter 2 · 5 × 5 平均</option><option value="filter3">Filter 3 · Sobel 邊緣</option></select></label>
+        <div class="kernel-note"><pre id="kernel">1  0  1
+0  4  0
+1  0  1</pre><p id="filter-description">保留原係數，不除以 8。亮度可能超過顯示範圍。</p></div>
+        <div class="field-row"><label class="field" for="padding">邊界處理<select id="padding"><option value="edge">複製邊界</option><option value="zero">補 0</option><option value="valid">不補邊（縮小）</option></select></label><label class="field" for="channel">處理通道<select id="channel"><option value="gray">灰階</option><option value="rgb">RGB 各通道</option></select></label></div>
+        <label class="field" for="display">預覽顯示<select id="display"><option value="minmax">Min–max 映射至 0–255</option><option value="clipped">裁切至 0–255</option></select></label>
+        <p class="hint">卷積核先翻轉 180°。顯示映射只影響 PNG 預覽，JSON 保留負值與完整原始數值。</p>
+      </div>
+      <div id="histogram-options" class="method-note" hidden><strong>均衡化亮度 Y</strong><p>依練習公式拆分 Y / Cb / Cr，以 CDF-min 調整 Y。只有一種亮度值時保留 Y 原值。</p><p>Cb、Cr 是色差通道；結果為均衡化後的 Y 灰階影像。</p></div>
+      <button type="button" id="process-button" class="primary-button" disabled>開始處理 <span aria-hidden="true">↗</span></button>
+      <p class="privacy-note">圖片傳至本機服務，運算不使用外部 AI 或雲端 API。</p>
+    </aside>
+    <section class="results" aria-label="處理結果">
+      <div class="result-top"><div><div class="eyebrow">WORKSPACE</div><h2>影像比較</h2></div><span class="status" id="status" role="status" aria-live="polite">等待上傳</span></div>
+      <div id="error" class="error-box" role="alert" hidden></div>
+      <div class="comparison"><article class="preview-card"><div class="preview-heading"><h3 id="before-label">處理前</h3><span>BEFORE</span></div><div class="image-stage" id="before-stage"><img id="before-image" alt="處理前影像" hidden><div class="placeholder" id="before-placeholder"><span aria-hidden="true">▧</span><p>原始影像將顯示在這裡</p></div></div><div class="image-caption" id="before-caption">選擇圖片以開始</div></article>
+      <article class="preview-card"><div class="preview-heading"><h3 id="after-label">處理後</h3><span class="accent-text">AFTER</span></div><div class="image-stage"><img id="after-image" alt="處理後影像" hidden><div class="placeholder" id="after-placeholder"><span aria-hidden="true">✧</span><p>等待你的第一個實驗</p></div></div><div class="image-caption" id="after-caption">處理完成後可下載結果</div></article></div>
+      <div id="result-details" hidden><div class="summary-strip" id="summary"></div><div class="histograms" id="histograms" hidden><figure><figcaption>處理前 Y 直方圖</figcaption><img id="histogram-before" alt="處理前 Y 的 256 階直方圖"></figure><figure><figcaption>均衡化後 Y 直方圖</figcaption><img id="histogram-after" alt="均衡化後 Y 的 256 階直方圖"></figure></div><section class="downloads panel"><div class="section-heading"><span class="step">03</span><h2>下載實驗結果</h2></div><div class="download-list" id="download-list"></div></section></div>
+      <div class="workspace-note"><span aria-hidden="true">⌁</span><p>看見結果，也保留計算。<small>預覽圖供觀察；完整數值與統計可從下方結果檔案下載。</small></p></div>
+    </section>
+  </div>
+  <footer><span>影像處理實驗室</span><span>純 Python 迴圈運算 · 本機實驗環境</span></footer>
+</main></body></html>
