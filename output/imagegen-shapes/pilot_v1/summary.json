@@ -1,0 +1,130 @@
+{
+  "train": {
+    "groups": {
+      "seen": {
+        "count": 24,
+        "unscorable": 24,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    },
+    "by_split": {
+      "train": {
+        "count": 24,
+        "unscorable": 24,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    },
+    "by_combo": {
+      "red_circle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "red_square": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "blue_circle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "blue_triangle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "green_square": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "green_triangle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "yellow_circle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "yellow_square": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    }
+  },
+  "dev": {
+    "groups": {
+      "unseen": {
+        "count": 6,
+        "unscorable": 6,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "count": 6,
+        "unscorable": 6,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    },
+    "by_combo": {
+      "red_triangle": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      },
+      "blue_square": {
+        "count": 3,
+        "unscorable": 3,
+        "color_correct": 0,
+        "shape_correct": 0,
+        "joint_correct": 0,
+        "joint_accuracy": 0.0
+      }
+    }
+  }
+}

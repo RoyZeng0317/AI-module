@@ -1,0 +1,101 @@
+{
+  "checkpoint": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\lib\\img_runs\\t2i_shapes\\pilot_v1\\model.pt",
+  "checkpoint_sha256": "7ed7696177a9e44dd3089b81f9208d05ef4d37eecea9efdf1c6060b6de7ec0ae",
+  "config": {
+    "latent_dim": 32,
+    "image_size": 64,
+    "cond_dim": 64,
+    "vocab": {
+      "三": 1,
+      "圓": 2,
+      "形": 3,
+      "方": 4,
+      "正": 5,
+      "紅": 6,
+      "綠": 7,
+      "色": 8,
+      "藍": 9,
+      "角": 10,
+      "黃": 11
+    },
+    "seed": 42,
+    "manifest": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\data\\imagegen_shapes\\v1\\train.json",
+    "val_manifest": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\data\\imagegen_shapes\\v1\\dev.json",
+    "epochs": 60,
+    "batch_size": 16,
+    "lr": 0.001,
+    "beta": 1.0,
+    "patience": 15,
+    "max_seconds": 600.0,
+    "max_steps": 900,
+    "schema_version": 1,
+    "task": "t2i",
+    "architecture": "TextToImageVAE",
+    "text_encoder": "char_mean",
+    "torch_version": "2.13.0+cu126",
+    "train_manifest_sha256": "1a68c789684c92280f60c0c6baee8025c702b6c76eeb8a8d1b756e5a24680944",
+    "dev_manifest_sha256": "e0386de274ea83722d6d812597b54b3a22a24625ed0ea765649eaa4fecf9e14e",
+    "channels": 3,
+    "pixel_range": [
+      0,
+      1
+    ],
+    "loss_reduction": "pixel_sum_per_batch"
+  },
+  "seed": 44,
+  "samples": [
+    {
+      "image": "sample_000.png",
+      "caption": "綠色正方形",
+      "prompt": "綠色正方形",
+      "seed": 44,
+      "batch_index": 0,
+      "batch_prompts": [
+        "綠色正方形"
+      ],
+      "checkpoint": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\lib\\img_runs\\t2i_shapes\\pilot_v1\\model.pt",
+      "checkpoint_sha256": "7ed7696177a9e44dd3089b81f9208d05ef4d37eecea9efdf1c6060b6de7ec0ae",
+      "model_config": {
+        "latent_dim": 32,
+        "image_size": 64,
+        "cond_dim": 64,
+        "vocab": {
+          "三": 1,
+          "圓": 2,
+          "形": 3,
+          "方": 4,
+          "正": 5,
+          "紅": 6,
+          "綠": 7,
+          "色": 8,
+          "藍": 9,
+          "角": 10,
+          "黃": 11
+        },
+        "seed": 42,
+        "manifest": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\data\\imagegen_shapes\\v1\\train.json",
+        "val_manifest": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\data\\imagegen_shapes\\v1\\dev.json",
+        "epochs": 60,
+        "batch_size": 16,
+        "lr": 0.001,
+        "beta": 1.0,
+        "patience": 15,
+        "max_seconds": 600.0,
+        "max_steps": 900,
+        "schema_version": 1,
+        "task": "t2i",
+        "architecture": "TextToImageVAE",
+        "text_encoder": "char_mean",
+        "torch_version": "2.13.0+cu126",
+        "train_manifest_sha256": "1a68c789684c92280f60c0c6baee8025c702b6c76eeb8a8d1b756e5a24680944",
+        "dev_manifest_sha256": "e0386de274ea83722d6d812597b54b3a22a24625ed0ea765649eaa4fecf9e14e",
+        "channels": 3,
+        "pixel_range": [
+          0,
+          1
+        ],
+        "loss_reduction": "pixel_sum_per_batch"
+      }
+    }
+  ]
+}
