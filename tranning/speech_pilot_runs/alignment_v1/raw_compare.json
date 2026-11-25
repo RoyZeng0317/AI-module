@@ -1,0 +1,77 @@
+{
+  "rows": [
+    {
+      "set": "dev",
+      "audio": "clips/cv_006293.wav",
+      "reference": "運量最多的一條公車路線",
+      "seconds": 3.888,
+      "baseline_output": "國道線",
+      "final_output": "東關線"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_003561.wav",
+      "reference": "這三個月都要投入此工作",
+      "seconds": 3.744,
+      "baseline_output": "資！",
+      "final_output": "只？"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_002660.wav",
+      "reference": "好像被動式的瑜珈",
+      "seconds": 2.16,
+      "baseline_output": "高的",
+      "final_output": "高的"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_003324.wav",
+      "reference": "你可能覺得很難",
+      "seconds": 2.988,
+      "baseline_output": "沒！",
+      "final_output": "每了"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_002786.wav",
+      "reference": "官方互動",
+      "seconds": 2.376,
+      "baseline_output": "文路",
+      "final_output": "東路"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_003444.wav",
+      "reference": "是先讓效能提高",
+      "seconds": 3.456,
+      "baseline_output": "是道",
+      "final_output": "實道"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_000161.wav",
+      "reference": "投票通知單",
+      "seconds": 2.448,
+      "baseline_output": "中！",
+      "final_output": "從華了"
+    },
+    {
+      "set": "dev",
+      "audio": "clips/cv_005644.wav",
+      "reference": "請求支援",
+      "seconds": 2.808,
+      "baseline_output": "機體",
+      "final_output": "新？"
+    },
+    {
+      "set": "regression",
+      "audio": "clips/cv_002993.wav",
+      "reference": "用衛星與圖資盤點",
+      "seconds": 3.492,
+      "baseline_output": "我街",
+      "final_output": "民街"
+    }
+  ],
+  "note": "raw greedy output; regression is public, not unseen"
+}

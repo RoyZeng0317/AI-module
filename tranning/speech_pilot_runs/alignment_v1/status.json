@@ -1,0 +1,58 @@
+{
+  "status": "completed",
+  "started": "2026-11-03T14:29:02+0800",
+  "decisions": {
+    "batchnorm": "frozen in eval mode",
+    "augmentation": "none",
+    "decode": "greedy, raw output, no remove_fillers",
+    "speaker_split": "no speaker_id in manifests; existing split only, not unseen-speaker"
+  },
+  "stop_reason": "max_updates",
+  "updates": 640,
+  "epochs": 10,
+  "metric_population": {
+    "val_loss": {
+      "items": 60,
+      "reference_chars": 445,
+      "rule": "CTC loss sum / reference chars, items whose text is fully in the charset"
+    },
+    "val_cer": {
+      "items": 64,
+      "reference_chars": 495,
+      "rule": "total edit distance / total reference chars, all dev items incl. unknown chars"
+    },
+    "train_loss": {
+      "items": 256,
+      "reference_chars": 1995
+    }
+  },
+  "train_seconds": 97.03,
+  "steady_seconds_per_update": 0.1072,
+  "config": {
+    "train_manifest": "tranning/commonvoice_zhTW/train.json",
+    "val_manifest": "tranning/commonvoice_zhTW/val.json",
+    "audio_root": "tranning/commonvoice_zhTW",
+    "regression_manifest": "team-run/speech-recognition/public_regression_manifest.json",
+    "base_dir": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\tranning\\speech_runs",
+    "run_dir": "tranning/speech_pilot_runs/alignment_v1",
+    "train_count": 256,
+    "dev_count": 64,
+    "compare_count": 8,
+    "max_audio_seconds": 10.0,
+    "batch_size": 4,
+    "lr": 0.0001,
+    "dropout": 0.2,
+    "epochs": 10,
+    "max_updates": 640,
+    "max_seconds": 600.0,
+    "seed": 42,
+    "device": "cuda"
+  },
+  "base_checkpoint_sha256": {
+    "charset.json": "f4bf4f392221b6c15b4071251d635884a8253a39b5f3374f1ab6faa2e85f5771",
+    "config.json": "c9dd329bbf5f3112cadd395e6af5d77d4c279af47afe7028191af36b702b32b2",
+    "best_model.pt": "86bdc982112bcbbb9613f9c9c4c5a8220190a4bfe4c082f9e9ab70497175d4ca"
+  },
+  "peak_vram_bytes": 642600960,
+  "finished": "2026-11-03T14:30:46+0800"
+}
