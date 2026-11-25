@@ -1,0 +1,12 @@
+{
+  "status": "stopped",
+  "stop_reason": "early_stopping",
+  "steps": 1665,
+  "device": "cuda",
+  "device_name": "NVIDIA GeForce RTX 4060",
+  "training_elapsed_seconds": 50.70374159999983,
+  "run_elapsed_seconds": 50.888744300000326,
+  "cuda_max_memory_allocated_bytes": 83829760,
+  "cuda_max_memory_reserved_bytes": 109051904,
+  "measurement_scope": "PyTorch allocator peaks; not total GPU usage. Time limit is cooperative."
+}
