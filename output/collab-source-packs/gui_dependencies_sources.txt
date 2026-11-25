@@ -1,0 +1,3870 @@
+SUPPLEMENTAL SOURCE HANDOFF. UI English A2+ only; comments Traditional Chinese. No training. Never touch .env. Main GUI is lib/GUI.py; lib/components/gui.py is genuinely empty. Preserve protected comments/imports. Do not translate model inputs or generated chat content.
+
+===== FILE: lib/components/image_search_viewer.py =====
+"""本輪網路圖片附件的獨立預覽；不下載、不重跑模型。"""
+import json, re, subprocess, sys
+from pathlib import Path
+
+ROOT = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[2]
+CACHE_DIR = ROOT / "output/image-search"
+
+
+def _allowed_path(value):
+    try:
+        path = Path(value).resolve()
+        return path if path.is_relative_to(CACHE_DIR.resolve()) and path.suffix == ".png" and path.is_file() else None
+    except (OSError, ValueError):
+        return None
+
+
+def attachment_paths(reply: str) -> list[Path]:
+    paths = []
+    for value in re.findall(r"!\[(?:\\.|[^\]\\])*\]\(<([^<>\r\n]+)>\)", reply):
+        path = _allowed_path(value)
+        if path and path not in paths:
+            paths.append(path)
+    return paths[:3]
+
+
+def open_previews(reply: str) -> int:
+    paths = attachment_paths(reply)
+    if not paths:
+        return 0
+    if getattr(sys, "frozen", False):
+        raise OSError("目前封裝執行檔不支援獨立圖片預覽，請使用 Python 版 CLI 或圖片連結。")
+    with (CACHE_DIR / "preview-errors.log").open("a", encoding="utf-8") as log:
+        subprocess.Popen([sys.executable, str(Path(__file__).resolve()), *map(str, paths)], cwd=ROOT,
+                         stdout=log, stderr=log,
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    return len(paths)
+
+
+def show_images(paths):
+    import tkinter as tk, webbrowser
+    from tkinter import ttk
+    from PIL import Image, ImageTk
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from tranning.url_display import readable_url
+    valid = [path for value in paths if (path := _allowed_path(value))]
+    if not valid:
+        return
+    root = tk.Tk()
+    root.title("網路圖片搜尋 / Image search")
+    root.geometry("1000x850")
+    tabs = ttk.Notebook(root)
+    tabs.pack(fill="both", expand=True)
+    photos = []
+    for index, path in enumerate(valid[:3], 1):
+        metadata_path = path.with_suffix(".json")
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.stat().st_size < 64 * 1024 else {}
+        except (OSError, ValueError):
+            metadata = {}
+        frame = ttk.Frame(tabs, padding=12)
+        query = str(metadata.get("query", "圖片"))
+        tabs.add(frame, text=f"{query} {index}")
+        score = metadata.get("score")
+        english = metadata.get("lang") == "en"
+        status = (f"YOLO prediction: {query} {score:.1%}. Not proof of identity." if english else f"YOLO 預測：{query} {score:.1%}；不代表身份驗證。") if isinstance(score, (int, float)) else ("Search image: not checked by the person model." if english else "網路搜尋候選：未經人物模型確認。")
+        ttk.Label(frame, text=status, wraplength=900).pack(pady=8)
+        with Image.open(path) as image:
+            image.thumbnail((900, 600))
+            photos.append(ImageTk.PhotoImage(image))
+        ttk.Label(frame, image=photos[-1]).pack(expand=True)
+        source = str(metadata.get("source", ""))
+        ttk.Label(frame, text=readable_url(source), wraplength=900).pack(pady=8)
+        if source.startswith(("https://", "http://")):
+            ttk.Button(frame, text="Open source" if english else "開啟來源頁面",
+                       command=lambda url=source: webbrowser.open(url)).pack()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    show_images(sys.argv[1:])
+
+===== END FILE =====
+
+===== FILE: lib/components/pcb_inspection.py =====
+"""PCB inspection panel — component detection + defect detection.
+
+Opens its own window (same pattern as camera.py), lets the user pick a PCB
+photo, and runs it through the same local YOLO detector web/backend/detector.py
+already uses (no separate model, no cloud API, matches Rule 06).
+
+No PCB-specific dataset exists yet (component classes like resistor/IC, or
+defect classes like missing_hole/short/open_circuit/mouse_bite/spur), so this
+only runs the COCO-pretrained yolo26n.pt for now — it will not recognise PCB
+components or defects, this just validates the load-image -> detect -> draw
+pipeline before a real PCB dataset + fine-tuned weights exist (same "training
+scaffold first, dataset later" situation as tranning/circuit_diagram_train.py).
+Once fine-tuned PCB weights exist, point `weights=` at that checkpoint — the
+underlying detect() already supports swapping weights, no code change needed
+here.
+
+home_screen.py/lib.main must add web/backend/ to sys.path before importing
+this module (that's where detector.py lives) — lib/main.py already does this.
+"""
+
+import tkinter as tk
+from tkinter import filedialog, messagebox
+
+import cv2
+from PIL import Image, ImageTk
+
+from detector import detect
+
+IMAGE_FILETYPES = [("PCB 影像", "*.jpg *.jpeg *.png *.bmp"), ("全部檔案", "*.*")]
+
+
+class PCBInspectionPanel:
+    def __init__(self, windows: tk.Tk, conf: float = 0.35, weights: str = "yolo26n.pt"):
+        self.windows = windows
+        self.conf = conf
+        self.weights = weights
+        self.win = None
+        self.label = None
+        self._photo = None  # 保留參照，不然畫面會被 GC 回收變空白（同 camera.py）
+
+    def open(self):
+        if self.win is not None:
+            self.win.lift()
+            return
+
+        self.win = tk.Toplevel(self.windows)
+        self.win.title("PCB 檢查 (YOLO26n)")
+        self.win.protocol("WM_DELETE_WINDOW", self.close)
+
+        tk.Button(self.win, text="開啟 PCB 影像", command=self._pick_image).pack(pady=6)
+        self.label = tk.Label(self.win)
+        self.label.pack()
+
+    def close(self):
+        if self.win is not None:
+            self.win.destroy()
+            self.win = None
+            self.label = None
+
+    def _pick_image(self):
+        path = filedialog.askopenfilename(title="選擇 PCB 影像", filetypes=IMAGE_FILETYPES)
+        if not path:
+            return
+
+        frame = cv2.imread(path)
+        if frame is None:
+            messagebox.showerror("PCB 檢查", f"無法讀取影像：{path}")
+            return
+
+        try:
+            detections = detect(frame, conf=self.conf, weights=self.weights)
+        except Exception as exc:
+            messagebox.showerror("PCB 檢查", f"偵測失敗：{exc}")
+            return
+
+        for det in detections:
+            x1, y1, x2, y2 = (int(v) for v in det["box"])
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (60, 220, 60), 2)
+            caption = f'{det["label"]} {det["confidence"]:.2f}'
+            cv2.putText(frame, caption, (x1, max(y1 - 8, 0)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (60, 220, 60), 1)
+
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self._photo = ImageTk.PhotoImage(Image.fromarray(rgb))
+        self.label.configure(image=self._photo)
+
+===== END FILE =====
+
+===== FILE: lib/components/project_init.py =====
+"""project_init.py — CLAUDE.md 需求 #01 的 `/init` 指令：掃描使用者指定的
+任意專案資料夾，產生/更新一份 CLAUDE.md 摘要。
+
+刻意不靠模型生成內容：sinco 目前的聊天模型（tranning/chats.py）是從零
+訓練的小型 seq2seq，沒有真正讀懂任意程式碼庫的能力，硬要模型「生成」
+專案摘要只會編造內容。改用 deterministic 的檔案樹分析（偵測技術棧標記檔、
+列出頂層檔案/資料夾、統計副檔名分佈）——跟 Claude Code 的 /init 目標一樣
+（讓 AI 助理對這個專案有基本認識），但誠實地只做結構列表層級的事，不假裝
+理解商業邏輯。
+
+重新執行 /init 只會更新 CLAUDE.md 裡 sinco:init 標記之間的區塊，區塊外
+使用者自己寫的規則/需求完全不會被動到；沒有 CLAUDE.md 就整份新建。
+"""
+
+import re
+from pathlib import Path
+
+IGNORE_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    ".next", "target", ".pytest_cache", ".mypy_cache", ".idea", ".vscode", "__MACOSX",
+}
+
+# 檔名 -> 技術棧標籤；用「這個檔案存在」當作證據，不去解析內容
+STACK_MARKERS = {
+    "package.json": "Node.js / JavaScript / TypeScript",
+    "pyproject.toml": "Python",
+    "requirements.txt": "Python",
+    "Cargo.toml": "Rust",
+    "go.mod": "Go",
+    "pom.xml": "Java (Maven)",
+    "build.gradle": "Java/Kotlin (Gradle)",
+    "Gemfile": "Ruby",
+    "composer.json": "PHP",
+    "CMakeLists.txt": "C/C++ (CMake)",
+}
+
+START_MARK = "<!-- sinco:init:start -->"
+END_MARK = "<!-- sinco:init:end -->"
+
+
+def detect_stack(root: Path) -> list[str]:
+    found = [label for marker, label in STACK_MARKERS.items() if (root / marker).exists()]
+    return found or ["未偵測到已知的語言/框架標記檔案"]
+
+
+def top_level_tree(root: Path, max_entries: int = 40) -> list[str]:
+    entries = sorted(
+        (p for p in root.iterdir() if p.name not in IGNORE_DIRS and not p.name.startswith(".")),
+        key=lambda p: (p.is_file(), p.name.lower()),
+    )
+    lines = []
+    for entry in entries[:max_entries]:
+        lines.append(f"- {entry.name}{'/' if entry.is_dir() else ''}")
+    if len(entries) > max_entries:
+        lines.append(f"- …（還有 {len(entries) - max_entries} 項未列出）")
+    return lines or ["（空資料夾）"]
+
+
+def extension_histogram(root: Path, max_files: int = 5000) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    scanned = 0
+    for path in root.rglob("*"):
+        if scanned >= max_files:
+            break
+        if any(part in IGNORE_DIRS or part.startswith(".") for part in path.relative_to(root).parts[:-1]):
+            continue
+        if path.is_file():
+            scanned += 1
+            ext = path.suffix.lower() or "(無副檔名)"
+            counts[ext] = counts.get(ext, 0) + 1
+    return counts
+
+
+def build_summary(root: Path) -> str:
+    stack = detect_stack(root)
+    tree = top_level_tree(root)
+    top_exts = sorted(extension_histogram(root).items(), key=lambda kv: -kv[1])[:8]
+
+    lines = [
+        START_MARK,
+        f"# {root.name}",
+        "",
+        "> 這個區塊由 sinco 的 `/init` 指令自動產生（deterministic 檔案樹分析，"
+        "不是模型生成的程式碼理解——sinco 的聊天模型是從零訓練的小型 seq2seq，"
+        "還沒有真正讀懂任意程式碼庫的能力）。重新執行 `/init` 只會更新這個"
+        "區塊，區塊外你自己寫的內容不會被動到。",
+        "",
+        "## 偵測到的技術棧",
+        *[f"- {s}" for s in stack],
+        "",
+        "## 頂層檔案/資料夾",
+        *tree,
+        "",
+        "## 主要副檔名分佈（依檔案數排序，已忽略常見雜訊資料夾）",
+        *([f"- {ext}: {count}" for ext, count in top_exts] or ["（沒有掃描到檔案）"]),
+        "",
+        END_MARK,
+    ]
+    return "\n".join(lines)
+
+
+def write_claude_md(root: Path) -> Path:
+    path = root / "CLAUDE.md"
+    summary = build_summary(root)
+
+    if not path.exists():
+        path.write_text(summary + "\n", encoding="utf-8")
+        return path
+
+    existing = path.read_text(encoding="utf-8")
+    if START_MARK in existing and END_MARK in existing:
+        pattern = re.compile(re.escape(START_MARK) + r".*?" + re.escape(END_MARK), re.DOTALL)
+        updated = pattern.sub(summary, existing)
+    else:
+        updated = existing.rstrip("\n") + "\n\n" + summary + "\n"
+    path.write_text(updated, encoding="utf-8")
+    return path
+
+===== END FILE =====
+
+===== FILE: lib/components/see_image.py =====
+"""`/see <圖片路徑>`：讓 sinco 前端「看」一張圖——YOLO 偵測後用 image_analysis.format_report() 的
+固定格式回報（確定性輸出，不交給 17M 模型生成，避免編造內容，見 ErrorLog #30/#33）。
+自訂分類只讀 tranning/pcb_classifier_runs/（PCB 缺陷，pcb_dataset_prep.py 準備資料）；舊的
+image_classifier_runs/ 是合成色塊測試 checkpoint（to_do #35），拿來分類真實照片會誤導，所以不讀。
+沒有 PCB checkpoint 時只回報偵測結果。
+讀取為純讀，可指向專案外路徑（同 /open、@ 附加，規則 01 只禁止「修改」）。
+"""
+import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[2]
+PCB_DIR = _ROOT / "tranning" / "pcb_classifier_runs"  # 舊的合成色塊 image_classifier_runs/ 刻意不讀
+NO_CLS = "（PCB 自訂分類器尚未訓練，見 tranning/pcb_dataset_prep.py）"
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+
+
+def see_image(arg: str) -> str:
+    path = Path(arg.strip().strip('"')).expanduser()
+    if not arg.strip():
+        return "用法：/see <圖片路徑>"
+    if not path.is_file():
+        return f"找不到檔案：{path}"
+    if path.suffix.lower() not in IMAGE_EXTS:
+        return f"不是支援的圖片格式（{'、'.join(sorted(IMAGE_EXTS))}）：{path.name}"
+    for d in (_ROOT / "tranning", _ROOT / "web" / "backend"):
+        if str(d) not in sys.path:
+            sys.path.append(str(d))
+    try:
+        import cv2
+        from detector import detect
+        from image_analysis import format_report
+        from image_classifier_bnn import classify_image
+        image = cv2.imread(str(path))
+        if image is None:
+            return f"無法讀取圖片：{path}"
+        label, conf, ent = classify_image(path, out_dir=PCB_DIR) if (PCB_DIR / "best_model.pt").exists() else (NO_CLS, 0.0, 0.0)
+        return f"[{path.name}]\n" + format_report({"detections": detect(image, conf=0.35),
+                                                 "classification": {"label": label, "confidence": conf, "entropy": ent}})
+    except Exception as exc:  # 缺套件/權重下載失敗等，回報而不是讓 UI 崩潰
+        return f"圖片分析失敗：{type(exc).__name__}: {exc}"
+
+===== END FILE =====
+
+===== FILE: lib/components/test_cli.py =====
+"""Unit tests for cli.py's SlashCommandCompleter — the Tab-completion logic
+behind "跟 GUI 一樣可以 tab 快速鍵入完整指令". This only tests the pure
+get_completions() generator (no real terminal/TTY needed); prompt_toolkit's
+own Tab-key wiring and the actual live-typing experience still need your own
+manual test in a real terminal, same honesty convention as this project's
+other GUI-interaction features (see CLAUDE.md to-do #09/#12).
+
+Also covers run_memory() — /memory ported from the GUI's CommandPalette
+(command.py) so the CLI can edit persistent memory too, not just chat.
+Every test monkeypatches memory_store.MEMORY_PATH to an isolated tmp_path
+file (same pattern as app/components/test_command.py) so these never touch
+the real project's memory/memory.json.
+"""
+
+from types import SimpleNamespace
+
+import lib.components.cli as cli
+import lib.components.conversation_store as conversation_store
+import lib.components.memory_store as memory_store
+import lib.components.session_store as session_store
+
+
+def _completions(text: str) -> list[str]:
+    document = SimpleNamespace(text_before_cursor=text)
+    return [item.text for item in cli.SlashCommandCompleter().get_completions(document, None)]
+
+
+def test_no_completions_without_leading_slash():
+    assert _completions("hello") == []
+    assert _completions("") == []
+
+
+def test_completes_partial_builtin_command_name():
+    assert _completions("/he") == ["help"]
+    # 比對跟 get_completions() 一樣的大小寫不敏感規則（"/c" 也會吃到
+    # "CodeReview" 這種指令），不是只比對字面開頭一致的子集合。
+    assert _completions("/c") == [c for c in cli._slash_commands() if c.lower().startswith("c")]
+
+
+def test_completes_markdown_command_names(monkeypatch):
+    monkeypatch.setattr(cli, "_markdown_commands", lambda: ["rules", "release"])
+    assert _completions("/rel") == ["release"]
+
+
+def test_full_command_name_still_matches_itself():
+    assert "help" in _completions("/help")
+
+
+def test_unknown_command_prefix_yields_no_completions():
+    assert _completions("/doesnotexist") == []
+
+
+def test_character_argument_suggestions_use_character_names(monkeypatch):
+    monkeypatch.setattr(cli, "_character_names", lambda: ["周柯宇", "周興哲"])
+    assert _completions("/character ") == ["周柯宇", "周興哲"]
+    assert _completions("/character 周柯") == ["周柯宇"]
+
+
+def test_no_argument_suggestions_for_commands_without_registered_args(monkeypatch):
+    monkeypatch.setattr(cli, "_markdown_commands", lambda: ["rules"])
+    assert _completions("/rules ") == []
+
+
+def test_completion_replaces_only_the_partially_typed_text():
+    completions = list(cli.SlashCommandCompleter().get_completions(
+        SimpleNamespace(text_before_cursor="/he"), None,
+    ))
+    assert completions[0].text == "help"
+    assert completions[0].start_position == -2  # 取代 "he"，不是整個 "/he"
+
+
+def test_memory_argument_suggestions_are_the_subcommands():
+    assert cli._arg_suggestions("memory") == ["list", "add", "del"]
+
+
+# ---------------------------------------------------------------------------
+# run_memory() — 見 CLAUDE.md：使用者在 CLI 問「我要怎麼編輯你的記憶?」，
+# 這句沒有訓練資料可以接住、掉回 GRU 亂答，但這其實是個真的能回答的問題——
+# GUI 早就有 /memory，只是 CLI 沒有移植過來。這裡不重新設計，直接複用
+# memory_store.py，跟 test_command.py 的 palette 測試同一套隔離方式。
+# ---------------------------------------------------------------------------
+
+def _isolate_memory(tmp_path, monkeypatch):
+    monkeypatch.setattr(memory_store, "MEMORY_PATH", tmp_path / "memory.json")
+
+
+def _printed(capsys) -> str:
+    return capsys.readouterr().out
+
+
+def test_run_memory_add_then_list_round_trips(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("add project 這是一筆測試記憶")
+    added = _printed(capsys)
+    assert "已新增記憶" in added
+    assert "這是一筆測試記憶" in added
+
+    cli.run_memory("")
+    listed = _printed(capsys)
+    assert "這是一筆測試記憶" in listed
+    assert "(Project)" in listed
+
+
+def test_run_memory_list_filters_by_category(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("add project 專案記憶")
+    cli.run_memory("add coding_style 風格記憶")
+    capsys.readouterr()
+
+    cli.run_memory("list coding_style")
+    listed = _printed(capsys)
+    assert "風格記憶" in listed
+    assert "專案記憶" not in listed
+
+
+def test_run_memory_add_rejects_unknown_category(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("add not_a_real_category 內容")
+    assert "未知分類" in _printed(capsys)
+    assert memory_store.list_memories() == []
+
+
+def test_run_memory_delete_removes_entry(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("add project 要被刪除的記憶")
+    entry_id = memory_store.list_memories()[0]["id"]
+    capsys.readouterr()
+
+    cli.run_memory(f"del {entry_id}")
+    assert "已刪除記憶" in _printed(capsys)
+    assert memory_store.list_memories() == []
+
+
+def test_run_memory_delete_unknown_id_reports_not_found(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("del doesnotexist")
+    assert "找不到記憶" in _printed(capsys)
+
+
+def test_run_memory_unknown_subcommand_shows_usage(tmp_path, monkeypatch, capsys):
+    _isolate_memory(tmp_path, monkeypatch)
+    cli.run_memory("frobnicate")
+    assert "用法" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_model() — /model 移植自 GUI 的 CommandPalette._run_model（見
+# lib/components/test_command.py 的對應測試），跟 /memory 一樣是 CLI 之前
+# 沒有的內建指令，靠 state["force_mode"] 覆蓋 smart_reply_traced() 的自動
+# chat/code 判斷。
+# ---------------------------------------------------------------------------
+
+def _state(**overrides) -> dict:
+    base = {
+        "out_dir": cli.DEFAULT_OUT_DIR, "persona": cli.DEFAULT_PERSONA, "force_mode": "auto", "history": [],
+        "conversation_id": None,
+    }
+    base.update(overrides)
+    return base
+
+
+def test_model_argument_suggestions_are_the_modes():
+    assert cli._arg_suggestions("model") == cli.MODEL_MODES
+
+
+def test_run_model_no_arg_reports_current_mode(capsys):
+    state = _state()
+    cli.run_model("", state)
+    assert "目前模式：auto" in _printed(capsys)
+    assert state["force_mode"] == "auto"
+
+
+def test_run_model_switches_force_mode(capsys):
+    state = _state()
+    cli.run_model("code", state)
+    assert state["force_mode"] == "code"
+    assert "已切換模式：code" in _printed(capsys)
+
+
+def test_run_model_rejects_unknown_mode_without_changing_state(capsys):
+    state = _state()
+    cli.run_model("not-a-mode", state)
+    assert state["force_mode"] == "auto"
+    assert "未知模式" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_resume() — /resume 回到電腦未關機前記錄下的對話（session_store.py），
+# 跟 lib/components/test_command.py 的 GUI 對應測試共用同一份 session_store。
+# ---------------------------------------------------------------------------
+
+def _isolate_session(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_store, "SESSION_PATH", tmp_path / "session.json")
+
+
+def _isolate_conversations(tmp_path, monkeypatch):
+    monkeypatch.setattr(conversation_store, "CONVERSATIONS_PATH", tmp_path / "conversations.json")
+
+
+def test_resume_argument_suggestions_are_clear():
+    assert cli._arg_suggestions("resume") == ["clear"]
+
+
+def test_run_resume_without_recorded_session_reports_empty(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    cli.run_resume("", _state())
+    assert "沒有記錄下的對話" in _printed(capsys)
+
+
+def test_run_resume_replays_recorded_turns(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+
+    cli.run_resume("", _state())
+
+    printed = _printed(capsys)
+    assert "你好" in printed
+    assert "哈囉，我是 sinco" in printed
+
+
+def test_run_resume_restores_history_for_nvidia_context(tmp_path, monkeypatch, capsys):
+    """/resume 重播只是唸給人看，不會送進 sinco；但要把 state["history"] 補回
+    去，讓 /model nvidia 能接上這段還原的歷史當多輪對話上下文（見
+    chats.smart_reply_traced() 的說明）——這是 NVIDIA 模式看起來「沒有還原
+    對話紀錄」的根因修正。"""
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+    state = _state()
+
+    cli.run_resume("", state)
+
+    assert state["history"] == [("你好", "哈囉，我是 sinco")]
+
+
+def test_run_resume_clear_wipes_recorded_session(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+
+    state = _state()
+    state["history"] = [("舊問題", "舊回答")]
+    cli.run_resume("clear", state)
+
+    assert "已清除" in _printed(capsys)
+    assert session_store.load_session(path=session_store.SESSION_PATH) == []
+    assert state["history"] == []
+
+
+def test_run_resume_shows_generated_subject(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("幫我訓練模型", "好的", path=session_store.SESSION_PATH)
+    session_store.record_turn("訓練模型完成了嗎", "還沒", path=session_store.SESSION_PATH)
+
+    cli.run_resume("", _state())
+
+    assert "主旨" in _printed(capsys)
+
+
+# ---------------------------------------------------------------------------
+# run_chat() — /chat 把 session_store 記錄的對話下載成 Markdown 檔案
+# ---------------------------------------------------------------------------
+
+def test_chat_argument_registered_as_builtin_command():
+    assert "chat" in cli._BUILTIN_SLASH_COMMANDS
+
+
+def test_run_chat_with_explicit_path_writes_file(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    session_store.record_turn("你好", "哈囉，我是 sinco", path=session_store.SESSION_PATH)
+    target = tmp_path / "exported.md"
+
+    cli.run_chat(str(target))
+
+    assert target.exists()
+    content = target.read_text(encoding="utf-8")
+    assert "你好" in content and "哈囉，我是 sinco" in content
+    assert "已下載對話紀錄" in _printed(capsys)
+
+
+def test_run_chat_without_arg_uses_default_output_dir(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    monkeypatch.setattr(session_store, "OUTPUT_DIR", tmp_path / "output" / "chats")
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+
+    cli.run_chat("")
+
+    saved = list((tmp_path / "output" / "chats").glob("chat_*.md"))
+    assert len(saved) == 1
+    assert "你好" in saved[0].read_text(encoding="utf-8")
+
+
+def test_ask_model_records_turn_to_session(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+
+    cli.ask_model("測試訊息", _state())
+
+    entries = session_store.load_session(path=session_store.SESSION_PATH)
+    assert len(entries) == 1
+    assert entries[0]["user"] == "測試訊息"
+    assert entries[0]["reply"] == "回覆內容"
+
+
+def test_preview_failure_keeps_reply_and_saved_history(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **kw: ("圖片搜尋", "搜尋候選（未確認）"))
+    def fail(reply):
+        assert session_store.load_session(path=session_store.SESSION_PATH)[0]["reply"] == reply
+        raise OSError("preview unavailable")
+    monkeypatch.setattr(cli, "open_previews", fail)
+    state = _state()
+    cli.ask_model("尋找圖片", state)
+    assert state["history"] == [("尋找圖片", "搜尋候選（未確認）")]
+    output = _printed(capsys)
+    assert "搜尋候選" in output and "圖片預覽無法開啟" in output
+
+
+def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypatch, capsys):
+    """同一個 process 內，state["history"] 要原樣轉交給 smart_reply_traced()，
+    /model nvidia 才接得到之前幾輪當上下文（sinco/code 模式會忽略這個參數，
+    見 chats.smart_reply_traced() 的說明，這裡只驗證有傳到，不驗證各模式怎麼用）。"""
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    seen = {}
+
+    def fake_smart_reply_traced(message, out_dir, force_mode, history, character=None):
+        seen["history"] = list(history)  # 快照——ask_model() 接下來會就地 append 同一個 list
+        seen["character"] = character  # /character 選的角色要一路傳到 smart_reply_traced()
+        return "· trace", "回覆內容"
+
+    monkeypatch.setattr(cli, "smart_reply_traced", fake_smart_reply_traced)
+    state = _state(history=[("之前的問題", "之前的回覆")])
+
+    cli.ask_model("測試訊息", state)
+
+    assert seen["history"] == [("之前的問題", "之前的回覆")]
+    assert state["history"] == [("之前的問題", "之前的回覆"), ("測試訊息", "回覆內容")]
+    assert seen["character"] == cli.DEFAULT_PERSONA
+
+
+def test_ask_model_creates_and_appends_to_shared_conversation(tmp_path, monkeypatch, capsys):
+    """跟 session_store 的 record_turn() 是分開兩件事：這裡驗證 ask_model() 也
+    把這一輪寫進 conversation_store.py 的共用多筆對話（跟 GUI／網頁互通），
+    第一次呼叫沒有 conversation_id 時要自動建立一筆新對話。"""
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+    state = _state()
+
+    cli.ask_model("測試訊息", state)
+
+    assert state["conversation_id"] is not None
+    conv = conversation_store.get_conversation(state["conversation_id"])
+    assert [m["role"] for m in conv["messages"]] == ["user", "assistant"]
+    assert conv["messages"][0]["content"] == "測試訊息"
+    assert conv["messages"][1]["content"] == "回覆內容"
+    assert conv["messages"][0]["persona"] == cli.DEFAULT_PERSONA
+
+
+def test_ask_model_reuses_existing_conversation_id(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **k: ("· trace", "回覆內容"))
+    existing = conversation_store.create_conversation()
+    state = _state(conversation_id=existing["id"])
+
+    cli.ask_model("第一句", state)
+    cli.ask_model("第二句", state)
+
+    assert state["conversation_id"] == existing["id"]
+    conv = conversation_store.get_conversation(existing["id"])
+    assert len(conv["messages"]) == 4  # 兩輪 user+assistant，沒有另外建立新對話
+
+
+# ---------------------------------------------------------------------------
+# run_conversations() — /conversations，跟 GUI（test_command.py 的
+# _run_conversations 對應測試）、網頁側邊欄共用同一份 conversation_store.py。
+# ---------------------------------------------------------------------------
+
+def test_conversations_argument_registered_as_builtin_command():
+    assert "conversations" in cli._BUILTIN_SLASH_COMMANDS
+
+
+def test_conversations_argument_suggestions_are_the_subcommands():
+    assert cli._arg_suggestions("conversations") == ["list", "new", "open"]
+
+
+def test_run_conversations_list_reports_empty(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    cli.run_conversations("", _state())
+    assert "沒有任何對話紀錄" in _printed(capsys)
+
+
+def test_run_conversations_new_creates_and_switches_current_conversation(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    state = _state()
+
+    cli.run_conversations("new", state)
+
+    assert state["conversation_id"] is not None
+    assert conversation_store.list_conversations()[0]["id"] == state["conversation_id"]
+    assert "已建立新對話" in _printed(capsys)
+
+
+def test_run_conversations_open_restores_history_from_shared_store(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "你好", persona="sinco", mode="auto")
+    conversation_store.append_message(conv["id"], "assistant", "哈囉，我是 sinco", persona="sinco", mode="auto")
+    state = _state()
+
+    cli.run_conversations(f"open {conv['id']}", state)
+
+    assert state["conversation_id"] == conv["id"]
+    assert state["history"] == [("你好", "哈囉，我是 sinco")]
+    printed = _printed(capsys)
+    assert "你好" in printed and "哈囉，我是 sinco" in printed
+
+
+def test_run_conversations_open_unknown_id_reports_error(tmp_path, monkeypatch, capsys):
+    _isolate_conversations(tmp_path, monkeypatch)
+    cli.run_conversations("open not-a-real-id", _state())
+    assert "找不到對話" in _printed(capsys)
+
+===== END FILE =====
+
+===== FILE: lib/components/test_command.py =====
+"""Unit tests for command.py — CommandPalette's /model, /memory, /init,
+/character, /learn dispatch and the "/指令 " argument-suggestion mechanism
+(CLAUDE.md 需求 #01, #02). tk.Entry/tk.Text need a live Tcl interpreter,
+so these spin up one hidden (withdrawn) root window, same pattern as
+tranning/test_train_gui.py.
+"""
+
+import sys
+import tkinter as tk
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+# character_browser.py（/character 指令的目標）匯入 chats.py，需要 tranning/
+# 在 sys.path 上——正常執行時是 home_screen.py 負責這件事，這裡的測試獨立
+# 執行，所以自己補上，跟 home_screen.py 用的是同一個相對路徑寫法。
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tranning"))
+
+import auto_learn
+import lib.components.command as command
+import lib.components.conversation_store as conversation_store
+import lib.components.memory_store as memory_store
+import lib.components.session_store as session_store
+from chats import DEFAULT_OUT_DIR
+from lib.components.command import ARG_SUGGESTIONS, CommandPalette
+
+
+@pytest.fixture(scope="module")
+def root():
+    r = tk.Tk()
+    r.withdraw()
+    yield r
+    r.destroy()
+
+
+@pytest.fixture
+def palette(root, tmp_path, monkeypatch):
+    # 每個測試各自的 memory.json / auto_learn 候選檔，不去動真正的專案資料
+    monkeypatch.setattr(memory_store, "MEMORY_PATH", tmp_path / "memory.json")
+    monkeypatch.setattr(auto_learn, "CANDIDATES_PATH", tmp_path / "auto_learn_candidates.json")
+    monkeypatch.setattr(auto_learn, "PAIRS_PATH", tmp_path / "pairs.json")
+    monkeypatch.setattr(session_store, "SESSION_PATH", tmp_path / "session.json")
+    monkeypatch.setattr(conversation_store, "CONVERSATIONS_PATH", tmp_path / "conversations.json")
+
+    message = tk.Entry(root)
+    chat_display = tk.Text(root)
+    chat_display.tag_configure("system")
+    conversation = SimpleNamespace(
+        force_mode="auto", persona="sinco", out_dir=DEFAULT_OUT_DIR,
+        conversation_id=None, history=[],
+        ask=lambda *a, **k: conversation.ask_calls.append((a, k)),
+        send_message=lambda text: conversation.send_calls.append(text),
+        ask_calls=[],
+        send_calls=[],
+    )
+    return CommandPalette(root, message, chat_display, conversation)
+
+
+@pytest.fixture
+def project_root(tmp_path, monkeypatch):
+    # @ 檔案附加一律以 PROJECT_ROOT 為根，測試改指到 tmp_path，才能自己擺
+    # 一份乾淨的假檔案樹，不會動到真正的專案內容。
+    monkeypatch.setattr(command, "PROJECT_ROOT", tmp_path)
+    return tmp_path
+
+
+def _set_input(palette: CommandPalette, text: str, cursor=None):
+    palette.message.delete(0, tk.END)
+    palette.message.insert(0, text)
+    palette.message.icursor(tk.END if cursor is None else cursor)
+
+
+def _chat_text(palette: CommandPalette) -> str:
+    return palette.chat_display.get("1.0", tk.END)
+
+
+# ---------------------------------------------------------------------------
+# /model
+# ---------------------------------------------------------------------------
+
+def test_model_no_arg_reports_current_mode(palette):
+    palette.run("model")
+    assert "目前模式：auto" in _chat_text(palette)
+
+
+def test_model_switches_conversation_force_mode(palette):
+    palette.run("model code")
+    assert palette.conversation.force_mode == "code"
+    assert "已切換模式：code" in _chat_text(palette)
+
+
+def test_model_rejects_unknown_mode_without_changing_state(palette):
+    palette.run("model not-a-mode")
+    assert palette.conversation.force_mode == "auto"
+    assert "未知模式" in _chat_text(palette)
+
+
+def test_model_arg_suggestions_registered():
+    assert ARG_SUGGESTIONS["model"] == ["auto", "sinco", "code", "nvidia"]
+
+
+def test_update_suggestions_offers_model_arg_options(palette):
+    palette.message.insert(0, "/model ")
+    palette.update_suggestions()
+    assert palette.current_matches == ["auto", "sinco", "code", "nvidia"]
+    assert palette._suggesting_arg_for == "model"
+
+
+def test_update_suggestions_filters_model_arg_by_prefix(palette):
+    palette.message.insert(0, "/model c")
+    palette.update_suggestions()
+    assert palette.current_matches == ["code"]
+
+
+def test_choose_suggestion_completes_argument_not_command_name(palette):
+    palette.message.insert(0, "/model ")
+    palette.update_suggestions()
+    palette.choose_suggestion("code")
+    assert palette.message.get() == "/model code"
+
+
+# ---------------------------------------------------------------------------
+# /memory
+# ---------------------------------------------------------------------------
+
+def test_memory_list_when_empty(palette):
+    palette.run("memory")
+    assert "沒有記憶" in _chat_text(palette)
+
+
+def test_memory_add_then_list_round_trip(palette):
+    palette.run("memory add project sinco 是自建 seq2seq 聊天模型")
+    assert "已新增記憶" in _chat_text(palette)
+
+    palette.chat_display.configure(state="normal")
+    palette.chat_display.delete("1.0", tk.END)
+    palette.chat_display.configure(state="disabled")
+
+    palette.run("memory")
+    assert "sinco 是自建 seq2seq 聊天模型" in _chat_text(palette)
+
+
+def test_memory_add_rejects_unknown_category(palette):
+    palette.run("memory add not-a-category 某些內容")
+    assert "未知分類" in _chat_text(palette)
+
+
+def test_memory_delete_unknown_id_reports_not_found(palette):
+    palette.run("memory del does-not-exist")
+    assert "找不到記憶" in _chat_text(palette)
+
+
+def test_memory_delete_existing_entry(palette):
+    entries_before = memory_store.add_memory("project", "待刪除", path=memory_store.MEMORY_PATH)
+    palette.run(f"memory del {entries_before['id']}")
+    assert "已刪除記憶" in _chat_text(palette)
+    assert memory_store.list_memories(path=memory_store.MEMORY_PATH) == []
+
+
+def test_memory_unknown_subcommand_shows_usage(palette):
+    palette.run("memory not-a-subcommand")
+    assert "用法" in _chat_text(palette)
+
+
+# ---------------------------------------------------------------------------
+# /init
+# ---------------------------------------------------------------------------
+
+def test_init_with_explicit_folder_writes_claude_md(palette, tmp_path):
+    target = tmp_path / "some_project"
+    target.mkdir()
+
+    palette.run(f"init {target}")
+
+    assert (target / "CLAUDE.md").exists()
+    assert "已產生/更新" in _chat_text(palette)
+
+
+def test_init_with_missing_folder_reports_error(palette, tmp_path):
+    missing = tmp_path / "does_not_exist"
+    palette.run(f"init {missing}")
+    assert "找不到資料夾" in _chat_text(palette)
+
+
+def test_init_without_arg_opens_folder_dialog(palette, monkeypatch, tmp_path):
+    target = tmp_path / "picked"
+    target.mkdir()
+    monkeypatch.setattr(command.filedialog, "askdirectory", lambda **kwargs: str(target))
+
+    palette.run("init")
+
+    assert (target / "CLAUDE.md").exists()
+
+
+def test_init_without_arg_cancelled_dialog_does_nothing(palette, monkeypatch):
+    monkeypatch.setattr(command.filedialog, "askdirectory", lambda **kwargs: "")
+    palette.run("init")
+    assert _chat_text(palette).strip() == ""
+
+
+# ---------------------------------------------------------------------------
+# /character
+# ---------------------------------------------------------------------------
+
+def test_character_opens_browser_with_windows_and_conversation(palette, monkeypatch):
+    captured = {}
+
+    def fake_open(parent, conversation):
+        captured["parent"] = parent
+        captured["conversation"] = conversation
+        return None
+
+    monkeypatch.setattr("lib.components.character_browser.open_character_browser", fake_open)
+
+    palette.run("character")
+
+    assert captured["parent"] is palette.windows
+    assert captured["conversation"] is palette.conversation
+
+
+# ---------------------------------------------------------------------------
+# /learn
+# ---------------------------------------------------------------------------
+
+def test_learn_list_when_empty(palette):
+    palette.run("learn")
+    assert "沒有待審核" in _chat_text(palette)
+
+
+def test_learn_list_shows_saved_candidate(palette):
+    auto_learn.save_candidate("你會微積分嗎", "微積分是...", "微積分", path=auto_learn.CANDIDATES_PATH)
+    palette.run("learn list")
+    assert "你會微積分嗎" in _chat_text(palette)
+    assert "微積分是..." in _chat_text(palette)
+
+
+def test_learn_approve_writes_to_pairs_and_clears_candidate(palette):
+    auto_learn.PAIRS_PATH.write_text('[{"prompt": "hi", "reply": "hi there"}]', encoding="utf-8")
+    entry = auto_learn.save_candidate("你會微積分嗎", "微積分是...", "微積分", path=auto_learn.CANDIDATES_PATH)
+
+    palette.run(f"learn approve {entry['id']}")
+
+    assert "已核准" in _chat_text(palette)
+    assert auto_learn.list_candidates(path=auto_learn.CANDIDATES_PATH) == []
+
+    import json
+    pairs = json.loads(auto_learn.PAIRS_PATH.read_text(encoding="utf-8"))
+    assert {"prompt": "你會微積分嗎", "reply": "微積分是..."} in pairs
+
+
+def test_learn_approve_unknown_id_reports_not_found(palette):
+    palette.run("learn approve does-not-exist")
+    assert "找不到候選" in _chat_text(palette)
+
+
+def test_learn_reject_removes_candidate(palette):
+    entry = auto_learn.save_candidate("你會微積分嗎", "微積分是...", "微積分", path=auto_learn.CANDIDATES_PATH)
+    palette.run(f"learn reject {entry['id']}")
+    assert "已捨棄候選" in _chat_text(palette)
+    assert auto_learn.list_candidates(path=auto_learn.CANDIDATES_PATH) == []
+
+
+def test_learn_unknown_subcommand_shows_usage(palette):
+    palette.run("learn not-a-subcommand")
+    assert "用法" in _chat_text(palette)
+
+
+# ---------------------------------------------------------------------------
+# /resume — 回到電腦未關機前記錄下的對話（session_store.py）
+# ---------------------------------------------------------------------------
+
+def test_resume_without_recorded_session_reports_empty(palette):
+    palette.run("resume")
+    assert "沒有記錄下的對話" in _chat_text(palette)
+
+
+def test_resume_replays_recorded_turns_and_restores_history(palette):
+    session_store.record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+    session_store.record_turn("再見", "掰掰", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+
+    palette.run("resume")
+
+    text = _chat_text(palette)
+    assert "你好" in text and "哈囉，我是 sinco" in text
+    assert "再見" in text and "掰掰" in text
+    assert palette.conversation.history == [("你好", "哈囉，我是 sinco"), ("再見", "掰掰")]
+
+
+def test_resume_clear_wipes_recorded_session(palette):
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+    palette.conversation.history = [("舊問題", "舊回答")]
+
+    palette.run("resume clear")
+
+    assert "已清除" in _chat_text(palette)
+    assert session_store.load_session(path=session_store.SESSION_PATH) == []
+    assert palette.conversation.history == []
+
+
+def test_context_switch_waits_for_inflight_reply(palette):
+    palette.conversation.busy = True
+    palette.conversation.history = [("目前聊天", "不能串到其他聊天")]
+    original_id = palette.conversation.conversation_id
+    palette.run("conversations new")
+    palette.run("resume clear")
+    assert palette.conversation.conversation_id == original_id
+    assert palette.conversation.history == [("目前聊天", "不能串到其他聊天")]
+    assert "等待" in _chat_text(palette)
+
+
+def test_resume_arg_suggestions_registered():
+    assert ARG_SUGGESTIONS["resume"] == ["clear"]
+
+
+def test_resume_replay_includes_subject(palette):
+    session_store.record_turn("幫我訓練模型", "好的", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+    session_store.record_turn("訓練模型完成了嗎", "還沒", persona="sinco", mode="auto",
+                               path=session_store.SESSION_PATH)
+
+    palette.run("resume")
+
+    assert "主旨" in _chat_text(palette)
+
+
+# ---------------------------------------------------------------------------
+# /chat — 把記錄下的對話下載成 Markdown 檔案（session_store.py）
+# ---------------------------------------------------------------------------
+
+def test_chat_with_explicit_path_saves_without_dialog(palette, tmp_path):
+    session_store.record_turn("你好", "哈囉，我是 sinco", path=session_store.SESSION_PATH)
+    target = tmp_path / "exported.md"
+
+    palette.run(f"chat {target}")
+
+    assert target.exists()
+    assert "你好" in target.read_text(encoding="utf-8")
+    assert "已下載對話紀錄" in _chat_text(palette)
+
+
+def test_chat_without_arg_opens_save_dialog(palette, monkeypatch, tmp_path):
+    session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
+    target = tmp_path / "picked.md"
+    monkeypatch.setattr(command.filedialog, "asksaveasfilename", lambda **kwargs: str(target))
+
+    palette.run("chat")
+
+    assert target.exists()
+    assert "已下載對話紀錄" in _chat_text(palette)
+
+
+def test_chat_without_arg_cancelled_dialog_does_nothing(palette, monkeypatch, tmp_path):
+    monkeypatch.setattr(command.filedialog, "asksaveasfilename", lambda **kwargs: "")
+    palette.run("chat")
+    assert _chat_text(palette).strip() == ""
+
+
+def test_chat_export_handles_empty_session(palette, tmp_path):
+    target = tmp_path / "empty.md"
+    palette.run(f"chat {target}")
+    assert "沒有記錄下的對話" in target.read_text(encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# /conversations — 跟 CLI／網頁共用的多筆對話紀錄（conversation_store.py）
+# ---------------------------------------------------------------------------
+
+def test_conversations_list_reports_empty(palette):
+    palette.run("conversations")
+    assert "沒有任何對話紀錄" in _chat_text(palette)
+
+
+def test_conversations_new_creates_and_switches_current_conversation(palette):
+    palette.run("conversations new")
+
+    assert palette.conversation.conversation_id is not None
+    assert conversation_store.list_conversations()[0]["id"] == palette.conversation.conversation_id
+    assert "已建立新對話" in _chat_text(palette)
+
+
+def test_conversations_list_marks_current_conversation(palette):
+    palette.run("conversations new")
+    conv_id = palette.conversation.conversation_id
+
+    palette.run("conversations list")
+
+    assert f"→ [{conv_id}]" in _chat_text(palette)
+
+
+def test_conversations_open_restores_history_from_shared_store(palette):
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "你好", persona="sinco", mode="auto")
+    conversation_store.append_message(conv["id"], "assistant", "哈囉，我是 sinco", persona="sinco", mode="auto")
+
+    palette.run(f"conversations open {conv['id']}")
+
+    assert palette.conversation.conversation_id == conv["id"]
+    assert palette.conversation.history == [("你好", "哈囉，我是 sinco")]
+    text = _chat_text(palette)
+    assert "你好" in text and "哈囉，我是 sinco" in text
+
+
+def test_conversations_open_unknown_id_reports_error(palette):
+    palette.run("conversations open not-a-real-id")
+    assert "找不到對話" in _chat_text(palette)
+
+
+def test_conversations_arg_suggestions_registered():
+    assert ARG_SUGGESTIONS["conversations"] == ["list", "new", "open"]
+
+
+def test_gui_and_web_writes_share_the_same_conversation(palette):
+    # GUI（command.py）跟網頁（web/backend/conversation_store.py）各自維護一份
+    # 幾乎相同的模組，但只要指向同一個實體檔案，讀寫就該完全互通——這裡直接
+    # 用 conversation_store（GUI 這邊 import 的模組）模擬「網頁那邊建立/回覆過
+    # 一則對話」，確認 GUI 的 /conversations 能看到它。
+    conv = conversation_store.create_conversation()
+    conversation_store.append_message(conv["id"], "user", "從網頁送出的訊息")
+
+    palette.run("conversations list")
+
+    assert conv["id"] in _chat_text(palette)
+
+
+# ---------------------------------------------------------------------------
+# 既有行為沒有被新指令弄壞：未知指令 / .md 指令仍照舊運作
+# ---------------------------------------------------------------------------
+
+def test_unknown_command_still_reports_error(palette):
+    palette.run("this-command-does-not-exist")
+    assert "未知指令" in _chat_text(palette)
+
+
+def test_clear_still_wipes_chat_display(palette):
+    palette.conversation.history = [("前文", "保留")]
+    palette.run("memory")  # 先寫一些東西進去
+    assert _chat_text(palette).strip() != ""
+    palette.run("clear")
+    assert _chat_text(palette).strip() == ""
+    assert palette.conversation.history == [("前文", "保留")]
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：mention_matches()（候選清單）
+# ---------------------------------------------------------------------------
+
+def test_mention_matches_lists_root_folders_before_files(project_root):
+    (project_root / "app").mkdir()
+    (project_root / "readme.txt").write_text("hi", encoding="utf-8")
+
+    assert command.mention_matches("") == ["app/", "readme.txt"]
+
+
+def test_mention_matches_filters_by_prefix(project_root):
+    (project_root / "readme.txt").write_text("hi", encoding="utf-8")
+    (project_root / "recipe.txt").write_text("hi", encoding="utf-8")
+    (project_root / "notes.txt").write_text("hi", encoding="utf-8")
+
+    assert command.mention_matches("re") == ["readme.txt", "recipe.txt"]
+
+
+def test_mention_matches_browses_subfolder_given_slash(project_root):
+    sub = project_root / "app"
+    sub.mkdir()
+    (sub / "command.py").write_text("code", encoding="utf-8")
+    (sub / "other.py").write_text("code", encoding="utf-8")
+
+    assert command.mention_matches("app/comm") == ["app/command.py"]
+
+
+def test_mention_matches_blocks_escaping_project_root(project_root):
+    assert command.mention_matches("../") == []
+    assert command.mention_matches("../secrets") == []
+
+
+def test_mention_matches_excludes_hidden_and_ignored_entries(project_root):
+    (project_root / ".git").mkdir()
+    (project_root / "__pycache__").mkdir()
+    (project_root / ".env").write_text("SECRET=1", encoding="utf-8")
+    (project_root / "app.py").write_text("code", encoding="utf-8")
+
+    assert command.mention_matches("") == ["app.py"]
+
+
+def test_mention_matches_caps_result_count(project_root):
+    for i in range(command.MAX_FILE_SUGGESTIONS + 5):
+        (project_root / f"file{i:02d}.txt").write_text("x", encoding="utf-8")
+
+    assert len(command.mention_matches("")) == command.MAX_FILE_SUGGESTIONS
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：磁碟絕對路徑（跳出專案資料夾讀檔，見 resolve_mention()）
+# ---------------------------------------------------------------------------
+
+def test_is_external_path_detects_windows_unc_and_home_paths():
+    assert command._is_external_path("C:/Users/Roy/Downloads/file.py")
+    assert command._is_external_path("C:\\Users\\Roy\\Downloads\\file.py")
+    assert command._is_external_path("\\\\server\\share\\file.py")
+    assert command._is_external_path("~/Downloads/file.py")
+    assert not command._is_external_path("readme.txt")
+    assert not command._is_external_path("../secrets")
+
+
+def test_mention_matches_browses_external_absolute_folder(project_root, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside")
+    (outside / "gemini-code-123.py").write_text("print(1)", encoding="utf-8")
+    (outside / "notes.txt").write_text("hi", encoding="utf-8")
+
+    norm_outside = str(outside).replace("\\", "/")
+    assert command.mention_matches(f"{outside}/gemini") == [f"{norm_outside}/gemini-code-123.py"]
+
+
+def test_mention_matches_still_blocks_relative_escape_when_not_absolute(project_root):
+    assert command.mention_matches("../") == []
+    assert command.mention_matches("../secrets") == []
+
+
+def test_resolve_mention_allows_external_absolute_file(project_root, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside") / "gemini-code-123.py"
+    outside.write_text("print(1)", encoding="utf-8")
+
+    assert command.resolve_mention(str(outside)) == outside
+
+
+def test_resolve_mention_rejects_external_path_that_is_a_directory(project_root, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside")
+    assert command.resolve_mention(str(outside)) is None
+
+
+def test_resolve_mention_still_blocks_relative_escape(project_root, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside") / "secret.txt"
+    outside.write_text("機密", encoding="utf-8")
+
+    assert command.resolve_mention(f"../{outside.parent.name}/secret.txt") is None
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：_current_mention()（目前游標左邊在打的 @提及）
+# ---------------------------------------------------------------------------
+
+def test_current_mention_detects_token_at_cursor(palette):
+    _set_input(palette, "請看 @read")
+    assert palette._current_mention() == (3, 8, "read")
+
+
+def test_current_mention_none_without_at_symbol(palette):
+    _set_input(palette, "hello world")
+    assert palette._current_mention() is None
+
+
+def test_current_mention_none_when_whitespace_breaks_token(palette):
+    _set_input(palette, "@readme.txt 已經打完了")
+    assert palette._current_mention() is None
+
+
+def test_current_mention_empty_token_right_after_at(palette):
+    _set_input(palette, "@")
+    assert palette._current_mention() == (0, 1, "")
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：update_suggestions() 接上 mention_matches()
+# ---------------------------------------------------------------------------
+
+def test_update_suggestions_shows_file_matches_for_at_token(palette, project_root):
+    (project_root / "readme.txt").write_text("hi", encoding="utf-8")
+    _set_input(palette, "請看 @re")
+
+    palette.update_suggestions()
+
+    assert palette.current_matches == ["readme.txt"]
+    assert palette._file_mention_span == (3, 6)
+
+
+def test_update_suggestions_falls_back_to_slash_commands_without_at(palette):
+    _set_input(palette, "/mo")
+    palette.update_suggestions()
+    assert palette.current_matches == ["model"]
+    assert palette._file_mention_span is None
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：choose_suggestion() 針對 @提及 的插入行為
+# ---------------------------------------------------------------------------
+
+def test_choose_suggestion_inserts_file_mention_with_trailing_space(palette, project_root):
+    (project_root / "readme.txt").write_text("hi", encoding="utf-8")
+    _set_input(palette, "請看 @re")
+    palette.update_suggestions()
+
+    palette.choose_suggestion("readme.txt")
+
+    assert palette.message.get() == "請看 @readme.txt "
+    assert palette.message.index(tk.INSERT) == len("請看 @readme.txt ")
+
+
+def test_choose_suggestion_inserts_folder_mention_without_trailing_space(palette, project_root):
+    (project_root / "app").mkdir()
+    _set_input(palette, "@a")
+    palette.update_suggestions()
+
+    palette.choose_suggestion("app/")
+
+    assert palette.message.get() == "@app/"
+    assert palette.message.index(tk.INSERT) == len("@app/")
+
+
+def test_choose_suggestion_keeps_text_after_mention_intact(palette, project_root):
+    (project_root / "readme.txt").write_text("hi", encoding="utf-8")
+    _set_input(palette, "請看 @re 這個檔案", cursor=6)  # 游標停在 "@re" 之後
+
+    palette.update_suggestions()
+    palette.choose_suggestion("readme.txt")
+
+    assert palette.message.get() == "請看 @readme.txt  這個檔案"
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：file()（送出訊息時展開 @提及 成檔案內容）
+# ---------------------------------------------------------------------------
+
+def test_file_without_mentions_delegates_to_send_message(palette):
+    palette.file("hello sinco")
+    assert palette.conversation.send_calls == ["hello sinco"]
+    assert palette.conversation.ask_calls == []
+
+
+def test_file_with_mention_reads_content_and_calls_ask(palette, project_root):
+    (project_root / "notes.txt").write_text("這是筆記內容", encoding="utf-8")
+
+    palette.file("幫我看 @notes.txt 這是什麼")
+
+    assert palette.conversation.ask_calls
+    (header, model_input), kwargs = palette.conversation.ask_calls[0]
+    assert header == "幫我看 @notes.txt 這是什麼"
+    assert "這是筆記內容" in model_input
+    assert "幫我看 @notes.txt 這是什麼" in model_input
+    assert kwargs["record_as"] == "幫我看 @notes.txt 這是什麼"
+
+
+def test_file_with_multiple_mentions_attaches_each_once(palette, project_root):
+    (project_root / "a.txt").write_text("內容A", encoding="utf-8")
+    (project_root / "b.txt").write_text("內容B", encoding="utf-8")
+
+    palette.file("比較 @a.txt 跟 @b.txt 跟 @a.txt")
+
+    (header, model_input), kwargs = palette.conversation.ask_calls[0]
+    assert model_input.count("內容A") == 1
+    assert model_input.count("內容B") == 1
+
+
+def test_file_with_unknown_mention_reports_error_and_sends_nothing(palette, project_root):
+    palette.file("看看 @does-not-exist.txt")
+
+    assert "未知檔案" in _chat_text(palette)
+    assert palette.conversation.ask_calls == []
+    assert palette.conversation.send_calls == []
+
+
+def test_file_mention_escaping_project_root_is_rejected(palette, project_root, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside") / "secret.txt"
+    outside.write_text("機密", encoding="utf-8")
+
+    palette.file(f"看看 @../{outside.parent.name}/secret.txt")
+
+    assert "未知檔案" in _chat_text(palette)
+    assert palette.conversation.ask_calls == []
+
+
+def test_file_with_external_absolute_mention_reads_content(palette, project_root, tmp_path_factory):
+    # 對應真實情境：使用者從檔案總管複製一個專案資料夾以外的檔案路徑，貼進
+    # @ 附加——這應該要能讀到內容並送給模型（例如 /model nvidia），不再被
+    # 「一律限制在專案資料夾內」擋下來。
+    outside = tmp_path_factory.mktemp("outside") / "gemini-code-123.py"
+    outside.write_text("print('hi')", encoding="utf-8")
+
+    palette.file(f"幫我看 @{outside} 這支程式")
+
+    assert palette.conversation.ask_calls
+    (header, model_input), kwargs = palette.conversation.ask_calls[0]
+    assert "print('hi')" in model_input
+
+
+# ---------------------------------------------------------------------------
+# @ 檔案附加：候選清單旁的檔案內容預覽面板（仿 Claude Code 打 @ 的體驗）
+# ---------------------------------------------------------------------------
+
+def test_update_suggestions_populates_preview_for_first_match(palette, project_root):
+    (project_root / "readme.txt").write_text("第一行\n第二行", encoding="utf-8")
+    _set_input(palette, "請看 @re")
+
+    palette.update_suggestions()
+
+    assert palette.preview_text is not None
+    assert "第一行" in palette.preview_text.get("1.0", tk.END)
+
+
+def test_update_suggestions_no_preview_pane_for_slash_commands(palette):
+    _set_input(palette, "/mo")
+    palette.update_suggestions()
+    assert palette.preview_text is None
+
+
+def test_update_suggestions_no_preview_pane_for_model_arg(palette):
+    _set_input(palette, "/model ")
+    palette.update_suggestions()
+    assert palette.preview_text is None
+
+
+def test_preview_shows_placeholder_for_folder_candidate(palette, project_root):
+    (project_root / "app").mkdir()
+    _set_input(palette, "@a")
+
+    palette.update_suggestions()
+
+    assert "資料夾" in palette.preview_text.get("1.0", tk.END)
+
+
+def test_move_selection_updates_preview_to_selected_file(palette, project_root):
+    (project_root / "a.txt").write_text("內容A", encoding="utf-8")
+    (project_root / "b.txt").write_text("內容B", encoding="utf-8")
+    _set_input(palette, "@")
+
+    palette.update_suggestions()
+    assert "內容A" in palette.preview_text.get("1.0", tk.END)
+
+    palette.move_selection(1)  # 第一次按下鍵：反白第一個候選（跟一開始的預設預覽一樣還是 a.txt）
+    palette.move_selection(1)  # 第二次才移到 b.txt
+    assert "內容B" in palette.preview_text.get("1.0", tk.END)
+
+
+def test_hide_suggestions_clears_preview_state(palette, project_root):
+    (project_root / "a.txt").write_text("內容A", encoding="utf-8")
+    _set_input(palette, "@a")
+    palette.update_suggestions()
+    assert palette.preview_text is not None
+
+    palette.hide_suggestions()
+
+    assert palette.preview_text is None
+    assert palette._match_paths is None
+
+===== END FILE =====
+
+===== FILE: lib/components/test_conversation_store.py =====
+"""Unit tests for conversation_store.py — the multi-conversation store shared
+by the desktop GUI, terminal CLI, and web frontend (memory/conversations.json).
+Each test uses its own tmp_path file so runs don't touch the project's real
+conversations.json, same isolation pattern as test_session_store.py.
+"""
+
+from lib.components.conversation_store import (
+    DEFAULT_TITLE,
+    append_message,
+    clear_messages,
+    create_conversation,
+    delete_conversation,
+    get_conversation,
+    list_conversations,
+    rename_conversation,
+)
+
+
+def test_create_conversation_starts_empty_with_default_title(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+
+    assert conv["title"] == DEFAULT_TITLE
+    assert conv["messages"] == []
+    assert "id" in conv and "created_at" in conv and "updated_at" in conv
+
+
+def test_list_conversations_sorted_newest_first(tmp_path):
+    path = tmp_path / "conversations.json"
+    first = create_conversation(path=path)
+    second = create_conversation(path=path)
+    append_message(second["id"], "user", "second 對話後來又動了一下", path=path)
+
+    ids_in_order = [c["id"] for c in list_conversations(path=path)]
+    assert ids_in_order[0] == second["id"]
+    assert first["id"] in ids_in_order
+
+
+def test_append_message_auto_titles_from_first_user_message(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+
+    updated = append_message(conv["id"], "user", "幫我看一下這段程式碼", path=path)
+    assert updated["title"] == "幫我看一下這段程式碼"
+    assert updated["messages"] == [{"role": "user", "content": "幫我看一下這段程式碼", "ts": updated["messages"][0]["ts"]}]
+
+
+def test_append_message_stores_persona_and_mode_when_given(tmp_path):
+    # persona/mode 是給 GUI/CLI 用的（記錄當時的 /character 人格、/model 模式）
+    # ——網頁端不帶這兩個引數，訊息物件應該維持精簡形狀（見上一項測試）。
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+
+    updated = append_message(conv["id"], "assistant", "哈囉，我是 sinco", persona="sinco", mode="auto", path=path)
+
+    assert updated["messages"][0]["persona"] == "sinco"
+    assert updated["messages"][0]["mode"] == "auto"
+
+
+def test_append_message_truncates_long_title(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+    long_text = "一二三四五六七八九十" * 5  # 50 字，超過 24 字上限
+
+    updated = append_message(conv["id"], "user", long_text, path=path)
+    assert updated["title"].endswith("…")
+    assert len(updated["title"]) == 25  # 24 字 + 省略號
+
+
+def test_append_message_does_not_retitle_after_first_message(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+    append_message(conv["id"], "user", "第一句話", path=path)
+    updated = append_message(conv["id"], "user", "第二句話不應該變成標題", path=path)
+
+    assert updated["title"] == "第一句話"
+    assert len(updated["messages"]) == 2
+
+
+def test_append_message_returns_none_for_unknown_conversation(tmp_path):
+    path = tmp_path / "conversations.json"
+    assert append_message("not-a-real-id", "user", "hi", path=path) is None
+
+
+def test_get_conversation_round_trips_messages(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+    append_message(conv["id"], "user", "哈囉", persona="sinco", mode="auto", path=path)
+    append_message(conv["id"], "assistant", "你好", persona="sinco", mode="auto", path=path)
+
+    fetched = get_conversation(conv["id"], path=path)
+    assert [m["role"] for m in fetched["messages"]] == ["user", "assistant"]
+
+
+def test_rename_conversation_updates_title(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+    renamed = rename_conversation(conv["id"], "自訂標題", path=path)
+
+    assert renamed["title"] == "自訂標題"
+    assert get_conversation(conv["id"], path=path)["title"] == "自訂標題"
+
+
+def test_rename_conversation_returns_none_for_unknown_id(tmp_path):
+    path = tmp_path / "conversations.json"
+    assert rename_conversation("not-a-real-id", "x", path=path) is None
+
+
+def test_clear_messages_empties_but_keeps_conversation_id(tmp_path):
+    path = tmp_path / "conversations.json"
+    conv = create_conversation(path=path)
+    append_message(conv["id"], "user", "會被清掉的訊息", path=path)
+
+    cleared = clear_messages(conv["id"], path=path)
+    assert cleared["id"] == conv["id"]
+    assert cleared["messages"] == []
+    assert cleared["title"] == DEFAULT_TITLE
+
+
+def test_delete_conversation_removes_matching_id_only(tmp_path):
+    path = tmp_path / "conversations.json"
+    keep = create_conversation(path=path)
+    remove = create_conversation(path=path)
+
+    assert delete_conversation(remove["id"], path=path) is True
+    remaining_ids = [c["id"] for c in list_conversations(path=path)]
+    assert remaining_ids == [keep["id"]]
+
+
+def test_delete_conversation_returns_false_for_unknown_id(tmp_path):
+    path = tmp_path / "conversations.json"
+    create_conversation(path=path)
+    assert delete_conversation("not-a-real-id", path=path) is False
+
+
+def test_load_missing_file_returns_empty_list(tmp_path):
+    path = tmp_path / "does_not_exist.json"
+    assert list_conversations(path=path) == []
+
+===== END FILE =====
+
+===== FILE: lib/components/test_image_search_viewer.py =====
+"""本輪附件白名單與預覽子程序，不依賴實際桌面或網路。"""
+import json
+from PIL import Image
+import lib.components.image_search_viewer as viewer
+
+
+def test_preview_only_uses_this_reply_and_cache_pngs(monkeypatch, tmp_path):
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    allowed, outside = cache / "a.png", tmp_path / "outside.png"
+    Image.new("RGB", (4, 4)).save(allowed)
+    Image.new("RGB", (4, 4)).save(outside)
+    monkeypatch.setattr(viewer, "CACHE_DIR", cache)
+    reply = f"![候選](<{allowed.as_posix()}>)\n![錯誤](<{outside.as_posix()}>)\n![網路](<https://example.com/a.png>)"
+    assert viewer.attachment_paths(reply) == [allowed]
+    assert viewer.attachment_paths("下一輪沒有附件") == []
+
+
+def test_open_previews_uses_argv_no_shell_and_no_redownload(monkeypatch, tmp_path):
+    path = tmp_path / "a.png"
+    Image.new("RGB", (4, 4)).save(path)
+    monkeypatch.setattr(viewer, "CACHE_DIR", tmp_path)
+    seen = []
+    monkeypatch.setattr(viewer.subprocess, "Popen", lambda args, **kw: seen.append((args, kw)))
+    assert viewer.open_previews(f"![預覽](<{path.as_posix()}>)") == 1
+    args, kw = seen[0]
+    assert args[0] == viewer.sys.executable and args[-1] == str(path)
+    assert "shell" not in kw and kw["cwd"] == viewer.ROOT
+    assert viewer.open_previews("沒有附件") == 0 and len(seen) == 1
+
+
+def test_preview_cap_and_deduplication(monkeypatch, tmp_path):
+    monkeypatch.setattr(viewer, "CACHE_DIR", tmp_path)
+    paths = [tmp_path / f"{i}.png" for i in range(5)]
+    for path in paths:
+        path.touch()
+    reply = "\n".join(f"![candidate](<{path.as_posix()}>)" for path in [paths[0], *paths])
+    assert viewer.attachment_paths(reply) == paths[:3]
+
+===== END FILE =====
+
+===== FILE: lib/components/test_markdown_view.py =====
+"""markdown_view.insert_markdown() 的渲染測試——重點驗證 CLAUDE.md 需求
+「模型輸出要有 markdown preview，不能讓 '##'、表格管線符號這些原始語法
+原封不動露出來」：data/pairs.json 裡從 md-chat 匯入的真實回覆含有四級以上
+標題（"####"）跟表格，這支測試確保這兩種語法都真的被解析掉，不是只驗證
+h1~h3、清單這些原本就有的語法。
+"""
+
+import tkinter as tk
+
+import pytest
+
+from lib.components.markdown_view import insert_markdown
+
+
+@pytest.fixture
+def widget():
+    try:
+        root = tk.Tk()
+    except tk.TclError:
+        pytest.skip("no display available for Tk")
+    root.withdraw()
+    text = tk.Text(root)
+    for tag in ("ai_text", "md_h1", "md_h2", "md_h3", "md_h4", "md_h5", "md_h6",
+                "md_bold", "md_italic", "md_code_inline", "md_code_block",
+                "md_quote", "md_bullet", "md_table"):
+        text.tag_configure(tag)
+    yield text
+    root.destroy()
+
+
+def _rendered(widget) -> str:
+    return widget.get("1.0", tk.END)
+
+
+def test_h1_to_h3_headers_stripped(widget):
+    insert_markdown(widget, "# 一級\n## 二級\n### 三級")
+    content = _rendered(widget)
+    assert "#" not in content
+    assert "一級" in content and "二級" in content and "三級" in content
+
+
+def test_h4_to_h6_headers_stripped(widget):
+    """既有 regex 只到 h3，data/pairs.json 的真實回覆裡有 "####" 這種
+    四級標題——沒修就會原封不動露出 "####" 字面符號。"""
+    insert_markdown(widget, "#### 四級\n##### 五級\n###### 六級")
+    content = _rendered(widget)
+    assert "#" not in content
+    assert "四級" in content and "五級" in content and "六級" in content
+
+
+def test_h4_header_uses_its_own_tag(widget):
+    insert_markdown(widget, "#### 標題文字")
+    ranges = widget.tag_ranges("md_h4")
+    assert ranges
+    assert widget.get(ranges[0], ranges[1]) == "標題文字"
+
+
+def test_table_pipes_and_separator_row_not_left_raw(widget):
+    """data/pairs.json 裡有 81 行表格列；沒有表格解析時 "| A | B |" 跟
+    "| --- | --- |" 這種原始 GFM 表格語法會整行照原樣顯示。"""
+    table_md = "| A | B |\n| --- | --- |\n| 1 | 2 |"
+    insert_markdown(widget, table_md)
+    content = _rendered(widget)
+    # 分隔列本身的 "---" 不該原封不動出現（改成依欄寬計算的分隔線）
+    assert "| --- | --- |" not in content
+    assert "A" in content and "B" in content and "1" in content and "2" in content
+
+
+def test_table_cells_land_in_md_table_tag(widget):
+    table_md = "| Name | Score |\n| --- | --- |\n| Roy | 100 |"
+    insert_markdown(widget, table_md)
+    ranges = widget.tag_ranges("md_table")
+    assert ranges
+    table_text = widget.get(ranges[0], ranges[-1])
+    assert "Name" in table_text and "Roy" in table_text and "100" in table_text
+
+
+def test_plain_text_without_markdown_still_renders_unchanged(widget):
+    insert_markdown(widget, "普通句子，沒有語法。")
+    assert _rendered(widget).strip() == "普通句子，沒有語法。"
+
+
+def test_chinese_link_label_hides_percent_encoded_target(widget):
+    insert_markdown(widget, "[https://zh.wikipedia.org/wiki/周柯宇](<https://zh.wikipedia.org/wiki/%E5%91%A8%E6%9F%AF%E5%AE%87>)")
+    rendered = _rendered(widget)
+    assert "wiki/周柯宇" in rendered and "%E5" not in rendered
+    tags = [tag for tag in widget.tag_names() if tag.startswith("md_link_")]
+    assert len(tags) == 1 and widget.tag_bind(tags[0], "<Button-1>", None)
+
+
+def test_image_attachment_label_does_not_show_raw_markdown(widget):
+    insert_markdown(widget, "![搜尋候選（未確認）](<C:/project/output/image-search/image.png>)")
+    assert _rendered(widget).strip() == "搜尋候選（未確認）"
+
+===== END FILE =====
+
+===== FILE: lib/components/test_memory_store.py =====
+"""Unit tests for memory_store.py — the persistent memory backing /memory
+(CLAUDE.md 需求 #01). Each test uses its own tmp_path file so runs don't
+touch the project's real memory/memory.json.
+"""
+
+import pytest
+
+from lib.components.memory_store import (
+    CATEGORIES,
+    add_memory,
+    delete_memory,
+    format_memories,
+    list_memories,
+)
+
+
+def test_add_memory_rejects_unknown_category(tmp_path):
+    with pytest.raises(ValueError):
+        add_memory("not-a-real-category", "some text", path=tmp_path / "memory.json")
+
+
+def test_add_memory_rejects_empty_text(tmp_path):
+    with pytest.raises(ValueError):
+        add_memory("project", "   ", path=tmp_path / "memory.json")
+
+
+def test_add_memory_persists_and_list_reads_it_back(tmp_path):
+    path = tmp_path / "memory.json"
+    entry = add_memory("project", "sinco 是自建 seq2seq 聊天模型", path=path)
+
+    assert entry["category"] == "project"
+    assert entry["text"] == "sinco 是自建 seq2seq 聊天模型"
+    assert "id" in entry and "created_at" in entry
+
+    entries = list_memories(path=path)
+    assert entries == [entry]
+
+
+def test_list_memories_filters_by_category(tmp_path):
+    path = tmp_path / "memory.json"
+    add_memory("project", "專案筆記", path=path)
+    add_memory("coding_style", "PEP8", path=path)
+
+    assert [e["category"] for e in list_memories("coding_style", path=path)] == ["coding_style"]
+    assert len(list_memories(path=path)) == 2
+
+
+def test_delete_memory_removes_matching_id_only(tmp_path):
+    path = tmp_path / "memory.json"
+    keep = add_memory("project", "保留這筆", path=path)
+    remove = add_memory("project", "刪掉這筆", path=path)
+
+    assert delete_memory(remove["id"], path=path) is True
+    remaining = list_memories(path=path)
+    assert remaining == [keep]
+
+
+def test_delete_memory_returns_false_for_unknown_id(tmp_path):
+    path = tmp_path / "memory.json"
+    add_memory("project", "存在的一筆", path=path)
+    assert delete_memory("not-a-real-id", path=path) is False
+
+
+def test_format_memories_empty_and_nonempty(tmp_path):
+    assert "沒有記憶" in format_memories([])
+
+    path = tmp_path / "memory.json"
+    entry = add_memory("developer_preference", "喜歡簡潔的回覆", path=path)
+    text = format_memories([entry])
+    assert entry["id"] in text
+    assert "喜歡簡潔的回覆" in text
+
+
+def test_all_declared_categories_are_accepted(tmp_path):
+    path = tmp_path / "memory.json"
+    for category in CATEGORIES:
+        entry = add_memory(category, f"{category} 測試", path=path)
+        assert entry["category"] == category
+
+===== END FILE =====
+
+===== FILE: lib/components/test_project_init.py =====
+"""Unit tests for project_init.py — the deterministic file-tree scan behind
+/init (CLAUDE.md 需求 #01).
+"""
+
+from lib.components.project_init import END_MARK, START_MARK, build_summary, detect_stack, write_claude_md
+
+
+def test_detect_stack_finds_marker_files(tmp_path):
+    (tmp_path / "package.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "requirements.txt").write_text("", encoding="utf-8")
+
+    stack = detect_stack(tmp_path)
+    assert "Node.js / JavaScript / TypeScript" in stack
+    assert "Python" in stack
+
+
+def test_detect_stack_reports_unknown_when_no_markers(tmp_path):
+    assert detect_stack(tmp_path) == ["未偵測到已知的語言/框架標記檔案"]
+
+
+def test_build_summary_lists_top_level_entries_and_ignores_noise_dirs(tmp_path):
+    (tmp_path / "src").mkdir()
+    (tmp_path / "README.md").write_text("# hi", encoding="utf-8")
+    (tmp_path / "node_modules").mkdir()
+    (tmp_path / ".git").mkdir()
+
+    summary = build_summary(tmp_path)
+
+    assert "src/" in summary
+    assert "README.md" in summary
+    assert "node_modules" not in summary
+    assert ".git" not in summary
+    assert summary.startswith(START_MARK)
+    assert summary.rstrip().endswith(END_MARK)
+
+
+def test_write_claude_md_creates_new_file(tmp_path):
+    path = write_claude_md(tmp_path)
+
+    assert path == tmp_path / "CLAUDE.md"
+    content = path.read_text(encoding="utf-8")
+    assert START_MARK in content and END_MARK in content
+
+
+def test_write_claude_md_preserves_user_content_outside_markers(tmp_path):
+    existing = tmp_path / "CLAUDE.md"
+    existing.write_text("# 我自己寫的規則\n\n這段不可以被 /init 動到\n", encoding="utf-8")
+
+    write_claude_md(tmp_path)
+
+    content = existing.read_text(encoding="utf-8")
+    assert "我自己寫的規則" in content
+    assert "這段不可以被 /init 動到" in content
+    assert START_MARK in content and END_MARK in content
+
+
+def test_write_claude_md_is_idempotent_and_only_replaces_marked_block(tmp_path):
+    write_claude_md(tmp_path)
+    first = (tmp_path / "CLAUDE.md").read_text(encoding="utf-8")
+
+    (tmp_path / "extra_file.txt").write_text("new", encoding="utf-8")
+    write_claude_md(tmp_path)
+    second = (tmp_path / "CLAUDE.md").read_text(encoding="utf-8")
+
+    assert first.count(START_MARK) == 1
+    assert second.count(START_MARK) == 1  # 沒有重複疊加區塊
+    assert "extra_file.txt" in second
+
+===== END FILE =====
+
+===== FILE: lib/components/test_see_image.py =====
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from lib.components import see_image as si
+
+
+def test_usage_and_missing_and_bad_ext(tmp_path):
+    assert "用法" in si.see_image("  ")
+    assert "找不到" in si.see_image(str(tmp_path / "x.png"))
+    f = tmp_path / "a.txt"; f.write_text("x")
+    assert "不是支援" in si.see_image(str(f))
+
+
+def test_report_uses_detections(tmp_path, monkeypatch):
+    import numpy as np, cv2, types
+    img = tmp_path / "a.png"; cv2.imwrite(str(img), np.zeros((32, 32, 3), np.uint8))
+    monkeypatch.setattr(si, "PCB_DIR", tmp_path / "none")
+    monkeypatch.setitem(sys.modules, "detector", types.SimpleNamespace(MODEL_NAME="x", detect=lambda im, conf: [{"label": "cat", "confidence": 0.9}]))
+    out = si.see_image(str(img))
+    assert "cat" in out and "a.png" in out and "尚未訓練" in out
+
+
+def test_classifier_used_when_pcb_checkpoint_exists(tmp_path, monkeypatch):
+    import numpy as np, cv2, types
+    img = tmp_path / "a.png"; cv2.imwrite(str(img), np.zeros((32, 32, 3), np.uint8))
+    (tmp_path / "pcb").mkdir(); (tmp_path / "pcb" / "best_model.pt").write_bytes(b"")
+    monkeypatch.setattr(si, "PCB_DIR", tmp_path / "pcb")
+    monkeypatch.setitem(sys.modules, "detector", types.SimpleNamespace(MODEL_NAME="x", detect=lambda im, conf: []))
+    monkeypatch.setitem(sys.modules, "image_classifier_bnn", types.SimpleNamespace(
+        classify_image=lambda p, out_dir: ("short", 0.93, 0.1), DEFAULT_MC_SAMPLES=1, DEFAULT_OUT_DIR=tmp_path))
+    assert "short" in si.see_image(str(img)) and "93%" in si.see_image(str(img))
+
+===== END FILE =====
+
+===== FILE: lib/components/test_session_store.py =====
+"""Unit tests for session_store.py — the autosave backing /resume (回到電腦
+未關機前記錄下的對話). Each test uses its own tmp_path file so runs don't
+touch the project's real memory/session.json, same isolation pattern as
+test_memory_store.py.
+"""
+
+from lib.components.session_store import (
+    MAX_SESSION_TURNS,
+    clear_session,
+    default_export_path,
+    export_markdown,
+    load_session,
+    record_turn,
+    save_chat_export,
+    session_subject,
+)
+
+
+def test_record_turn_persists_and_load_reads_it_back(tmp_path):
+    path = tmp_path / "session.json"
+    entry = record_turn("你好", "哈囉，我是 sinco", persona="sinco", mode="auto", path=path)
+
+    assert entry["user"] == "你好"
+    assert entry["reply"] == "哈囉，我是 sinco"
+    assert entry["persona"] == "sinco"
+    assert entry["mode"] == "auto"
+    assert "id" in entry and "created_at" in entry
+
+    entries = load_session(path=path)
+    assert entries == [entry]
+
+
+def test_record_turn_appends_in_order(tmp_path):
+    path = tmp_path / "session.json"
+    record_turn("第一句", "回覆一", path=path)
+    record_turn("第二句", "回覆二", path=path)
+
+    entries = load_session(path=path)
+    assert [e["user"] for e in entries] == ["第一句", "第二句"]
+
+
+def test_load_session_empty_when_file_missing(tmp_path):
+    path = tmp_path / "does_not_exist.json"
+    assert load_session(path=path) == []
+
+
+def test_record_turn_caps_history_length(tmp_path):
+    path = tmp_path / "session.json"
+    for i in range(MAX_SESSION_TURNS + 10):
+        record_turn(f"訊息{i}", f"回覆{i}", path=path)
+
+    entries = load_session(path=path)
+    assert len(entries) == MAX_SESSION_TURNS
+    # 保留的是最新的那些，不是最舊的
+    assert entries[-1]["user"] == f"訊息{MAX_SESSION_TURNS + 9}"
+    assert entries[0]["user"] == f"訊息{10}"
+
+
+def test_clear_session_empties_the_file(tmp_path):
+    path = tmp_path / "session.json"
+    record_turn("你好", "哈囉", path=path)
+
+    clear_session(path=path)
+
+    assert load_session(path=path) == []
+
+
+# ---------------------------------------------------------------------------
+# session_subject() — /resume 顯示用的主旨，現算不持久化
+# ---------------------------------------------------------------------------
+
+def test_session_subject_empty_without_entries():
+    assert session_subject([]) == ""
+
+
+def test_session_subject_picks_repeated_keyword():
+    entries = [
+        {"user": "幫我訓練模型", "reply": "..."},
+        {"user": "訓練模型要多久", "reply": "..."},
+        {"user": "訓練模型完成了嗎", "reply": "..."},
+    ]
+    assert "訓練" in session_subject(entries) or "練模" in session_subject(entries)
+
+
+def test_session_subject_falls_back_to_first_message_when_no_keyword_survives():
+    entries = [{"user": "嗨", "reply": "你好"}]
+    assert session_subject(entries) == "嗨"
+
+
+def test_session_subject_regenerates_after_clear(tmp_path):
+    path = tmp_path / "session.json"
+    record_turn("訓練模型進度", "...", path=path)
+    record_turn("訓練模型完成", "...", path=path)
+    first_subject = session_subject(load_session(path=path))
+    assert first_subject != ""
+
+    clear_session(path=path)
+    assert session_subject(load_session(path=path)) == ""
+
+    record_turn("查詢台北天氣", "...", path=path)
+    record_turn("查詢台北天氣預報", "...", path=path)
+    second_subject = session_subject(load_session(path=path))
+    assert second_subject != "" and second_subject != first_subject
+
+
+# ---------------------------------------------------------------------------
+# export_markdown() / save_chat_export() — /chat 下載對話紀錄成 Markdown
+# ---------------------------------------------------------------------------
+
+def test_export_markdown_reports_empty_session():
+    assert "沒有記錄下的對話" in export_markdown([])
+
+
+def test_export_markdown_includes_turns_and_subject():
+    entries = [
+        {"user": "你好", "reply": "哈囉，我是 sinco", "persona": "sinco",
+         "created_at": "2026-08-28T00:00:00+00:00"},
+    ]
+    text = export_markdown(entries)
+    assert "你好" in text
+    assert "哈囉，我是 sinco" in text
+    assert "主旨" in text
+
+
+def test_default_export_path_lands_under_given_base_dir(tmp_path):
+    path = default_export_path(base_dir=tmp_path)
+    assert path.parent == tmp_path
+    assert path.name.startswith("chat_") and path.suffix == ".md"
+
+
+def test_save_chat_export_writes_file_and_returns_path(tmp_path):
+    entries = [
+        {"user": "你好", "reply": "哈囉", "persona": "sinco",
+         "created_at": "2026-08-28T00:00:00+00:00"},
+    ]
+    target = tmp_path / "my_chat.md"
+
+    saved = save_chat_export(entries, path=target)
+
+    assert saved == target
+    assert target.exists()
+    assert "你好" in target.read_text(encoding="utf-8")
+
+
+def test_save_chat_export_creates_missing_parent_dirs(tmp_path):
+    target = tmp_path / "nested" / "dir" / "chat.md"
+    saved = save_chat_export([], path=target)
+    assert saved.exists()
+
+===== END FILE =====
+
+===== FILE: lib/GUI.py =====
+# GUI 呈現層：只放視窗/元件建構與純視覺繪製（顏色、字型、SVG 圖示光柵化、
+# 圓角膠囊、聊天氣泡樣式…），刻意不 import lib/main.py 或任何商業邏輯
+# （Conversation / CommandPalette / CameraPanel），避免這支檔案跟 main.py
+# 互相 import 造成循環匯入。main.py 是唯一的執行入口，由它 `import GUI as gui`
+# 取用這裡的元件/常數，再把對話邏輯、指令面板、事件綁定掛上去。
+import re
+import tkinter as tk
+from typing import Callable
+
+import fitz  # PyMuPDF：把下面的 FontAwesome SVG 光柵化成 Tkinter 看得懂的點陣圖示，
+             # 不必再另外裝 cairosvg（在 Windows 上常常要另外裝原生 Cairo 函式庫才能用）。
+from PIL import Image, ImageTk
+
+MODULE = "Sinco 1.5"  # 應用程式/品牌名稱（視窗標題/標題列用）；聊天時的助理人格名稱仍是 "sinco"（訓練資料/回覆內容都沒有改，見 CLAUDE.md to-do #15/#16）
+
+# SVG code
+send = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M322.5 351.7L523.4 150.9L391 520.3L322.5 351.7zM489.4 117L288.6 317.8L120 249.3L489.4 117zM70.1 280.8L275.9 364.4L359.5 570.2C364.8 583.3 377.6 591.9 391.8 591.9C406.5 591.9 419.6 582.7 424.6 568.8L602.6 72C606.1 62.2 603.6 51.4 596.3 44C589 36.6 578.1 34.2 568.3 37.7L71.4 215.7C57.5 220.7 48.3 233.8 48.3 248.5C48.3 262.7 56.9 275.5 70 280.8z"/></svg>'
+microphone = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 64C267 64 224 107 224 160L224 288C224 341 267 384 320 384C373 384 416 341 416 288L416 160C416 107 373 64 320 64zM176 248C176 234.7 165.3 224 152 224C138.7 224 128 234.7 128 248L128 288C128 385.9 201.3 466.7 296 478.5L296 528L248 528C234.7 528 224 538.7 224 552C224 565.3 234.7 576 248 576L392 576C405.3 576 416 565.3 416 552C416 538.7 405.3 528 392 528L344 528L344 478.5C438.7 466.7 512 385.9 512 288L512 248C512 234.7 501.3 224 488 224C474.7 224 464 234.7 464 248L464 288C464 367.5 399.5 432 320 432C240.5 432 176 367.5 176 288L176 248z"/></svg>'
+
+_SVG_ICON_CACHE: dict[tuple[str, int, str], "ImageTk.PhotoImage"] = {}
+
+
+def _tint_svg(svg_source: str, color: str) -> str:
+    """把 fill 直接寫在 <svg> 根節點上，靠 SVG fill 屬性的繼承性套用到底下所有
+    <path>（FontAwesome 匯出的 path 本身沒寫 fill，預設繼承父層），這樣同一份
+    SVG 原始碼就能依需要重繪成 MUTED_FG／ACCENT／BG 等不同顏色。"""
+    return re.sub(r"<svg ", f'<svg fill="{color}" ', svg_source, count=1)
+
+
+def render_svg_icon(svg_source: str, size: int, color: str) -> "ImageTk.PhotoImage":
+    """把 FontAwesome 的 SVG 原始碼（send / microphone）用 PyMuPDF 光柵化成指定
+    大小/顏色的點陣圖，再包成 Tkinter 認得的 PhotoImage。用 (svg_source, size,
+    color) 當快取 key：同一個圖示同一個顏色只會渲染一次，順便讓這些 PhotoImage
+    物件一直被這個全域字典參照著——Tkinter 的 PhotoImage 沒有其他地方引用時，
+    下一次垃圾回收就會被清掉、Canvas 上會突然變成空白，這是常見的坑。
+    """
+    cache_key = (svg_source, size, color)
+    cached = _SVG_ICON_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+    tinted = _tint_svg(svg_source, color)
+    doc = fitz.open(stream=tinted.encode("utf-8"), filetype="svg")
+    page = doc[0]
+    scale = size / max(page.rect.width, page.rect.height)
+    pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=True)
+    image = Image.frombytes("RGBA", (pix.width, pix.height), pix.samples)
+    photo = ImageTk.PhotoImage(image)
+    _SVG_ICON_CACHE[cache_key] = photo
+    return photo
+
+# 仿 Claude.ai 深色主題的暖色調色盤（肉眼比對抓出來的近似值，不是官方色票）。
+BG = "#262624"          # 視窗主背景
+INPUT_BG = "#30302E"     # 輸入列（圓角膠囊）背景
+BUBBLE_BG = "#3A3936"    # 使用者訊息「氣泡」背景
+BORDER = "#3E3D39"       # 分隔線 / 邊框
+TEXT_FG = "#F3F1EA"      # 主要文字（暖白）
+MUTED_FG = "#9C9890"     # 次要/說明文字（暖灰）
+ACCENT = "#D97757"       # Claude 品牌強調色（陶土橘）：送出鍵、AI 名稱、標題重點
+ACCENT_HOVER = "#C56A4C"  # 送出鍵 hover 時用的深一階陶土橘
+FONT_FAMILY = "Segoe UI"
+
+
+def rounded_rect(canvas: tk.Canvas, x1, y1, x2, y2, radius, **kwargs):
+    """在 canvas 上畫一個圓角矩形（Tk 原生沒有這個圖元，用 12 個控制點 + smooth
+    多邊形近似出圓角，這是 Tkinter 畫圓角矩形的標準做法）。"""
+    radius = max(2, min(radius, (x2 - x1) / 2, (y2 - y1) / 2))
+    points = [
+        x1 + radius, y1,
+        x2 - radius, y1,
+        x2, y1,
+        x2, y1 + radius,
+        x2, y2 - radius,
+        x2, y2,
+        x2 - radius, y2,
+        x1 + radius, y2,
+        x1, y2,
+        x1, y2 - radius,
+        x1, y1 + radius,
+        x1, y1,
+    ]
+    return canvas.create_polygon(points, smooth=True, **kwargs)
+
+
+class VectorIconCanvas(tk.Canvas):
+    """帶 icon_type/redraw 的 Canvas 子類別，讓 make_claude_icon_button() 畫出的
+    向量圖示按鈕可以事後換圖案（例如麥克風錄音中變成停止方塊）。單純繼承 tk.Canvas
+    加型別註記，不改變任何行為，只是讓這兩個屬性是「宣告過的」，而不是動態塞到
+    不知情的 tk.Canvas 實例上。
+    """
+    icon_type: str
+    redraw: Callable[..., None]
+
+
+def make_claude_icon_button(parent, icon_type, command, size=34, icon_color=None, hover_bg=None):
+    """Claude 風格圖示按鈕：不用 Emoji/文字符號，改以 Canvas 繪製簡約幾何線條
+    (Vector Icon)，跟 tk.Button 在 Windows 上 bd=0/relief="flat" 仍會畫出一圈
+    系統亮框的問題無關——這裡本來就是純 Canvas 畫，highlightthickness=0 天生乾淨。
+    icon_type 存成 canvas.icon_type（而不是閉包常數），讓外部可以事後動態換圖示
+    （例如麥克風錄音中變成停止方塊），呼叫 canvas.redraw() 重繪即可。
+    command 由呼叫端（main.py）傳入實際的商業邏輯 callback，這支函式本身不知道
+    也不需要知道 conversation/camera_panel 等物件的存在。
+    """
+    icon_color = icon_color or MUTED_FG
+    hover_bg = hover_bg or BORDER
+    canvas = VectorIconCanvas(parent, width=size, height=size, bg=INPUT_BG, highlightthickness=0, cursor="hand2")
+    canvas.icon_type = icon_type
+
+    # 繪製 Icon 線條
+    def draw_icon(color=None):
+        color = color or icon_color
+        canvas.delete("icon")
+        cx, cy = size / 2, size / 2
+        t = canvas.icon_type
+
+        if t == "plus":  # 「+」新增附件
+            canvas.create_line(cx - 5, cy, cx + 5, cy, fill=color, width=1.8, tags="icon")
+            canvas.create_line(cx, cy - 5, cx, cy + 5, fill=color, width=1.8, tags="icon")
+
+        elif t == "mic":  # 麥克風：改用真的 FontAwesome SVG（line 19），不再手繪幾何形狀
+            icon = render_svg_icon(microphone, int(size * 0.5), color)
+            canvas.create_image(cx, cy, image=icon, tags="icon")
+
+        elif t == "camera":  # 相機/鏡頭 (雙重圓環)
+            canvas.create_oval(cx - 5, cy - 5, cx + 5, cy + 5, outline=color, width=1.5, tags="icon")
+            canvas.create_oval(cx - 2, cy - 2, cx + 2, cy + 2, fill=color, outline="", tags="icon")
+
+        elif t == "stop":  # 錄音中：停止方塊
+            canvas.create_rectangle(cx - 4, cy - 4, cx + 4, cy + 4, fill=color, outline="", tags="icon")
+
+        elif t == "pcb":  # PCB 檢查：晶片方框 + 四邊接腳
+            canvas.create_rectangle(cx - 4, cy - 4, cx + 4, cy + 4, outline=color, width=1.5, tags="icon")
+            for dx, dy in ((-7, -2), (-7, 2), (7, -2), (7, 2)):
+                canvas.create_line(cx + dx, cy + dy, cx + dx * 0.6, cy + dy, fill=color, width=1.5, tags="icon")
+
+    # 滑鼠 Hover 效果 (浮現圓形灰底)
+    def on_enter(e):
+        canvas.delete("bg")
+        canvas.create_oval(2, 2, size - 2, size - 2, fill=hover_bg, outline="", tags="bg")
+        canvas.tag_lower("bg")
+
+    def on_leave(e):
+        canvas.delete("bg")
+
+    canvas.redraw = draw_icon
+    draw_icon()
+    canvas.bind("<Enter>", on_enter)
+    canvas.bind("<Leave>", on_leave)
+    canvas.bind("<Button-1>", lambda e: command())
+
+    return canvas
+
+
+windows = tk.Tk()
+windows.geometry("800x600")
+windows.title(f"{MODULE}")
+_ICON = __import__("pathlib").Path(__file__).resolve().parents[1] / "model_icon.ico"  # 專案根目錄的應用程式圖示（MSI 捷徑也用同一個）
+if _ICON.exists(): windows.iconbitmap(default=str(_ICON))
+windows.configure(bg=BG)
+
+# 頂部標題列：強調色圓點 + 名稱，仿 Claude 網頁版左上角的品牌識別，跟下面聊天區
+# 之間用一條細分隔線隔開
+header_frame = tk.Frame(windows, bg=BG)
+header_frame.pack(side="top", fill="x")
+
+header_dot = tk.Canvas(header_frame, width=10, height=10, bg=BG, highlightthickness=0)
+header_dot.pack(side="left", padx=(16, 8), pady=12)
+header_dot.create_oval(1, 1, 9, 9, fill=ACCENT, outline="")
+
+tk.Label(
+    header_frame, text=MODULE, bg=BG, fg=TEXT_FG, font=(FONT_FAMILY, 11, "bold"),
+).pack(side="left", pady=12)
+
+tk.Frame(windows, bg=BORDER, height=1).pack(side="top", fill="x")
+
+# 輸入列：外層 input_outer 只負責跟視窗邊緣留白，input_canvas 畫圓角膠囊背景，
+# input_frame（embed 進 canvas 裡的一般 Frame）才是真正放按鈕/輸入框的地方。
+# 按鈕/Entry 本身在這裡只建構元件、不 pack——實際要放哪些按鈕（含商業邏輯
+# callback）跟 pack 的先後順序，由 main.py 統一決定，因為 pack 在同一個 side
+# 上是照呼叫順序排版的，跨檔案拆開建立容易讓左右順序跑掉。
+INPUT_HEIGHT = 52
+
+input_outer = tk.Frame(windows, bg=BG)
+input_outer.pack(side="bottom", fill="x", padx=18, pady=(4, 14))
+
+input_canvas = tk.Canvas(input_outer, bg=BG, height=INPUT_HEIGHT, highlightthickness=0)
+input_canvas.pack(fill="x")
+
+input_frame = tk.Frame(input_canvas, bg=INPUT_BG)
+_pill_id = None
+_pill_window = input_canvas.create_window(0, 0, anchor="nw", window=input_frame)
+
+
+def _redraw_pill(event=None):
+    global _pill_id
+    w, h = input_canvas.winfo_width(), input_canvas.winfo_height()
+    if w < 4 or h < 4:
+        return
+    if _pill_id is not None:
+        input_canvas.delete(_pill_id)
+    _pill_id = rounded_rect(input_canvas, 1, 1, w - 1, h - 1, radius=h / 2, fill=INPUT_BG, outline=BORDER)
+    input_canvas.tag_lower(_pill_id)
+    input_canvas.itemconfig(_pill_window, width=w - 2, height=h - 2)
+    input_canvas.coords(_pill_window, 1, 1)
+
+
+input_canvas.bind("<Configure>", _redraw_pill)
+
+chat_frame = tk.Frame(windows, bg=BG)
+chat_frame.pack(side="top", fill="both", expand=True, padx=8, pady=8)
+
+chat_scrollbar = tk.Scrollbar(chat_frame, bg=BG, troughcolor=BG, activebackground=ACCENT, bd=0)
+chat_scrollbar.pack(side="right", fill="y")
+
+chat_display = tk.Text(
+    chat_frame, state="disabled", wrap="word", bg=BG, fg=TEXT_FG,
+    relief="flat", bd=0, yscrollcommand=chat_scrollbar.set,
+    padx=18, pady=14, spacing1=2, spacing3=10, font=(FONT_FAMILY, 10),
+)
+chat_display.pack(side="left", fill="both", expand=True)
+chat_scrollbar.config(command=chat_display.yview)
+
+# 訊息樣式：user_bubble 靠左邊界(lmargin)推遠 + justify=right，讓上色的「氣泡」
+# 只出現在整行的右側一小段，視覺上接近 Claude 右對齊的使用者訊息氣泡；AI 這邊
+# 是 sinco 名稱(ai_label) + 判斷依據(trace，小字/灰階，呼應 smart_reply_traced()
+# 「誠實展示真正的路由決策」這個設計) + 實際回覆(ai_text)三段組成，不用氣泡框，
+# 貼近 Claude 回覆本身不加框、靠純排版跟顏色區分身份的作法。
+chat_display.tag_configure(
+    "user_bubble", justify="right", background=BUBBLE_BG, foreground=TEXT_FG,
+    lmargin1=90, lmargin2=90, rmargin=6, spacing1=10, spacing3=2, font=(FONT_FAMILY, 10),
+)
+chat_display.tag_configure("pending", foreground=MUTED_FG, font=(FONT_FAMILY, 9, "italic"))
+chat_display.tag_configure("ai_label", foreground=ACCENT, font=(FONT_FAMILY, 10, "bold"), spacing1=10)
+chat_display.tag_configure("trace", foreground=MUTED_FG, font=(FONT_FAMILY, 8))
+chat_display.tag_configure("ai_text", foreground=TEXT_FG, font=(FONT_FAMILY, 10), spacing3=4)
+chat_display.tag_configure("system", foreground=MUTED_FG, font=(FONT_FAMILY, 9), spacing1=6, spacing3=6)
+
+# md_* 系列：markdown_view.insert_markdown() 解析 sinco 回覆時套用的渲染 tag，
+# 讓 ai_text 顯示的是排版後的「預覽」（標題變大字粗體、清單變項目符號、程式碼
+# 區塊變等寬字），跟 CLI 版用 rich.markdown.Markdown 是同一個目的、不同技術棧
+# （Tkinter Text 沒有內建 markdown 渲染能力，只能手動 tag_configure + insert）。
+# 這些 tag 都是在 ai_text 之後才建立，Tk 的 tag 優先權預設「後建立的蓋過先建立
+# 的」，所以疊加 ai_text 一起用時，字型/顏色會照這裡的設定顯示，不會被 ai_text
+# 蓋掉。
+CODE_FONT_FAMILY = "Consolas"
+chat_display.tag_configure("md_h1", font=(FONT_FAMILY, 15, "bold"), foreground=TEXT_FG, spacing1=10, spacing3=4)
+chat_display.tag_configure("md_h2", font=(FONT_FAMILY, 13, "bold"), foreground=TEXT_FG, spacing1=8, spacing3=3)
+chat_display.tag_configure("md_h3", font=(FONT_FAMILY, 11, "bold"), foreground=TEXT_FG, spacing1=6, spacing3=2)
+# h4~h6：data/pairs.json 裡從 md-chat 匯入的真實回覆偶爾會用到四級以上標題
+# （例如巢狀技術文件的子小節），字級比 h3 更小、顏色轉 MUTED_FG，跟 GitHub
+# README 預覽裡越深層標題越不顯眼的視覺習慣一致。
+chat_display.tag_configure("md_h4", font=(FONT_FAMILY, 10, "bold"), foreground=TEXT_FG, spacing1=5, spacing3=2)
+chat_display.tag_configure("md_h5", font=(FONT_FAMILY, 10, "bold"), foreground=MUTED_FG, spacing1=4, spacing3=2)
+chat_display.tag_configure("md_h6", font=(FONT_FAMILY, 9, "bold"), foreground=MUTED_FG, spacing1=4, spacing3=2)
+chat_display.tag_configure("md_bold", font=(FONT_FAMILY, 10, "bold"), foreground=TEXT_FG)
+chat_display.tag_configure("md_italic", font=(FONT_FAMILY, 10, "italic"), foreground=TEXT_FG)
+chat_display.tag_configure("md_code_inline", font=(CODE_FONT_FAMILY, 9), foreground=ACCENT, background=INPUT_BG)
+chat_display.tag_configure(
+    "md_code_block", font=(CODE_FONT_FAMILY, 9), foreground=TEXT_FG, background=INPUT_BG,
+    lmargin1=24, lmargin2=24, spacing1=4, spacing3=4,
+)
+chat_display.tag_configure("md_quote", font=(FONT_FAMILY, 10, "italic"), foreground=MUTED_FG, lmargin1=24, lmargin2=24)
+chat_display.tag_configure("md_bullet", font=(FONT_FAMILY, 10, "bold"), foreground=ACCENT)
+# md_table：表格沒有真正的儲存格排版能力（Tk Text 不支援），改用等寬字型手動
+# 補齊欄寬對齊（見 markdown_view._insert_table()），避免 "| A | B |" 這種原始
+# 管線符號未經對齊、原封不動地露出來。
+chat_display.tag_configure(
+    "md_table", font=(CODE_FONT_FAMILY, 9), foreground=TEXT_FG, background=INPUT_BG,
+    lmargin1=24, lmargin2=24, spacing1=2, spacing3=2,
+)
+
+# message 只在這裡「建構」，特意不 pack——要等 main.py 把 plus/mic/camera 等
+# 按鈕都 pack(side="left") 完，最後才能 pack message(fill="both", expand=True)
+# 去吃剩餘空間，順序反了三顆圖示鍵會被擠到看不見（Tk pack 同一 side 依呼叫
+# 順序排版），所以 pack 動作留給 main.py 統一處理。
+message = tk.Entry(
+    input_frame, relief="flat", bd=0,
+    fg=TEXT_FG, bg=INPUT_BG, insertbackground=TEXT_FG,
+)
+
+# 輸入框提示文字：Tkinter Entry 沒有原生 placeholder，用「灰色提示字 + 手動清除/還原」
+# 模擬。清除要同時掛在 FocusIn（滑鼠點進來）跟 KeyPress（送出後游標留在框內，
+# 沒有觸發新的 FocusIn，靠這個抓住下一次打字）兩個事件上，不然直接打字會把
+# 提示文字當成真的輸入內容夾在游標後面。
+PLACEHOLDER_TEXT = "Enter message to sinco"
+_showing_placeholder = False
+
+
+def _show_placeholder():
+    global _showing_placeholder
+    message.delete(0, tk.END)
+    message.insert(0, PLACEHOLDER_TEXT)
+    message.configure(fg=MUTED_FG)
+    _showing_placeholder = True
+
+
+def _clear_placeholder(event=None):
+    global _showing_placeholder
+    if _showing_placeholder:
+        message.delete(0, tk.END)
+        message.configure(fg=TEXT_FG)
+        _showing_placeholder = False
+
+
+def _restore_placeholder_if_empty(event=None):
+    if not message.get():
+        _show_placeholder()
+
+
+_show_placeholder()
+
+# 語音波形：錄音中顯示麥克風即時音量，AI 回覆中顯示脈動動畫；兩者共用同一組
+# bar 高度陣列與畫布，靠 draw_waveform() 統一畫出來。動畫本身（麥克風音量回呼、
+# AI 回應中的假脈動）屬於商業邏輯，留在 main.py，這裡只負責把 waveform_levels
+# 目前的值畫到 voice_canvas 上。
+WAVEFORM_BARS = 16
+waveform_levels = [0.0] * WAVEFORM_BARS
+
+
+def draw_waveform():
+    voice_canvas.delete("all")
+    width = voice_canvas.winfo_width() or int(voice_canvas["width"])
+    height = voice_canvas.winfo_height() or int(voice_canvas["height"])
+    bar_width = width / WAVEFORM_BARS
+    for i, level in enumerate(waveform_levels):
+        bar_height = max(2, level * height)
+        x0 = i * bar_width + 1
+        x1 = x0 + bar_width - 2
+        y0 = (height - bar_height) / 2
+        y1 = y0 + bar_height
+        voice_canvas.create_rectangle(x0, y0, x1, y1, fill=ACCENT, outline="")
+
+
+# 送出鍵不走 make_claude_icon_button()：它是唯一實心圓底的主要動作，圖示改用真的
+# FontAwesome 紙飛機 SVG，不再手繪多邊形。圖示顏色固定用 BG（深色）襯在 ACCENT
+# 橘色圓底上，跟原本文字版 fg=BG 的慣例一致。外觀/hover 在這裡就畫好，真正
+# 「送出」的 <Button-1> commit 動作由 main.py 綁（那是 on_submit()，屬於商業
+# 邏輯），pack 順序理由同 message。
+send_button = tk.Canvas(input_frame, width=34, height=34, bg=INPUT_BG, highlightthickness=0, cursor="hand2")
+
+
+def draw_send_btn(bg_color):
+    send_button.delete("all")
+    send_button.create_oval(2, 2, 32, 32, fill=bg_color, outline="")
+    icon = render_svg_icon(send, 17, BG)
+    send_button.create_image(17, 17, image=icon, tags="icon")
+
+
+draw_send_btn(ACCENT)
+send_button.bind("<Enter>", lambda e: draw_send_btn(ACCENT_HOVER))
+send_button.bind("<Leave>", lambda e: draw_send_btn(ACCENT))
+
+# 錄音時的聲波疊在輸入框「裡面」，不要另外開一個聲波框：跟 message 疊在同一個
+# 位置/同一塊大小（in_=message 讓座標以 message 為基準），預設沉到 message
+# 底下（打字時完全看不到、看到的是正常輸入框），開始錄音才 lift 上來蓋住輸入
+# 框、改顯示波形，停止錄音再 lower 回去，輸入框就恢復原狀。這兩行只靠 place()
+# 定位（跟 pack() 是獨立的兩套幾何管理器），不受上面 message 尚未 pack 影響。
+voice_canvas = tk.Canvas(input_frame, bg=INPUT_BG, highlightthickness=0)
+voice_canvas.place(in_=message, x=0, y=0, relwidth=1, relheight=1)
+tk.Misc.lower(voice_canvas, message)
+
+# AI 免責聲明：跟一般 AI 產品同樣的位置跟語氣，提醒使用者 sinco 可能出錯
+disclaimer = tk.Label(
+    windows, text="sinco is AI and can make mistakes. Please double-check response.",
+    font=(FONT_FAMILY, 8), fg=MUTED_FG, bg=BG,
+)
+disclaimer.pack(side="bottom", pady=(0, 4))
+
+# 選單殼在這裡建好，但「Open Chats」要接的 on_submit 是商業邏輯，
+# add_command(...) 留給 main.py 呼叫 chat_menu.add_command(...)。
+menubar = tk.Menu(windows)
+windows.config(menu=menubar)
+chat_menu = tk.Menu(menubar, tearoff=0)
+menubar.add_cascade(label="Chats", menu=chat_menu)
+
+===== END FILE =====
+
+===== FILE: tranning/auto_learn.py =====
+"""auto_learn.py — candidate pool for turning tools.py's live web lookups
+into future chats.py training pairs.
+
+Rule 06 boundary: this module never calls another AI model. tools.py's
+web_search() already does the only network call (DuckDuckGo's Instant
+Answer API, a plain data API) — this module just stores what it found as
+{"prompt", "reply", "topic"} candidates, the same shape chats.py's
+data/pairs.json already uses. Sinco does NOT learn from these
+automatically: they sit in a review queue (list_candidates()) until a human
+approves one (approve_candidate()), which appends it to data/pairs.json —
+retraining itself still only happens when you run
+`python chats.py --data data/pairs.json --epochs N` yourself. No automatic
+retraining on approve: the current checkpoint already converged (see
+CLAUDE.md 修正日誌 — 1500 epoch, loss 0.0011), and quietly retraining on
+every approval risks silently degrading it before anyone notices.
+"""
+
+import json
+import sys
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path    
+
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile (nova.exe, built to live at the project root): see
+    # lib/components/cli.py for why __file__ can't be used here when frozen.
+    DATA_DIR = Path(sys.executable).resolve().parent / "data"
+else:
+    DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+CANDIDATES_PATH = DATA_DIR / "auto_learn_candidates.json"
+PAIRS_PATH = DATA_DIR / "pairs.json"
+
+
+def _load(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+
+
+def _save(entries: list[dict], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(entries, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def save_candidate(prompt: str, reply: str, topic: str, source: str = "duckduckgo",
+                    path: Path | None = None) -> dict:
+    """Record a live web-lookup result as a training candidate. Deduped by
+    topic (not by exact prompt) — repeatedly asking about the same subject
+    in slightly different phrasings shouldn't pile up near-duplicate
+    candidates; the first answer found for a topic is kept.
+    """
+    path = path or CANDIDATES_PATH
+    entries = _load(path)
+    existing = next((e for e in entries if e["topic"] == topic), None)
+    if existing is not None:
+        return existing
+
+    entry = {
+        "id": uuid.uuid4().hex[:8],
+        "prompt": prompt,
+        "reply": reply,
+        "topic": topic,
+        "source": source,
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    entries.append(entry)
+    _save(entries, path)
+    return entry
+
+
+def list_candidates(path: Path | None = None) -> list[dict]:
+    return _load(path or CANDIDATES_PATH)
+
+
+def approve_candidate(candidate_id: str, candidates_path: Path | None = None,
+                       pairs_path: Path | None = None) -> bool:
+    """Move a candidate into the real training set (data/pairs.json) and
+    drop it from the review queue. Does NOT retrain — that stays a manual
+    `python chats.py --data ...` step you run whenever you're ready.
+    """
+    candidates_path = candidates_path or CANDIDATES_PATH
+    pairs_path = pairs_path or PAIRS_PATH
+
+    entries = _load(candidates_path)
+    match = next((e for e in entries if e["id"] == candidate_id), None)
+    if match is None:
+        return False
+
+    pairs = _load(pairs_path)
+    pairs.append({"prompt": match["prompt"], "reply": match["reply"]})
+    _save(pairs, pairs_path)
+
+    remaining = [e for e in entries if e["id"] != candidate_id]
+    _save(remaining, candidates_path)
+    return True
+
+
+def reject_candidate(candidate_id: str, path: Path | None = None) -> bool:
+    path = path or CANDIDATES_PATH
+    entries = _load(path)
+    remaining = [e for e in entries if e["id"] != candidate_id]
+    if len(remaining) == len(entries):
+        return False
+    _save(remaining, path)
+    return True
+
+
+def format_candidates(entries: list[dict]) -> str:
+    if not entries:
+        return "（目前沒有待審核的候選學習內容）"
+    lines = []
+    for e in entries:
+        lines.append(f"[{e['id']}] Q: {e['prompt']}\n    A: {e['reply']}")
+    return "\n".join(lines)
+
+===== END FILE =====
+
+===== FILE: tranning/chats.py =====
+"""Chat model — from-scratch sequence-to-sequence scaffold (no external AI API).
+
+Point this at a JSON file of [{"prompt": ..., "reply": ...}, ...] pairs once a
+real conversation dataset is available. Right now, with no data provided yet,
+this only defines the architecture (GRU encoder-decoder) and training loop;
+it is smoke-tested against a handful of synthetic pairs in test_chats.py (no
+reply-quality claims — just "the pipeline runs").
+
+Architecture: a character-level tokenizer + vocab built from the training
+pairs (character-level rather than whitespace-split so it works for Chinese,
+which has no spaces between words, as well as English), a GRU encoder that
+reads the prompt into a per-position sequence of hidden states, and a GRU
+decoder with Luong-style attention over those encoder states that generates
+the reply character-by-character (teacher forcing during training, greedy
+decoding at inference). This mirrors the classic "seq2seq chatbot from
+scratch" design — no pretrained weights, no calls to any cloud LLM API.
+Attention was added after a plain (no-attention) GRU decoder reliably
+memorized short chat replies but collapsed to a single answer for every
+prompt once targets got long (100-200+ character code snippets) — squeezing
+a whole reply through one fixed hidden vector doesn't scale, attention lets
+the decoder look back at specific source positions each step instead. Swap
+the tokenizer for something smarter (jieba for Chinese, BPE, ...) once real
+data is in and the language mix is known.
+
+2026-07-28 Bayesian upgrade (MC Dropout, Gal & Ghahramani 2016): the encoder
+and decoder each gained a real nn.Dropout layer (--dropout), and training
+moved from plain Adam to AdamW (--weight-decay) — under a Bayesian reading,
+weight decay is a Gaussian prior on the weights, so "dropout + weight decay"
+together are the standard cheap stand-in for a fully variational network
+(which would need every weight replaced by its own mean+variance and cost
+far more compute than an RTX 4060 8GB budget wants to spend on a chat
+model). The training loop itself did NOT change — still ordinary gradient
+descent on the same cross-entropy loss, no ELBO, no extra loss term. What
+changed is inference: chat_reply()/mc_chat_reply() now run mc_samples
+independent greedy decodes with dropout deliberately left ON (see
+bayesian_utils.mc_dropout_mode) instead of a single deterministic pass, and
+report the majority-vote reply plus a confidence score (how many of those
+samples agreed). Honest caveat: this is not a way to need less training
+data — the data requirement is unchanged — it's a way to get an honest "how
+sure is the model" number instead of a single greedy decode that looks
+equally confident whether the model actually learned the answer or is
+guessing; with very little training data the confidence number can still
+look artificially high if the model simply memorized that exact prompt.
+
+2026-09-08 typo-robustness augmentation (--typo-noise-prob, default 0.4): each
+training example, on every epoch, has a chance of having its *prompt only*
+(never the reply target) run through inject_typos() — random char-level
+substitute/delete/insert/adjacent-swap noise drawn from the training vocab
+itself. Reason: this is still a character-level exact-match memorizer (see
+above), so a single mistyped character used to turn a known prompt into an
+unseen one and produce a wrong/garbled reply. Applied inside
+ChatPairsDataset.__getitem__ rather than by writing extra rows into
+pairs.json, so the same 297 pairs get a different noisy variant each epoch
+for free — no bigger dataset file, no extra epochs, one training run.
+
+Usage:
+    python chats.py --data path/to/pairs.json --epochs 50
+    python chats.py --chat                      # REPL against the last checkpoint
+"""
+
+import argparse
+import json
+import random
+import re
+import sys
+import time
+from pathlib import Path
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+
+import code_retrieval
+import persona_chat
+import transformer_chat
+import chat_quality
+from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
+from tools import route_reply
+
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile (nova.exe, built to live at the project root):
+    # __file__ resolves inside the temp extraction dir at runtime, which has
+    # none of the actual checkpoints — use the running exe's own directory
+    # instead, same fix as lib/components/cli.py.
+    _TRANNING_DIR = Path(sys.executable).resolve().parent / "tranning"
+    _LIB_DIR = str(Path(sys.executable).resolve().parent / "lib")
+else:
+    _TRANNING_DIR = Path(__file__).resolve().parent
+    # lib/NVIDIA.py 所在資料夾：跟 conversation.py 把 tranning/ 加進 sys.path
+    # 是同一種寫法，只是這裡指向專案根目錄底下的 lib/。只有 force_mode="nvidia"
+    # 真的被呼叫到時才會 import（見 _nvidia_reply()），sinco/sinco-code 這兩個
+    # 從零訓練的預設模型完全不依賴這個資料夾或 openai 套件。
+    _LIB_DIR = str(Path(__file__).resolve().parent.parent / "lib")
+
+# tranning/MentalHealth/action.py 的情緒傾向分數模型（0~5 有界迴歸，見該檔案
+# docstring）——跟這裡的 sinco 聊天模型是兩個獨立訓練、獨立 checkpoint 的
+# 東西，這裡只是借用它的 predict_emotion() 在 trace 裡多報一行「使用者這句話
+# 的情緒判斷」，不影響 sinco 的回覆內容。沒有 __init__.py，用跟 action.py
+# 自己 import train_utils 同一種手動加 sys.path 的寫法。
+_MENTAL_HEALTH_DIR = str(_TRANNING_DIR / "MentalHealth")
+if _MENTAL_HEALTH_DIR not in sys.path:
+    sys.path.insert(0, _MENTAL_HEALTH_DIR)
+import action as emotion_action  # noqa: E402
+
+PAD, SOS, EOS, UNK = 0, 1, 2, 3
+SPECIAL_TOKENS = {"<pad>": PAD, "<sos>": SOS, "<eos>": EOS, "<unk>": UNK}
+
+DEFAULT_OUT_DIR = _TRANNING_DIR / "chat_runs"
+# Code snippets ("寫一個氣泡排序法" -> a real function body) run 100-200+
+# characters, ~5x longer than a casual chat reply. Mixing both lengths into
+# one checkpoint made every reply collapse to the same garbage output (the
+# few long code examples dominated the loss and overwhelmed the short chat
+# examples in the same 128-dim hidden state) — so code gets its own
+# checkpoint, trained with a longer --max-len, and smart_reply() below picks
+# which checkpoint to use per message.
+CODE_OUT_DIR = _TRANNING_DIR / "code_runs"
+MAX_LEN = 40
+# Rule 06 的算力上限（RTX 4060 8G）：訓練用量不得超過半張卡，用
+# torch.cuda.set_per_process_memory_fraction 在程式碼裡直接鎖死，超用時
+# CUDA 會直接丟 OutOfMemoryError，而不是只能靠訓練前後跑 nvidia-smi 人工
+# 觀察（to-do #24 那次的做法）才發現有沒有超量。
+DEFAULT_GPU_MEM_FRACTION = 0.5
+
+_CODE_PREFIXES = ("寫一個", "寫一段", "寫個")
+
+
+def is_code_request(message: str) -> bool:
+    """Heuristic: does this look like "write me a snippet that does X"
+    (routes to CODE_OUT_DIR) rather than a general chat/capability question
+    like "你能幫我寫程式嗎" (routes to the normal chat checkpoint)?
+    """
+    text = message.strip()
+    code_terms = r"(?i)(?<![a-z])(?:python|javascript|typescript|java|c\+\+|c#|sql|html|css|rust|golang)(?![a-z])|程式|函式|函數|演算法|排序法|迴圈|陣列|類別|正規表示式"
+    has_code = bool(re.search(code_terms, text))
+    if text.startswith(_CODE_PREFIXES) and has_code:
+        return True
+    if text.lower().startswith("python") and "寫" in text:
+        return True
+    # code_snippet_import.py 的 build_prompt() 產生的多語言 prompt 模板是
+    # 「用 <語言> 寫一個/寫一段/寫個 ...」（例如「用 C++ 寫一個氣泡排序法」），
+    # 開頭是語言字樣而不是「寫一個」，原本單純 startswith(_CODE_PREFIXES)
+    # 比對不到，會讓這批多語言程式碼訓練資料在實際聊天路由時被誤判成一般
+    # 聊天請求——這裡額外比對「用...寫」這個形狀。
+    if text.startswith("用") and has_code and any(prefix in text for prefix in _CODE_PREFIXES):
+        return True
+    if re.match(r"(?i)^(?:please\s+)?(?:write|create|implement)\b", text) and has_code:
+        return True
+    return False
+
+
+def tokenize(text: str) -> list[str]:
+    return list(text.strip())
+
+
+def build_vocab(pairs: list[dict]) -> dict[str, int]:
+    vocab = dict(SPECIAL_TOKENS)
+    for pair in pairs:
+        for text in (pair["prompt"], pair["reply"]):
+            for token in tokenize(text):
+                if token not in vocab:
+                    vocab[token] = len(vocab)
+    return vocab
+
+
+def encode(text: str, vocab: dict, max_len: int) -> list[int]:
+    ids = [vocab.get(t, UNK) for t in tokenize(text)][: max_len - 1]
+    ids.append(EOS)
+    ids += [PAD] * (max_len - len(ids))
+    return ids
+
+
+# 2026-09-08 錯字容忍度：使用者實際打字會漏字/多字/選錯同位鍵/選錯注音候選字，
+# 但這個字元級模型本來就是逐字比對，訓練資料只有「乾淨」的句子，稍微打錯字
+# 就等於變成沒看過的全新輸入（跟 to-do #12/#14 記錄的「沒背過就答錯」是同一個
+# 根因）。修法不是換架構，是資料增強：訓練時把 prompt（只有 prompt，reply
+# 維持原文）隨機做字元級增刪換位，讓模型看過同一句話的多種錯字版本仍要對應同一
+# 個正確回覆。char_pool 直接從這批訓練資料自己的 vocab 取字（排除特殊
+# token），不是任意 unicode 字元，錯字換出來的字才會落在中英文混雜語料本來
+# 就會出現的字元範圍內，也不會讓 vocab 變大、不吃額外 GPU 顯存。
+_TYPO_OPS = ("substitute", "delete", "insert", "swap")
+_TYPO_CHAR_RATE = 0.15  # 一句話被選中做增強時，每個字元的變動機率
+
+
+def inject_typos(text: str, char_rate: float, char_pool: list[str]) -> str:
+    """Return `text` with random per-character typos (substitute/delete/
+    insert/adjacent-swap), each character mutated independently with
+    probability `char_rate`. `char_pool` supplies the replacement characters
+    for substitute/insert — pass characters drawn from the training vocab so
+    injected noise stays inside the language mix the model already knows.
+    """
+    if char_rate <= 0 or not char_pool:
+        return text
+    chars = list(text)
+    out = []
+    i = 0
+    while i < len(chars):
+        if random.random() >= char_rate:
+            out.append(chars[i])
+            i += 1
+            continue
+        op = random.choice(_TYPO_OPS)
+        if op == "delete":
+            i += 1
+        elif op == "substitute":
+            out.append(random.choice(char_pool))
+            i += 1
+        elif op == "insert":
+            out.append(chars[i])
+            out.append(random.choice(char_pool))
+            i += 1
+        elif op == "swap" and i + 1 < len(chars):
+            out.append(chars[i + 1])
+            out.append(chars[i])
+            i += 2
+        else:  # 選到 swap 但已經是最後一個字，沒有下一個字可換
+            out.append(chars[i])
+            i += 1
+    return "".join(out)
+
+
+class ChatPairsDataset(Dataset):
+    def __init__(self, pairs: list[dict], vocab: dict, max_len: int,
+                 typo_prob: float = 0.0, typo_char_pool: list[str] | None = None):
+        self.pairs = pairs
+        self.vocab = vocab
+        self.max_len = max_len
+        # typo_prob：整句話（而非每個字）被選中做錯字增強的機率。刻意兩層
+        # 機率（先整句抽籤，抽中才逐字用 _TYPO_CHAR_RATE 變動）而不是單一
+        # 逐字機率，是為了讓「乾淨、一字不差」的原始句子仍佔多數訓練樣本，
+        # 保留既有精準重現能力（to-do #14 驗證過的行為），不會因為每個 epoch
+        # 都在跟雜訊版本學習而反過來讓精準比對變差。__getitem__ 每次被
+        # DataLoader 呼叫都重新抽籤/重新產生雜訊，同一筆資料在不同 epoch
+        # 會看到不同的錯字版本，等於免費做資料擴增，不用把 pairs.json 實際
+        # 膨脹成好幾倍、也不用因此多訓練好幾輪。
+        self.typo_prob = typo_prob
+        self.typo_char_pool = typo_char_pool or []
+
+    def __len__(self):
+        return len(self.pairs)
+
+    def __getitem__(self, idx):
+        pair = self.pairs[idx]
+        prompt = pair["prompt"]
+        if self.typo_prob > 0 and random.random() < self.typo_prob:
+            prompt = inject_typos(prompt, _TYPO_CHAR_RATE, self.typo_char_pool)
+        src = encode(prompt, self.vocab, self.max_len)
+        tgt = encode(pair["reply"], self.vocab, self.max_len)
+        return torch.tensor(src), torch.tensor(tgt)
+
+
+class Encoder(nn.Module):
+    def __init__(self, vocab_size: int, embed_size: int, hidden_size: int, dropout: float = 0.0):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_size, padding_idx=PAD)
+        self.gru = nn.GRU(embed_size, hidden_size, batch_first=True)
+        # dropout defaults to 0.0 so existing callers that construct Encoder
+        # positionally without it (voice_clone.py reuses this class) are
+        # unaffected; chats.py's own train()/load path passes a real value.
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, src):
+        embedded = self.dropout(self.embedding(src))
+        outputs, hidden = self.gru(embedded)
+        outputs = self.dropout(outputs)
+        return outputs, hidden  # outputs: (batch, src_len, hidden_size); hidden: (1, batch, hidden_size)
+
+
+class Attention(nn.Module):
+    """Luong-style ("general") attention: score each encoder position against
+    the current decoder hidden state via a learned bilinear map, softmax over
+    non-PAD positions, then take the weighted sum as the context vector.
+
+    Plain GRU seq2seq squeezes the *whole* source sentence through one fixed
+    hidden_size vector, which falls apart once targets run past ~50-100
+    characters (exactly what broke the code-snippet checkpoint — it kept
+    collapsing to the same memorized answer no matter the prompt). Attention
+    lets the decoder look back at specific source positions at every step
+    instead of relying on that single bottleneck, which is the standard fix
+    for long-sequence seq2seq — still trained from scratch, no external model.
+    """
+
+    def __init__(self, hidden_size: int):
+        super().__init__()
+        self.attn = nn.Linear(hidden_size, hidden_size, bias=False)
+
+    def forward(self, decoder_hidden, encoder_outputs, src_mask):
+        # decoder_hidden: (batch, hidden_size); encoder_outputs: (batch, src_len, hidden_size)
+        # src_mask: (batch, src_len) bool, True where the source position is PAD
+        energy = torch.bmm(self.attn(encoder_outputs), decoder_hidden.unsqueeze(2)).squeeze(2)
+        energy = energy.masked_fill(src_mask, float("-inf"))
+        weights = torch.softmax(energy, dim=1)  # (batch, src_len)
+        context = torch.bmm(weights.unsqueeze(1), encoder_outputs).squeeze(1)  # (batch, hidden_size)
+        return context
+
+
+class Decoder(nn.Module):
+    def __init__(self, vocab_size: int, embed_size: int, hidden_size: int, dropout: float = 0.0):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_size, padding_idx=PAD)
+        self.attention = Attention(hidden_size)
+        self.gru = nn.GRU(embed_size + hidden_size, hidden_size, batch_first=True)
+        self.dropout = nn.Dropout(dropout)
+        self.out = nn.Linear(hidden_size * 2, vocab_size)
+
+    def forward(self, input_step, hidden, encoder_outputs, src_mask):
+        # input_step: (batch, 1)
+        embedded = self.dropout(self.embedding(input_step))  # (batch, 1, embed_size)
+        context = self.attention(hidden.squeeze(0), encoder_outputs, src_mask)  # (batch, hidden_size)
+        gru_input = torch.cat([embedded, context.unsqueeze(1)], dim=2)
+        output, hidden = self.gru(gru_input, hidden)
+        # dropout right before the output projection is where MC Dropout
+        # inference (bayesian_utils.mc_dropout_mode) does the most good: it
+        # directly perturbs the logits each stochastic pass, which is what
+        # mc_chat_reply()'s majority vote needs to actually see disagreement.
+        combined = self.dropout(torch.cat([output.squeeze(1), context], dim=1))
+        return self.out(combined), hidden
+
+
+def train(data_path: Path, out_dir: Path, epochs: int, batch_size: int,
+          embed_size: int, hidden_size: int, lr: float, max_len: int,
+          teacher_forcing_ratio: float, dropout: float = 0.3, weight_decay: float = 1e-4,
+          device: str | None = None, gpu_mem_fraction: float = DEFAULT_GPU_MEM_FRACTION,
+          typo_noise_prob: float = 0.4):
+    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    if device.startswith("cuda") and torch.cuda.is_available():
+        torch.cuda.set_per_process_memory_fraction(gpu_mem_fraction, torch.cuda.current_device())
+    pairs = json.loads(Path(data_path).read_text(encoding="utf-8"))
+    vocab = build_vocab(pairs)
+    typo_char_pool = [tok for tok in vocab if tok not in SPECIAL_TOKENS]
+
+    dataset = ChatPairsDataset(pairs, vocab, max_len, typo_prob=typo_noise_prob, typo_char_pool=typo_char_pool)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+    encoder = Encoder(len(vocab), embed_size, hidden_size, dropout).to(device)
+    decoder = Decoder(len(vocab), embed_size, hidden_size, dropout).to(device)
+    # AdamW rather than plain Adam: its decoupled weight decay is a Gaussian
+    # prior on the weights, which paired with the dropout above is this
+    # model's (cheap, MC-Dropout-based) approximation to a Bayesian network
+    # — see the module docstring's 2026-07-28 note.
+    optimizer = torch.optim.AdamW(
+        list(encoder.parameters()) + list(decoder.parameters()), lr=lr, weight_decay=weight_decay
+    )
+    # sum reduction + manual normalization by valid-token count: with mean
+    # reduction, a batch whose targets are all PAD at some timestep (short
+    # replies fully padded past their length) divides 0/0 -> NaN loss.
+    criterion = nn.CrossEntropyLoss(ignore_index=PAD, reduction="sum")
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # vocab.json/config.json 跟權重檔永遠一起寫（而非分開）：如果只先寫
+    # vocab.json、權重檔晚點才存，中途任何人（CLI、GUI）讀取這個 checkpoint
+    # 都會因為 embedding 維度對不上而直接 Error(s) in loading state_dict。
+    # 四個檔案綁在同一個函式裡一次寫完，讓 out_dir 隨時只會是「完整的舊
+    # checkpoint」或「完整的新 checkpoint」兩種狀態之一。
+    def save_checkpoint():
+        (out_dir / "vocab.json").write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
+        (out_dir / "config.json").write_text(
+            json.dumps({"embed_size": embed_size, "hidden_size": hidden_size, "max_len": max_len}, indent=2)
+        )
+        torch.save(encoder.state_dict(), out_dir / "encoder.pt")
+        torch.save(decoder.state_dict(), out_dir / "decoder.pt")
+
+    # progress.json 每個 epoch 覆寫一次（跟 history.json 不同，這份只放
+    # "現在跑到哪" 的單一快照，不用整份讀完再自己找最後一筆），訓練跑到一半
+    # 也能隨時打開看目前 epoch/loss/預估剩餘時間，不用等 epochs 全部跑完
+    # （原本 history.json 只在迴圈結束後才寫一次，訓練中途完全看不到進度）。
+    def save_progress(epoch: int, avg_loss: float | None, elapsed: float, eta: float, done: bool):
+        (out_dir / "progress.json").write_text(json.dumps({
+            "epoch": epoch,
+            "epochs": epochs,
+            "percent": round(epoch / epochs * 100, 1),
+            "loss": avg_loss,
+            "best_loss": None if best_loss == float("inf") else best_loss,
+            "elapsed_seconds": round(elapsed, 1),
+            "eta_seconds": round(eta, 1),
+            "done": done,
+        }, indent=2))
+
+    history = []
+    start_time = time.time()
+    best_loss = float("inf")
+    params = list(encoder.parameters()) + list(decoder.parameters())
+    for epoch in range(1, epochs + 1):
+        total_loss, total_tokens = 0.0, 0
+        for src, tgt in loader:
+            src, tgt = src.to(device), tgt.to(device)
+            optimizer.zero_grad()
+
+            encoder_outputs, hidden = encoder(src)
+            src_mask = src == PAD
+            decoder_input = torch.full((src.size(0), 1), SOS, dtype=torch.long, device=device)
+
+            step_loss = torch.tensor(0.0, device=device)
+            teacher_forcing = random.random() < teacher_forcing_ratio
+            for t in range(max_len):
+                logits, hidden = decoder(decoder_input, hidden, encoder_outputs, src_mask)
+                step_loss = step_loss + criterion(logits, tgt[:, t])
+                decoder_input = tgt[:, t].unsqueeze(1) if teacher_forcing else logits.argmax(1, keepdim=True)
+
+            valid_tokens = int((tgt != PAD).sum().item())
+            loss = step_loss / max(valid_tokens, 1)
+            loss.backward()
+            # 沒有裁剪時，長時間訓練偶爾會在某個 epoch 梯度暴衝，把已經收斂
+            # 好的權重瞬間打壞，且後面的 epoch 回不去（3000 epochs 那次從
+            # loss 0.65 一路發散到 4.1 就是這樣）——clip 到 max_norm=5 是
+            # RNN 訓練的標準做法，擋掉單步暴衝但不影響正常梯度下降。
+            torch.nn.utils.clip_grad_norm_(params, max_norm=5.0)
+            optimizer.step()
+            total_loss += step_loss.item()
+            total_tokens += valid_tokens
+
+        avg_loss = total_loss / max(total_tokens, 1)
+        elapsed = time.time() - start_time
+        eta = elapsed / epoch * (epochs - epoch)
+        # flush=True: 沒有這個，被導向檔案/pipe 時 print 會整批緩衝，
+        # 中途讀檔看到的永遠是空的，要等訓練完全跑完才會一次冒出來
+        # （這次重訓 chat_runs 就是這樣才看不到進度）。
+        is_best = avg_loss < best_loss
+        print(f"epoch {epoch:3d}/{epochs}  loss={avg_loss:.4f}  elapsed={elapsed:.0f}s  eta={eta:.0f}s"
+              f"{'  (best)' if is_best else ''}", flush=True)
+        history.append({"epoch": epoch, "loss": avg_loss})
+        if is_best:
+            # 每個 epoch 都存最佳狀態，而不是只存訓練跑完當下那個 epoch：
+            # 上面的梯度裁剪能降低暴衝機率，但沒辦法保證整個訓練過程都不會
+            # 有比較差的尾段——與其事後才發現最後一個 epoch 比中間差，不如
+            # 全程都保留看過的最佳結果。
+            best_loss = avg_loss
+            save_checkpoint()
+        # history.json/progress.json 每個 epoch 都寫（跟 vocab/config/權重的
+        # 「訓練跑完才一次寫」不同）：這兩份只是進度紀錄，不會被拿去
+        # load_state_dict，中途寫壞或被強制中止時最多只是進度數字停在中途，
+        # 不會像權重檔那樣造成 size mismatch，所以可以放心即時更新，讓外部
+        # 隨時打開 progress.json 就能看到目前 epoch/loss/預估剩餘時間。
+        (out_dir / "history.json").write_text(json.dumps(history, indent=2))
+        save_progress(epoch, avg_loss, elapsed, eta, done=False)
+
+    save_progress(epochs, history[-1]["loss"] if history else None, time.time() - start_time, 0.0, done=True)
+    return encoder, decoder, vocab, history
+
+
+_loaded_models: dict = {}
+
+
+def _load(out_dir: Path):
+    key = str(out_dir)
+    if key in _loaded_models:
+        return _loaded_models[key]
+
+    vocab_path, config_path = out_dir / "vocab.json", out_dir / "config.json"
+    encoder_path, decoder_path = out_dir / "encoder.pt", out_dir / "decoder.pt"
+    if not (vocab_path.exists() and config_path.exists() and encoder_path.exists() and decoder_path.exists()):
+        return None
+
+    vocab = json.loads(vocab_path.read_text(encoding="utf-8"))
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    idx2word = {i: w for w, i in vocab.items()}
+
+    # dropout has no learned parameters, so it doesn't affect
+    # load_state_dict — reading it back from config.json is just for
+    # architecture bookkeeping and so mc_dropout_mode() has a real dropout
+    # probability (not the 0.0 default) to make stochastic at MC time.
+    dropout = config.get("dropout", 0.0)
+    encoder = Encoder(len(vocab), config["embed_size"], config["hidden_size"], dropout)
+    decoder = Decoder(len(vocab), config["embed_size"], config["hidden_size"], dropout)
+    encoder.load_state_dict(torch.load(encoder_path, map_location="cpu"))
+    decoder.load_state_dict(torch.load(decoder_path, map_location="cpu"))
+    encoder.eval()
+    decoder.eval()
+
+    loaded = (encoder, decoder, vocab, idx2word, config["max_len"])
+    _loaded_models[key] = loaded
+    return loaded
+
+
+_NOT_TRAINED_MESSAGE = "模型尚未訓練，請先提供對話資料集並執行 `python chats.py --data <pairs.json>` 進行訓練。"
+DEFAULT_MC_SAMPLES = 20
+
+
+_REPEAT_MAX_PERIOD, _REPEAT_MIN_CYCLES = 6, 3
+
+
+def _is_repeating(ids: list[int]) -> bool:
+    """True once the tail of `ids` is some short cycle (period 1..6, e.g. a
+    single repeated character or a repeated multi-char unit like ", AI")
+    repeated _REPEAT_MIN_CYCLES times in a row. An undertrained checkpoint's
+    greedy decode has no built-in reason to ever stop repeating itself once
+    it locks onto such a cycle (this is exactly how "我是 AI, AI, AI, AI..."
+    happens) — this is an inference-time safety net, not a fix for the
+    underlying undertraining, so it only fires on genuine loops, not on a
+    legitimately short repeated word.
+    """
+    for period in range(1, _REPEAT_MAX_PERIOD + 1):
+        needed = period * _REPEAT_MIN_CYCLES
+        if len(ids) < needed:
+            continue
+        tail = ids[-needed:]
+        if all(tail[i] == tail[i % period] for i in range(needed)):
+            return True
+    return False
+
+
+def _greedy_decode(encoder: Encoder, decoder: Decoder, src: torch.Tensor,
+                    max_len: int, idx2word: dict, temperature: float = 0.0) -> str:
+    """One deterministic-shaped decode pass. Not actually deterministic when
+    dropout is left stochastic by the caller (mc_dropout_mode) — that's the
+    point: mc_chat_reply() calls this DEFAULT_MC_SAMPLES times and the
+    dropout masks make each call a different sample from the approximate
+    posterior.
+
+    temperature=0.0 (default) keeps this a true greedy decode (argmax, same
+    as before). temperature>0 instead scales logits by 1/temperature, softmax,
+    and samples (torch.multinomial) — low values (<1) stay close to greedy,
+    high values (>1) pick lower-probability characters more often. This is a
+    second, independent source of variety on top of MC Dropout: dropout
+    perturbs *which* posterior sample is decoded, temperature perturbs *how
+    committed* that decode is to its own top choice at each character.
+    """
+    output_ids = []
+    with torch.no_grad():
+        encoder_outputs, hidden = encoder(src)
+        src_mask = src == PAD
+        decoder_input = torch.tensor([[SOS]])
+        for _ in range(max_len):
+            logits, hidden = decoder(decoder_input, hidden, encoder_outputs, src_mask)
+            if temperature > 0:
+                probs = torch.softmax(logits / temperature, dim=-1)
+                next_id = torch.multinomial(probs, 1).item()
+            else:
+                next_id = logits.argmax(1).item()
+            if next_id == EOS:
+                break
+            output_ids.append(next_id)
+            if _is_repeating(output_ids):
+                break
+            decoder_input = torch.tensor([[next_id]])
+    return "".join(idx2word.get(i, "<unk>") for i in output_ids)
+
+
+def mc_chat_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR,
+                   mc_samples: int = DEFAULT_MC_SAMPLES, temperature: float = 0.0) -> tuple[str, float]:
+    """Bayesian (MC Dropout) reply generation: greedy-decodes `mc_samples`
+    times with dropout deliberately left on (bayesian_utils.mc_dropout_mode),
+    then majority-votes across the resulting replies. Returns
+    (reply, confidence), where confidence is the fraction of samples that
+    landed on that exact reply — 1.0 means every sample agreed, low values
+    mean the model produced several different guesses for this prompt.
+
+    temperature is forwarded to _greedy_decode() unchanged (0.0 = greedy,
+    same behaviour as before this parameter existed); raising it makes the
+    per-sample decodes more varied, so confidence should be expected to drop
+    as temperature rises even for prompts the model knows well.
+
+    Returns (placeholder_message, 0.0) rather than crashing if no checkpoint
+    has been trained yet at out_dir.
+    """
+    loaded = _load(Path(out_dir))
+    if loaded is None:
+        return _NOT_TRAINED_MESSAGE, 0.0
+
+    encoder, decoder, vocab, idx2word, max_len = loaded
+    src = torch.tensor([encode(message, vocab, max_len)])
+
+    with mc_dropout_mode(encoder), mc_dropout_mode(decoder):
+        samples = [_greedy_decode(encoder, decoder, src, max_len, idx2word, temperature)
+                   for _ in range(mc_samples)]
+
+    reply, confidence = majority_vote(samples)
+    return (reply or "..."), confidence
+
+
+def chat_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR,
+               mc_samples: int = DEFAULT_MC_SAMPLES, temperature: float = 0.0) -> str:
+    """Generate a reply from the self-trained seq2seq model.
+
+    Kept as a plain str-returning function (smart_reply(), web/backend/app.py
+    and app/components/conversation.py all depend on that shape) — internally
+    this is now mc_chat_reply()'s majority-vote reply; use mc_chat_reply()
+    directly when the confidence score is also needed.
+    """
+    reply, _confidence = mc_chat_reply(message, out_dir=out_dir, mc_samples=mc_samples, temperature=temperature)
+    return reply
+
+
+def _nvidia_reply(message: str, history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+    """/model nvidia 專用：呼叫 lib/NVIDIA.py 的 NVIDIA 雲端 API（外部模型，
+    非本專案自訓練——CLAUDE.md 規則 #06 預設仍是 sinco/sinco-code，這個模式
+    要使用者透過 /model nvidia 明確選用才會走到這裡）。openai 套件與對外
+    網路請求都只在這個分支才會發生，不影響其餘模式。
+
+    `history` 原樣轉交給 nvidia_reply() 組成多輪 messages（見該函式說明）——
+    這裡不額外處理，只是單純傳遞，避免呼叫端跟實際組 messages 的邏輯分散
+    在兩個檔案。
+
+    回傳 (思考過程, 正式回覆)——nvidia_reply() 已經把 NVIDIA API 串流回應
+    裡的 reasoning_content（思考過程）跟 content（正式回覆）分開收集。
+    """
+    if _LIB_DIR not in sys.path:
+        sys.path.insert(0, _LIB_DIR)
+    from NVIDIA import nvidia_reply
+
+    try:
+        return nvidia_reply(message, history=history)
+    except Exception as exc:
+        return "", f"NVIDIA API 呼叫失敗：{exc}"
+
+
+def _emotion_trace_suffix(message: str) -> str:
+    """Detection-only add-on for the trace string: reports what
+    tranning/MentalHealth/action.py's predict_emotion() thinks `message`'s
+    emotional valence is (0~5 score + label) plus its MC Dropout confidence,
+    or "" if that checkpoint hasn't been trained yet — never raises, never
+    changes the actual sinco reply. mc_confidence is agreement across
+    stochastic dropout passes, not correctness — a wrong prediction can
+    still land at 100% if the model is *consistently* wrong about it.
+    """
+    result = emotion_action.predict_emotion(message)
+    if result["status"] is not None:
+        return ""
+    return (f"\n情緒判斷：{result['label_name']}（分數 {result['score']:.1f}/5，"
+            f"MC Dropout 信心度 {result['mc_confidence']:.0%}）")
+
+
+def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
+                        force_mode: str = "auto", temperature: float = 0.0,
+                        history: list[tuple[str, str]] | None = None,
+                        character: str | None = None) -> tuple[str, str]:
+    """Like smart_reply(), but also returns *why* that path answered the
+    message — the actual rule/pattern that fired, not a decorative label and
+    not a fabricated reasoning chain (sinco is a small memorization model,
+    it has no real step-by-step reasoning to show; this reports the real
+    routing decision instead, which is the honest version of "thinking").
+
+    force_mode overrides the automatic chat/code routing (CLAUDE.md 需求
+    #01 的 /model 指令): "auto" (default, existing behaviour, unchanged) =
+    decide via is_code_request(); "sinco" = always answer with the general
+    chat checkpoint at out_dir even if the message looks code-shaped;
+    "code" = always answer with the code checkpoint even if it doesn't;
+    "nvidia" = 明確選用外部 NVIDIA 雲端模型（見 _nvidia_reply()），是唯一
+    會離開本機、呼叫外部 API 的模式，其餘模式維持 Rule 06「全部自建」。
+    route_reply()（天氣/搜尋等即時查詢）一律優先，不受 force_mode 影響——
+    那是誠實資料查詢，跟「要用哪個聊天 checkpoint 回答」是兩件事。
+
+    temperature 轉呼叫 mc_chat_reply()（見該函式說明），0.0（預設）等同原本
+    行為不變；只影響 sinco/sinco-code 兩個生成分支，不影響 route_reply() 或
+    code_retrieval 命中既有範例原文那兩條路徑（沒有「生成」這回事可調）。
+
+    history交給一般Transformer，及force_mode="nvidia"時的_nvidia_reply()。
+    本地多輪格式由checkpoint metadata啟用；舊單輪權重明確提示未啟用。
+    程式碼、工具與角色分支維持原路由，不把聊天歷史當成新的任務訊息。
+
+    character（2026-09-30，to_do_list.md #45）：/character 選到的角色名字，
+    None 或 "sinco" = 一般模式。有值且找得到角色卡時，一般聊天分支改走
+    persona_chat.persona_reply()（角色範例 → 依性格挑選改寫 sinco 候選）。
+    修的是 2026-09-10 換成 Transformer 後一般聊天分支忽略 out_dir、導致選了
+    角色回覆仍是 sinco 本人的 bug；程式碼/nvidia/即時查詢分支不受角色影響。
+    """
+    # Empty input never reaches a tool, checkpoint or external API.
+    if not message.strip():
+        return "輸入檢查：空白訊息", chat_quality.dialogue_reply(message)
+    routed = route_reply(message)
+    if routed is not None:
+        return routed
+    if force_mode == "nvidia":
+        reasoning, reply = _nvidia_reply(message, history=history)
+        trace = "已手動切換為 NVIDIA 雲端模型（nemotron-3-ultra，外部 API，非本專案自訓練）"
+        if reasoning:
+            trace += f"\n思考過程：\n{reasoning}"
+        return trace, reply
+    use_code = force_mode == "code" or (force_mode == "auto" and is_code_request(message))
+    if use_code:
+        reason_prefix = "已手動切換為程式碼模式" if force_mode == "code" else \
+            '訊息包含撰寫要求與程式語言／程式術語，判斷為程式碼請求'
+        # 先試檢索式：data/code_pairs.json 裡有夠相似的既有範例就直接回傳
+        # 原文，不經過模型生成——比 sinco-code 生成可靠得多（見
+        # code_retrieval.py 開頭說明），資料庫沒覆蓋到才退回模型生成。
+        retrieved = code_retrieval.retrieve(message)
+        if retrieved is not None:
+            reply, score, matched_prompt = retrieved
+            return (
+                f'{reason_prefix} → 檢索式命中既有訓練範例「{matched_prompt}」'
+                f'（字元相似度 {score:.0%}，直接回傳訓練資料原文，非模型生成）',
+                reply,
+            )
+        reply, confidence = mc_chat_reply(message, out_dir=CODE_OUT_DIR, temperature=temperature)
+        warning = low_confidence_warning(confidence)
+        return (
+            f'{reason_prefix} → 資料庫沒有夠相似的既有範例，改用 sinco-code 模型生成'
+            f'（貝氏 MC Dropout 信心度 {confidence:.0%}）{warning}' + _emotion_trace_suffix(message),
+            reply,
+        )
+    # 2026-09-10：一般聊天分支正式從 chats.py 自己的字元級 GRU（chat_runs）
+    # 切換成 transformer_chat.py 的 Transformer checkpoint（gpt_pretrain_runs
+    # + gpt_chat_runs）——這是 transformer_chat.py 模組docstring 一開始就說
+    # 「等實際驗證比 GRU 好才切換」的那一步，今天用同一批情緒陪伴測試句反覆
+    # 比較過（repetition penalty 修生成迴圈、調低 lr/加大 weight decay 修過
+    # 擬合、原始問答 oversample 3 倍找回身份/能力問答）確認 Transformer 版本
+    # 明顯更好才換。GRU 的 mc_chat_reply()/chat_reply() 函式本身保留不刪，
+    # 只是不再是 smart_reply_traced() 預設路徑，仍可用 chats.py --chat 直接
+    # 呼叫。沒有 MC Dropout 信心度這個機制可以沿用（Transformer 走取樣式
+    # 生成，不是 GRU 的多次 dropout forward 投票），trace 改成誠實地只說明
+    # 是哪個模型在回覆，不硬套一個不適用的信心度數字。
+    if character and character != "sinco":
+        card = persona_chat.load_card(character)
+        if card is not None:
+            trace, reply = persona_chat.persona_reply(message, card)
+            return trace + _emotion_trace_suffix(message), reply
+    use_context = bool(history) and transformer_chat.context_enabled()
+    known_reply = chat_quality.dialogue_reply(message) if not use_context else None
+    if known_reply is not None:
+        return "一般對話：精確比對已審核句型（非模型生成）", known_reply
+    try:
+        reply = transformer_chat.reply(message, history=history) if history else transformer_chat.reply(message)
+    except ValueError as exc:
+        return "一般聊天上下文輸入檢查", f"無法處理這段上下文：{exc}"
+    issue = chat_quality.output_issue(message, reply)
+    if issue:
+        return f"一般聊天模型輸出檢查：{issue}；請使用者補充內容", chat_quality.clarification(message)
+    reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
+              "沒有比對到即時查詢或程式碼請求的句型")
+    if history and not transformer_chat.context_enabled():
+        reason += "；歷史已轉交，但現行舊權重尚未啟用多輪格式"
+    return (
+        f"{reason} → 交給 sinco 一般聊天模型（Transformer，2026-09-10 上線）" + _emotion_trace_suffix(message),
+        reply,
+    )
+
+
+def smart_reply(message: str, out_dir: Path = DEFAULT_OUT_DIR) -> str:
+    """Reply to `message`, checking a live data lookup (tools.route_reply)
+    before falling back to the trained seq2seq model.
+
+    Weather/search-shaped messages ("台北天氣", "搜尋 X", "你認識 X 嗎", ...)
+    get answered with real data pulled at call time — sinco's own model
+    never has to memorize (and can't be wrong about) live facts. Everything
+    else goes to chat_reply() as before.
+    """
+    _, reply = smart_reply_traced(message, out_dir=out_dir)
+    return reply
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Train or chat with a from-scratch seq2seq chat model")
+    parser.add_argument("--data", type=Path, help='JSON file of [{"prompt": ..., "reply": ...}, ...] pairs')
+    parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--embed-size", type=int, default=64)
+    parser.add_argument("--hidden-size", type=int, default=128)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--max-len", type=int, default=MAX_LEN)
+    parser.add_argument("--teacher-forcing-ratio", type=float, default=0.5)
+    parser.add_argument("--dropout", type=float, default=0.3,
+                         help="also the MC Dropout probability used at chat-time inference")
+    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument("--gpu-mem-fraction", type=float, default=DEFAULT_GPU_MEM_FRACTION,
+                         help="cap CUDA memory to this fraction of the GPU (Rule 06: RTX 4060 8G, must not exceed half)")
+    parser.add_argument("--typo-noise-prob", type=float, default=0.4,
+                         help="probability a training prompt gets random char-level typo noise injected "
+                              "each epoch (0 disables); reply targets are never touched")
+    parser.add_argument("--chat", action="store_true",
+                         help="skip training; start an interactive REPL against --out-dir's checkpoint")
+    parser.add_argument("--temperature", type=float, default=0.0,
+                         help="--chat only: 0.0 (default) = greedy decode, same as before this flag existed; "
+                              ">0 scales logits by 1/temperature and samples instead of always taking the top "
+                              "character (<1 mostly-greedy, >1 more varied/riskier wording)")
+    args = parser.parse_args()
+
+    if args.chat:
+        print(f"Chat with your self-trained model (type 'exit' to quit, temperature={args.temperature})")
+        while True:
+            text = input("You: ")
+            if text.strip().lower() in {"exit", "quit"}:
+                break
+            trace, reply = smart_reply_traced(text, out_dir=args.out_dir, temperature=args.temperature)
+            print(f"[{trace}]")
+            print(f"Model: {reply}")
+        return
+
+    if not args.data:
+        parser.error("--data is required unless --chat is given")
+
+    train(args.data, args.out_dir, args.epochs, args.batch_size, args.embed_size,
+          args.hidden_size, args.lr, args.max_len, args.teacher_forcing_ratio,
+          args.dropout, args.weight_decay, gpu_mem_fraction=args.gpu_mem_fraction,
+          typo_noise_prob=args.typo_noise_prob)
+
+
+if __name__ == "__main__":
+    main()
+
+===== END FILE =====
+
+===== FILE: tranning/speech_to_text.py =====
+"""Speech recognition (STT) — from-scratch CTC scaffold (no Whisper, no cloud
+speech API — Rule 06).
+
+Reuses the exact CRNN + CTC machinery already built and validated in OCR.py
+(that architecture is generic over any single-channel 2D input — it has
+nothing OCR-specific in it — so a log-magnitude spectrogram slots in in
+place of a text-line image without duplicating the model/decoder code).
+
+Point this at a manifest of (audio, transcript) pairs once a real dataset is
+available. Right now, with no data provided yet, this only defines the
+feature extraction + training loop; it is smoke-tested against a handful of
+synthetic sine-wave "utterances" in test_speech_to_text.py (no
+recognition-accuracy claim — just "the pipeline runs").
+
+Manifest format — a JSON list, audio paths relative to --audio-root
+(defaults to the manifest's own folder), PCM WAV files:
+
+    [{"audio": "0001.wav", "text": "你好"}, {"audio": "0002.wav", "text": "goodbye"}]
+
+Pipeline: mono waveform -> torch.stft log-magnitude spectrogram (freq x
+time, no torchaudio/librosa dependency needed) -> same CRNN (collapses
+frequency to one row, keeps a column per time frame) -> 2-layer
+bidirectional LSTM -> per-frame character logits -> CTC loss, exactly like
+OCR.py's per-column character logits. Character-level vocabulary built the
+same way (chats.py / OCR.py) so Chinese and English both work.
+
+Design choices to avoid overfitting AND underfitting (same reasoning as
+OCR.py / road_sign_train.py, adapted to audio):
+
+  Underfitting:
+    - Same 2-layer bidirectional LSTM for left/right context per frame.
+    - ReduceLROnPlateau instead of a fixed decay schedule.
+
+  Overfitting:
+    - Augmentation deliberately excludes time-reversal ("flipping" audio
+      backwards) — reversed speech is unintelligible / a different sound
+      entirely, the same directional-signal reasoning road_sign_train.py /
+      OCR.py use for signs and text. Instead uses SpecAugment-style
+      frequency/time masking plus mild additive noise.
+    - Dropout between LSTM layers + weight decay (AdamW), both reused as-is
+      from OCR.py's CRNN.
+    - Early stopping on validation loss, restoring the best checkpoint.
+    - Per-epoch validation CER (character error rate) printed alongside the
+      loss gap, plus a warning on a wide train/val loss gap.
+
+Usage:
+    python speech_to_text.py --train-manifest train.json --val-manifest val.json --epochs 50
+    python speech_to_text.py --recognize path/to/clip.wav   # run the last checkpoint on one file
+"""
+
+import argparse
+import json
+import re
+import wave
+from pathlib import Path
+
+import numpy as np
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+
+from OCR import CRNN, BLANK, build_charset, char_error_rate, greedy_decode
+from train_utils import EarlyStopper, loss_gap_warning, plateau_scheduler, save_checkpoint
+
+DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "speech_runs"
+SAMPLE_RATE = 16000
+N_FFT = 254          # -> 128 frequency bins (multiple of 16, same constraint as CRNN's img_height)
+HOP_LENGTH = 128      # 8ms hop at 16kHz
+FREQ_BINS = N_FFT // 2 + 1
+
+
+def load_waveform(path: Path, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Read a PCM WAV file with the stdlib `wave` module (no soundfile/
+    librosa dependency), mixed down to mono float32 in [-1, 1].
+
+    Simple linear-interpolation resample if the file's rate differs from
+    `sample_rate` — good enough for this project's own recordings; swap for
+    a real polyphase resampler if a dataset arrives with far-off rates.
+    """
+    with wave.open(str(path), "rb") as wf:
+        n_channels = wf.getnchannels()
+        sampwidth = wf.getsampwidth()
+        frame_rate = wf.getframerate()
+        raw = wf.readframes(wf.getnframes())
+
+    if sampwidth != 2:
+        raise ValueError(f"{path}: only 16-bit PCM WAV is supported, got {sampwidth * 8}-bit")
+
+    samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+    if n_channels > 1:
+        samples = samples.reshape(-1, n_channels).mean(axis=1)
+
+    if frame_rate != sample_rate:
+        duration = len(samples) / frame_rate
+        target_len = max(1, round(duration * sample_rate))
+        old_idx = np.linspace(0, len(samples) - 1, num=len(samples))
+        new_idx = np.linspace(0, len(samples) - 1, num=target_len)
+        samples = np.interp(new_idx, old_idx, samples).astype(np.float32)
+
+    return samples
+
+
+def waveform_to_spectrogram(waveform: np.ndarray, n_fft: int = N_FFT, hop_length: int = HOP_LENGTH) -> torch.Tensor:
+    """Log-magnitude STFT spectrogram, shape (freq_bins, time_frames).
+
+    Plain torch.stft — no torchaudio/librosa mel-filterbank needed, since a
+    linear-frequency spectrogram is enough signal for the CNN to learn from
+    at this project's scale.
+    """
+    tensor = torch.from_numpy(np.ascontiguousarray(waveform)).float()
+    if tensor.numel() < n_fft:
+        tensor = nn.functional.pad(tensor, (0, n_fft - tensor.numel()))
+    spec = torch.stft(
+        tensor, n_fft=n_fft, hop_length=hop_length, window=torch.hann_window(n_fft),
+        return_complex=True, center=True,
+    )
+    return torch.log1p(spec.abs())
+
+
+def _fit_time_frames(spec: torch.Tensor, max_frames: int) -> torch.Tensor:
+    """Pad with silence (zeros) or crop along the time axis to a fixed
+    width — same reasoning as OCR.load_image's right-pad, but zero (silence)
+    is the natural "blank" filler for audio the way white background is for
+    a scanned line of text.
+    """
+    freq_bins, frames = spec.shape
+    if frames >= max_frames:
+        return spec[:, :max_frames]
+    pad = torch.zeros(freq_bins, max_frames - frames)
+    return torch.cat([spec, pad], dim=1)
+
+
+def _spec_augment(spec: torch.Tensor, freq_mask: int = 12, time_mask: int = 12, noise_std: float = 0.02) -> torch.Tensor:
+    """SpecAugment-style masking + mild noise. Deliberately no time-reversal
+    (see module docstring) — masking/noise perturb the recording without
+    turning it into a different or unintelligible utterance.
+    """
+    spec = spec.clone()
+    freq_bins, frames = spec.shape
+
+    f0 = torch.randint(0, max(1, freq_bins - freq_mask), (1,)).item()
+    spec[f0:f0 + freq_mask, :] = 0.0
+
+    t0 = torch.randint(0, max(1, frames - time_mask), (1,)).item()
+    spec[:, t0:t0 + time_mask] = 0.0
+
+    spec = spec + torch.randn_like(spec) * noise_std
+    return spec
+
+
+class SpeechDataset(Dataset):
+    def __init__(self, records: list[dict], audio_root: Path, charset: dict[str, int], max_frames: int, train: bool):
+        self.records = records
+        self.audio_root = Path(audio_root)
+        self.charset = charset
+        self.max_frames = max_frames
+        self.train = train
+
+    def __len__(self):
+        return len(self.records)
+
+    def __getitem__(self, idx):
+        record = self.records[idx]
+        waveform = load_waveform(self.audio_root / record["audio"])
+        spec = waveform_to_spectrogram(waveform)
+        spec = _fit_time_frames(spec, self.max_frames)
+        if self.train:
+            spec = _spec_augment(spec)
+        text = record["text"]
+        label = torch.tensor([self.charset[c] for c in text if c in self.charset], dtype=torch.long)
+        return spec.unsqueeze(0), label, text
+
+
+def collate(batch):
+    specs, labels, texts = zip(*batch)
+    specs = torch.stack(specs)
+    target_lengths = torch.tensor([len(label) for label in labels], dtype=torch.long)
+    targets = torch.cat(labels)
+    return specs, targets, target_lengths, list(texts)
+
+
+def train(train_manifest: Path, val_manifest: Path, audio_root: Path, out_dir: Path,
+          epochs: int, batch_size: int, lr: float, patience: int, max_frames: int,
+          hidden_size: int, dropout: float, weight_decay: float, device: str | None = None):
+    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    train_records = json.loads(Path(train_manifest).read_text(encoding="utf-8"))
+    val_records = json.loads(Path(val_manifest).read_text(encoding="utf-8"))
+    audio_root = Path(audio_root) if audio_root else Path(train_manifest).resolve().parent
+
+    charset = build_charset(train_records)
+    idx_to_char = {i: c for c, i in charset.items()}
+
+    train_loader = DataLoader(
+        SpeechDataset(train_records, audio_root, charset, max_frames, train=True),
+        batch_size=batch_size, shuffle=True, collate_fn=collate,
+    )
+    val_loader = DataLoader(
+        SpeechDataset(val_records, audio_root, charset, max_frames, train=False),
+        batch_size=batch_size, shuffle=False, collate_fn=collate,
+    )
+
+    model = CRNN(len(charset) + 1, FREQ_BINS, hidden_size, dropout).to(device)
+    criterion = nn.CTCLoss(blank=BLANK, zero_infinity=True)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    scheduler = plateau_scheduler(optimizer)
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "charset.json").write_text(json.dumps(charset, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "config.json").write_text(
+        json.dumps({"max_frames": max_frames, "hidden_size": hidden_size}, indent=2)
+    )
+
+    stopper = EarlyStopper(patience)
+    history = []
+
+    for epoch in range(1, epochs + 1):
+        model.train()
+        train_loss_sum, train_samples = 0.0, 0
+        for specs, targets, target_lengths, _ in train_loader:
+            specs, targets, target_lengths = specs.to(device), targets.to(device), target_lengths.to(device)
+            optimizer.zero_grad()
+            log_probs = model(specs)
+            input_lengths = torch.full((specs.size(0),), log_probs.size(0), dtype=torch.long, device=device)
+            loss = criterion(log_probs, targets, input_lengths, target_lengths)
+            loss.backward()
+            optimizer.step()
+            train_loss_sum += loss.item() * specs.size(0)
+            train_samples += specs.size(0)
+        train_loss = train_loss_sum / train_samples
+
+        model.eval()
+        val_loss_sum, val_samples, cer_sum = 0.0, 0, 0.0
+        with torch.no_grad():
+            for specs, targets, target_lengths, texts in val_loader:
+                specs, targets, target_lengths = specs.to(device), targets.to(device), target_lengths.to(device)
+                log_probs = model(specs)
+                input_lengths = torch.full((specs.size(0),), log_probs.size(0), dtype=torch.long, device=device)
+                loss = criterion(log_probs, targets, input_lengths, target_lengths)
+                val_loss_sum += loss.item() * specs.size(0)
+                val_samples += specs.size(0)
+                preds = greedy_decode(log_probs.cpu(), idx_to_char)
+                cer_sum += sum(char_error_rate(pred, target) for pred, target in zip(preds, texts))
+        val_loss = val_loss_sum / val_samples
+        val_cer = cer_sum / val_samples
+        scheduler.step(val_loss)
+
+        warning = loss_gap_warning(train_loss, val_loss, epoch, epochs)
+
+        print(f"epoch {epoch:3d}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}  val_cer={val_cer:.3f}{warning}")
+        history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss, "val_cer": val_cer})
+
+        if stopper.step(val_loss, model, epoch):
+            break
+
+    stopper.restore_best(model)
+    save_checkpoint(model, out_dir, history)
+    return model, charset, history
+
+
+_loaded_models: dict = {}
+
+
+def _load(out_dir: Path):
+    key = str(out_dir)
+    if key in _loaded_models:
+        return _loaded_models[key]
+
+    charset_path, config_path, model_path = out_dir / "charset.json", out_dir / "config.json", out_dir / "best_model.pt"
+    if not (charset_path.exists() and config_path.exists() and model_path.exists()):
+        return None
+
+    charset = json.loads(charset_path.read_text(encoding="utf-8"))
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    idx_to_char = {i: c for c, i in charset.items()}
+
+    model = CRNN(len(charset) + 1, FREQ_BINS, config["hidden_size"])
+    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+    model.eval()
+
+    loaded = (model, config, idx_to_char)
+    _loaded_models[key] = loaded
+    return loaded
+
+
+# --- 去口語化：轉錄後的文字過濾（見 CLAUDE.md to-do，使用者要的是「轉錄後
+# 文字過濾」而非模型本身學會跳過語助詞——後者需要語音資料集本身的文字標註
+# 就先人工濾掉語助詞，例如語音說「嗯我覺得」但標註寫「我覺得」，目前完全沒有
+# 真實語音資料集，做不到；文字過濾這條路不需要任何訓練資料就能先動起來）。
+#
+# 這是字元級 CTC 模型的輸出——沒有詞邊界、沒有標點，中文又沒有空白分詞，所以
+# 這裡採用「這些字元幾乎只會單獨當語助詞/感嘆詞用、極少是正常詞彙的一部分」
+# 的務實判斷（嗯/啊/呃/欸/誒/喔/齁/呦/噢/唉），不管它出現在句子的哪個位置都
+# 直接濾掉——這是簡單的規則式過濾，不是語言理解，符合 Rule 06 的精神：判斷
+# 「濾掉哪些字」的規則是 sinco 自己寫死的，不是叫另一個 AI 模型去理解語意再
+# 決定要不要濾。已知的取捨：「太好了啊」這種語尾語氣詞也會被濾成「太好了」
+# ——這正是「去口語化」要的效果（口語語氣詞本來就是要濾掉的東西），但如果
+# 未來語料庫出現「呃逆」（打嗝的醫學名詞）這種罕見詞，會被誤濾成「逆」，這是
+# 這個簡單規則的已知盲點，機率很低所以先不特別處理。
+_FILLER_CHARS = "嗯啊呃欸誒喔齁呦噢唉"
+_FILLER_CHAR_PATTERN = re.compile(f"[{_FILLER_CHARS}]+")
+_FILLER_WORDS_EN = re.compile(r"\b(?:um+|uh+|erm+|hmm+)\b", re.IGNORECASE)
+
+
+def remove_fillers(text: str) -> str:
+    """濾掉「嗯」「啊」這類語助詞/感嘆詞（中英文都處理），回傳去口語化後的
+    文字。純規則式字串處理，不呼叫任何模型。
+    """
+    text = _FILLER_WORDS_EN.sub("", text)
+    text = _FILLER_CHAR_PATTERN.sub("", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def recognize_waveform(waveform: np.ndarray, out_dir: Path = DEFAULT_OUT_DIR) -> str:
+    """Run the self-trained CRNN+CTC model on raw samples already in memory
+    (e.g. straight from a microphone capture) — no temp file needed.
+
+    Returns a placeholder message (rather than crashing) if no checkpoint
+    has been trained yet at out_dir. The raw transcription is passed through
+    remove_fillers() before returning — see that function's comment for why
+    this is a post-transcription text filter rather than something the
+    acoustic model itself is trained to skip.
+    """
+    loaded = _load(Path(out_dir))
+    if loaded is None:
+        return "語音辨識模型尚未訓練，請先提供語音資料集並執行 `python speech_to_text.py --train-manifest ... --val-manifest ...` 進行訓練。"
+
+    model, config, idx_to_char = loaded
+    spec = waveform_to_spectrogram(waveform)
+    spec = _fit_time_frames(spec, config["max_frames"]).unsqueeze(0).unsqueeze(0)
+
+    with torch.no_grad():
+        log_probs = model(spec)
+    return remove_fillers(greedy_decode(log_probs, idx_to_char)[0])
+
+
+def recognize(audio_path: Path, out_dir: Path = DEFAULT_OUT_DIR) -> str:
+    """Same as recognize_waveform(), reading the audio from a WAV file first."""
+    return recognize_waveform(load_waveform(Path(audio_path)), out_dir)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Train or run a from-scratch CRNN+CTC speech recognition model")
+    parser.add_argument("--train-manifest", type=Path, help='JSON file of [{"audio": ..., "text": ...}, ...]')
+    parser.add_argument("--val-manifest", type=Path)
+    parser.add_argument("--audio-root", type=Path, default=None,
+                        help="base dir audio paths are relative to (default: --train-manifest's own folder)")
+    parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--patience", type=int, default=6)
+    parser.add_argument("--max-frames", type=int, default=200)
+    parser.add_argument("--hidden-size", type=int, default=256)
+    parser.add_argument("--dropout", type=float, default=0.2)
+    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument("--recognize", type=Path, default=None,
+                        help="skip training; run STT on this WAV file using --out-dir's checkpoint")
+    args = parser.parse_args()
+
+    if args.recognize:
+        print(recognize(args.recognize, out_dir=args.out_dir))
+        return
+
+    if not (args.train_manifest and args.val_manifest):
+        parser.error("--train-manifest and --val-manifest are required unless --recognize is given")
+
+    train(args.train_manifest, args.val_manifest, args.audio_root, args.out_dir,
+          args.epochs, args.batch_size, args.lr, args.patience, args.max_frames,
+          args.hidden_size, args.dropout, args.weight_decay)
+
+
+if __name__ == "__main__":
+    main()
+
+===== END FILE =====
+
+===== FILE: web/backend/detector.py =====
+"""YOLO object-detection wrapper. Loads the model once (lazily, on first
+call) and exposes a single function so it can be exercised directly —
+without FastAPI or a browser — in tests.
+"""
+
+from functools import lru_cache
+
+import numpy as np
+
+# 2026-09-10: yolo11n.pt -> yolo26n.pt（Ultralytics 2026-01 發布，nano 版本
+# 2.4M 參數/5.5MB，比 yolo11n 再快 43% CPU 推論，邊緣裝置導向，同一顆
+# ultralytics 套件、同樣的 .predict()/results.boxes API，純換權重檔不用
+# 改呼叫方式；已用已安裝的 ultralytics 8.4.90 實測 YOLO("yolo26n.pt") 能
+# 正常下載、推論、回傳跟 yolo11n 一樣形狀的 Boxes）。
+MODEL_NAME = "yolo26n.pt"  # nano: fastest CPU inference, downloaded on first use
+
+
+def _device() -> str:
+    # Ultralytics does NOT auto-move the model to the GPU just because CUDA
+    # is available — .predict() stays on CPU unless told otherwise, which
+    # left an RTX 4060 sitting idle while inference ran on CPU. Pick the GPU
+    # when there is one; CPU-only deploy targets (e.g. Render.com) still get
+    # a plain CPU run since torch.cuda.is_available() is False there.
+    import torch
+    return "0" if torch.cuda.is_available() else "cpu"
+
+
+@lru_cache(maxsize=4)
+def _model(weights: str = MODEL_NAME):
+    from ultralytics import YOLO
+    return YOLO(weights)
+
+
+def detect(image: np.ndarray, conf: float = 0.35, weights: str = MODEL_NAME) -> list[dict]:
+    """Run object detection on a BGR image (as read by cv2 / cv2.imdecode).
+
+    `weights` defaults to the COCO-pretrained nano model but can point at a
+    fine-tuned local checkpoint (e.g. a circuit-component detector) instead.
+
+    Returns a list of {label, confidence, box: [x1, y1, x2, y2]}, sorted by
+    confidence descending.
+    """
+    results = _model(weights).predict(image, conf=conf, device=_device(), verbose=False)[0]
+    names = results.names
+
+    detections = []
+    for box in results.boxes:
+        cls_id = int(box.cls[0])
+        detections.append({
+            "label": names[cls_id],
+            "confidence": round(float(box.conf[0]), 4),
+            "box": [round(v, 1) for v in box.xyxy[0].tolist()],
+        })
+    detections.sort(key=lambda d: d["confidence"], reverse=True)
+    return detections
+
+===== END FILE =====

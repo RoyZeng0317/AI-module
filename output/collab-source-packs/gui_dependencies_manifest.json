@@ -1,0 +1,74 @@
+[
+  {
+    "path": "lib/components/image_search_viewer.py",
+    "sha256": "553a54b9098a15db5b7ad3d7026afd42e4e2eb88cc9a751b2d3b82a662e178a2"
+  },
+  {
+    "path": "lib/components/pcb_inspection.py",
+    "sha256": "4bdf745bbe7f7f38f47ab8456587c70c0511196bf95b180f98abab7681cbc91a"
+  },
+  {
+    "path": "lib/components/project_init.py",
+    "sha256": "8126699f0b6aaf6fa8f063b5aa2edfb33296690250ab17dd83fdf544042e7f72"
+  },
+  {
+    "path": "lib/components/see_image.py",
+    "sha256": "4ba31b49802f52bd83ea8ffff4f2a39547672faec3ea40410aefb2c4caabe33c"
+  },
+  {
+    "path": "lib/components/test_cli.py",
+    "sha256": "3974cf444f4d91cb451348c572f599cfa973faee7422b099460808038fb907a7"
+  },
+  {
+    "path": "lib/components/test_command.py",
+    "sha256": "3de8512be9b95cf3b4a2f1b34d768879af5d7bc08153cf84c25ee44a65a59dff"
+  },
+  {
+    "path": "lib/components/test_conversation_store.py",
+    "sha256": "093231ce044de17b3a0dc01d15155a41a51fed5f758532c60321bcf9db1a5aeb"
+  },
+  {
+    "path": "lib/components/test_image_search_viewer.py",
+    "sha256": "6f866c736c3707de58f452db6583d1ac82087fc665c917061b7c067561166353"
+  },
+  {
+    "path": "lib/components/test_markdown_view.py",
+    "sha256": "40ed7c0fc51fec4c744496616a1aff892cd84575cfef2a1e7d30c836fb0c8684"
+  },
+  {
+    "path": "lib/components/test_memory_store.py",
+    "sha256": "3640a27faee362f09e0815be672fa0c61a2e59861f1e39cb0d373d28fd7b6b37"
+  },
+  {
+    "path": "lib/components/test_project_init.py",
+    "sha256": "7b2011b30a61a792aa61aa30c684ec97599bad59377cd58e1996f79e2380fc0b"
+  },
+  {
+    "path": "lib/components/test_see_image.py",
+    "sha256": "76ceeac7feb4862131697777c48f091e276dd1f884037f28f8a1dd43e549be6c"
+  },
+  {
+    "path": "lib/components/test_session_store.py",
+    "sha256": "57328c8551ef64c0f16ba94c14342bdab8d527a24654c078bbe990132f7135e8"
+  },
+  {
+    "path": "lib/GUI.py",
+    "sha256": "96db066bbf116c81780d438c7cefe820795a3bc3c7dbdef7ac91141da7202350"
+  },
+  {
+    "path": "tranning/auto_learn.py",
+    "sha256": "e735c595efa71c262039863ef92e4d640cd7d50f7aa29b5a8c27015cedc85ddb"
+  },
+  {
+    "path": "tranning/chats.py",
+    "sha256": "bdd59d94312d7e742939ca0fee70c9b0b0d1126568f4024afc7f91e3005807fb"
+  },
+  {
+    "path": "tranning/speech_to_text.py",
+    "sha256": "89b6b206d9ef6c8cd1e664539ac90ac5e91cce235d0c0c9e9fc44fb02cb7988c"
+  },
+  {
+    "path": "web/backend/detector.py",
+    "sha256": "dd7547394a8451be84bea41c1ee3640bfad0bf80516727b6eb9aa3b7525ade14"
+  }
+]

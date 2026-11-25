@@ -167,3 +167,6 @@ output/test_character_image_close_review.py
 
 # 旋積運算專題測試結果中 for 迴圈大量輸出圖（可重新產生，不進版控；文件與範例圖仍保留追蹤）
 /專題測試結果/旋積運算/for_loop_results/
+
+# speech CLI pytest tmp_path 測試暫存輸出（可重新產生，不進版控）
+/output/speech-cli-test-tmp/

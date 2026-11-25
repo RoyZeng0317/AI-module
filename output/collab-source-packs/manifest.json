@@ -1,0 +1,233 @@
+{
+  "gui_cli_sources": {
+    "files": [
+      {
+        "path": "lib/components/camera.py",
+        "sha256": "e6a49ca48a7b49159c05eb33a1ac7accb2d744cca8f81ef901d7bf767908d156"
+      },
+      {
+        "path": "lib/components/character_browser.py",
+        "sha256": "f4f51f0fb17150dec66dc5ce860de82a2fa7511501cb8cb5be83c82e4c7388b3"
+      },
+      {
+        "path": "lib/components/cli.py",
+        "sha256": "8b12b3287d9cff24d4092af8a7ee589637c80c7a8868d620ce752a15dd83014e"
+      },
+      {
+        "path": "lib/components/command.py",
+        "sha256": "ca1e44365305dbd5e6e62e8c32954806d4f7cfff6b53502923fb2dc1be37d1ea"
+      },
+      {
+        "path": "lib/components/conversation.py",
+        "sha256": "1f0aa3bbfe0603e565b8132a51d51a94be52877d5ab12e1da84b6d73d2e6c666"
+      },
+      {
+        "path": "lib/components/conversation_store.py",
+        "sha256": "d9995b678bfcbde066519aa4de025bd0f972244ecf6e90184d66f4d0244a3700"
+      },
+      {
+        "path": "lib/components/function.py",
+        "sha256": "d6722833221dcc312422efcf8c3ac4ed801bb3a2d537791fe92d292ad9f5cb66"
+      },
+      {
+        "path": "lib/components/gui.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "lib/components/markdown_view.py",
+        "sha256": "1515eade183c666b2715d0d55fc5bbfe8c96931e14cd56324346d3aefd779586"
+      },
+      {
+        "path": "lib/components/memory_store.py",
+        "sha256": "861bf2580e52ce243e15c5d8e70d8226da9cac670ccc97ea3b368a3d3660f1c5"
+      },
+      {
+        "path": "lib/components/session_store.py",
+        "sha256": "dd488ab5fe396e463f268c37c67700f0e6057d04773a36fc85ffd92d204923eb"
+      },
+      {
+        "path": "lib/main.py",
+        "sha256": "419624ace52901cb68ad30269e9d983e0f5f63c6415b1ee2b329224ad66a2ec2"
+      }
+    ],
+    "bytes": 126783
+  },
+  "web_sources": {
+    "files": [
+      {
+        "path": "web/admin/frontend/package.json",
+        "sha256": "759fae5197e7973039210ea1ff68ba0af6f713f9d7b53008788b8406c2cb60bb"
+      },
+      {
+        "path": "web/admin/frontend/script.js",
+        "sha256": "1e049aae2de20abe029d03017793160e9234518f4cc9d9f20c86088aebb8cc6d"
+      },
+      {
+        "path": "web/admin/frontend/src/components/action.py",
+        "sha256": "2eb714ae0a55a9b4bf130b5c6d425974efdd1f30285658e8676867b83315aa00"
+      },
+      {
+        "path": "web/admin/frontend/src/components/default.html",
+        "sha256": "b6c80960c03956de36d8b261e8bdfc969d1da5f5ac5ddbde97d769aadf34b948"
+      },
+      {
+        "path": "web/admin/frontend/src/components/gpu_info.py",
+        "sha256": "b186354ac6bbd69e363c3b7932b599b527c1784fa35b7b7e4309792d3163c1a5"
+      },
+      {
+        "path": "web/admin/frontend/src/components/index.html",
+        "sha256": "184b26d6e1fd16dcfdbb141aba98b2627ce45c1f236b32e456fdce6705dd0350"
+      },
+      {
+        "path": "web/admin/frontend/src/components/python.py",
+        "sha256": "d5533b4eb0f95bb73c671d67fc22524bddd17c3df7370c3bd660a5ed7c2697bd"
+      },
+      {
+        "path": "web/admin/frontend/src/components/script.js",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "web/admin/frontend/src/components/style.css",
+        "sha256": "8e83614ad5aa65fdba09a9cdc7eba8cef6cd864b3b0704dec3067d5ee27b2774"
+      },
+      {
+        "path": "web/admin/frontend/src/components/test_render_markdown.py",
+        "sha256": "98476d233dc4bf3976e0c8cdde5992fb3a74cc87252990a65a093382832f9dcc"
+      },
+      {
+        "path": "web/admin/frontend/src/components/test_xss_browser.py",
+        "sha256": "68b3971e5a14626bf05148058a258876b1fdfa05c1e0bf36fce82e80d46baa5c"
+      },
+      {
+        "path": "web/admin/frontend/src/components/xss_fixtures.py",
+        "sha256": "f738158c114d0cfbff7c73d376888373a5b43dcefaba98c79222160a113248a0"
+      },
+      {
+        "path": "web/admin/frontend/視覺電路圖.py",
+        "sha256": "4033ad88830929456025cedd3681d6cee4a656d16b8d8b637f2f54ad1de74119"
+      },
+      {
+        "path": "web/backend/app.py",
+        "sha256": "4d3f4d70a527d62f0bb6233144888de7721236a29a20705ddccb1d6970f99673"
+      },
+      {
+        "path": "web/backend/conversation_store.py",
+        "sha256": "59736848bafdec0f06ea61e514973fc5db53102c82c747de3d2ace284d5f0fdd"
+      },
+      {
+        "path": "web/backend/detector.py",
+        "sha256": "dd7547394a8451be84bea41c1ee3640bfad0bf80516727b6eb9aa3b7525ade14"
+      },
+      {
+        "path": "web/backend/notify_store.py",
+        "sha256": "89abc329cd87796f3f6752e50a036fcda4c4b9be9f8391328d3ecc6a249bd232"
+      },
+      {
+        "path": "web/backend/region_rules.json",
+        "sha256": "e74f2bea3d6f79dc8677b90512571fc189c17ac4c9b929902c758a4661756c52"
+      },
+      {
+        "path": "web/backend/region_signals.py",
+        "sha256": "3ee89b2b12c96ee47729274a08491388e8dcf7fa714ff5937765e6496c71d000"
+      },
+      {
+        "path": "web/backend/security_headers.py",
+        "sha256": "57d40e777f71b97b4a047d9cece8b929296eb093406bc1482f47fbe92c9870b6"
+      },
+      {
+        "path": "web/backend/test_conversation_store.py",
+        "sha256": "5dfa12c95355454664dfd5d63c48df8533508a56a9bc1beef9cc46e40a3f1bd7"
+      },
+      {
+        "path": "web/backend/tests/test_app.py",
+        "sha256": "98cda06f9bed99e1c02b52d58a30feef66cc47bb18fd0f06eabb146236000c25"
+      },
+      {
+        "path": "web/backend/tests/test_detector.py",
+        "sha256": "2c9e3d0f0cb8579f232234a73c5146bba22c384b32439b101907151443bb263a"
+      },
+      {
+        "path": "web/backend/tests/test_frontend_chat.py",
+        "sha256": "a64c4950cbb76c2117d8d56e76cd57a80e1c2834238308ebcd20b2fda42995d9"
+      },
+      {
+        "path": "web/backend/tests/test_region_signals.py",
+        "sha256": "2dfc647cdc23753847930a3240279305e0e531f4603a4be1f9312de9434817c7"
+      },
+      {
+        "path": "web/backend/tests/test_xss_security.py",
+        "sha256": "f25b31e98b1454942055d2792cb783e2bdc56959c0a15bf82dae62956974dec1"
+      },
+      {
+        "path": "web/backend/usage_store.py",
+        "sha256": "c1923c4271b37c14e3d24577ab9beea1baf35788a6756110568e59056919a82d"
+      },
+      {
+        "path": "web/frontend/src/components/google-auth-init.js",
+        "sha256": "67e50260dced2f59dfb4b7b3a3ca7e1240417224afdd67e7ea37af2b8201d716"
+      },
+      {
+        "path": "web/frontend/src/components/index.html",
+        "sha256": "cee3b3433a36a5ac978198a50fe7cdedf551f322be5b4a7be62435babaeed495"
+      },
+      {
+        "path": "web/frontend/src/components/python.py",
+        "sha256": "5c6ab7e40060f1fa4277e9f673e1ec4a836d39b7bdc4d0118cabd84699ee51cc"
+      },
+      {
+        "path": "web/frontend/src/components/script.js",
+        "sha256": "b157c2c3025d6b999d5e9ea7e1f401063fd71479755df351a77b915cf8f83e74"
+      },
+      {
+        "path": "web/frontend/src/components/style.css",
+        "sha256": "9a123506314254bf8fc94e4df2e8a8640e39931e6b9607e8801b9299bf3afa69"
+      },
+      {
+        "path": "web/image_processing/app.py",
+        "sha256": "7fbb0d6b883b56f27eedf982ca1b2243fca31be4ec8c3be3e4f1174c136b02f7"
+      },
+      {
+        "path": "web/image_processing/static/app.js",
+        "sha256": "1a1970d9db5c063fb48159546f1ea1c51e4ac3f75cf5ec7abe3a3cd9a4749c51"
+      },
+      {
+        "path": "web/image_processing/static/index.html",
+        "sha256": "448c79113f5e20305fe2e3b8ff2a371c83b1929d1546617279ab4b48165606ef"
+      },
+      {
+        "path": "web/image_processing/static/style.css",
+        "sha256": "7270780534c36a5b3c8626aa77ee8bf5a43a307b9fe446b5dcdb2f8b077efd1d"
+      },
+      {
+        "path": "web/image_processing/test_app.py",
+        "sha256": "fae7dc0aacef69d881cd4cb0274777ac94cc0a43889c1da3b8ee9d2ea93609d1"
+      }
+    ],
+    "bytes": 460534
+  },
+  "image_sources": {
+    "files": [
+      {
+        "path": "lib/opencv2/convolution.py",
+        "sha256": "e6afa3cadd85f219607f41f3e26ebbc089c68ad0c4b30539c64fb8ed874a9e45"
+      },
+      {
+        "path": "lib/opencv2/histogram_equalization.py",
+        "sha256": "cc1fe7a2c41984e399e4ecfe832e213fee2da411690da8dce0e1b7d7c9740e99"
+      },
+      {
+        "path": "lib/opencv2/IMAGE_PROCESSING.md",
+        "sha256": "d071ad2f2dd01b50fe448996cdd754cd3940848bdcf25f86a8b1e1fca138885c"
+      },
+      {
+        "path": "lib/opencv2/test_convolution.py",
+        "sha256": "f70d14b39d390c92a11bda132483ec13be44b6fedc5c600bb94dbc213fa77bf1"
+      },
+      {
+        "path": "lib/opencv2/test_histogram_equalization.py",
+        "sha256": "a5cc02f1ae421aad78ffe7f9bfb7b972484d35aa8b90b46c786f3f7ce6f6ba47"
+      }
+    ],
+    "bytes": 23812
+  }
+}
