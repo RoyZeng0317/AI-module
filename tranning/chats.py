@@ -61,6 +61,7 @@ Usage:
 import argparse
 import json
 import random
+import re
 import sys
 import time
 from pathlib import Path
@@ -70,7 +71,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
 import code_retrieval
+import persona_chat
 import transformer_chat
+import chat_quality
 from bayesian_utils import low_confidence_warning, majority_vote, mc_dropout_mode
 from tools import route_reply
 
@@ -127,7 +130,9 @@ def is_code_request(message: str) -> bool:
     like "你能幫我寫程式嗎" (routes to the normal chat checkpoint)?
     """
     text = message.strip()
-    if text.startswith(_CODE_PREFIXES):
+    code_terms = r"(?i)(?<![a-z])(?:python|javascript|typescript|java|c\+\+|c#|sql|html|css|rust|golang)(?![a-z])|程式|函式|函數|演算法|排序法|迴圈|陣列|類別|正規表示式"
+    has_code = bool(re.search(code_terms, text))
+    if text.startswith(_CODE_PREFIXES) and has_code:
         return True
     if text.lower().startswith("python") and "寫" in text:
         return True
@@ -136,7 +141,9 @@ def is_code_request(message: str) -> bool:
     # 開頭是語言字樣而不是「寫一個」，原本單純 startswith(_CODE_PREFIXES)
     # 比對不到，會讓這批多語言程式碼訓練資料在實際聊天路由時被誤判成一般
     # 聊天請求——這裡額外比對「用...寫」這個形狀。
-    if text.startswith("用") and any(prefix in text for prefix in _CODE_PREFIXES):
+    if text.startswith("用") and has_code and any(prefix in text for prefix in _CODE_PREFIXES):
+        return True
+    if re.match(r"(?i)^(?:please\s+)?(?:write|create|implement)\b", text) and has_code:
         return True
     return False
 
@@ -616,7 +623,8 @@ def _emotion_trace_suffix(message: str) -> str:
 
 def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
                         force_mode: str = "auto", temperature: float = 0.0,
-                        history: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+                        history: list[tuple[str, str]] | None = None,
+                        character: str | None = None) -> tuple[str, str]:
     """Like smart_reply(), but also returns *why* that path answered the
     message — the actual rule/pattern that fired, not a decorative label and
     not a fabricated reasoning chain (sinco is a small memorization model,
@@ -637,11 +645,19 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     行為不變；只影響 sinco/sinco-code 兩個生成分支，不影響 route_reply() 或
     code_retrieval 命中既有範例原文那兩條路徑（沒有「生成」這回事可調）。
 
-    history 只有在 force_mode="nvidia" 時才會被用到（轉交給 _nvidia_reply()
-    組成多輪 messages）。sinco/sinco-code 這兩個字元級模型故意不吃歷史（見
-    lib/components/conversation.py 開頭的說明——塞歷史字串反而會把回覆拉走），
-    所以其餘分支完全忽略這個參數，呼叫端可以無條件傳，不用依模式判斷要不要帶。
+    history交給一般Transformer，及force_mode="nvidia"時的_nvidia_reply()。
+    本地多輪格式由checkpoint metadata啟用；舊單輪權重明確提示未啟用。
+    程式碼、工具與角色分支維持原路由，不把聊天歷史當成新的任務訊息。
+
+    character（2026-09-30，to_do_list.md #45）：/character 選到的角色名字，
+    None 或 "sinco" = 一般模式。有值且找得到角色卡時，一般聊天分支改走
+    persona_chat.persona_reply()（角色範例 → 依性格挑選改寫 sinco 候選）。
+    修的是 2026-09-10 換成 Transformer 後一般聊天分支忽略 out_dir、導致選了
+    角色回覆仍是 sinco 本人的 bug；程式碼/nvidia/即時查詢分支不受角色影響。
     """
+    # Empty input never reaches a tool, checkpoint or external API.
+    if not message.strip():
+        return "輸入檢查：空白訊息", chat_quality.dialogue_reply(message)
     routed = route_reply(message)
     if routed is not None:
         return routed
@@ -654,7 +670,7 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     use_code = force_mode == "code" or (force_mode == "auto" and is_code_request(message))
     if use_code:
         reason_prefix = "已手動切換為程式碼模式" if force_mode == "code" else \
-            '訊息以「寫一個／寫一段」或「用<語言>寫」開頭，判斷為程式碼請求'
+            '訊息包含撰寫要求與程式語言／程式術語，判斷為程式碼請求'
         # 先試檢索式：data/code_pairs.json 裡有夠相似的既有範例就直接回傳
         # 原文，不經過模型生成——比 sinco-code 生成可靠得多（見
         # code_retrieval.py 開頭說明），資料庫沒覆蓋到才退回模型生成。
@@ -684,9 +700,26 @@ def smart_reply_traced(message: str, out_dir: Path = DEFAULT_OUT_DIR,
     # 呼叫。沒有 MC Dropout 信心度這個機制可以沿用（Transformer 走取樣式
     # 生成，不是 GRU 的多次 dropout forward 投票），trace 改成誠實地只說明
     # 是哪個模型在回覆，不硬套一個不適用的信心度數字。
-    reply = transformer_chat.reply(message)
+    if character and character != "sinco":
+        card = persona_chat.load_card(character)
+        if card is not None:
+            trace, reply = persona_chat.persona_reply(message, card)
+            return trace + _emotion_trace_suffix(message), reply
+    use_context = bool(history) and transformer_chat.context_enabled()
+    known_reply = chat_quality.dialogue_reply(message) if not use_context else None
+    if known_reply is not None:
+        return "一般對話：精確比對已審核句型（非模型生成）", known_reply
+    try:
+        reply = transformer_chat.reply(message, history=history) if history else transformer_chat.reply(message)
+    except ValueError as exc:
+        return "一般聊天上下文輸入檢查", f"無法處理這段上下文：{exc}"
+    issue = chat_quality.output_issue(message, reply)
+    if issue:
+        return f"一般聊天模型輸出檢查：{issue}；請使用者補充內容", chat_quality.clarification(message)
     reason = ("已手動切換為一般聊天模式" if force_mode == "sinco" else
               "沒有比對到即時查詢或程式碼請求的句型")
+    if history and not transformer_chat.context_enabled():
+        reason += "；歷史已轉交，但現行舊權重尚未啟用多輪格式"
     return (
         f"{reason} → 交給 sinco 一般聊天模型（Transformer，2026-09-10 上線）" + _emotion_trace_suffix(message),
         reply,

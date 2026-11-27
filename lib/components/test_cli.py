@@ -238,10 +238,13 @@ def test_run_resume_clear_wipes_recorded_session(tmp_path, monkeypatch, capsys):
     _isolate_session(tmp_path, monkeypatch)
     session_store.record_turn("你好", "哈囉", path=session_store.SESSION_PATH)
 
-    cli.run_resume("clear", _state())
+    state = _state()
+    state["history"] = [("舊問題", "舊回答")]
+    cli.run_resume("clear", state)
 
     assert "已清除" in _printed(capsys)
     assert session_store.load_session(path=session_store.SESSION_PATH) == []
+    assert state["history"] == []
 
 
 def test_run_resume_shows_generated_subject(tmp_path, monkeypatch, capsys):
@@ -300,6 +303,21 @@ def test_ask_model_records_turn_to_session(tmp_path, monkeypatch, capsys):
     assert entries[0]["reply"] == "回覆內容"
 
 
+def test_preview_failure_keeps_reply_and_saved_history(tmp_path, monkeypatch, capsys):
+    _isolate_session(tmp_path, monkeypatch)
+    _isolate_conversations(tmp_path, monkeypatch)
+    monkeypatch.setattr(cli, "smart_reply_traced", lambda *a, **kw: ("圖片搜尋", "搜尋候選（未確認）"))
+    def fail(reply):
+        assert session_store.load_session(path=session_store.SESSION_PATH)[0]["reply"] == reply
+        raise OSError("preview unavailable")
+    monkeypatch.setattr(cli, "open_previews", fail)
+    state = _state()
+    cli.ask_model("尋找圖片", state)
+    assert state["history"] == [("尋找圖片", "搜尋候選（未確認）")]
+    output = _printed(capsys)
+    assert "搜尋候選" in output and "圖片預覽無法開啟" in output
+
+
 def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypatch, capsys):
     """同一個 process 內，state["history"] 要原樣轉交給 smart_reply_traced()，
     /model nvidia 才接得到之前幾輪當上下文（sinco/code 模式會忽略這個參數，
@@ -308,8 +326,9 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
     _isolate_conversations(tmp_path, monkeypatch)
     seen = {}
 
-    def fake_smart_reply_traced(message, out_dir, force_mode, history):
+    def fake_smart_reply_traced(message, out_dir, force_mode, history, character=None):
         seen["history"] = list(history)  # 快照——ask_model() 接下來會就地 append 同一個 list
+        seen["character"] = character  # /character 選的角色要一路傳到 smart_reply_traced()
         return "· trace", "回覆內容"
 
     monkeypatch.setattr(cli, "smart_reply_traced", fake_smart_reply_traced)
@@ -319,6 +338,7 @@ def test_ask_model_passes_state_history_to_smart_reply_traced(tmp_path, monkeypa
 
     assert seen["history"] == [("之前的問題", "之前的回覆")]
     assert state["history"] == [("之前的問題", "之前的回覆"), ("測試訊息", "回覆內容")]
+    assert seen["character"] == cli.DEFAULT_PERSONA
 
 
 def test_ask_model_creates_and_appends_to_shared_conversation(tmp_path, monkeypatch, capsys):

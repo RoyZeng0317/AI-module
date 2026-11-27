@@ -7,11 +7,8 @@ Run:
 Then open http://localhost:8080/
 """
 
-import json
-import os
-import sys
-import time
-from collections import defaultdict
+import json, os, sys, time
+from collections import defaultdict, deque
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -67,13 +64,14 @@ from fastapi import (
     File,
     HTTPException,
     Request,
+    Response,
     UploadFile,
     WebSocket,
     WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import auto_learn
 import conversation_store as convo_store
@@ -84,6 +82,7 @@ import notify_store
 # 這是使用者明確選擇的行為（比照 CLI）。
 import session_store
 import usage_store
+import region_signals
 from chats import DEFAULT_OUT_DIR, smart_reply_traced
 from detector import detect
 from function import read_as_chat_content
@@ -106,6 +105,7 @@ MOUNT_PREFIX = os.environ.get("MOUNT_PREFIX", "").rstrip("/")
 
 class ChatRequest(BaseModel):
     message: str
+    client_timezone: Optional[str] = Field(default=None, max_length=128)
     # 沒帶 conversation_id 時維持原本無狀態行為（不寫入任何存檔）——只有
     # action.py 側邊欄「對話紀錄」這條新流程才會帶 id 進來，直接呼叫這支
     # API 的舊用法/其他呼叫端不會被逼著配合這個新功能。
@@ -128,7 +128,7 @@ class NotificationCreateRequest(BaseModel):
 
 def _resolve_client_id(request: Request) -> str:
     """用連線 IP 識別呼叫端，聊天/對話紀錄/用量限制共用同一個 key。"""
-    return request.client.host
+    return _client_ip(request)
 
 
 # 單一使用者一段時間內能送出的聊天請求數量上限。key 優先用 Google 帳號識別
@@ -138,6 +138,12 @@ CHAT_RATE_LIMIT = 20
 CHAT_RATE_WINDOW_SEC = 60
 _chat_request_log: dict[str, list[float]] = defaultdict(list)
 
+def _client_ip(request: Request) -> str:
+    """request.client 的型別是 Address | None --不是純粹型別檢查器吹毛求疵,
+    某些 ASGI 情境(例如測試用的 TestClient、某些反向代理設定) 下真的會是
+    None。沒有真實來源位址時退回 "unknow"，讓 rate limit/用量統計照樣用
+    一個固定 key 累加，不會直接丟 AttributeError。"""
+    return request.client.host if request.client is not None else "unknown"
 
 def _check_chat_rate_limit(client_ip: str) -> None:
     now = time.time()
@@ -161,6 +167,26 @@ def _check_chat_rate_limit(client_ip: str) -> None:
 # /memory、/learn、/resume 跟 app/command/*.md 提示詞指令才會真的打
 # /api/chat（見下面 _run_local_command()）。
 # ═══════════════════════════════════════════════════════════════
+
+router = APIRouter(prefix=MOUNT_PREFIX)
+
+@router.post("/api/your-endpoint")
+async def process_img(frame: UploadFile = File(...)):
+    data = await frame.read()
+    img_file = ""   # 根據選選擇的圖片檔案
+    img = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if img is None:
+        return {"Error:": "無法讀取到圖片影像"}
+
+    width = int(img.shape[1] * 0.8)
+    height = int(img.shape[0] * 0.5)
+    resized_img = cv2.resize(img, (width, height))
+    gary_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
+
+    ok, encoded = cv2.imencode(".png", gary_img)
+    if not ok:
+        return {"error": "圖片無法進行解碼"}
+    return Response(content=encoded.tobytes(), media_type="image/png")
 
 _BUILTIN_SLASH_COMMANDS = {
     "help", "clear", "open", "preview", "character", "memory", "model", "resume", "chat", "conversations", "learn",
@@ -211,6 +237,7 @@ def _arg_suggestions(name: str) -> list[str] | None:
 
 
 app = FastAPI(title="AI-module camera object detection")
+app.state.region_assessments = deque(maxlen=200)
 router = APIRouter(prefix=MOUNT_PREFIX)
 
 app.add_middleware(
@@ -336,6 +363,7 @@ async def list_notifications_endpoint():
 async def create_notification_endpoint(payload: NotificationCreateRequest):
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
+
     return notify_store.create_notification(payload.message.strip())
 
 
@@ -491,9 +519,9 @@ def _run_local_command(message: str) -> tuple[str, str] | None:
     return "reply", f"未知指令：/{name}（輸入 /help 查看可用指令）"
 
 
-def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[tuple[str, str]]:
-    """/model nvidia 是唯一會吃多輪歷史的模式（見 chats.smart_reply_traced()
-    的 history 參數說明），history 直接從這個對話已經存下來的訊息現算，不用
+def _build_chat_history(conversation_id: str | None, client_id: str) -> list[tuple[str, str]]:
+    """本地Transformer與明確選用的NVIDIA模式共用此歷史快照，
+    history直接從這個對話已經存下來的訊息現算，不用
     像 CLI 那樣另外在記憶體維護一份 state["history"]——重新整理分頁、換一台
     裝置都還讀得到同一份，且 CLI 那份的建立時機（process 存活期間）在瀏覽器
     分頁這種隨時可能重整的環境下不夠可靠。"""
@@ -503,21 +531,32 @@ def _build_nvidia_history(conversation_id: str | None, client_id: str) -> list[t
     if conv is None:
         return []
     messages = conv["messages"]
-    pairs = [
-        (messages[i]["content"], messages[i + 1]["content"])
-        for i in range(0, len(messages) - 1, 2)
-        if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant"
-    ]
+    pairs, pending = [], None
+    for message in messages:
+        if message["role"] == "user":
+            pending = message["content"]
+        elif message["role"] == "assistant" and pending is not None:
+            pairs.append((pending, message["content"]))
+            pending = None
     return pairs[-RESUME_HISTORY_CAP:]
+
+
+# 保留舊介面供既有呼叫與測試；本地Transformer也使用同一權限隔離的歷史快照。
+_build_nvidia_history = _build_chat_history
 
 
 @router.post("/api/chat")
 async def chat_endpoint(payload: ChatRequest, request: Request):
-    client_id = _resolve_client_id(request)
+    client_id = _client_ip(request)
     _check_chat_rate_limit(client_id)
 
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="message must not be empty")
+
+    # 不採信body國別/IP或X-Forwarded-For；代理來源由ASGI部署設定決定。
+    assessment = region_signals.assess_region(payload.message, payload.client_timezone, client_id)
+    request.state.region_assessment = assessment
+    app.state.region_assessments.append(assessment)
 
     if usage_store.get_usage(client_id) >= usage_store.USAGE_CHAR_LIMIT:
         window_hours = usage_store.USAGE_WINDOW_SEC // 3600
@@ -544,13 +583,15 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
     # 同一個現況，sinco/預設人格才用 chat_runs，其餘角色一律共用同一個目錄。
     out_dir = DEFAULT_OUT_DIR if persona.lower() in ("sinco", "default", "reset") else CHARACTER_CHAT_DIR
 
+    trace = "本機指令處理"
     outcome = _run_local_command(payload.message.strip())
     if outcome is not None and outcome[0] == "reply":
         reply = outcome[1]
     else:
         model_message = outcome[1] if outcome is not None else payload.message
-        history = _build_nvidia_history(conversation_id, client_id) if force_mode == "nvidia" else None
-        _, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history)
+        history = _build_chat_history(conversation_id, client_id) if conversation_id and force_mode in ("auto", "sinco", "nvidia") else None
+        trace, reply = smart_reply_traced(model_message, out_dir=out_dir, force_mode=force_mode, history=history,
+                                      character=None if out_dir == DEFAULT_OUT_DIR else persona)
         # /open、app/command/*.md 提示詞指令這兩種才會真的問模型，比照 CLI
         # 的 ask_model()：只有「真的問過模型」的這一輪才落地到 session.json，
         # /memory、/learn、/resume 這種純本機指令不記錄（跟 CLI 行為一致，
@@ -564,14 +605,14 @@ async def chat_endpoint(payload: ChatRequest, request: Request):
     if conversation_id is not None:
         convo_store.append_message(conversation_id, "assistant", reply)
 
-    return {"reply": reply, "conversation_id": conversation_id}
+    return {"reply": reply, "conversation_id": conversation_id, "trace": trace}
 
 
 @router.get("/api/usage")
 async def usage_endpoint(request: Request):
     """查詢呼叫端目前的用量 vs 上限，用來確認 rate limit／用量上限有沒有生效
     （例如手動測試，或之後接進 admin 端畫面）。"""
-    used = usage_store.get_usage(_resolve_client_id(request))
+    used = usage_store.get_usage(_client_ip(request))
     return {
         "chars_used": used,
         "char_limit": usage_store.USAGE_CHAR_LIMIT,

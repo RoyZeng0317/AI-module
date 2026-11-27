@@ -137,8 +137,8 @@ Write-Step "安裝 shape-vision/requirements.txt（獨立子專案）"
 & $VenvPython -m pip install -r (Join-Path $ProjectRoot "shape-vision\requirements.txt")
 
 # --- 6. 補裝已知環境缺口（見 CLAUDE.md／ErrorLog.md 第 8、10、11 條）---------
-Write-Step "補裝已知環境缺口：pymupdf（tranning/ 的 fitz）、prompt_toolkit（lib/components/cli.py）"
-& $VenvPython -m pip install pymupdf prompt_toolkit
+Write-Step "補裝已知環境缺口：pymupdf（tranning/ 的 fitz）、prompt_toolkit（lib/components/cli.py）、sounddevice/markdown/rich（桌面 GUI）"
+& $VenvPython -m pip install pymupdf prompt_toolkit sounddevice markdown rich
 
 # --- 7. 開發用套件（可選）---------------------------------------------------
 if ($Dev) {

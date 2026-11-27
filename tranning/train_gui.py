@@ -1,7 +1,7 @@
 """Training GUI — pick a task, point at your data, tune hyperparameters, and
 launch/monitor training without memorizing each script's CLI flags.
 
-Wraps road_sign_train.py, OCR.py, circuit_diagram_train.py, speech_to_text.py,
+Wraps road_sign_train.py, OCR.py, yolo_custom.py, circuit_diagram_train.py, speech_to_text.py,
 chats.py, character_model.py, voice_clone.py, kicad_dataset_convert.py,
 code_snippet_import.py, image_classifier_bnn.py and data_split.py. Each "開始訓練"/"匯入" button runs the *exact* command
 line that script's own module docstring documents under "Usage" — as a real
@@ -15,6 +15,12 @@ Only one job runs at a time — a single RTX 4060 8GB can't usefully train two
 models at once anyway (Rule 06), so the whole app shares one subprocess slot,
 one log console, and one Stop button across every tab.
 
+The "總控台" tab shares that same slot for `chats.py --chat` inference test
+runs (temperature is adjustable there instead of only via a hand-typed
+terminal command), and separately polls any checkpoint folder's
+history.json to plot its per-epoch loss curve(s) — no torch import needed
+for that, it just reads the JSON train() already writes every epoch.
+
 Caveat surfaced in the UI itself: killing a running job does NOT save a
 checkpoint. best_model.pt / encoder.pt+decoder.pt are only written once the
 training loop finishes on its own (full epoch count or early stopping) —
@@ -24,6 +30,7 @@ one you want to keep.
 Run: python train_gui.py
 """
 
+import json
 import queue
 import re
 import subprocess
@@ -33,6 +40,9 @@ import tkinter as tk
 from dataclasses import dataclass
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 TRANNING_DIR = Path(__file__).resolve().parent
 PYTHON = sys.executable
@@ -385,6 +395,13 @@ CHAT_FIELDS = [
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
 ]
 
+CHAT_TEST_FIELDS = [
+    Field("out_dir", "Checkpoint 資料夾 (chat_runs 或 code_runs)", "dir", "--out-dir",
+          required=True, default="chat_runs"),
+    Field("temperature", "Temperature (0=貪婪解碼固定答案，越大回覆越隨機發散)", "float",
+          "--temperature", default=0.0),
+]
+
 CHARACTER_FIELDS = [
     Field("train_manifest", "訓練 manifest (JSON)", "file", "--train-manifest",
           required=True, filetypes=JSON_FT),
@@ -461,6 +478,85 @@ CIRCUIT_COMMON_FIELDS = [
 ]
 
 
+PCB_PREP_YOLO_FIELDS = [
+    Field("images", "PCB 圖片資料夾", "dir", "--images", required=True),
+    Field("annotations", "VOC XML 標註資料夾", "dir", "--annotations", required=True),
+    Field("yolo_out", "輸出資料夾（YOLO 格式）", "dir", "--yolo-out", required=True,
+          hint="完成後把 <這個資料夾>/data.yaml 貼到下方「開始訓練」的 data.yaml 欄位。"),
+    Field("val_ratio", "驗證集比例 (val ratio)", "float", "--val-ratio", default=0.2),
+    Field("seed", "隨機種子", "int", "--seed", default=0),
+]
+
+PCB_DEFECT_FIELDS = [
+    Field("data", "data.yaml 路徑（上面步驟一輸出的）", "file", "--data", required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="pcb_defect_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+ROAD_SIGN_YOLO_FIELDS = [
+    Field("data", "data.yaml 路徑（真實標註資料集；目前沒有現成資料集時，"
+          "可先用終端機 --dataset-dir + --classes 模式，見腳本 Usage）", "file", "--data",
+          required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="road_sign_yolo_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+MATERIALS_YOLO_FIELDS = [
+    Field("data", "data.yaml 路徑（真實標註資料集；目前沒有現成資料集時，"
+          "可先用終端機 --dataset-dir 模式，--classes 預設 resistor capacitor）", "file", "--data",
+          required=True, filetypes=YAML_FT),
+    Field("weights", "起始權重（留空 = COCO 版 yolo11n.pt）", "file", "--weights"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="materials_yolo_runs/train"),
+    Field("epochs", "Epochs", "int", "--epochs", default=50),
+    Field("batch", "Batch size", "int", "--batch", default=16),
+    Field("imgsz", "圖片邊長 (imgsz)", "int", "--imgsz", default=640),
+    Field("patience", "Early stopping 耐心值", "int", "--patience", default=15),
+    Field("freeze", "凍結前 N 層 backbone（0 = 全部解凍）", "int", "--freeze", default=10),
+    Field("lr0", "初始學習率 (lr0)", "float", "--lr0", default=1e-3),
+    Field("weight_decay", "Weight decay", "float", "--weight-decay", default=5e-4),
+    Field("device", "裝置（留空 = 自動挑選，'0'=第一張GPU，'cpu'=強制CPU）", "str", "--device"),
+]
+
+
+YOLO_CUSTOM_MAKE_DATA_FIELDS = [
+    Field("make_data", "輸出資料夾（合成資料，測試管線用）", "dir", "--make-data", required=True),
+    Field("n", "每類張數 (n)", "int", "--n", default=200),
+]
+
+YOLO_CUSTOM_TRAIN_FIELDS = [
+    Field("train", "data.yaml 路徑（上面步驟一輸出的，或自己準備的真實資料集）", "file", "--train",
+          required=True, filetypes=YAML_FT),
+    Field("epochs", "Epochs", "int", "--epochs", default=30),
+    Field("hsv_h", "色調增強 (hsv-h)", "float", "--hsv-h", default=0.015),
+    Field("hsv_s", "飽和度增強 (hsv-s)", "float", "--hsv-s", default=0.7),
+    Field("hsv_v", "明度增強 (hsv-v)", "float", "--hsv-v", default=0.4),
+    Field("degrees", "旋轉角度 (degrees)", "float", "--degrees", default=0.0),
+    Field("translate", "平移比例 (translate)", "float", "--translate", default=0.1),
+    Field("scale", "縮放比例 (scale)", "float", "--scale", default=0.5),
+    Field("mosaic", "Mosaic 機率", "float", "--mosaic", default=1.0),
+    Field("fliplr", "水平翻轉機率（物件有方向性時設 0）", "float", "--fliplr", default=0.5),
+    Field("flipud", "垂直翻轉機率", "float", "--flipud", default=0.0),
+    Field("detach", "背景執行（關閉視窗不中斷，進度見「總控台」或終端機 --status）", "bool",
+          "--detach", default=False),
+]
+
+
 IMAGE_SPLIT_FIELDS = [
     Field("source", "來源資料夾（每個子資料夾一個類別）", "dir", "--source", required=True),
     Field("output", "輸出資料夾", "dir", "--output", required=True,
@@ -474,7 +570,7 @@ IMAGE_SPLIT_FIELDS = [
 
 IMAGE_BNN_FIELDS = [
     Field("data_dir", "資料夾（--source/--output 分割後的輸出）", "dir", "--data-dir", required=True),
-    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="image_classifier_runs"),
+    Field("out_dir", "輸出資料夾", "str", "--out-dir", default="image_classifier_feature_runs"),
     Field("epochs", "Epochs", "int", "--epochs", default=30),
     Field("batch_size", "Batch size", "int", "--batch-size", default=32),
     Field("lr", "學習率 (lr)", "float", "--lr", default=3e-4),
@@ -483,8 +579,7 @@ IMAGE_BNN_FIELDS = [
     Field("dropout", "Dropout（貝氏 MC Dropout：推論時同一層繼續發揮作用）", "float",
           "--dropout", default=0.3),
     Field("weight_decay", "Weight decay", "float", "--weight-decay", default=1e-4),
-    Field("unfreeze_backbone", "解凍 backbone（train_acc 一直偏低才勾）", "bool",
-          "--unfreeze-backbone", default=False),
+    Field("grayscale", "灰階輸入（卷積層從零學習特徵）", "bool", "--grayscale", default=True),
     Field("no_hflip", "停用水平翻轉增強（類別有方向性時勾選，例如箭頭/文字）", "bool",
           "--no-hflip", default=False),
 ]
@@ -516,10 +611,15 @@ class TrainGUI:
         notebook = ttk.Notebook(root)
         notebook.pack(side="top", fill="both", expand=True, padx=10, pady=(10, 6))
 
+        self._build_console_tab(notebook)
         self._build_road_sign_tab(notebook)
         self._build_image_bnn_tab(notebook)
         self._build_ocr_tab(notebook)
+        self._build_yolo_custom_tab(notebook)
         self._build_circuit_tab(notebook)
+        self._build_pcb_defect_tab(notebook)
+        self._build_road_sign_yolo_tab(notebook)
+        self._build_materials_yolo_tab(notebook)
         self._build_speech_tab(notebook)
         self._build_chat_tab(notebook)
         self._build_code_tab(notebook)
@@ -530,6 +630,7 @@ class TrainGUI:
         self._build_log_console()
 
         self.root.after(80, self._poll_log)
+        self.root.after(1000, self._refresh_history_plot)
 
     # -- tabs ----------------------------------------------------------
 
@@ -539,6 +640,106 @@ class TrainGUI:
         tk.Label(outer, text=subtitle, bg=PANEL_BG, fg=MUTED_FG, anchor="w",
                   wraplength=820, justify="left").pack(fill="x", padx=10, pady=(10, 4))
         return outer
+
+    def _build_console_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "總控台",
+            "訓練參數/推論參數與結果放同一個地方看，不用再手動打終端機指令。"
+            "上半部監看任一個 checkpoint 資料夾的 history.json，畫出逐 epoch 的 loss 曲線"
+            "（訓練進行中每個 epoch 都會更新，訓練完的舊 checkpoint 打開一樣看得到最終曲線）；"
+            "下半部啟動 chats.py --chat 做推論測試，temperature 調完直接送訊息看效果。",
+        )
+
+        hist_frame = tk.LabelFrame(outer, text=" Loss 曲線（history.json） ", bg=PANEL_BG, fg=FG, bd=1)
+        hist_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        picker = tk.Frame(hist_frame, bg=PANEL_BG)
+        picker.pack(fill="x", padx=10, pady=(6, 4))
+        tk.Label(picker, text="Checkpoint 資料夾：", bg=PANEL_BG, fg=FG).pack(side="left")
+        self.history_dir_var = tk.StringVar(value="chat_runs")
+        tk.Entry(picker, textvariable=self.history_dir_var, bg=FIELD_BG, fg=FG,
+                  insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True, padx=(6, 6))
+        ttk.Button(picker, text="瀏覽…", command=lambda: _browse_dir(self.history_dir_var)).pack(side="left")
+
+        fig = Figure(figsize=(6, 3), dpi=100, facecolor=PANEL_BG)
+        self.history_ax = fig.add_subplot(111, facecolor=FIELD_BG)
+        self.history_canvas = FigureCanvasTkAgg(fig, master=hist_frame)
+        self.history_canvas.get_tk_widget().pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        self._style_history_axes()
+
+        chat_frame = tk.LabelFrame(outer, text=" 推論測試（chats.py --chat，temperature 等） ",
+                                    bg=PANEL_BG, fg=FG, bd=1)
+        chat_frame.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(chat_frame, CHAT_TEST_FIELDS)
+        start_btn = ttk.Button(chat_frame, text="啟動聊天測試", command=self._start_chat_test)
+        start_btn.grid(row=99, column=0, columnspan=3, pady=(4, 6))
+        self.start_buttons.append(start_btn)
+
+        send_row = tk.Frame(chat_frame, bg=PANEL_BG)
+        send_row.grid(row=100, column=0, columnspan=3, sticky="ew", padx=10, pady=(0, 10))
+        send_row.columnconfigure(0, weight=1)
+        self.chat_input_var = tk.StringVar()
+        entry = tk.Entry(send_row, textvariable=self.chat_input_var, bg=FIELD_BG, fg=FG,
+                          insertbackground=FG, relief="flat")
+        entry.grid(row=0, column=0, sticky="ew", padx=(0, 6))
+        entry.bind("<Return>", lambda _e: self._send_chat_message())
+        ttk.Button(send_row, text="傳送", command=self._send_chat_message).grid(row=0, column=1)
+
+    def _style_history_axes(self):
+        self.history_ax.tick_params(colors=FG)
+        self.history_ax.set_xlabel("epoch", color=FG)
+        self.history_ax.set_ylabel("value", color=FG)
+        for spine in self.history_ax.spines.values():
+            spine.set_color(MUTED_FG)
+
+    def _refresh_history_plot(self):
+        dir_str = self.history_dir_var.get().strip() if hasattr(self, "history_dir_var") else ""
+        if dir_str:
+            hist_dir = Path(dir_str)
+            if not hist_dir.is_absolute():
+                hist_dir = TRANNING_DIR / hist_dir
+            hist_path = hist_dir / "history.json"
+            if hist_path.exists():
+                try:
+                    history = json.loads(hist_path.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    history = None
+                if history:
+                    self._plot_history(history)
+        self.root.after(1000, self._refresh_history_plot)
+
+    def _plot_history(self, history: list[dict]):
+        """畫出 history.json 裡除了 epoch 以外的每個數值欄位（loss / train_loss /
+        val_loss / train_acc / val_acc……各腳本欄位名稱不同，通用畫全部）。"""
+        epochs = [h.get("epoch") for h in history]
+        keys = [k for k in history[0] if k != "epoch"]
+        self.history_ax.clear()
+        for k in keys:
+            ys = [h.get(k) for h in history]
+            if all(isinstance(y, (int, float)) for y in ys):
+                self.history_ax.plot(epochs, ys, label=k)
+        self._style_history_axes()
+        if keys:
+            self.history_ax.legend(loc="upper right", fontsize=8)
+        self.history_canvas.draw_idle()
+
+    def _start_chat_test(self):
+        values = collect_values(CHAT_TEST_FIELDS)
+        if values is None:
+            return
+        self._launch("聊天測試", ["chats.py", "--chat"] + build_argv(CHAT_TEST_FIELDS, values))
+
+    def _send_chat_message(self):
+        text = self.chat_input_var.get().strip()
+        if not text:
+            return
+        if self.proc is None or self.proc.poll() is not None or self.proc.stdin is None:
+            messagebox.showwarning("尚未啟動", "請先按「啟動聊天測試」")
+            return
+        self._append_log(f"You: {text}\n")
+        self.proc.stdin.write(text + "\n")
+        self.proc.stdin.flush()
+        self.chat_input_var.set("")
 
     def _build_road_sign_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
@@ -581,7 +782,7 @@ class TrainGUI:
     def _build_image_bnn_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "圖像分類（貝氏）",
-            "貝氏（MC Dropout）MobileNetV2 遷移學習分類器 (image_classifier_bnn.py)，"
+            "貝氏（MC Dropout）自建 CNN 特徵學習分類器 (image_classifier_bnn.py)，"
             "適用任何「一個子資料夾一個類別」的通用圖像分類任務（不限路牌，路牌請仍用"
             "「路牌辨識」分頁）。原始圖片先用「步驟一」依類別子資料夾分割成 train/val/test，"
             "再用「步驟二」指到分割後的輸出資料夾進行訓練。訓練用的 Dropout 層在推論時會"
@@ -835,6 +1036,34 @@ class TrainGUI:
         btn.pack(pady=10)
         self.start_buttons.append(btn)
 
+    def _build_yolo_custom_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "YOLO 通用偵測",
+            "通用 YOLO 遷移學習偵測器 (yolo_custom.py)，拿不到真實標註資料集時可以先用"
+            "「步驟一」產生圓/方/三角合成資料跑通整條管線（不代表真實準確度）；有真實 YOLO 格式"
+            "資料集（images/labels 各 train/val + data.yaml）時可以跳過步驟一，直接用「步驟二」訓練。",
+        )
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：產生合成資料（選用，測試管線用） ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(step1, YOLO_CUSTOM_MAKE_DATA_FIELDS)
+        make_data_btn = ttk.Button(
+            step1, text="產生合成資料",
+            command=lambda: self._start("YOLO 合成資料", "yolo_custom.py", YOLO_CUSTOM_MAKE_DATA_FIELDS),
+        )
+        make_data_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(make_data_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (yolo_custom.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step2, YOLO_CUSTOM_TRAIN_FIELDS)
+        btn = ttk.Button(step2, text="開始訓練",
+                          command=lambda: self._start("YOLO 通用偵測訓練", "yolo_custom.py", YOLO_CUSTOM_TRAIN_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
     def _build_circuit_tab(self, notebook: ttk.Notebook):
         outer = self._new_tab(
             notebook, "電路圖偵測",
@@ -984,6 +1213,68 @@ class TrainGUI:
 
         self._launch("電路圖偵測訓練", ["circuit_diagram_train.py"] + argv)
 
+    def _build_pcb_defect_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "PCB 缺陷偵測",
+            "本機 YOLO 遷移學習偵測器 (pcb_defect_train.py)，直接在完整 PCB 照片上框出缺陷"
+            "（missing_hole/mouse_bite/open_circuit/short/spur/spurious_copper），跟原本"
+            "「圖像分類（貝氏）」分頁的裁圖分類路徑並存、互不影響。VOC XML 標註資料集（如"
+            "PKU-Market-PCB）先用「步驟一」轉成 YOLO 格式，再用「步驟二」訓練。",
+        )
+
+        step1 = tk.LabelFrame(outer, text=" 步驟一：VOC 標註轉 YOLO 格式 (pcb_dataset_prep.py --yolo-out) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step1.pack(fill="x", padx=10, pady=(0, 10))
+        build_form(step1, PCB_PREP_YOLO_FIELDS)
+        prep_btn = ttk.Button(
+            step1, text="轉換成 YOLO 格式",
+            command=lambda: self._start("PCB 標註轉換", "pcb_dataset_prep.py", PCB_PREP_YOLO_FIELDS),
+        )
+        prep_btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(prep_btn)
+
+        step2 = tk.LabelFrame(outer, text=" 步驟二：訓練模型 (pcb_defect_train.py) ",
+                               bg=PANEL_BG, fg=FG, bd=1)
+        step2.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(step2, PCB_DEFECT_FIELDS)
+        btn = ttk.Button(step2, text="開始訓練",
+                          command=lambda: self._start("PCB 缺陷偵測訓練", "pcb_defect_train.py", PCB_DEFECT_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
+    def _build_road_sign_yolo_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "路牌偵測 (YOLO)",
+            "本機 YOLO 遷移學習偵測器 (road_sign_yolo_train.py)，在一張可能有多個路牌、位置"
+            "未知的畫面上直接框出每個路牌，跟原本「路牌辨識」分頁（假設一張照片已裁好、只有"
+            "一個路牌）並存、互不影響。目前沒有任何標好框的真實路牌資料集，這裡只能先用已經"
+            "準備好的 data.yaml 測試；要自己指定資料夾＋類別清單，請改用終端機（見腳本 Usage）。",
+        )
+        frame = tk.LabelFrame(outer, text=" 訓練模型 (road_sign_yolo_train.py) ", bg=PANEL_BG, fg=FG, bd=1)
+        frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(frame, ROAD_SIGN_YOLO_FIELDS)
+        btn = ttk.Button(frame, text="開始訓練",
+                          command=lambda: self._start("路牌偵測訓練", "road_sign_yolo_train.py", ROAD_SIGN_YOLO_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
+    def _build_materials_yolo_tab(self, notebook: ttk.Notebook):
+        outer = self._new_tab(
+            notebook, "電阻/電容定位 (YOLO)",
+            "本機 YOLO 遷移學習偵測器 (materials_yolo_train.py)，自動找出畫面裡電阻/電容的"
+            "位置，取代 materials_recongizion/main.py 原本手動 cv2.selectROI 框選那一步"
+            "（偵測到的框會接 materials_recongizion/detect_and_read.py，呼叫既有的色碼/數字"
+            "代碼判讀，判讀邏輯完全沒變）。目前沒有任何標好框的真實資料集，這裡只能先用已經"
+            "準備好的 data.yaml 測試；要自己指定資料夾，請改用終端機（見腳本 Usage）。",
+        )
+        frame = tk.LabelFrame(outer, text=" 訓練模型 (materials_yolo_train.py) ", bg=PANEL_BG, fg=FG, bd=1)
+        frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        build_form(frame, MATERIALS_YOLO_FIELDS)
+        btn = ttk.Button(frame, text="開始訓練",
+                          command=lambda: self._start("電阻/電容定位訓練", "materials_yolo_train.py", MATERIALS_YOLO_FIELDS))
+        btn.grid(row=99, column=0, columnspan=3, pady=(4, 10))
+        self.start_buttons.append(btn)
+
     # -- shared start/stop/log -----------------------------------------
 
     def _start(self, task_label: str, script: str, fields: list[Field]):
@@ -1020,7 +1311,8 @@ class TrainGUI:
         self._set_running_ui(True)
 
         self.proc = subprocess.Popen(
-            command, cwd=str(TRANNING_DIR), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            command, cwd=str(TRANNING_DIR), stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, bufsize=1, encoding="utf-8", errors="replace",
         )
         threading.Thread(target=self._reader, args=(self.proc,), daemon=True).start()
@@ -1076,7 +1368,7 @@ class TrainGUI:
         self.status_var = tk.StringVar(value="閒置")
         tk.Label(bar, textvariable=self.status_var, bg=BG, fg=FG, anchor="w").pack(side="left")
 
-        self.stop_btn = tk.Button(bar, text="停止訓練", bg=STOP_RED, fg="white", relief="flat",
+        self.stop_btn = tk.Button(bar, text="停止工作", bg=STOP_RED, fg="white", relief="flat",
                                     state="disabled", command=self.stop_training)
         self.stop_btn.pack(side="right", padx=(6, 0))
         ttk.Button(bar, text="清除紀錄", command=self._clear_log).pack(side="right")

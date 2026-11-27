@@ -63,6 +63,16 @@ something a human eyeballing hundreds of nets would actually miss:
     *different* label/global_label/power-symbol names (e.g. GND wired
     directly to +5V by mistake) -- KiCad will happily let you draw this
     wire; it never asks "did you mean to short these".
+  - missing_decoupling_cap / missing_reset_pullup / missing_crystal_load_caps
+    (added for MCU-style ICs, e.g. circuit_ic_generator.py's atmega328p
+    output): a pin named like "VCC"/"AVCC" with no capacitor to a ground
+    net, a pin named like "RESET"/"RST" with no pull-up resistor to a power
+    net, or a pin named like "XTAL1"/"XTAL2" with no load capacitor to a
+    ground net. Matched purely by conventional pin NAME text (see the
+    *_RE constants near the top of this file), so these fire on any real
+    part using standard KiCad pin naming, not only on generator output.
+    Warnings, not errors -- these are design-quality heuristics, not
+    guaranteed-wrong wiring the way floating_pin/no_connect_conflict are.
 
 Usage:
     python circuit_rule_check.py path/to/one.kicad_sch
@@ -90,6 +100,7 @@ as kicad_dataset_convert.py's docstring):
 import argparse
 import json
 import math
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -97,6 +108,15 @@ from pathlib import Path
 from kicad_dataset_convert import find_all, find_child, parse_sexpr
 
 GND_NAME_HINTS = ("GND", "GNDREF", "VSS", "AGND", "DGND")
+
+# MCU-aware pin-name heuristics (checks below), matched against a pin's own
+# (name ...) text -- e.g. "VCC", "AVCC", "PC6/RESET", "PB6/XTAL1" -- so they
+# apply to ANY part using these conventional KiCad pin names, not just the
+# parts ic_library.py/circuit_ic_generator.py happens to know about.
+POWER_PIN_NAME_RE = re.compile(r'^A?V(CC|DD)\d*$', re.IGNORECASE)
+RESET_PIN_NAME_RE = re.compile(r'RESET|RST', re.IGNORECASE)
+XTAL_PIN_NAME_RE = re.compile(r'XTAL', re.IGNORECASE)
+POWER_NET_NAME_RE = re.compile(r'^\+?\d*\.?\d*V\d*$|^A?V(CC|DD)\d*$', re.IGNORECASE)
 
 
 # ---------------------------------------------------------------------------
@@ -136,7 +156,9 @@ def _parse_pin_node(node) -> dict:
     x, y = (float(at[1]), float(at[2])) if at else (0.0, 0.0)
     number_node = find_child(node, "number")
     number = number_node[1] if number_node else "?"
-    return {"number": number, "electrical_type": electrical_type, "x": x, "y": y}
+    name_node = find_child(node, "name")
+    name = name_node[1] if name_node else "?"
+    return {"number": number, "electrical_type": electrical_type, "x": x, "y": y, "name": name}
 
 
 def _walk_pins(node, units: dict, current_unit: int) -> None:
@@ -290,6 +312,35 @@ class CircuitFinding(dict):
         super().__init__(rule=rule, severity=severity, message=message, point=point)
 
 
+def _two_pin_net_edges(instances: list, pin_table: dict, uf: "UnionFind", lib_prefix: str) -> list:
+    """(net_root_a, net_root_b) for every placed 2-pin part whose lib_id
+    starts with lib_prefix -- lets the MCU-aware checks below ask "is there
+    a capacitor/resistor bridging this net to that one"."""
+    edges = []
+    for inst in instances:
+        if not inst["lib_id"].startswith(lib_prefix):
+            continue
+        pins = pins_for_instance(pin_table, inst["lib_id"], inst["unit"])
+        if len(pins) != 2:
+            continue
+        points = [transform_point(p["x"], p["y"], inst["mirror"], inst["angle"], inst["x"], inst["y"])
+                  for p in pins]
+        edges.append((uf.find(points[0]), uf.find(points[1])))
+    return edges
+
+
+def _is_ground_net(root, net_labels: dict) -> bool:
+    return any(name.upper().startswith(hint) for hint in GND_NAME_HINTS for name in net_labels.get(root, ()))
+
+
+def _is_power_net(root, net_labels: dict) -> bool:
+    return any(POWER_NET_NAME_RE.match(name) for name in net_labels.get(root, ()))
+
+
+def _net_bridged_to(root, edges: list, predicate) -> bool:
+    return any((a == root and predicate(b)) or (b == root and predicate(a)) for a, b in edges)
+
+
 def check_schematic(sch_path: Path) -> list:
     root = parse_sexpr(sch_path.read_text(encoding="utf-8"))
     pin_table = get_lib_pin_table(root)
@@ -376,6 +427,48 @@ def check_schematic(sch_path: Path) -> list:
                 f'net touches {len(names)} different names that are electrically '
                 f'joined: {", ".join(sorted(names))} -- likely an unintended short',
                 root_point))
+
+    # missing_decoupling_cap / missing_reset_pullup / missing_crystal_load_caps
+    # (MCU-aware, driven by conventional pin NAMES -- see the *_RE constants
+    # above -- so these fire on any IC using standard KiCad pin naming, not
+    # only on circuit_ic_generator.py's own output)
+    cap_edges = _two_pin_net_edges(instances, pin_table, uf, "Device:C")
+    res_edges = _two_pin_net_edges(instances, pin_table, uf, "Device:R")
+    flagged_decouple, flagged_reset, flagged_xtal = set(), set(), set()
+
+    for inst in instances:
+        if is_power(inst["lib_id"]):
+            continue
+        for pin in pins_for_instance(pin_table, inst["lib_id"], inst["unit"]):
+            point = transform_point(pin["x"], pin["y"], inst["mirror"], inst["angle"], inst["x"], inst["y"])
+            net_root = uf.find(point)
+            name = pin.get("name", "?")
+            label = f'{inst["reference"] or inst["lib_id"]} pin {pin["number"]} ({name})'
+
+            if (pin["electrical_type"] == "power_in" and POWER_PIN_NAME_RE.match(name)
+                    and net_root not in flagged_decouple):
+                flagged_decouple.add(net_root)
+                if not _net_bridged_to(net_root, cap_edges, lambda r: _is_ground_net(r, net_labels)):
+                    findings.append(CircuitFinding(
+                        "missing_decoupling_cap", "warning",
+                        f'{label} has no capacitor to a ground net on its net -- '
+                        f'add a decoupling capacitor', point))
+
+            if RESET_PIN_NAME_RE.search(name) and net_root not in flagged_reset:
+                flagged_reset.add(net_root)
+                if not _net_bridged_to(net_root, res_edges, lambda r: _is_power_net(r, net_labels)):
+                    findings.append(CircuitFinding(
+                        "missing_reset_pullup", "warning",
+                        f'{label} has no pull-up resistor to a power net on its net -- '
+                        f'add a reset pull-up resistor', point))
+
+            if XTAL_PIN_NAME_RE.search(name) and net_root not in flagged_xtal:
+                flagged_xtal.add(net_root)
+                if not _net_bridged_to(net_root, cap_edges, lambda r: _is_ground_net(r, net_labels)):
+                    findings.append(CircuitFinding(
+                        "missing_crystal_load_caps", "warning",
+                        f'{label} has no load capacitor to a ground net on its net -- '
+                        f'add a crystal load capacitor', point))
 
     # missing_ground (schematic-level, only meaningful if the sheet has power pins at all)
     has_power_pin = any(

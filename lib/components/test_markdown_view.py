@@ -78,3 +78,16 @@ def test_table_cells_land_in_md_table_tag(widget):
 def test_plain_text_without_markdown_still_renders_unchanged(widget):
     insert_markdown(widget, "普通句子，沒有語法。")
     assert _rendered(widget).strip() == "普通句子，沒有語法。"
+
+
+def test_chinese_link_label_hides_percent_encoded_target(widget):
+    insert_markdown(widget, "[https://zh.wikipedia.org/wiki/周柯宇](<https://zh.wikipedia.org/wiki/%E5%91%A8%E6%9F%AF%E5%AE%87>)")
+    rendered = _rendered(widget)
+    assert "wiki/周柯宇" in rendered and "%E5" not in rendered
+    tags = [tag for tag in widget.tag_names() if tag.startswith("md_link_")]
+    assert len(tags) == 1 and widget.tag_bind(tags[0], "<Button-1>", None)
+
+
+def test_image_attachment_label_does_not_show_raw_markdown(widget):
+    insert_markdown(widget, "![搜尋候選（未確認）](<C:/project/output/image-search/image.png>)")
+    assert _rendered(widget).strip() == "搜尋候選（未確認）"

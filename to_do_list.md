@@ -290,4 +290,137 @@
 
 39. [x] 延續 #38，DNN/偵測接進 sinco——2026-09-21：你選桌面 GUI + CLI + 網頁全接、新指令 `/see <圖片路徑>`、沿用現有 YOLO `detect()`（不用 MobileNetSSD，符合 Rule 06）、直接輸出 `format_report()` 固定格式文字（不讓 17M 模型生成，避免編造）。新增 `lib/components/see_image.py`（共用核心）＋ `command.py`（GUI，背景執行緒）／`cli.py`／`web/backend/app.py` 的 `_run_local_command()` 三處入口＋`test_see_image.py`、`test_app.py` 新測試。實測 koala.jpg 回報「bird 38%」。**限制**：(a) 只跑偵測、不呼叫自訂分類器（`image_classifier_runs/` 目前是 #35 的合成色塊測試 checkpoint，分類真實照片會誤導）；(b) YOLO 只認 COCO 80 類，沒有無尾熊所以判成 bird；(c) `/see` 的路徑引數目前沒有 Tab 路徑補全（GUI 可用 `@` 附檔）；(d) GUI 的 `/see` 尚未實機開視窗點過。
 
-40. [] 延續 #39，PCB 自訂分類準備——2026-09-21：你選 PCB 方向、公開資料集（你自行下載）、只做資料準備＋啟用 /see 分類（不訓練）、保留舊合成色塊資料。新增 `tranning/pcb_dataset_prep.py`（VOC XML 標註→裁切成類別資料夾，`test_pcb_dataset_prep.py`）；`see_image.py` 改為 `tranning/pcb_classifier_runs/best_model.pt` 存在才呼叫 `classify_image()`，不讀舊的 `image_classifier_runs/`。流程：下載資料集（如 PKU-Market-PCB）→ `pcb_dataset_prep.py` → `data_split.py` → `image_classifier_bnn.py --out-dir tranning/pcb_classifier_runs`（訓練需你確認後才跑）。**尚未做**：實際下載/裁切/訓練；分類器只會在 PCB 缺陷類別中選，餵非 PCB 照片也會硬分一類（信心度低時 format_report 會附警告）；YOLO 偵測器微調未做。
+40. [] 延續 #39，PCB 自訂分類準備——2026-09-21：你選 PCB 方向、公開資料集（你自行下載）、只做資料準備＋啟用 /see 分類（不訓練）、保留舊合成色塊資料。新增 `tranning/pcb_dataset_prep.py`（VOC XML 標註→裁切成類別資料夾，`test_pcb_dataset_prep.py`）；`see_image.py` 改為 `tranning/pcb_classifier_runs/best_model.pt` 存在才呼叫 `classify_image()`，不讀舊的 `image_classifier_runs/`。流程：下載資料集（如 PKU-Market-PCB）→ `pcb_dataset_prep.py` → `data_split.py` → `image_classifier_bnn.py --out-dir tranning/pcb_classifier_runs`（訓練需你確認後才跑）。**尚未做**：實際下載/裁切/訓練；分類器只會在 PCB 缺陷類別中選，餵非 PCB 照片也會硬分一類（信心度低時 format_report 會附警告）；YOLO 偵測器微調未做。**2026-09-22 追加**：你把真實資料集放進 `data/pcb/archive/`（`DeepPCB/` 1200+150+150 張、`PKU-Market-PCB(Data enhanced version)/` 2773+366+366 張，都是 6 類瑕疵），但 label 格式是 `x1 y1 x2 y2 class_id`（像素座標、class 放最後），既不是這裡 `pcb_dataset_prep.py` 要的 VOC XML，也不是 `circuit_diagram_train.py` 要的 Ultralytics YOLO 正規化格式，需要另外寫轉換；你確認先完成 #41（atmega328p 電路設計）再回頭處理這個。
+
+41. [x] 電路設計補強：支援 atmega328p 這類 IC（生成端＋ERC 檢查端＋渲染端＋偵測端全都要）——2026-09-22：先用 `AskUserQuestion` 問清楚要哪些能力，你選四個全要；資料來源你選「沒有真實 .kicad_sch，用公開接腳定義硬編碼」。鑑於 `schmitt_trigger_train.py` 神經網路生成電路 5 次都沒成功（ErrorLog #23），這次刻意選跟 `circuit_rule_check.py`／`calculus_generator.py` 同一類「決定性演算法，不是類神經網路」的做法，不重蹈覆轍。新增 `tranning/ic_library.py`：atmega328p DIP-28 接腳表（公開 datasheet 硬編碼：VCC/AVCC/GND/RESET/XTAL1-2/AREF/GPIO 全 28 腳功能分類）＋ `dip_pin_layout()` 通用 DIP 腳位幾何（之後要加其他 DIP 晶片只要給腳位表，不用重寫排版邏輯）。新增 `tranning/circuit_ic_generator.py`：`build_minimal_system()` 產生 atmega328p 最小系統（reset 上拉電阻、VCC/AVCC/AREF 去耦電容、石英振盪器+兩顆負載電容、GND 直接接地、GPIO 腳位標 `no_connect`），輸出是**真的**能被本專案既有工具解析的 `.kicad_sch`——`_attach_two_pin()` 重用 `circuit_rule_check.transform_point()` 同一套旋轉平移數學把配件精準對齊到 IC 腳位座標，石英振盪器腳距（5.08mm）跟 IC 相鄰腳距（2.54mm）對不上，改用明確 wire 而非強迫共點。`circuit_rule_check.py`（ERC 端）新增 `missing_decoupling_cap`／`missing_reset_pullup`／`missing_crystal_load_caps` 三個新規則，純靠腳位 `name` 文字（VCC/AVCC、RESET/RST、XTAL）比對，所以**任何**用標準 KiCad 命名習慣的真實 IC 都能檢查，不是只認自己生成的電路；`_parse_pin_node` 順便補上原本沒抓的 `name` 欄位。`circuit_kicad_to_schemdraw.py`（渲染端）沒動——因為產生器直接寫出精確的真實腳位座標，既有的 `_draw_ic()` 通用 >2 腳畫法直接就能正確畫出兩側接腳的 DIP 外觀，不用另外加特化邏輯。`circuit_diagram_train.py`（偵測端）只補文件：誠實說明沒有真實照片資料集，認不出「atmega328p 這顆晶片」，只能加一個 `ic_dip28`（封裝形狀，不是型號）當 YOLO 類別候選。新增 `test_ic_library.py`（5 項，DIP 腳位幾何+atmega328p 接腳表校對）、`test_circuit_ic_generator.py`（6 項，含「拔掉所有去耦電容後檢查器真的會抓到」的陰性對照）、擴充 `test_circuit_rule_check.py`（6 項新測試，各規則的 flagged/clear 兩種情境）。除錯過程抓到 3 個問題並修正：① 測試 fixture 的 `_LIB_MCU_EXTRAS` 漏了 `power:GND` 定義，導致誤判 floating；② 用 regex 硬切巢狀括號字串來移除「所有去耦電容」不可靠（非貪婪比對會在內層括號提前收尾），改成手寫的括號深度計數器；③ 產生器一開始沒幫 GPIO 腳位標 `no_connect`，被 `floating_pin` 誤判——這其實是真實電路的合理狀態（GPIO 本來就留給使用者自己接），照 KiCad 慣例補上 `no_connect` 標記解決，不是關掉檢查。`pytest tranning/` 596 項全過（原本 509+ 沒有被連帶弄壞）。實測 CLI 端到端：`python circuit_ic_generator.py --ic atmega328p --out ... --check --render ...` 產生的電路圖零 ERC 發現、SVG 成功渲染（IC 方框＋兩側接腳、電容、電阻、石英振盪器、電源符號全部到位），範例輸出在 `output/atmega328p_minimal.kicad_sch`／`.svg`。**老實列出限制**：(a) 只有 atmega328p 一顆 IC，接腳表沒對照過真實 KiCad 官方庫（因為手上沒有），只是照 datasheet 抄的，理論上腳位/名稱正確但沒有實機比對過；(b) 只做「最小系統」（電源+振盪+reset），不含 ISP 燒錄頭、不含使用者的實際應用電路；(c) 偵測端（YOLO 認出實體 atmega328p 晶片）完全沒做，只是文件註記，需要真實照片資料集才能真的訓練；(d) 新 ERC 規則是 warning 不是 error，純粹是設計品質提示，不代表電路一定有問題。
+
+42. [] 加強訓練 sinco 一般聊天模型（transformer_chat.py，預設對話路徑）——2026-09-22：先用 `AskUserQuestion` 問清楚範圍，你選：(a) 目標模型＝一般聊天（不是程式碼/多輪對話/角色扮演）；(b) 加強方式＝修已知問題＋餵新資料＋順便加訓練量三個都要；(c) 資料範圍＝只加 `pairs_negation_contrast_draft.json`（12 筆）＋我新寫的英文語料，不含 `pairs_emotion_draft.json`（392 筆，跟這次要修的 bug 無直接關係，範圍另議）；(d) 訓練前先補中途 checkpoint 安全網；(e) 順便調高 dropout/weight_decay 對抗過擬合傾向，不是單純加 epochs。**已完成的部分**：① `transformer_chat.py` 的 `_run_epochs()` 新增 `checkpoint_every`/`save_checkpoint` 參數（預設 0＝關閉，向後相容），`pretrain()`/`finetune()` 都接上，每隔 N epoch 把當下權重用跟最終輸出**完全相同**的 tokenizer/config/model.pt/history.json 格式存到 `<out_dir>/checkpoint/`——中斷後不用另外寫「續跑」邏輯，直接把新的 `finetune()` 呼叫的 `--pretrain-dir` 指向那個 checkpoint 資料夾繼續訓練剩餘 epoch 數即可，重用既有的載入邏輯；CLI 新增 `--checkpoint-every`。新增 2 項測試（`test_finetune_checkpoint_every_writes_resumable_mid_run_checkpoint`：驗證中途檔案存在且真的能拿來當 `pretrain_dir` 續跑、`test_pretrain_checkpoint_every_zero_writes_no_checkpoint_dir`：預設關閉時不會多產生資料夾）。② 寫了 `data/pairs_english_smalltalk_draft.json`（30 筆基本英文閒聊/簡短應答，直接對應 ErrorLog #30「what are you doing now」、#33「ok, got it.」這兩個失敗案例；既有 609 筆裡的英文只有 31 筆，且 21 筆是進階字彙教學，完全沒有這類隨口應答句型），先給你看過內容你確認可以併，再跟 `pairs_negation_contrast_draft.json`（否定句對比，6 組共 12 筆，直接對應 37.5% 否定句誤判的已知問題）一起合併進 `data/pairs.json`：609→651 筆，零重複。③ 已用 `Start-Process -WindowStyle Hidden`（PowerShell，真正背景執行、跟這個對話/VSCode 分離，符合你「要求能夠在背景上執行」的追加要求）啟動 `finetune --data data/pairs.json --pretrain-dir gpt_pretrain_runs --out-dir gpt_chat_runs_v2 --epochs 60 --dropout 0.2 --weight-decay 0.05 --checkpoint-every 5 --patience 10`——**刻意輸出到新資料夾 `gpt_chat_runs_v2`，不覆蓋目前產線在用的 `gpt_chat_runs`**，等訓練完你可以比較兩者效果再決定要不要切換（GRU 版跟這個一樣有一套「先跑新的不動舊的」慣例）。dropout 0.1→0.2、weight_decay 0.01→0.05 是針對已確認的過擬合診斷（上次 finetune 41 epoch 後 train_loss=0.247、val_loss=2.156，落差很大）刻意加大正則化，不是單純延長訓練時間。`pytest tranning/` 597 項全過（含新增的 2 項 checkpoint 測試；1 項 `test_voice_clone.py` 既有失敗跟這次改動無關，音訊 padding 錯誤）。**尚未完成**：訓練本身還在跑，還沒看到結果；訓練完成後要（a）比較 `gpt_chat_runs_v2` 對「what are you doing now」「ok, got it.」「我不開心」這幾句實測回覆是否真的改善，(b) 你確認滿意後才把 `smart_reply_traced()`／`chats.py` 預設指向的 checkpoint 從 `gpt_chat_runs` 切到 `gpt_chat_runs_v2`（目前還沒切，現有產線行為不受影響）。`pairs_emotion_draft.json`（392 筆）維持草稿狀態，這次沒動。
+
+43. [] 加強 NLP 能力三個面向（斷詞品質／embedding 語意品質／模型架構+資料量）——2026-09-28：你要求三個面向都加強，先用 `AskUserQuestion` 問清楚四個決定，你選：(a) 資料量來源＝**先從既有 corpus 擴增 pairs**（不是先要新資料）；(b) 過擬合處理順序＝**先解決資料量，之後再考慮擴大架構**；(c) 執行方式＝**先列待辦清單給你確認**，不直接開做；(d) 訓練授權＝**每次要跑訓練前都先問**，不整批預先授權。
+
+    **先診斷現況再排順序**：`tranning/gpt_chat_runs_v2/history.json`（#42 正在跑、尚未完成的 finetune）epoch 15-17 train_loss 1.21→1.11、val_loss 卻打平在 3.97~3.98，是過擬合訊號——finetune 用的 `data/pairs.json` 目前 651 筆，是模型容量（8 層／384 維／1746 萬參數）的真正瓶頸，不是斷詞或 embedding 本身做得不好。所以順序訂為：**資料量 → 斷詞 → embedding → 架構**（架構是否要動，看前三步跑完的結果再決定，不是這次必做項目）。
+
+    拆分成以下小任務，依序執行、每步驟完成後回報，任何要跑訓練的步驟另外個別詢問是否啟動（不預先整批授權）：
+    - [x] 43-1 資料量：合併 `data/pairs_emotion_draft.json`（392 筆情緒陪伴草稿）進 `data/pairs.json`——2026-09-28：程式化檢查（去重、`tools.py route_reply()` 逐筆過濾避免誤觸發）後發現**草稿其實大半已經用過**：392 筆裡有 301 筆跟 `pairs.json` 既有內容一字不差（git log 顯示這份草稿與 `pairs.json` 曾在同一個 commit 一起被動過，只是沒記錄進這份清單），代表「資料量最大化」這條路能從這份草稿榨出的新資料遠比 392 筆少。實際新增 91 筆（651→**742**），全部無重複 prompt、皆通過 `route_reply()` 路由檢查未被誤攔截。**過程中意外抓到一個既有現況**：91 筆裡有 55 筆 reply 超過 `chats.py` 的 `MAX_LEN=39` 字上限（比照 #13 訂下的規則），但查了一下**現有 687 筆裡本來就已經有 186 筆（27%）超過這個上限**——`encode()` 遇到超長文字是靜默截斷不報錯，這批早就在檔案裡被悄悄砍尾巴訓練多時，不是這次造成的新問題。既然這條規則本來就沒被嚴格遵守，用 `AskUserQuestion` 問你要不要為了這 55 筆特別處理，你選**原文直接併入**（保留完整語意比硬剪更重要，受影響的只有 `chats.py` GRU 路徑，`transformer_chat.py` block_size=512 token 完全夠用），已一併合併，不額外裁剪。
+    - [ ] 43-1b（後續議題，非這次範圍）：`data/pairs.json` 現有 742 筆裡有 186 筆 reply 超過 `chats.py` 的 `MAX_LEN=39` 字上限，訓練時被靜默截斷尾巴——要不要之後統一處理（例如提高 `chats.py` 的 `--max-len` 預設值重新訓練，或逐筆檢視是否要裁短），2026-09-28 你選先列入待辦、這次不處理。
+    - [x] 43-2 資料量：評估 `data/pairs_context_draft.json`（10 筆多輪對話草稿）這次要不要一起處理——2026-09-28：查證後**決定這次不處理，維持獨立議題**。這份草稿的 schema（`{"context":{"prompt","reply"}, "prompt","reply"}`）跟一般 pairs 不同，用途是讓 `chats.py`/`transformer_chat.py` 能接續上一輪對話，但確認過 `chats.py`／`transformer_chat.py` 目前**完全沒有任何讀取 `context` 欄位的程式碼**（`grep context` 只查到既有 Luong attention 的 context vector，是同名but不同概念）——代表這份草稿要真的有用，得先改 encode/dataset/`smart_reply_traced()` 讓模型吃得下多輪輸入，不是單純把 10 筆資料併進 `pairs.json` 就能生效（併了也只會被當成普通單輪 pair 訓練，`context` 欄位會被忽略，等於做白工）。這屬於 [[project_multiturn_context_feature]] 既有規劃的「架構+資料+重訓」三件套，性質上更接近#43-6的「架構」而非單純「資料量」，範圍也遠大於 43-1/43-3 這種資料層級的小任務，維持獨立議題，不併入這次的斷詞/embedding/資料量/架構加強計畫。
+    - [x] 43-3 資料量：盤點能否從既有 `corpus_zh_starter.txt`／`corpus_code_fullstack.txt` 用決定性規則額外挖出更多 QA 配對——2026-09-28：**評估後決定不做**。(a) `corpus_zh_starter.txt` 是 440 個標題的維基百科文章直接用 `"\n\n"` 串接（`build_corpus.py` 沒有保留標題邊界，`\n\n` 同時也是同一篇文章內部段落的分隔符，無法可靠切回「這段文字屬於哪個標題」），要挖 QA 配對得整個重新設計儲存格式；更關鍵的是，`tools.py` 的 `_KNOWLEDGE_QUESTION_PATTERNS`（`^什麼是X$`／`^你會/懂/了解X嗎$`）本來就會攔截這類提問去查**即時** Wikipedia（`_lookup()`），這是專案刻意的設計（見 `tools.py` docstring：查即時資料比記憶固定答案可靠，避免記憶過時/編造）——把維基內容做成記憶式訓練配對，等於是在對抗自己已經做好、更可靠的既有機制，沒有實際價值。(b) `corpus_code_fullstack.txt` 是直接爬來的原始碼檔案串接（只有檔名註解當分隔），沒有「指令→程式碼」的天然配對，要湊配對只能用檔名/資料夾名硬猜使用者意圖（例如「Calculator/BMI-Calculator/script.js」猜成「寫一個BMI計算器」），品質不穩定，而且這屬於獨立的 `code_runs` checkpoint／`data/code_pairs.json`，不在這次「一般聊天模型」的範圍內（延續 #42 的範圍界定）。兩個語料檔案目前的正確用途（`pretrain` 無監督語言統計）已經在發揮作用，不需要另外榨出 QA 配對。
+    - [x] 43-4 斷詞品質：檢查現有 BPE `vocab_size` 是否還夠涵蓋新語料的詞彙覆蓋率——2026-09-28：寫小工具載入 `tranning/gpt_pretrain_runs` 現有 BPE tokenizer（`vocab_size=8000`），量測整份 `data/pairs.json`（742 筆）的 UNK 比例：**本次新增的 91 筆 UNK 率 0%**（都是常見情緒詞彙，已被既有詞彙表涵蓋）；但**全部 742 筆合計 UNK 率 0.089%（31503 個 token 中 28 個）**，集中在 12 個字：掰／惦／揪／暄／嗨／囉／挂／闭／喔／嗯／溏／愜。**根因找到了**：`transformer_chat.py` 的 `pretrain()` 只吃 `--corpus`（目前指到 `corpus_zh_starter.txt`，純維基百科正式文章）去訓練 BPE 詞彙表，`data/pairs.json` 的口語內容從來沒有被拿去訓練過 BPE——維基百科正式文章本來就不會出現「掰掰」「嗨」「喔」「嗯嗯」這種口語助詞/招呼語，導致這些**恰好是打招呼/道別最高頻會用到的字**目前是 UNK。**修法定案但這次不執行**（會連帶讓既有 checkpoint 的 vocab 失效，必須整個重跑 pretrain+finetune，屬於 43-5 的訓練範圍，要先問過你才能啟動）：43-5 重跑時把 `pretrain()` 的訓練文字來源從單純 `corpus_zh_starter.txt` 改成「`corpus_zh_starter.txt` + `data/pairs.json` 攤平成純文字」兩者一起餵給 `BPETokenizer.train()`，讓詞彙表同時涵蓋正式書面語跟口語聊天用字。
+    - [ ] 43-5 embedding 語意品質：資料量+斷詞都確認後才重跑 pretrain+finetune（個別詢問是否啟動，這次順便套用 43-4 訂出的 BPE 語料來源修正），完成後跟既有 checkpoint 做 loss＋實際回覆品質雙重比較（比照 #16/#17 既有「不能只看 loss 數字」的驗證慣例）——2026-09-28 你同意後，**pretrain 階段已在背景啟動**：新增 `data/corpus_pretrain_v2.txt`（= `corpus_zh_starter.txt` 449 萬字 + `data/pairs.json` 742 筆攤平成純文字 3.7 萬字，套用 43-4 定案的修法），`python transformer_chat.py pretrain --corpus ../data/corpus_pretrain_v2.txt --out-dir gpt_pretrain_runs_v2 --epochs 25 --vocab-size 8000 --gpu-mem-fraction 0.85 --checkpoint-every 5`（你追加要求「效能不得超過100%」，`--gpu-mem-fraction 0.85`＝85% VRAM 上限，符合要求，沿用既有預設值沒有另外調高）。finetune 階段要等 pretrain 跑完、且會**再另外問過你**才啟動，不是這次一次授權兩個訓練階段。
+
+      **2026-09-29 後續**：發現 `gpt_pretrain_runs_v2` 這個 pretrain 行程在 epoch 17/25（目標的前 8 epoch）就沒有再繼續，最後寫入 2026-09-28 21:35，`tasklist` 查無任何相關行程，判斷是中途被中止（見 ErrorLog #35）；`val_loss` 在 epoch 11 見底（4.4209）後已開始回升，繼續跑完剩下 8 epoch 對過擬合問題本來就幫助不大。用 `AskUserQuestion` 問過你要怎麼處理，你選**把 `checkpoint/`（epoch 15）權重當 pretrain 完成，直接進 finetune**，不補寫 `pretrain()` 目前並不存在的「resume 續跑」邏輯（現有 `checkpoint_every` 續跑機制文件上寫的只支援「pretrain checkpoint → 接 finetune」這條路，不支援「pretrain 續跑 pretrain」，見 `transformer_chat.py:427-430` 的註解）。已啟動：`python transformer_chat.py finetune --data ../data/pairs.json --pretrain-dir gpt_pretrain_runs_v2/checkpoint --out-dir gpt_chat_runs_v3 --epochs 60 --dropout 0.2 --weight-decay 0.05 --checkpoint-every 5 --patience 10 --gpu-mem-fraction 0.85`，用 `Start-Process -WindowStyle Hidden` 背景執行（跟 VSCode/對話分離），這次額外把 stdout/stderr 導到 `tranning/gpt_chat_runs_v3_train.log`／`.err.log`（上次 v2 pretrain 沒留 log，中止原因完全查不回來，這次補上）。**刻意輸出到新資料夾 `gpt_chat_runs_v3`**，不覆蓋 `gpt_chat_runs_v2`（那份是接在舊版 `gpt_pretrain_runs`、詞彙表沒修過口語 UNK 問題的 pretrain 之後 finetune 出來的，跟這次不是同一個基底，兩者需要分開比較）。訓練中，尚未看到結果。
+
+    **pretrain 結果**：第一次用預設 `--batch-size 32` 在 85% GPU 記憶體上限下 CUDA OOM（超用約 500MB），改用 `--batch-size 16` 重跑成功，第 17 epoch 觸發 early stopping（連續 5 epoch 沒進步），最佳 val_loss 落在第 12 epoch ≈4.4209。比 #17 純維基語料（449萬字）的最佳 val_loss（≈4.2706）**略差**，推測是新混進的口語對話文字統計特性跟正式書面語不同、拉高了 val split 的難度，加上 batch size 減半也可能影響訓練動態——這不代表退步，**重新量測 UNK 率確認 43-4 的修法真的有效**：`data/pairs.json` 742 筆在新 `gpt_pretrain_runs_v2` 詞彙表下 **UNK 率 0%**（原本 0.089%、12 個口語字），目標達成。輸出於 `tranning/gpt_pretrain_runs_v2/`，沒有動到既有 `gpt_pretrain_runs`。
+    - [ ] 43-6 模型架構：43-1~43-5 跑完後，若仍有明顯欠擬合（而非過擬合）現象才考慮加大 `n_layer`/`n_embd`/`block_size`，否則維持現有架構不動
+
+    **這次先列出待辦清單，尚未開始執行任何一步，等你確認後才動工。**
+
+44. [] 處理 sinco 一般聊天模型（`transformer_chat.py` finetune）的過擬合——2026-09-30：依 ErrorLog #35 的診斷（v2 val_loss 第 7 epoch 見底、v3 第 4 epoch 見底後回升，train_loss 持續下降；約 1746 萬參數全部可訓練、只有約 670 筆訓練 pairs，#42 已經把 dropout/weight_decay 調高過仍擋不住），這次**不是再調大 dropout/weight_decay**，而是在 `finetune()` 補四個從不同方向壓過擬合的機制（函式參數預設全關，既有呼叫與測試行為不變；CLI 預設開前三項）：
+    - `--freeze-embeddings`（CLI 預設開）＋`--freeze-layers N`（CLI 預設 4）：token/position embedding（透過 weight tying 同時也是輸出層，約 310 萬參數）與底下 N 層 Transformer block 維持 pretrain 權重不動，只微調上面幾層——底層學到的是 449 萬字語料的通用語法/用詞統計，讓 670 筆 pairs 去改寫它們正是記憶容量的主要來源。訓練開始會印出「可訓練參數 / 總參數」比例。
+    - `--label-smoothing`（CLI 預設 0.1）：只作用在訓練 loss，val_loss 仍是純 cross-entropy，數字能直接跟舊的 history.json 比較。
+    - `--typo-noise-prob`（CLI 預設 0.3）：跟 `chats.py` GRU 版 2026-09-08 同一套「只對 prompt 加錯字、每個 epoch 重抽」的資料擴增（用 `typo_augment.inject_typos()`），只套用在訓練集。
+    - `--lm-corpus` ＋ `--lm-mix-ratio`（預設關閉，要給 `--lm-corpus` 才開）：rehearsal——每個 epoch 額外混入「訓練 pairs 數量 × ratio」段隨機 pretrain 語料，讓 finetune 持續被拉回一般語言模型，不會一路漂成純背答案（也減少忘掉 pretrain 學到的東西）。
+    - 用到的正則化設定會一併寫進輸出 `config.json` 的 `finetune_regularization` 欄位（`_load_gpt()` 不讀這欄，只是紀錄這顆 checkpoint 怎麼訓練出來的）。
+    新增 4 項測試（凍結部分的權重跟 pretrain 完全相同、未凍結的最上層有被訓練到；`freeze_layers` 超過層數會報錯；label smoothing/錯字/rehearsal 一起開能跑完；label smoothing 只影響 train 模式 loss）。`pytest test_transformer_chat.py test_reward_model.py test_train_grpo.py` 24 項全過。
+    **尚未完成**：這次只改程式碼、沒有跑真實訓練（雲端環境沒有 GPU 也沒有 `model.pt`；依 `feedback_no_unattended_long_training` 規則也要先問過你才啟動）。建議指令（輸出到新資料夾 `gpt_chat_runs_v4`，不覆蓋既有 checkpoint）：
+    `python transformer_chat.py finetune --data ../data/pairs.json --pretrain-dir gpt_pretrain_runs_v2/checkpoint --out-dir gpt_chat_runs_v4 --epochs 60 --dropout 0.2 --weight-decay 0.05 --checkpoint-every 5 --patience 10 --gpu-mem-fraction 0.85 --lm-corpus ../data/corpus_pretrain_v2.txt`
+    跑完要（a）比較 v3（val_loss 最低 4.138）與 v4 的 val_loss 曲線是否不再早早反彈；（b）用同一批測試句（what are you doing now／ok, got it.／我不開心）實測回覆，確認不是只有 loss 數字變好；（c）你確認滿意後才把產線從 `gpt_chat_runs` 切過去。若 v4 反而欠擬合（train_loss 也降不下來），先把 `--freeze-layers` 從 4 降到 2 再試。
+
+45. [] 人物角色模擬要更像真人、要能依使用者描述的性格對話——2026-09-30：先查出真的 bug（ErrorLog #37：9/10 換成 Transformer 後選角色根本沒生效）。新增 `tranning/persona_chat.py`（不用重新訓練、不呼叫外部 API）：
+    - **範例優先**：角色卡 `prompt`（你寫的 `{"問": "答" | ["答1","答2"] | ""}`，空字串草稿自動略過）、`examples`、以及 `data/character.json`（只有內容提到這個角色名字才算它的）→ 字面相似度比對（先拿掉名字/暱稱，「柯宇在幹嘛呢?」≈「你在幹嘛」），命中就直接回你寫的原句。
+    - **依性格挑選＋改寫**：沒命中時 sinco 產生 6 個候選，依性格用字打分，扣分 AI/sinco 身分句與過長回覆，挑最高分那個再改寫語氣（`humanize()`）。
+    - **性格來源**：卡片 `traits` 分數 + 描述文字的性格關鍵字（18 種性格、40 多個同義說法，例如「陽光」→活潑、「壞學生」→俏皮、「話少/冷漠」→高冷）。
+    - **新增角色只要一句描述**：`python tranning/persona_chat.py new --name 小晴 --description "個性活潑開朗，講話很直，但很體貼" --call-user 你`；卡片可選欄位 `aliases`（暱稱）、`call_user`（角色怎麼稱呼你）。
+    - `/character` 瀏覽器的提示改成「目前有幾組你寫的範例，越多越像本人」（不再要求角色專屬 checkpoint）。
+    **限制（老實說）**：沒命中範例時，內容仍來自 sinco 一般模型（742 筆對話），這層只能改語氣、用字、自稱，沒辦法讓模型真的「理解」任意描述後自己推演台詞。**最有效的加強方式是多寫角色範例**（建議每個角色 50 組以上，涵蓋問候/日常/情緒/撒嬌/拒絕等情境）。之後資料夠了，可以再做「角色描述 + 對話」一起 finetune 的角色條件模型。
+
+
+
+46. [ ] 一般人類問答、英文母語交流與可靠上網（2026-10-18）
+    - [x] 工程階段：修正程式／故事、能力／行情、定義／天氣的路由；加入有限雙語對話與結構檢查；網路來源與明顯無關片段過濾、失敗不亂生成。
+    - [x] 網頁階段：修改後端實際提供的 admin/frontend，新增手機選單與提問卡、trace、來源連結、組字與重送保護。桌面與390×844瀏覽器實測。
+    - [x] 評估階段：建立24筆獨立中英驗收案例、evaluate_chat.py與真實離線輸出 team-run/chat_eval_offline.jsonl。只記錄回答供人工語意評估，不作虛假分數。
+    - [ ] 能力階段：現有模型在未見中文／自然英文改寫仍偏題、亂詞，多輪訓練尚未實作；不能宣布正常問答已完成。應先整理人工審核雙語／多輪語料，保留獨立測試，依 #43/#44 分階段確認後再正式訓練，輸出新 checkpoint 不覆蓋舊版。
+    - [ ] 正式品質驗收：用未見問法比較相關性、事實性、語言一致性、上下文及網路來源；目標參考Claude/GPT品質，不使用外部AI模型或API代答，不以模板或測試全過冒充同梯隊能力。仍以RTX4060 8GB為上限。
+
+
+47. [ ] 照片方向判斷、灰階特徵與文字修圖（2026-10-20）
+    - 本階段建立獨立 `lib/photo_edit_demo.py`／`tranning/photo_edit.py`，以企鵝實拍照片輸出灰階、邊緣、角點、四方向候選、旋轉與彩色修改結果；操作／訓練方式見 `team-run/photo-edit/README.md`。
+    - 自建四方向 CNN 由正向照片資料夾產生旋轉資料，先按原圖切分；無權重／低信心時保留方向。小角度暫由人工指定，不宣稱可以自動判斷所有照片正向。
+    - 精確文字操作支援亮度、對比、銳化、指定座標添加圓形／文字；另提供從零灰階文字殘差模型及 source／target／instruction 配對訓練介面。模型僅預測亮度修改，原色度另外保留，無預訓練權重或外部 AI。
+    - [ ] 使用者檢視示範並確認輸出；完成後才登記正式功能驗收。
+    - [ ] 收集方向正確且多樣的真實照片，建立獨立測試集並檢驗方向判斷與不確定性；softmax 門檻不能保證域外照片可靠。
+    - [ ] 建立真實文字修改前後配對、含未見指令與否定／位置／物件評估；目前未完成任意照片語意理解、任意文字添加或移除真實物件、生成新色彩及視角推理。單純邊緣或角點不視為理解完成。
+
+
+#47 補充（2026-10-20）：獨立邊緣示範納入電路圖模式，三組 Canny 比較、原灰階 Otsu 線條前景圖、RC 電路範例與參數 CLI 已建立；白底深線細線／斷線測試通過。元件辨識、交叉／接點判斷與 netlist／電路正確性仍未實作，待使用者檢視後再決定後續資料與驗收，不標示完整理解電路圖已完成。
+
+
+#47 麵包板實拍補充（2026-10-20）：範圍包括真實麵包板上的杜邦線、電阻與其他插接元件，非僅原理圖。新增 breadboard 共用前處理：保留原色、雙邊去噪 Canny、非語意飽和色區域與邊緣疊圖，Adafruit 實拍（出處留存）跑通兩個入口，十項測試通過。使用者希望做到前處理／元件辨識／接線理解的層級及自有照片路徑已一次集中提問，仍待回覆。後續元件框／實例分割、電阻色環、線端點／孔位、遮擋／交叉、內部節點與 netlist 驗證尚未完成；不可將前處理宣布為上述能力驗收完成。
+
+
+48. [ ] 地區限制、帳戶封禁及隱私告知（2026-10-20）
+    - 已記錄 CN/HK/MO/TW 限制、定位拒絕不直接封禁、僅人工核准解除；[需求規格](team-run/region-enforcement/REQUIREMENTS.md)。
+    - [ ] 確認帳戶來源、網頁或含本機介面、文字觸發門檻與申訴管理權限。現有程式僅 IP 識別與 observe_only，尚未啟用封禁。
+    - [ ] 實作定位告知、可信帳戶、持久封禁、所有受保護入口與人工申訴；檢驗拒絕定位、共享IP、換IP、重啟、跨界精度、偽造身分及未授權解除。
+    - [ ] 補齊[隱私草案](team-run/region-enforcement/PRIVACY_DRAFT.md)的營運者、法域、保存期限、第三方及生效規則；核對實作後再發布。
+
+#46 後續作業規劃（2026-10-20）：[模型差距與16週時程](team-run/region-enforcement/MODEL_ROADMAP.md)以實際 Transformer 主聊天、GRU 程式碼與742/118/24資料盤點為基礎，分階段做資料、獨立評測、單卡資源、多輪與領域能力。不把規則回覆當成模型生成，不保證於排程內達Claude/GPT整體能力；未啟動正式訓練或自動排程。
+
+
+#47 自有資料進度（2026-10-20）：目標已確認接線理解，來源C:/Users/roy/Downloads/電路資料集（8照片7影片，先前誤傳資料排除）。唯讀整理已建立15來源／29資產／0錯誤與完整SHA256、原尺寸影格、6個端點標註候選、空白端點／連線／孔列／群組模板；三近拍已原解析度前處理。影片只稀疏抽21幀，未聽音訊／看完。仍待預期原理圖與三腳元件型號／腳序；跨檔電路群組、人工真值、可追溯netlist、錯接檢查與真實模型訓練尚未完成，不宣告全目標完成。
+
+49. [ ] 自訂物品標註、微調與即時偵測（2026-10-25）
+    - [x] 本次50張資料加強後，使用者回饋「這次的準確率很高了」；已授權記錄[原因與修正成功紀錄](Agent/ErrorLog/Success/2026-10-25-YOLO物品標記與小資料訓練修正.md)。此回饋確認目前效果改善，缺樣本類別、獨立驗證與先前剩餘漏判仍保留待辦。
+    - 50張已儲存資料已完成真實加強比較，選用 `tranning/object_detection_runs/expanded_50_transfer11/weights/best.pt`，攝影機路徑已切換。小資料配方與GUI預設已改善；同一快照train正確框101/102，仍有21個FP，不能視為整體準確率。使用者截圖回放可找橡皮擦與直尺，指甲剪仍漏；實體鏡頭、缺樣本類別與獨立驗證仍待驗收。[比較與限制](team-run/object-labeling/TRAINING_COMPARISON.md)。
+    - 已實作獨立工具 `python -m lib.yolo.object_labeler`：照片匯入／鏡頭擷取、人工框選與重載、可新增類別、背景負例、YOLO 資料快照、背景微調及自訂 `best.pt` 即時偵測；預設類別「橡皮擦」。[操作說明](lib/yolo/README.md)、[計畫與驗證](team-run/object-labeling/BUILD_LOG.md)。
+    - 使用者明確允許本次沿用本地 YOLO 預訓練權重微調，不擴張至雲端 API；專案記憶已記錄。
+    - [ ] 蒐集並人工標註真實物品資料，以不同場景分 train/val，完成實際微調、實體攝影機與辨識品質驗收。工具測試不代表橡皮擦已能正確辨識。
+
+
+50. [ ] Transformer多輪上下文理解（2026-10-26）
+    - [x] 共用dialogue_v1訓練／推論格式、512token預算、完整輪裁切、answer-only mask、動態padding與GUI／CLI／Web歷史隔離已實作；舊模型維持legacy格式，持久memory未自動注入。
+    - [x] 建立四類多輪資料及去重／反事實raw評估，完成兩次有界本地微調與獨立測試；原正式權重保留。[實驗與切換決策](team-run/transformer-context/EXPERIMENT.md)。
+    - [ ] 模型尚未達標：獨立test去重macro14.71%，偏好／格式0%，單輪保留能力退步；需更多多樣多輪／引用資料與保留舊能力策略，再用新的獨立測試集驗收，不把程式串接當理解。
+
+
+51. [ ] 獨立人物YOLO模型characters.pt（2026-10-26）
+    - [x] 獨立人物標註入口、data/character_detection、character_detection_runs與characters.pt備份發布已實作；不混入物品模型。操作見[人物說明](lib/yolo/CHARACTERS.md)。
+    - [x] 使用者已標註84張人物影像並完成54train／30val訓練；characters.pt已為有效權重，經驗證發布last.pt，.25門檻正確配對24/31框、FP1。人物資料及權重仍獨立，52張pending保留。[本輪修正](team-run/character-detection/DETECTION_FIX.md)。
+    - [ ] 補齊剩餘人物標註，實機與不同場景辨識驗收；不宣稱完成人臉身份驗證或未知人物拒絕。
+# 2026-10-26 上下文字詞語意
+
+- [x] 新增可選本機中文雙向向量介面、明確詞範圍抽取與獨立分類／檢索／聊天原始評估，詳見 [操作說明](data/word_sense/README.md)。
+- [x] 建立 38 筆多義詞示範，train20／val9／test9 按句型家族隔離；原 pairs742 筆與新 train20 筆另存 replay762 筆。新資料皆無 UNK／截斷，舊 replay19 筆 UNK 如實保留記錄。
+- [x] 保存原 GPT 的 val 原始回答基準；觀察仍偏題，未把工程通過或向量不同當作語意成功。
+- [x] 2026-10-26：重試下載本機 BGE 真實權重（`tranning/prepare_contextual_model.py`），這次未再遇到 WinError10013，`models/bge-small-zh-v1.5` 已完整下載並通過 `ContextualEncoder` 實際編碼煙霧測試（「蘋果」在手機句／水果句的上下文向量餘弦相似度 0.833，僅供流程驗證，不是語意品質結論）。
+- [x] 2026-10-26：依 #43 逐次確認約定，取得本輪核准後執行獨立 GPT 微調 pilot_v1（基底 `tranning/gpt_chat_runs`、762筆replay+9筆val、5 epochs、lr5e-5、batch8、GPU上限0.85，輸出 `tranning/gpt_word_sense_runs/pilot_v1`，未覆寫正式權重）。val_loss 每個 epoch 單調下降（2.17→1.25→0.82→0.53→0.44），5 epoch 跑滿未觸發 early stopping。**老實列出 val9（incident_report，訓練未見過的句型家族）原始回覆結果**：9 筆中 3 筆與標準答案逐字相符（蘋果手機／蘋果水果／病毒生物各1筆），其餘 6 筆雖然已經學會「指的是...」的回答格式（不再像基線模型答非所問亂接話），但詞義判斷錯誤（鼠/病毒方向常答反）；**insufficient_context 類別 3 筆全部答錯**，模型傾向硬猜一個具體詞義而非承認資訊不足，是目前最弱的一類。基線（`gpt_chat_runs`）原始回覆對照見 [output/word-sense/chat_val_baseline.json](output/word-sense/chat_val_baseline.json)，pilot_v1 見 [output/word-sense/chat_val_pilot_v1.json](output/word-sense/chat_val_pilot_v1.json)。**尚未決定**：是否要加大 epoch／補充 insufficient_context 訓練資料再跑下一輪，或維持現狀——依規則未切換正式聊天模型，等使用者看過結果再決定。
+- [x] 2026-10-26：新增 `tranning/add_word_sense_entry.py`（CLI），讓使用者可以手動新增一筆「句子＋目標詞→上下文詞向量」，用 `ContextualEncoder` 算出向量後累加（非覆寫）進 `data/word_sense/train.json`／`sft_train.json`，向量另存 `data/word_sense/train_vectors.json`（以 id 為 key，隨使用次數累積成長的向量庫）。重複 text+term 會擋下、未知 label 需要加 `--new-label` 並提供 `--reply` 才能新增、詞在句中出現多次需用 `--occurrence` 指定是第幾次。新增 `tranning/test_add_word_sense_entry.py`（14項，涵蓋span定位/重複詞/去重/新label/向量快取累加），搭配 `tranning/` 全套回歸測試 841 項通過（另有3項既有、與本次改動無關的 Tk GUI/資料封存測試在這台機器上失敗，非本次新增）。實際執行一次真實新增（`我在果汁店訂了一箱蘋果。`→apple_fruit）驗證整條路徑可用，`train.json` 現為21筆、`train_vectors.json`已有1筆512維向量。
+- [x] 2026-10-26：使用者要求把微調 epoch 上限調到128，並補充 `insufficient_context` 訓練資料——用 `add_word_sense_entry.py` 新增9筆不同句型（非量詞替換、換動詞/問句/轉述等中性寫法）的 insufficient_context 範例（6→15筆），重新跑 `prepare_word_sense.py` 到新目錄 `data/word_sense/prepared_v2`（36→實際為30+9=... 見下，coverage全部ready）。pilot_v2（基底仍 `gpt_chat_runs`，epochs上限128、patience2）在 epoch14 提前停止（val_loss最低≈0.089於epoch12），**未跑滿128**，安全網正常運作。val9原始回覆：6/9逐字答對（前一輪3/9），`insufficient_context` 3筆**全部答對**（前一輪0/3）；仍錯的3筆有清楚規律——模型對同一詞固定偏向某一詞義（蘋果→偏手機、鼠→偏動物、病毒→偏生物），顯示沒有真的解析「不是A而是B」的否定線索，只是詞義偏置。
+- [x] 2026-10-26：依使用者同意投入「方向1」——新增6筆train專用的否定線索句型（`contrast_clue`家族，「不是A，而是B」結構搭配間接線索，句子內容跟val/test的incident_report/comparison_question不同，避免洩題），train共36筆，coverage確認無UNK/截斷後跑 pilot_v3（同基底、同參數，epoch16提前停止，val_loss最低≈0.091於epoch14）。**老實結果：這輪反而退步到4/9**（前一輪pilot_v2是6/9）——蘋果手機/水果兩種詞義分辨改善（1筆由錯轉對），但代價是原本pilot_v2已經學會的`insufficient_context`判斷**3筆全部變回答錯**（回去硬猜一個具體詞義）。三輪原始回覆比對檔：[pilot_v1](../output/word-sense/chat_val_pilot_v1.json)／[pilot_v2](../output/word-sense/chat_val_pilot_v2.json)／[pilot_v3](../output/word-sense/chat_val_pilot_v3.json)。**結論**：方向1的否定線索資料沒有帶來預期的整體提升，目前三輪裡pilot_v2（只補insufficient_context、沒加否定線索資料）表現最好；在這麼小的資料量（30~36筆新資料）下，不同訓練輪次之間的表現波動可能本身就很大，不代表否定線索這個方向本身是錯的，但也不能宣稱已經驗證有效。未切換正式聊天模型，等使用者決定下一步（例如回頭用pilot_v2的資料配方、或是否要先解決資料量/波動性問題再繼續加新句型）。
+    - [x] 2026-10-26：使用者選擇回到pilot_v2資料配方，用**完全相同**的`prepared_v2`資料／參數重跑一次（`pilot_v2b`，無額外seed參數可調，`transformer_chat.py`本身shuffle/dropout未固定種子，重跑本身就是隨機重抽樣），檢驗6/9是否只是運氣。pilot_v2b在epoch11提前停止（val_loss最低≈0.127於epoch9），結果**5/9**（insufficient_context 2/3，原本答對的「有人在車站提到蘋果」這筆這次變成答成蘋果手機）。**四輪完整對照**：pilot_v1(無補強)3/9insuff0/3→pilot_v2(+9筆insuff)6/9insuff3/3→pilot_v2b(同配方重跑)5/9insuff2/3→pilot_v3(+6筆否定線索)4/9insuff0/3。**結論**：insufficient_context資料增補是真實、可重現的改善（兩次同配方重跑都落在5-6/9、insuff2-3/3，穩定優於baseline的3/9、0/3），只是有±1筆的訓練隨機波動；否定線索(contrast_clue)資料兩個指標都比v2系列的兩次重跑更差，且insufficient_context完全retrogress到0/3，目前證據不支持這個方向有幫助，但單次實驗也不能完全排除是運氣差。**建議**：之後若要繼續，優先在v2配方基礎上累積更多insufficient_context範例（已證實有效的方向），contrast_clue方向除非有更多資料量支撐，先不列為下一步重點。仍未切換正式聊天模型。
+    - [x] 2026-10-26：使用者要求把epoch拉高到50並真的跑滿（`transformer_chat.py`無`--seed`參數但也沒有`--force-epochs`，確認後把`--patience`從2拉高到50等同關閉提前停止），用跟pilot_v2完全相同的`prepared_v2`資料配方跑`pilot_v2_50ep`。**結果**：val_loss在epoch~28之後打平在0.084~0.093之間微幅震盪、train_loss在epoch~20後也停在1.54附近幾乎不再下降——後面30個epoch基本是原地踏步，沒有繼續學到東西，但也沒有惡化爆掉。原始回覆5/9答對、insufficient_context 2/3，錯誤模式跟pilot_v2b完全一樣（同樣是第1/2/4/6筆錯），落在已知5-6/9的正常波動範圍內，沒有比提前停止更好。**結論**：這個資料量級（30筆新資料+742筆replay）下，patience=2的提前停止機制已經抓到了這個配方能達到的實際上限，拉長epoch不會進一步提升，純粹浪費運算時間；之後如果要真的突破目前5-6/9的瓶頸，需要的是更多/更多樣的資料，不是更多epoch。五輪完整loss曲線對照圖：[折線圖](https://claude.ai/code/artifact/57f4338f-dcf4-48b2-8a28-903f3384c212)。仍未切換正式聊天模型。
+    - [x] 2026-10-26：使用者問「應該調整哪個參數使loss更低」。盤點後判斷dropout/weight-decay/label-smoothing/typo-noise-prob等正則化參數方向不對（目前沒有過擬合訊號，加重只會更難降），epochs已證明無效；提出目前唯一沒試過、理論上有機會的槓桿——**五輪以來embedding一直是凍結的**（`--freeze-embeddings`預設開，約310萬參數鎖死，81%可訓練），讓「蘋果/鼠/病毒」這幾個詞本身的嵌入向量能針對詞義任務微調，搭配調高學習率1e-4（原5e-5偏保守）。使用者核准，若不穩定則退回5e-5。**結果：`pilot_v2_unfrozen_lr1e4`（`--no-freeze-embeddings --lr 1e-4`，100%參數可訓練）epoch9提前停止，沒有NaN/不穩定，不需要退回5e-5**。原始回覆**7/9，是目前六輪裡最好的結果**（前面最好6/9）——鼠→裝置、病毒→電腦這兩組原本每輪都答錯的固定偏置，這次答對了；但val_loss數值本身（最低0.087於epoch7）跟其他輪差不多，不是數字上大幅降低，**loss數字不是完美的代理指標**，真正的改善要看實際回覆才看得出來。新的失敗模式：row3答出「操作電腦的鼠類動物」這種混合句、row5直接複製row4的答案（感染電腦的惡意程式），顯示還沒完全學會，只是改善了原本最明顯的偏置問題。六輪完整loss曲線：[折線圖](https://claude.ai/code/artifact/57f4338f-dcf4-48b2-8a28-903f3384c212)（同一網址已更新）。仍未切換正式聊天模型，等使用者決定下一步（例如在這個解凍embedding配方上繼續補資料，或多跑幾次驗證7/9是否穩定）。
+    - [x] 2026-10-26：使用者問「該不該調epochs到50讓它收斂更好」。先檢查`pilot_v2_unfrozen_lr1e4`實際走勢（而非假設跟上次50ep實驗一樣）：val_loss在epoch7到最低0.087後連續2epoch往上爬（0.108→0.116），同時train_loss還在穩定下降（1.79→1.71→1.64）——跟上次凍結embedding那輪「打平不動」完全不同，這次是典型「train持續進步、val開始變差」的過擬合訊號，**建議不要拉長epoch**（會讓7/9變差，不是變好）。改用使用者原本核准的備案——同樣解凍embedding但lr退回5e-5。**結果：反而是七輪裡最差（2/9），val_loss最佳點也更高（0.183，比1e-4的0.087高一倍多）**。推測解凍的embedding需要較大的學習率才能在early stopping允許的少數epoch內真正調整到位，5e-5太保守，讓embedding卡在「稍微挪動但沒調好」的中間狀態，比完全凍結或完全調到位（1e-4）都更差。**老實承認**：這次建議的「調低lr求穩」方向判斷錯誤，不是更安全的選擇。**目前仍以`pilot_v2_unfrozen_lr1e4`（7/9）為最佳**，`pilot_v2_unfrozen_lr5e5`這個實驗本身也是有價值的紀錄（排除了「lr再低一點會更好」這個假設）。七輪完整loss曲線：[折線圖](https://claude.ai/code/artifact/57f4338f-dcf4-48b2-8a28-903f3384c212)。仍未切換正式聊天模型。
+    - [x] 2026-10-26：使用者把「lr越低越差」這個單點觀察過度推論成「lr可以一直往上調」，問要不要試1e-3。先糾正：兩個點（5e-5<1e-4）不能證明單向趨勢，loss對lr的關係通常是有最佳點的曲線；並指出1e-3對微調已收斂的checkpoint風險明顯更高（可能直接發散/NaN，也可能把一般聊天能力洗掉——六輪以來都沒檢查過這點）。使用者同意找折衷方案：確認`transformer_chat.py`本身已有`clip_grad_norm_`（norm上限1.0）這個數值穩定性安全網，改試中間值**3e-4**（不直接跳1e-3），並補做「一般閒聊（你好/可以幫我寫程式嗎/你是誰）微調前後回覆對照」這個之前漏掉的檢查。**結果**：`pilot_v2_unfrozen_lr3e4`epoch10提前停止，沒有NaN，但epoch1 train_loss（3.548）明顯比其他輪高、val_loss震盪更明顯（0.38→0.24→0.30→0.18→0.25...），最佳val_loss0.134也比1e-4的0.087差。**原始回覆3/9，且是模式崩塌**——除了3筆本來就是insufficient_context外，其餘6筆（蘋果/鼠/病毒各2筆）全部也都答成「資訊不足」套用同一句模板，比5e-5那種「答錯但還會變化」更像訓練失控。**一般聊天能力對照：沒有被洗壞**——「你好」「你是誰」回覆跟正式權重`gpt_chat_runs`逐字相同，「可以幫我寫程式嗎」只多一個詞讓句子更完整，不是劣化；模式崩塌只局限在詞義消歧這個窄任務，沒有波及一般聊天。**三點lr測試（5e-5/1e-4/3e-4）呈倒U型**：5e-5欠調（2/9）、1e-4最佳（7/9）、3e-4又因為更新幅度太大出現新的模式崩塌（3/9）——**不建議再往1e-3試**，趨勢已經很清楚不是越高越好，且3e-4已經開始出現品質劣化，沒有理由預期1e-3會更好，只會承擔更高的發散/洗壞風險卻可能一樣是退步。八輪完整loss曲線：[折線圖](https://claude.ai/code/artifact/57f4338f-dcf4-48b2-8a28-903f3384c212)。**目前最終確認最佳配方＝`prepared_v2`資料＋`--no-freeze-embeddings`＋`--lr 1e-4`（即`pilot_v2_unfrozen_lr1e4`，7/9）**，仍未切換正式聊天模型。
+
+
+## 2026-10-28：開放式電學首輪試驗
+
+- [x] 使用者核准後完成3 epochs／66更新，另存pilot_v1；原始dev0/10、首次test0/10，未啟用候選。詳見[試驗報告](data/electricity_open/PILOT_V1_RESULT.md)。
+- [ ] 電學解題仍未達標；需依原始作答擬定下一輪方案與新未見題，並依#43另行核准。
+
+
+## 2026-10-28：使用者確認尚未進行項目與表現狀態
+
+- [ ] 二值化：尚未進行。
+- [ ] 卷積（Convolution）：已新增純for迴圈的MatrixA／三核／RGB與灰階獨立範例，工程測試通過；待使用者驗收實際效果。
+- [ ] 直方圖／均衡化：已新增獨立Lenna的Y/Cb/Cr、Y直方圖、CDF-min均衡化及前後對照，工程測試通過；待使用者驗收效果。
+- [ ] Transformer：表現未達標，需繼續改善，不以loss下降或工具代答當成已學會。
+- [ ] 其餘模型／功能：表現待定，待真實資料與實際操作驗收。
+
+以上為使用者本次確認的狀態，零散既有實作不視為專項完成或效果驗收。
+
+- 檔案定位補充：`CNN-MNIST_Classification.py` 由使用者指出為直方圖均衡化相關位置；靜態核對現況為MNIST CNN分類，`Rescaling(1./255)` 是正規化，已有 `Conv2D`，尚未見直方圖均衡化。圖表為accuracy／loss曲線，不能據此標示均衡化已完成。未修改或執行該檔。
+
+- 2026-10-28後續確認：本次均衡化採獨立Lenna練習，不整合MNIST。卷積與均衡化皆禁用NumPy，20項測試及實際兩圖輸出檢查通過；詳見[實作與操作](lib/opencv2/IMAGE_PROCESSING.md)。尚未記錄為使用者已驗收完成。

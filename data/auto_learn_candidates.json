@@ -102,5 +102,13 @@
     "topic": "電子學",
     "source": "wikipedia",
     "created_at": "2026-09-08T08:04:31+00:00"
+  },
+  {
+    "id": "f89368b3",
+    "prompt": "你知道馬嘉祺嗎?",
+    "reply": "马嘉祺可以指：\n马嘉祺 (歌手)，中国歌手、演员，台风少年团、时代少年团成员。\n馬嘉祺 (運動員)，香港足球运动员。\nhttps://zh.wikipedia.org/wiki/%E9%A6%AC%E5%98%89%E7%A5%BA",
+    "topic": "馬嘉祺",
+    "source": "wikipedia",
+    "created_at": "2026-10-18T11:01:28+00:00"
   }
 ]

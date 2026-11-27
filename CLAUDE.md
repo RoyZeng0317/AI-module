@@ -116,6 +116,20 @@ python lib/img.py --edit before.png "make it blue"
 python lib/img.py --train-deblur path/to/sharp_photos/ --epochs 100
 python lib/img.py --deblur blurry.jpg
 
+# YOLO 偵測訓練（yolo_custom.py 通用骨架、circuit_diagram_train.py/pcb_defect_train.py/
+# road_sign_yolo_train.py/materials_yolo_train.py 各自領域，--detach 背景訓練 + --status 查進度）
+python tranning/yolo_custom.py --make-data tranning/yolo_data --n 200
+python tranning/yolo_custom.py --train tranning/yolo_data/data.yaml --epochs 30
+python tranning/pcb_dataset_prep.py --images <圖片資料夾> --annotations <XML資料夾> --yolo-out data/pcb_yolo
+python tranning/pcb_defect_train.py --data data/pcb_yolo/data.yaml --detach
+python tranning/road_sign_yolo_train.py --dataset-dir <資料夾> --classes stop yield no-entry
+python tranning/materials_yolo_train.py --data <data.yaml>
+
+# 區域指稱模型（YOLO 候選框 + 自訓視覺/文字對比學習，見 to_do_list 區域指稱相關條目）
+python tranning/region_refer.py --make-data tranning/region_refer_data --n 300
+python tranning/region_refer.py --train tranning/region_refer_data --epochs 30
+python tranning/region_refer.py --refer photo.jpg "左邊的紅色圓形" --yolo-weights <YOLO權重>
+
 # 跑測試（各元件分開跑，彼此 requirements 不共用；沒有集中的 pytest.ini/conftest.py）
 pytest tranning/
 pytest lib/components/
@@ -195,7 +209,7 @@ AI-module/
 │   ├── yolo/Instant Image Reconginizion.py
 │   └── opencv2/                    # check_mouth  dnn  image  img_convert  img_to_gray  img_write  簽到 (.py) + 範例圖片
 ├── machine_migration/              # 換機備份 (MIGRATION_MANIFEST.md、checksums_sha256.txt、git_info.txt、requirements_freeze.txt)
-├── materials_recongizion/          # 電子元件辨識 (capacitor.py、resistor.py、main.py + test_*)
+├── materials_recongizion/          # 電子元件辨識 (capacitor.py、resistor.py、main.py、detect_and_read.py + test_*)
 ├── memory/                         # memory.json (/memory 指令)、usage.json
 ├── output/                         # 輸出 (三星ring2新聞消息.md、Music-Player/front/action.md)
 ├── shape-vision/                   # 獨立子專案：古典影像形狀辨識
@@ -210,6 +224,8 @@ AI-module/
 │   ├── build_corpus.py  build_code_corpus.py  code_retrieval.py  code_snippet_import.py
 │   ├── dataset_import.py  data_split.py  filter_manifest.py  package_checkpoint.py
 │   ├── pcb_dataset_prep.py  kicad_dataset_convert.py  bayesian_utils.py
+│   ├── yolo_custom.py  yolo_train_utils.py  pcb_defect_train.py  road_sign_yolo_train.py
+│   ├── materials_yolo_train.py  region_refer.py
 │   ├── CNN.py  OCR.py  RNN.py  RNN.md  image_analysis.py  image_classifier_bnn.py  road_sign_train.py
 │   ├── cv_inference_check.py  inference_check.py
 │   ├── speech_to_text.py  voice_clone.py  prepare_audio.py  label_clips.py  align_lyrics.py

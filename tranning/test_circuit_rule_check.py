@@ -156,3 +156,131 @@ def test_get_lib_pin_table_reads_unit_1_pins():
     pins = table["Test:R"][1]
     numbers = {p["number"] for p in pins}
     assert numbers == {"1", "2"}
+
+
+# ---------------------------------------------------------------------------
+# MCU-aware checks: missing_decoupling_cap / missing_reset_pullup /
+# missing_crystal_load_caps. A tiny 3-pin "Test:MCU" part (VCC/RESET/XTAL1,
+# named exactly like a real MCU library so the *_RE name-matching in
+# circuit_rule_check.py is what's actually under test) plus generic
+# "Device:R"/"Device:C" two-pin parts and a "power:+5V" flag alongside the
+# existing "power:GND" fixture.
+# ---------------------------------------------------------------------------
+
+_LIB_MCU_EXTRAS = """
+    (lib_symbols
+        (symbol "Test:MCU"
+            (symbol "MCU_1_1"
+                (pin power_in line (at -2.54 5.08 180) (length 2.54)
+                    (name "VCC" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin input line (at -2.54 0 180) (length 2.54)
+                    (name "RESET" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at -2.54 -5.08 180) (length 2.54)
+                    (name "XTAL1" (effects (font (size 1.27 1.27))))
+                    (number "3" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "Device:R"
+            (symbol "R_1_1"
+                (pin passive line (at -2.54 0 0) (length 2.54)
+                    (name "1" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 2.54 0 0) (length 2.54)
+                    (name "2" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "Device:C"
+            (symbol "C_1_1"
+                (pin passive line (at -2.54 0 0) (length 2.54)
+                    (name "1" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 2.54 0 0) (length 2.54)
+                    (name "2" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "power:+5V"
+            (power)
+            (symbol "+5V_0_1"
+                (pin power_in line (at 0 0 90) (length 0)
+                    (name "+5V" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "power:GND"
+            (power)
+            (symbol "GND_0_1"
+                (pin power_in line (at 0 0 90) (length 0)
+                    (name "GND" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+            )
+        )
+    )
+"""
+
+
+def _write_mcu_sch(tmp_path: Path, body: str) -> Path:
+    text = (f'(kicad_sch (version 20231120) (generator test) (paper "A4") '
+            f'{_LIB_MCU_EXTRAS} {body})')
+    path = tmp_path / "mcu.kicad_sch"
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def test_missing_decoupling_cap_flagged_when_vcc_pin_undecoupled(tmp_path):
+    # MCU at (0,0): VCC pin -> abs (-2.54, 5.08). Wired only to a bare label,
+    # no capacitor anywhere -- must be flagged.
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _wire(-10, 5.08, -2.54, 5.08)
+        + '(label "VCC_NET" (at -10 5.08 0) (effects (font (size 1.27 1.27))))'
+    )
+    findings = check_schematic(_write_mcu_sch(tmp_path, body))
+    assert any(f["rule"] == "missing_decoupling_cap" for f in findings)
+
+
+def test_missing_decoupling_cap_clear_when_cap_bridges_to_ground(tmp_path):
+    # Same VCC pin, but now a Device:C bridges its net straight to power:GND.
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _symbol_instance("Device:C", "C1", -7.54, 5.08)      # pins at -10.08,5.08 / -5.0,5.08
+        + _wire(-5.0, 5.08, -2.54, 5.08)
+        + _symbol_instance("power:GND", "#PWR01", -10.08, 5.08, angle=90)
+    )
+    findings = check_schematic(_write_mcu_sch(tmp_path, body))
+    assert not any(f["rule"] == "missing_decoupling_cap" for f in findings)
+
+
+def test_missing_reset_pullup_flagged_when_reset_pin_floats_free(tmp_path):
+    # RESET pin -> abs (-2.54, 0). No pull-up resistor anywhere.
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _wire(-10, 0, -2.54, 0)
+        + '(label "RESET_NET" (at -10 0 0) (effects (font (size 1.27 1.27))))'
+    )
+    findings = check_schematic(_write_mcu_sch(tmp_path, body))
+    assert any(f["rule"] == "missing_reset_pullup" for f in findings)
+
+
+def test_missing_reset_pullup_clear_when_resistor_bridges_to_power_net(tmp_path):
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _symbol_instance("Device:R", "R1", -7.54, 0)          # pins at -10.08,0 / -5.0,0
+        + _wire(-5.0, 0, -2.54, 0)
+        + _symbol_instance("power:+5V", "#PWR02", -10.08, 0)
+    )
+    findings = check_schematic(_write_mcu_sch(tmp_path, body))
+    assert not any(f["rule"] == "missing_reset_pullup" for f in findings)
+
+
+def test_missing_crystal_load_caps_flagged_when_xtal_pin_undecoupled(tmp_path):
+    # XTAL1 pin -> abs (-2.54, -5.08). No capacitor to ground anywhere.
+    body = (
+        _symbol_instance("Test:MCU", "U1", 0, 0)
+        + _wire(-10, -5.08, -2.54, -5.08)
+    )
+    findings = check_schematic(_write_mcu_sch(tmp_path, body))
+    assert any(f["rule"] == "missing_crystal_load_caps" for f in findings)

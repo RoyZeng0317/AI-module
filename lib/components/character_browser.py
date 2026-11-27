@@ -19,6 +19,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
+import persona_chat
 from chats import DEFAULT_OUT_DIR
 
 TRANNING_DIR = Path(__file__).resolve().parents[2] / "tranning"
@@ -66,8 +67,11 @@ def _build_card_row(parent: tk.Widget, card: dict, on_switch) -> tk.Frame:
         tk.Label(row, text=f"氣質：{trait_text}", bg=PANEL_BG, fg=ACCENT, anchor="w",
                   wraplength=480, justify="left").pack(fill="x", padx=10, pady=(2, 0))
 
-    if not (CHARACTER_CHAT_DIR / "encoder.pt").exists():
-        tk.Label(row, text="（尚未訓練這個角色的聊天 checkpoint，切換後會顯示「尚未訓練」提示而非真的回覆）",
+    # 2026-09-30 起角色回覆走 persona_chat.py（範例優先 → 依性格改寫 sinco
+    # 候選），不再需要角色專屬 checkpoint；改提示「範例越多越像」。
+    example_count = len(persona_chat.card_examples(card))
+    if example_count < 10:
+        tk.Label(row, text=f"（目前只有 {example_count} 組你寫的對話範例；範例越多，角色講話越像本人）",
                   bg=PANEL_BG, fg=WARN, anchor="w", wraplength=480, justify="left").pack(
             fill="x", padx=10, pady=(2, 0))
 

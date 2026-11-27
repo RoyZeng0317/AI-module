@@ -1,4 +1,4 @@
-"""Generic Bayesian image classifier — MobileNetV2 transfer learning +
+"""Generic Bayesian image classifier — custom CNN trained from scratch +
 Monte Carlo Dropout, for any "one subfolder per class" image dataset (not
 tied to road signs specifically; see road_sign_train.py for that dedicated
 pipeline, which this deliberately does not replace or modify).
@@ -35,6 +35,7 @@ script is meant for generic photos rather than direction-sensitive signs:
     RTX 4060 8GB budget reasoning applies here.
 
 Usage:
+    python image_classifier_bnn.py --data-dir path/to/split_output --grayscale
     python image_classifier_bnn.py --data-dir path/to/split_output --epochs 30
     python image_classifier_bnn.py --data-dir path/to/split_output --no-hflip --epochs 30
     python image_classifier_bnn.py --classify path/to/image.jpg --out-dir image_classifier_runs
@@ -60,7 +61,7 @@ DEFAULT_OUT_DIR = Path(__file__).resolve().parent / "image_classifier_runs"
 DEFAULT_MC_SAMPLES = 20
 
 
-def build_transforms(image_size: int = 224, hflip: bool = True):
+def build_transforms(image_size: int = 224, hflip: bool = True, grayscale: bool = False):
     train_ops = [transforms.Resize((image_size, image_size))]
     if hflip:
         train_ops.append(transforms.RandomHorizontalFlip())
@@ -71,17 +72,22 @@ def build_transforms(image_size: int = 224, hflip: bool = True):
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
     ]
+    # 保留三通道架構；灰階時在 Normalize 前將亮度複製到三通道。
+    if grayscale:
+        train_ops.insert(-2, transforms.Grayscale(num_output_channels=3))
     train_tf = transforms.Compose(train_ops)
     eval_tf = transforms.Compose([
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
     ])
+    if grayscale:
+        eval_tf.transforms.insert(1, transforms.Grayscale(num_output_channels=3))
     return train_tf, eval_tf
 
 
-def build_dataloaders(data_dir: Path, image_size: int, batch_size: int, hflip: bool):
-    train_tf, eval_tf = build_transforms(image_size, hflip)
+def build_dataloaders(data_dir: Path, image_size: int, batch_size: int, hflip: bool, grayscale: bool = False):
+    train_tf, eval_tf = build_transforms(image_size, hflip, grayscale)
     data_dir = Path(data_dir)
     train_ds = datasets.ImageFolder(data_dir / "train", transform=train_tf)
     val_ds = datasets.ImageFolder(data_dir / "val", transform=eval_tf)
@@ -94,20 +100,34 @@ def build_dataloaders(data_dir: Path, image_size: int, batch_size: int, hflip: b
     return train_loader, val_loader, train_ds.classes
 
 
-def build_model(num_classes: int, freeze_backbone: bool, dropout: float = 0.3):
-    model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
-    if freeze_backbone:
-        for param in model.features.parameters():
-            param.requires_grad = False
-    in_features = model.classifier[1].in_features
-    # This Dropout layer does double duty: ordinary regularization during
-    # training, and — left deliberately ON at inference via
-    # bayesian_utils.mc_dropout_mode — the source of stochasticity
-    # classify_image() samples from for its Bayesian confidence/entropy.
-    model.classifier = nn.Sequential(
-        nn.Dropout(dropout),
-        nn.Linear(in_features, num_classes),
-    )
+class FeatureCNN(nn.Module):
+    """自建卷積特徵提取器；所有權重從隨機初始化開始學習。"""
+
+    def __init__(self, num_classes: int, dropout: float):
+        super().__init__()
+        blocks, channels = [], 3
+        for width in (16, 32, 64):
+            blocks.append(nn.Sequential(nn.Conv2d(channels, width, 3, padding=1),
+                          nn.BatchNorm2d(width), nn.ReLU(), nn.MaxPool2d(2)))
+            channels = width
+        self.features = nn.Sequential(*blocks)
+        self.classifier = nn.Sequential(nn.AdaptiveAvgPool2d(1), nn.Flatten(),
+                                        nn.Dropout(dropout), nn.Linear(64, num_classes))
+
+    def forward(self, images):
+        return self.classifier(self.features(images))
+
+
+def build_model(num_classes: int, freeze_backbone: bool = False, dropout: float = 0.3,
+                architecture: str = "feature_cnn"):
+    if architecture == "feature_cnn":
+        # 舊呼叫即使傳 freeze_backbone=True，自建模型仍必須訓練特徵層。
+        return FeatureCNN(num_classes, dropout)
+    if architecture != "mobilenet_v2":
+        raise ValueError(f"Unknown architecture: {architecture}")
+    # 僅供舊 checkpoint 載入；不下載或載入外部預訓練權重。
+    model = models.mobilenet_v2(weights=None)
+    model.classifier = nn.Sequential(nn.Dropout(dropout), nn.Linear(model.last_channel, num_classes))
     return model
 
 
@@ -131,11 +151,40 @@ def run_epoch(model, loader, criterion, optimizer, device, train: bool):
     return total_loss / total, correct / total
 
 
+
+def plot_history(out_dir: Path) -> Path:
+    """Render recorded training/validation metrics without a GUI or retraining."""
+    from matplotlib.figure import Figure
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+    from matplotlib.ticker import PercentFormatter
+
+    out_dir = Path(out_dir)
+    history = json.loads((out_dir / "history.json").read_text(encoding="utf-8"))
+    if not history:
+        raise ValueError("history.json contains no training epochs")
+    fig = Figure(figsize=(10, 4), layout="constrained")
+    FigureCanvasAgg(fig)
+    axes = fig.subplots(1, 2)
+    epochs = [row["epoch"] for row in history]
+    for ax, metric, title in zip(axes, ("loss", "acc"), ("Loss", "Accuracy")):
+        for split in ("train", "val"):
+            ax.plot(epochs, [row[f"{split}_{metric}"] for row in history],
+                    label="Training" if split == "train" else "Validation", marker=".")
+        ax.set(title=title, xlabel="Epoch", ylabel=title)
+        ax.grid(alpha=0.25)
+        ax.legend()
+    axes[1].set_ylim(0, 1.05)
+    axes[1].yaxis.set_major_formatter(PercentFormatter(1))
+    path = out_dir / "training_curves.png"
+    fig.savefig(path, dpi=160)
+    return path
+
+
 def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float,
           patience: int, image_size: int, freeze_backbone: bool, dropout: float,
-          weight_decay: float, hflip: bool = True, device: str | None = None):
+          weight_decay: float, hflip: bool = True, device: str | None = None, grayscale: bool = False):
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    train_loader, val_loader, classes = build_dataloaders(data_dir, image_size, batch_size, hflip)
+    train_loader, val_loader, classes = build_dataloaders(data_dir, image_size, batch_size, hflip, grayscale)
     model = build_model(len(classes), freeze_backbone, dropout).to(device)
 
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
@@ -147,7 +196,7 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "classes.json").write_text(json.dumps(classes, ensure_ascii=False, indent=2))
-    (out_dir / "config.json").write_text(json.dumps({"image_size": image_size, "dropout": dropout}, indent=2))
+    (out_dir / "config.json").write_text(json.dumps({"image_size": image_size, "dropout": dropout, "grayscale": grayscale, "architecture": "feature_cnn"}, indent=2))
 
     stopper = EarlyStopper(patience)
     history = []
@@ -169,6 +218,7 @@ def train(data_dir: Path, out_dir: Path, epochs: int, batch_size: int, lr: float
 
     stopper.restore_best(model)
     save_checkpoint(model, out_dir, history)
+    print(f"Training curves: {plot_history(out_dir)}")
     return model, classes, history
 
 
@@ -187,11 +237,12 @@ def _load(out_dir: Path):
     classes = json.loads(classes_path.read_text(encoding="utf-8"))
     config = json.loads(config_path.read_text(encoding="utf-8"))
 
-    model = build_model(len(classes), freeze_backbone=False, dropout=config["dropout"])
+    model = build_model(len(classes), freeze_backbone=False, dropout=config["dropout"],
+                        architecture=config.get("architecture", "mobilenet_v2"))
     model.load_state_dict(torch.load(model_path, map_location="cpu"))
     model.eval()
 
-    loaded = (model, classes, config["image_size"])
+    loaded = (model, classes, config["image_size"], config.get("grayscale", False))
     _loaded_models[key] = loaded
     return loaded
 
@@ -219,8 +270,8 @@ def classify_image(image_path: Path, out_dir: Path = DEFAULT_OUT_DIR,
             0.0, 0.0,
         )
 
-    model, classes, image_size = loaded
-    _, eval_tf = build_transforms(image_size)
+    model, classes, image_size, grayscale = loaded
+    _, eval_tf = build_transforms(image_size, grayscale=grayscale)
     image = Image.open(image_path).convert("RGB")
     tensor = eval_tf(image).unsqueeze(0)
 
@@ -231,10 +282,45 @@ def classify_image(image_path: Path, out_dir: Path = DEFAULT_OUT_DIR,
     return classes[top_idx], confidence, entropy
 
 
+def export_features(image_path: Path, out_dir: Path) -> Path:
+    """輸出各卷積階段前四個通道的反應，不將特徵圖當作辨識正確證明。"""
+    from matplotlib.figure import Figure
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+    image_path = Path(image_path)
+    if not image_path.is_file():
+        raise FileNotFoundError(f"找不到圖片：{image_path.resolve()}。請將範例圖片路徑換成實際存在的檔案。")
+    loaded = _load(Path(out_dir))
+    if loaded is None:
+        raise FileNotFoundError("Train a checkpoint before exporting features")
+    model, _, image_size, grayscale = loaded
+    if not isinstance(model, FeatureCNN):
+        raise ValueError("Feature maps require a feature_cnn checkpoint")
+    _, transform = build_transforms(image_size, grayscale=grayscale)
+    with Image.open(image_path) as image:
+        tensor = transform(image.convert("RGB")).unsqueeze(0)
+    fig = Figure(figsize=(10, 7), layout="constrained")
+    FigureCanvasAgg(fig)
+    axes = fig.subplots(3, 4)
+    with torch.no_grad():
+        for stage, block in enumerate(model.features):
+            tensor = block(tensor)
+            for channel in range(4):
+                axes[stage, channel].imshow(tensor[0, channel].cpu(), cmap="gray")
+                axes[stage, channel].set_title(f"Stage {stage + 1} / Channel {channel + 1}")
+                axes[stage, channel].axis("off")
+    path = Path(out_dir) / "feature_maps.png"
+    fig.savefig(path, dpi=140)
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description="Train or run a generic Bayesian (MC Dropout) image classifier")
+    parser.add_argument("--features", type=Path, help="export learned feature maps for an image")
+    parser.add_argument("--plot-history", action="store_true", help="plot existing history.json without training")
     parser.add_argument("--data-dir", type=Path,
                         help="folder with train/ and val/ subfolders (ImageFolder layout, output of data_split.py)")
+    parser.add_argument("--grayscale", action="store_true", help="將訓練與驗證圖片轉成灰階，推論沿用 checkpoint 設定")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)
@@ -245,7 +331,7 @@ def main():
                         help="also the MC Dropout probability used at --classify time")
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--unfreeze-backbone", dest="freeze_backbone", action="store_false")
-    parser.set_defaults(freeze_backbone=True)
+    parser.set_defaults(freeze_backbone=False)
     parser.add_argument("--no-hflip", dest="hflip", action="store_false",
                         help="disable random horizontal flip augmentation — turn off for direction-sensitive "
                              "classes (arrows, text, left/right-specific objects)")
@@ -255,6 +341,17 @@ def main():
     parser.add_argument("--classify", type=Path,
                         help="skip training; classify a single image against --out-dir's checkpoint")
     args = parser.parse_args()
+
+    if args.features:
+        try:
+            print(export_features(args.features, args.out_dir))
+        except (OSError, ValueError) as exc:
+            parser.error(str(exc))
+        return
+
+    if args.plot_history:
+        print(plot_history(args.out_dir))
+        return
 
     if args.classify:
         label, confidence, entropy = classify_image(args.classify, out_dir=args.out_dir, mc_samples=args.mc_samples)
@@ -267,7 +364,7 @@ def main():
 
     train(args.data_dir, args.out_dir, args.epochs, args.batch_size, args.lr,
           args.patience, args.image_size, args.freeze_backbone, args.dropout,
-          args.weight_decay, args.hflip)
+          args.weight_decay, args.hflip, grayscale=args.grayscale)
 
 
 if __name__ == "__main__":
