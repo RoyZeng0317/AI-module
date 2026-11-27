@@ -136,7 +136,7 @@ def run(run_dir, output_dir, stage="dev", previous=None, dataset=None, generate_
     if len(captions) != len(combinations(stage)) or {t["combo"] for t in captions.values()} != combinations(stage):
         raise ValueError("Unexpected caption coverage")
     if generate_fn is None:
-        from lib.img import generate as generate_fn
+        from lib.Image.img import generate as generate_fn
     output_dir.mkdir(parents=True, exist_ok=True)
     samples = []
     for caption, target in captions.items():

@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 import pytest, torch
 from PIL import Image
-from lib import img
+from lib.Image import img
 
 ROOT = Path(__file__).resolve().parents[1]
 

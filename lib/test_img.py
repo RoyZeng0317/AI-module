@@ -10,7 +10,7 @@ import json
 
 from PIL import Image, ImageDraw
 
-from img import deblur, edit, generate, train_deblur, train_editor, train_text_to_image
+from lib.Image.img import deblur, edit, generate, train_deblur, train_editor, train_text_to_image
 
 CAPTIONS = ["a red circle", "a blue circle", "a green circle"]
 

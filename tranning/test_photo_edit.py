@@ -116,7 +116,7 @@ def test_circuit_ink_preserves_thin_wire_and_gap(tmp_path):
 
 
 def test_circuit_practice_cli_saves_comparisons(tmp_path, monkeypatch):
-    from lib.img_edge import main
+    from lib.Image.img_edge import main
     gray = np.full((50, 80), 255, dtype=np.uint8)
     gray[20, 5:70] = 0
     source, output = tmp_path / 'diagram.png', tmp_path / 'practice'
@@ -153,7 +153,7 @@ def test_breadboard_preserves_color_and_separates_analysis(tmp_path):
 
 
 def test_breadboard_practice_cli_saves_color(tmp_path, monkeypatch):
-    from lib.img_edge import main
+    from lib.Image.img_edge import main
     source, output = tmp_path / 'breadboard.png', tmp_path / 'practice'
     Image.new('RGB', (40, 30), (255, 0, 0)).save(source)
     monkeypatch.setattr('sys.argv', ['img_edge.py', '--mode', 'breadboard', '--input', str(source), '--output', str(output)])
