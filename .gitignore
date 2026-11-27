@@ -170,3 +170,6 @@ output/test_character_image_close_review.py
 
 # speech CLI pytest tmp_path 測試暫存輸出（可重新產生，不進版控）
 /output/speech-cli-test-tmp/
+
+# 大型影片（261MB，超過 GitHub 100MB 上限，不進版控）
+/lib/opencv2/08-11.mp4
