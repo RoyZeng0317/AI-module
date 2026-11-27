@@ -1,0 +1,17 @@
+path: C:/Users/roy/Documents/GitHub/AI-module/data/object_detection/exports/18eb74d258ff418ebd515d6bcaa1cce3
+train: images/train
+val: images/val
+names:
+  0: 橡皮擦
+  1: 鉛筆
+  2: 指甲剪
+  3: 耳機
+  4: 剪刀
+  5: 立可帶
+  6: 直尺
+  7: 原子筆
+  8: 筆芯盒
+  9: 鑰匙
+  10: 存錢筒
+  11: 自動比
+  12: 自動筆

@@ -1,0 +1,10 @@
+{"grading": "numeric", "id": "test-ohm-0-0", "target": "依歐姆定律，I=V/R=7/35=0.2 A（200 mA）。"}
+{"grading": "numeric", "id": "test-ohm-0-1", "target": "依歐姆定律，V=IR=0.2*35=7 V。"}
+{"grading": "numeric", "id": "test-ohm-0-2", "target": "依歐姆定律，R=V/I=7/0.2=35 歐姆。"}
+{"grading": "numeric", "id": "test-ohm-1-0", "target": "依歐姆定律，I=V/R=9/45=0.2 A（200 mA）。"}
+{"grading": "numeric", "id": "test-ohm-1-1", "target": "依歐姆定律，V=IR=0.2*45=9 V。"}
+{"grading": "numeric", "id": "test-ohm-1-2", "target": "依歐姆定律，R=V/I=9/0.2=45 歐姆。"}
+{"grading": "numeric", "id": "test-units", "target": "先換算電阻為4000歐姆。I=V/R=12/4000=0.003 A（3 mA）。"}
+{"grading": "manual", "id": "test-invalid-0", "target": "資訊不足，請補充另一個已知的電壓、電流或電阻數值。"}
+{"grading": "manual", "id": "test-invalid-1", "target": "零電阻不能用有限電流的歐姆定律直接相除；理想電源短路，需提供實際內阻。"}
+{"grading": "worked", "id": "test-mesh", "target": "節點法：(X-18)/4+(X-9)/8+X/6=0，X=135/13 V。左右順時針電流I1、I2，共用支路向下電流I1-I2。網目式：10I1-6I2=18；-6I1+14I2=-9。I1=(18-X)/4=99/52 A，I2=(X-9)/8=9/52 A，共用電流=45/26 A。"}

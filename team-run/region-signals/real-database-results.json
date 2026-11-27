@@ -1,0 +1,67 @@
+{
+  "cn": {
+    "status": "cn_timezone_and_ip",
+    "beijing_timezone": true,
+    "ip_country": "CN",
+    "text_signals": {
+      "simplified_sample": true,
+      "fullwidth_comma": true,
+      "phrases": [
+        "那咋啦"
+      ]
+    },
+    "action": "observe_only"
+  },
+  "my": {
+    "status": "malaysia_ip",
+    "beijing_timezone": false,
+    "ip_country": "MY",
+    "text_signals": {
+      "simplified_sample": true,
+      "fullwidth_comma": true,
+      "phrases": [
+        "那咋啦"
+      ]
+    },
+    "action": "observe_only"
+  },
+  "conflict": {
+    "status": "malaysia_timezone_conflict",
+    "beijing_timezone": true,
+    "ip_country": "MY",
+    "text_signals": {
+      "simplified_sample": true,
+      "fullwidth_comma": true,
+      "phrases": [
+        "那咋啦"
+      ]
+    },
+    "action": "observe_only"
+  },
+  "tw": {
+    "status": "other_country_ip",
+    "beijing_timezone": false,
+    "ip_country": "TW",
+    "text_signals": {
+      "simplified_sample": true,
+      "fullwidth_comma": true,
+      "phrases": [
+        "那咋啦"
+      ]
+    },
+    "action": "observe_only"
+  },
+  "unknown": {
+    "status": "unknown",
+    "beijing_timezone": false,
+    "ip_country": null,
+    "text_signals": {
+      "simplified_sample": true,
+      "fullwidth_comma": true,
+      "phrases": [
+        "那咋啦"
+      ]
+    },
+    "action": "observe_only"
+  }
+}

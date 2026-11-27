@@ -1,0 +1,35 @@
+{
+  "base": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\tranning\\gpt_chat_runs",
+  "block_size": 512,
+  "groups": {
+    "train": {
+      "total": 20,
+      "no_unk": 20,
+      "untruncated": 20,
+      "effective": 20,
+      "reply_fully_removed": 0
+    },
+    "val": {
+      "total": 9,
+      "no_unk": 9,
+      "untruncated": 9,
+      "effective": 9,
+      "reply_fully_removed": 0
+    },
+    "test": {
+      "total": 9,
+      "no_unk": 9,
+      "untruncated": 9,
+      "effective": 9,
+      "reply_fully_removed": 0
+    },
+    "replay": {
+      "total": 742,
+      "no_unk": 723,
+      "untruncated": 742,
+      "effective": 723,
+      "reply_fully_removed": 0
+    }
+  },
+  "ready": true
+}

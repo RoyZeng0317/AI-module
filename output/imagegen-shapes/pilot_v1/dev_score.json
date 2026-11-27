@@ -1,0 +1,151 @@
+{
+  "groups": {
+    "unseen": {
+      "count": 6,
+      "unscorable": 6,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "by_split": {
+    "dev": {
+      "count": 6,
+      "unscorable": 6,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "by_combo": {
+    "red_triangle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "blue_square": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "details": [
+    {
+      "image": "raw/sample_46d3fe35ed304557b3a1d786d101b39a/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "triangle"
+      },
+      "split": "dev",
+      "combo": "red_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_388ffbe413d14b8a8c9bcbf3c9824199/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "square"
+      },
+      "split": "dev",
+      "combo": "blue_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_27122bc15d1747ab813ba3842c15051e/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "triangle"
+      },
+      "split": "dev",
+      "combo": "red_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_2c46f6a14d8f4c88a5e26019207b25bf/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "square"
+      },
+      "split": "dev",
+      "combo": "blue_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_fa091950ba954420ad775e8d847c9cf3/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "triangle"
+      },
+      "split": "dev",
+      "combo": "red_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_9aa20f745209498e8600ade2f9737162/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "square"
+      },
+      "split": "dev",
+      "combo": "blue_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    }
+  ],
+  "limitation": "Narrow clean-shape heuristic; human inspection still required. All unscorable outputs count as failures. Aggregate unseen scores do not establish test or per-combination success."
+}

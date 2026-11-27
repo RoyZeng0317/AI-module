@@ -1,0 +1,26 @@
+[
+  {
+    "path": "lib/img.py",
+    "sha256": "daa466c2c520b2f9ea534bf80169f83ef5467d4ed54cecdf8a17903f594617b4"
+  },
+  {
+    "path": "tranning/imagegen/draw.py",
+    "sha256": "198a691b4a8bf831e2f5a12c21e762bb51965d74dba92705dd334ac96460f5e9"
+  },
+  {
+    "path": "tranning/imagegen/shapes_score.py",
+    "sha256": "778dbb2e6e914f64a37ee5c44ecd2b2ae6709b624af99c2426c39c16418d3783"
+  },
+  {
+    "path": "tranning/imagegen/shapes_data.py",
+    "sha256": "df16d4b954dacbf2f82357b6779da55dd5b68834137fd012cc76cfdfa00794e1"
+  },
+  {
+    "path": "lib/img_runs/t2i_shapes/pilot_v2/config.json",
+    "sha256": "9b0a4b9be3dd7f85f36b5a7d4de068f0f3617422abccc9159d967b83946bf5ab"
+  },
+  {
+    "path": "team-run/imagegen-shapes-v2/preflight.py",
+    "sha256": "cc639207ae70aa7d33a6bda1081b0bb05b2f86e5f91bb854c8a7f5d6a86d8585"
+  }
+]

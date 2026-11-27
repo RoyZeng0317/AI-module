@@ -1,0 +1,1022 @@
+[
+  {
+    "image": "images/test/green_circle_000.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "144510a30bd8f90d16c046d2a0e15751c11b769a44dd77e7f4f2a8d8faea0c1a",
+    "file_sha256": "3b7c07619dcefac9e14a2b2be7bcb19ed237de50d5a6961552aa19d7839ff228",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      13,
+      50,
+      51
+    ]
+  },
+  {
+    "image": "images/test/green_circle_001.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "35918320bfa27e431cac8c3dd0e6bf022d052fee32163ee9f860f1f7153e9586",
+    "file_sha256": "49e9d8797de4370c834b5c036ec467d67fa4485a6f12eb50d963666bae615107",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      10,
+      38,
+      39
+    ]
+  },
+  {
+    "image": "images/test/green_circle_002.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "8b18a8430c41b90bb5adde9eeeecc67b8735b7898846d3882ef9a46fca05da56",
+    "file_sha256": "fbabdd08901ffc2320840d37197a513c67b2be10f8fe98bf1a69e96cb760fb26",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      8,
+      42,
+      41
+    ]
+  },
+  {
+    "image": "images/test/green_circle_003.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "7c4259b2034872310a4ff0ceeae989394173b26649b1c3c43a10703e0b9e518c",
+    "file_sha256": "e93000947a76fd9bc6fc6ca6852d6b075cc950b6e53c5b98455df944edffb5f4",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      14,
+      47,
+      47
+    ]
+  },
+  {
+    "image": "images/test/green_circle_004.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "4ecef528846cc67f6fbd880c71e03a6af02853d2af83b2b9b64fd38e7e2c1d88",
+    "file_sha256": "5ab4e5b107d7eb3beb7fab022d176e98ef9433aa590f10fed7e592a0581ed89f",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      11,
+      39,
+      41
+    ]
+  },
+  {
+    "image": "images/test/green_circle_005.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "7dc17209dae8c41b4917b7a1fcaad9c415eb6e0d8debb8afa93276b6eb48b1cc",
+    "file_sha256": "5f737f9b3e5ab35c1a0752a645edbab6e4cca056291c7a3d349668746f7fd19f",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      9,
+      39,
+      36
+    ]
+  },
+  {
+    "image": "images/test/green_circle_006.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "ef554a1e31cd83f583f1cd08624ccc1d696ba463f2cc3df1740316e580fe2e4b",
+    "file_sha256": "95b5aea3241252c9604b18962bf71546e4aa2f3a1f1be9f76e9168df2ec38992",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      14,
+      38,
+      39
+    ]
+  },
+  {
+    "image": "images/test/green_circle_007.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "853221d50328938642bb38e2717f5056fbb2fa4e76dbb070e13a3321adfdcb83",
+    "file_sha256": "1e550fdbcec8d30faf00ab1e88490a3fbe9bfe739462b514c1494779f3392422",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      13,
+      44,
+      48
+    ]
+  },
+  {
+    "image": "images/test/green_circle_008.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "4ad70aa85d021186d39f219ac9612bc2afe03b5b0e18b64cbe25a5d6e557e0df",
+    "file_sha256": "e2e182121302d1f7fca488e550fd03fb1cb89072d1d1153dc3d78080c0f7ebdd",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      15,
+      38,
+      39
+    ]
+  },
+  {
+    "image": "images/test/green_circle_009.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "c6a353e02b1e1ad1799a238ff6cd340030ab99fc0b34d084a351512d1a2c7433",
+    "file_sha256": "bf7bdce1666dfa360a398d50c9d37de43340a15909bd0609aa0f62f95a3e5dcd",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      13,
+      41,
+      40
+    ]
+  },
+  {
+    "image": "images/test/green_circle_010.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "fff7c6f5c165d2ef1f77ad88700f5d7fbe60a48058bac77f8648b697d1fcccfe",
+    "file_sha256": "0e0efa2157ca320ee47eeb067112e05e23c5c1113d466a01cbcd03785150a7b8",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      10,
+      14,
+      48,
+      52
+    ]
+  },
+  {
+    "image": "images/test/green_circle_011.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "3d2812d576f8e72ccae6bb4c8641be001a2f197d616ca757d0ed5a40fad4c83b",
+    "file_sha256": "00916f5a0b35399f8b60b0e5afc0a3b8b6c9e43d0932e9ebce26e6cb67642c7c",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      15,
+      41,
+      44
+    ]
+  },
+  {
+    "image": "images/test/green_circle_012.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "ca2968aea9dc885a47693704ae063e1397997f112e3ae25d91d3e0c95b49cc40",
+    "file_sha256": "3133f0ecf6919debb01bc2050ed030c5d20518fcf4331be4b57444aca2d1aacc",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      12,
+      52,
+      50
+    ]
+  },
+  {
+    "image": "images/test/green_circle_013.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "695d223b4a418ac75ceb8a3d518585b9e1643f9767b088ca138485ff584d96f6",
+    "file_sha256": "bc110bc3c34168702222d4d31482df4638209e002f77fb5cf0796be743184563",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      9,
+      45,
+      43
+    ]
+  },
+  {
+    "image": "images/test/green_circle_014.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "f53c73344a4e5945e7e85aab26b6532dcbbf9ab6d2dffc4c1b44afc6bee45083",
+    "file_sha256": "a16680b21f2fafface1c35f641176ba022c79e3e867c96c344171fbb87db2282",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      11,
+      47,
+      43
+    ]
+  },
+  {
+    "image": "images/test/green_circle_015.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "9e2451797a569986f42b00d9bcdd02b27f966cf71eed98f988d5de6ee9be7ea6",
+    "file_sha256": "019af40095273ad65db8b81222a3ca69beae06ed63fa6095b695db548fb32cdb",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      13,
+      52,
+      51
+    ]
+  },
+  {
+    "image": "images/test/green_circle_016.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "619d2959298885bf7d90e5828fcbe3bf2ec73827a889e0f8ce50efbe58cdcd67",
+    "file_sha256": "3ebf9fbb06e3f5b97c9bdb318326eaf27e841bb7ac0a4589a8622327df824059",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      13,
+      39,
+      37
+    ]
+  },
+  {
+    "image": "images/test/green_circle_017.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "76115489e72f097910b14d33dbc14aeb135be3f9ca8dad8859575d3e3187951c",
+    "file_sha256": "3b9348cb50201d6cde652dbe053be7b2d21141a19228034d5451568f230841fa",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      11,
+      44,
+      40
+    ]
+  },
+  {
+    "image": "images/test/green_circle_018.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "61e5457cd6c63b858ce4985f92cbf5523282e5800bbe16ae0d570e5da0d2b4b6",
+    "file_sha256": "a0eff2c2c0c6d50fb260378eb1c84752fe7d396dc95eb5d3b801b3e9ab8627cf",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      13,
+      47,
+      48
+    ]
+  },
+  {
+    "image": "images/test/green_circle_019.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "e4572c6b6beea8d28ca372c0f03cf6d9c28b73dca8e27b588c5d3a0ab8c6c5fb",
+    "file_sha256": "51412a89f148e32abb84bb875e6dc849894543998d4bad24ad32f9b20be53127",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      8,
+      44,
+      40
+    ]
+  },
+  {
+    "image": "images/test/green_circle_020.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "3941e0aac33fb70b76feb22681fb8228d42021bc60079826247830256b0780e2",
+    "file_sha256": "8122388f3e116efff8fded3d7f9b858b338aca791e8cea2745af28c974d92702",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      9,
+      51,
+      49
+    ]
+  },
+  {
+    "image": "images/test/green_circle_021.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "50bc776fb341bbb97b3fe3b5c1f7713de5d4c6636d7e6e6c1a7ce684225353f4",
+    "file_sha256": "a8cde1f35a8c2810a4a439457680b09e7e78fdfb368e9d8b6a89919087898987",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      15,
+      45,
+      46
+    ]
+  },
+  {
+    "image": "images/test/green_circle_022.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "d7cb9d6af69bc80c6f4970947141de5f1bf7a6d2b69991c1dd190afc7557850c",
+    "file_sha256": "94da54ef0f74d547c32dddfdfcd2cc4eb78d2b559ad198f96a12a2240fe98508",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      15,
+      46,
+      46
+    ]
+  },
+  {
+    "image": "images/test/green_circle_023.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "2eaee6b06eb51966b4af364a46778832314c0f50a6876c7b00b9e89b8e74d70c",
+    "file_sha256": "4a408a81c796c2db1478411d1d5375003335a8b55f8680d29e18680a69c5d694",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      9,
+      46,
+      47
+    ]
+  },
+  {
+    "image": "images/test/green_circle_024.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "38fd3c261ac561a17c6facceafaac4a28f2ca52a20464ab4084a0573b457a3d1",
+    "file_sha256": "3b42dda09e66d247db25da698164d24c6ad2b6420c94f263bb2981a65b2a2d7f",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      14,
+      44,
+      47
+    ]
+  },
+  {
+    "image": "images/test/green_circle_025.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "d0ee640e1799ce1fcb39cc78cf50472bcf536471a04a820010c50a5c8569dbcf",
+    "file_sha256": "a934ce5b7aaf697de3e5d6a30b5a76397b6a3c21306a5b42512d2d2e6908b3bc",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      13,
+      43,
+      44
+    ]
+  },
+  {
+    "image": "images/test/green_circle_026.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "9affe831f3fa10cecc0da1d0cbbcf3f64ad4a335c3e903064121fdcb99a24a2d",
+    "file_sha256": "6598e5261a6653e2340375c2d1a284b3146167c76240ab6096f4f52720dbd0cc",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      14,
+      52,
+      53
+    ]
+  },
+  {
+    "image": "images/test/green_circle_027.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "6fccb2e8d382993f86552c49116006e77f339ba48e1b45e677a11537d3a5a078",
+    "file_sha256": "c49d385d6775d4a7eee5d57613ebd6c403a1f7323677cd4a2640504dc7ce3568",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      15,
+      47,
+      49
+    ]
+  },
+  {
+    "image": "images/test/green_circle_028.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "13fe4bb275fdf29e5ea66085b893e56c47cd444e0bcd31398fa8d591d378abb6",
+    "file_sha256": "699f365d6779687bac3cad501daa1120af2104e920d0a46cefe8f27b40326fd7",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      12,
+      44,
+      44
+    ]
+  },
+  {
+    "image": "images/test/green_circle_029.png",
+    "caption": "綠色圓形",
+    "color": "green",
+    "shape": "circle",
+    "split": "test",
+    "combo": "green_circle",
+    "pixel_sha256": "b1b19225eb23a87910543e2ec69231bf4319f6c83440eb908d63ebc766e82814",
+    "file_sha256": "4643b7c086bfb7f25b1526ffe113964ff721c272ef899c6cd6989f066dbd6e35",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      11,
+      40,
+      42
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_000.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "0867240444c5742acfdc82082fa55455c99c9c5bdb6bef1cdfbdf47ce05820f4",
+    "file_sha256": "e037b860dc7df53e65ea7eb5c010d1e0ace2c3c8caf552810d81d49c967a500d",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      9,
+      42,
+      37
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_001.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "2d056fe7ac3cfd67adcecfdfe18fc8eff7e037c166cf565035da5f747fcd3eb7",
+    "file_sha256": "f592745c925b3ebc58788287d094d4a686b8b61c13bcfdcf324c5b54812b40c0",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      12,
+      53,
+      51
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_002.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "eceb5e6f5699e12ac2c38cbb5c9d31dc3ec9cb91a8c3293ac80979994d760c4b",
+    "file_sha256": "2ebadbfe514307d52238a458004b3f9bf622038013e12e59a470f8c8b2eba5b9",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      11,
+      38,
+      36
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_003.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "2803c5d82f820031cfc036da7d995d28ac446a06401042baf7f509bd615d2f1b",
+    "file_sha256": "ab1fe99e31b998f16a8aeccc14490b02de1a9d944e0086ddd69e648009f45a00",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      11,
+      53,
+      49
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_004.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "ca0b259117abcdf63c49fb2bda17593f3165b1566f604ddefd9f66ef85d9e4f8",
+    "file_sha256": "bafb56fc8b1ec07007f14b39836a1a3e2a384e9430ca581db322d8e15af7363a",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      13,
+      44,
+      48
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_005.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "c900bb751f12407756afc520ce0494a9bf251f8b46b9295c7c2a9748c6cd587d",
+    "file_sha256": "1e1cccc1765d2eafbf648f83fd090fe5007d84cac9da159d2e13e42c47ef5145",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      14,
+      43,
+      49
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_006.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "3e32953d31fc95af7be90df3d412427b9cc57d89a3720ced320257dde3c2d7b2",
+    "file_sha256": "18dc4851efa0662249e84b7059cbe0c288f6fb9b3e5f771c6372959289263c36",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      9,
+      43,
+      41
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_007.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "d10aa260be81bd4038eb6b3e1ff6aeda1414a300e9bb9b969f15f5de511ab3ba",
+    "file_sha256": "6767ed13aab68b4edf2df4d2708314eb33c922699e1ca6b1e03cd96c39e476f4",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      11,
+      47,
+      49
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_008.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "2f2113e4ad69bcd5255dd4c5d53bbc87f3e8c9e5b481f047ea33ac96ed1cb13b",
+    "file_sha256": "49ea0ac9a23de54c485b5c89b2354dc14ff17696c378958c928032274a366e71",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      13,
+      32,
+      37
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_009.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "4c13d38fecc77c2992308258bfd5999f8ba2ccca81c6fd81d081ed74222c62e6",
+    "file_sha256": "cacc5077a1c7a51e37f1120ca0bc1cf9f6a48bfade20ec888954fd6be500caf2",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      10,
+      11,
+      41,
+      42
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_010.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "fdca1cb45b40bcc40d2230e76821290d13ada036e54db38e589ea04ac3bb59b5",
+    "file_sha256": "187db5af20d081fc36cea91f636e406815b501328841a51a09aeaf2676436b28",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      11,
+      37,
+      37
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_011.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "a35be5905ad768ccef6929c8b53ff2f071068e8293de962f38cf46ab40838156",
+    "file_sha256": "ed010cab067995610ec9b78e67594705f34c1565e8db25998e89a2375734486b",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      10,
+      44,
+      41
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_012.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "38deb965edd717edafb25abfc44847d83ba44cc073599f3b793c0bdc0db633c3",
+    "file_sha256": "563fb50d23955853d1fef3f5d4af2afad82a8f7cc8e13d9647e168c327b3fce5",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      10,
+      36,
+      34
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_013.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "1713da04b9f11b5b7b0a889b7e14d9b50d9559c277d670e7c921d63e7cea4de2",
+    "file_sha256": "1862fe6d722d9e928565544a008f1b4ed22734c4a55d882fd2f42299271bc5d0",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      10,
+      40,
+      38
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_014.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "f28e3be58cb5d41c69ddacf70f20d4a71f52f9d0c696e920cf25917a0896a658",
+    "file_sha256": "08eb0e28333e6bd0d0bdb0952b6f61a6d78e8c4d289498f2ba8eb66e19ce1ad5",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      10,
+      35,
+      37
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_015.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "3b99228113914ab66934c1d97eed72c62a70e0de4116e5ec52325ba3578304a2",
+    "file_sha256": "fb6744935911655c7d59232af7c6136321c8a505e01ab6c3319893d9739314f4",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      11,
+      37,
+      35
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_016.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "5df8487c1bc15f05abefac3a6a71bb2f32922f4a5eb16037c5c1e540e14f6587",
+    "file_sha256": "a63d479e6cfba2442c44237e38832cf178cb3eb8ac73abb02e33a1d6c1873d42",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      10,
+      42,
+      44
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_017.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "f45cda1c3790ef4fb27963053d0fc30bc8698111f9288a09674d928d3cef1604",
+    "file_sha256": "0b78a3c637737c9e1a2072d57b3d5cfe30f2a712f6f34d8fa34fcb0a7feec631",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      10,
+      40,
+      42
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_018.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "3664976e1139623903cc31afd0a0a5e2b4ea33982fd6d14b57b75ede77606602",
+    "file_sha256": "baaa43a1e3519e5ac81dced4c948be4d560d3161afdf971825543165cbbf1a9f",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      9,
+      46,
+      46
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_019.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "e525e22dfe488f47e7d509082be925533454b77d5702a0e07318cef36c99b1ab",
+    "file_sha256": "b3a8f41d3100364b5c12e32f5361f016b65c60573f03fe44a59810e7859708e9",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      13,
+      54,
+      52
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_020.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "cd00bc2a501956ac597256692b825300914c063b5e3372f3c28d601a3e5496ee",
+    "file_sha256": "21207b4373447ffebf251e6fa6afea8cbd221255ceef9c95e2a4a430205850db",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      9,
+      15,
+      49,
+      55
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_021.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "8b7aa4700af7791cf1d4e7c325e010374b8e184e1f9b352da6fdeb937608258d",
+    "file_sha256": "1f2426b6d1f2769aa59495d86d64b004f2ce3a973df357d1158fb7e43219844c",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      11,
+      8,
+      51,
+      48
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_022.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "199c9c03368cc2095c9baeac440941eb20ad4a4e40e6cd552eac0ef2dbb615e4",
+    "file_sha256": "d3406b6af8f0fbd9648bccebd198c2d6dcfd9dbc072769a278da97a708ddb106",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      12,
+      15,
+      52,
+      55
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_023.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "e58c00d8195942a51c1426e7559d1393079c33a59cd0ad2e2c069acb04d3e1a0",
+    "file_sha256": "d88c92093d9671d92d5cedf66c6b0283b88789f7f4076189d4919f68b258a227",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      8,
+      15,
+      32,
+      39
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_024.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "8cc4df4bd124e24ea1291d24578889894694663c03b7c68ed66e56a6e8aa2310",
+    "file_sha256": "a7b165eeff65e838a53174854e8f36e2c93e1f06e2f731c223cb10defe1b61e4",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      9,
+      50,
+      45
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_025.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "12ed8943491b0cee8f70849ad19774d9ffa0c54b7ad44c94681046e775fe5e06",
+    "file_sha256": "a79731756b4fa7f6b4ea4add4af049a66e255d79f08445432dd3984c72ff23a6",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      15,
+      9,
+      54,
+      48
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_026.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "704ad9924ec375337f45e67bc94d77e35105e8c3652e61afa75c2f3c6e145c2b",
+    "file_sha256": "b0f309ae7deb820905da8c2bcf9c668df959e6725da1c9f7e8090fcbdc789d23",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      13,
+      10,
+      39,
+      36
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_027.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "116505cc18999f0ce1e937e4ffae986fe99755b42699219ab4d388e67482b6f4",
+    "file_sha256": "4968338d78f01bf1e2aebf9d3301e36f5cfc98bb48dd1eac78315f512c910c95",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      10,
+      12,
+      36,
+      38
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_028.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "c4683ef78dec714ad4959d0c8bfc13dff58fc7c9d31d917acdbcefec8c114d94",
+    "file_sha256": "b927ed953c59a90d3df88633e01bc45622879ea791c986d3238af2f45db3d043",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      12,
+      48,
+      46
+    ]
+  },
+  {
+    "image": "images/test/yellow_triangle_029.png",
+    "caption": "黃色三角形",
+    "color": "yellow",
+    "shape": "triangle",
+    "split": "test",
+    "combo": "yellow_triangle",
+    "pixel_sha256": "d8ed97deb71a29c938e111b306781825cba29c4a64d1ccecad7f3945ff655620",
+    "file_sha256": "1ebc8a8597374a8445c4e90b2e0581060a3aa4666278b83972523f5fc603e7ce",
+    "source": "PIL synthetic teaching image",
+    "box": [
+      14,
+      9,
+      52,
+      47
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/100-4y-04-1-standard.pdf",
+  "parts": [
+    {
+      "page": 1,
+      "text": "公  告 \n答  案\n100學年度技術校院四年制與專科學校二年制 \n統一入學測驗公告答案 \n考科代碼：4-04-1 \n類  別：電機與電子群電子類 \n考  科：電子學、基本電學 \n \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n題號 \n答案 \n1 \nC \n11 \nA \n21 \nC \n31 \nA \n41 \nA \n51 \n  \n2 \nA \n12 \nD \n22 \nC \n32 \nB \n42 \nB \n52 \n  \n3 \nD \n13 \nC \n23 \nB \n33 \nA \n43 \nB \n53 \n  \n4 \nC \n14 \nC \n24 \nD \n34 \nC \n44 \nB \n54 \n  \n5 \n送分 \n15 \nA \n25 \nD \n35 \nD \n45 \nB \n55 \n  \n6 \nB \n16 \nD \n26 \nB \n36 \nA \n46 \nD \n56 \n  \n7 \nB \n17 \nA \n27 \nD \n37 \nD \n47 \nC \n57 \n  \n8 \nA \n18 \nC \n28 \nA \n38 \nB \n48 \nB \n58 \n  \n9 \nC \n19 \nA \n29 \nD \n39 \n送分 \n49 \nB \n59 \n  \n10 \nC \n20 \nB \n30 \nD \n40 \nD \n50 \nC \n60 \n  \n \n備註：第5 題及第39 題變更為「送分」。 \n \n",
+      "images": 0,
+      "drawings": 1680,
+      "text_sha256": "c3ca622eb5ebb854e7aeb6c1c0c6828c5b79141146f3bbe2641c1aeb469db376"
+    }
+  ],
+  "risks": [
+    "diagrams_or_formula_layout_not_reconstructed"
+  ]
+}

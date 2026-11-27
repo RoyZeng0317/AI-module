@@ -1,0 +1,2 @@
+# Traditional Chinese conversion only; no external AI models.
+opencc-python-reimplemented==0.1.7

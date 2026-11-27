@@ -1,0 +1,11 @@
+{
+  "schema_version": "svg_shapes.v1",
+  "shapes": [
+    {
+      "shape": "circle",
+      "color": "red",
+      "position": "center",
+      "size": "small"
+    }
+  ]
+}

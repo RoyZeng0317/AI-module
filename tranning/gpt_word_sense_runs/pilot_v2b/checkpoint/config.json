@@ -1,0 +1,15 @@
+{
+  "block_size": 512,
+  "n_layer": 8,
+  "n_embd": 384,
+  "n_head": 6,
+  "dropout": 0.1,
+  "finetune_regularization": {
+    "freeze_embeddings": true,
+    "freeze_layers": 0,
+    "label_smoothing": 0.1,
+    "typo_noise_prob": 0.0,
+    "lm_corpus": null,
+    "lm_mix_ratio": 0.0
+  }
+}

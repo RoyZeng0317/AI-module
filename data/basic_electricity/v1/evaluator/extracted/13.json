@@ -1,0 +1,3661 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/110-4y-04-1.docx",
+  "parts": [
+    {
+      "paragraph": 1,
+      "text": " 注意：考試開始鈴(鐘)響前，不可以翻閱試題本 ",
+      "text_sha256": "f3158fc66ed25b9f748aa6c2bacc9c6da42b631b075aeb32974df4ef41006461"
+    },
+    {
+      "paragraph": 2,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 3,
+      "text": "110學年度科技校院四年制與專科學校二年制",
+      "text_sha256": "e51967ace2857d47c29f21aa322a6f51c303ad7b61b32c0ab82d9e7f5e2e312c"
+    },
+    {
+      "paragraph": 4,
+      "text": "統　一　入　學　測　驗　試　題　本",
+      "text_sha256": "bb12a934df0eaadee5e40eb9fef53832e930ddaab0687c2419884e5adaa0504b"
+    },
+    {
+      "paragraph": 5,
+      "text": "電機與電子群電機類",
+      "text_sha256": "5eb2eaf8abdb64a076871c04751f6c5347ecc76e0c3c0afb6043a303bcc55a91"
+    },
+    {
+      "paragraph": 6,
+      "text": "電機與電子群資電類",
+      "text_sha256": "3bfb838cebb2060ecd64cb3fa5f6d850f34188552fc95dcf26f8e228b3becaf1"
+    },
+    {
+      "paragraph": 7,
+      "text": "專業科目(一)：電子學、基本電學 ",
+      "text_sha256": "99c0e4ed5aad483e738552f0bd0d5d7888f1b59848613af85e33817cff56aa1e"
+    },
+    {
+      "paragraph": 8,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 9,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 10,
+      "text": "【注　意　事　項】 ",
+      "text_sha256": "d9850e0e6f3efb6dc1cee04ba0e2ebd3051d13a677ee81931921f0acc30f617a"
+    },
+    {
+      "paragraph": 11,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 12,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 13,
+      "text": "1.請核對考試科目與報考群(類)別是否相符。 ˉ ",
+      "text_sha256": "c13d50b3cae220f74da08d112814f408fdd763d358d5de1d9775ad4e85edcfe0"
+    },
+    {
+      "paragraph": 14,
+      "text": "2.請檢查答案卡(卷)、座位及准考證三者之號碼是否完全相同，如有不符，請監試人員查明處理。 ˉ ",
+      "text_sha256": "5397fdf004b1309b41acf5bbfebb7463ef0b322c4f2502f616a7f24f876109b8"
+    },
+    {
+      "paragraph": 15,
+      "text": "3.本試卷分兩部份，共50題，共100分，答對給分，答錯不倒扣。試卷最後一題後面有備註【以下空白】。",
+      "text_sha256": "f611182504ae58ec16b1b4d938446ab1cb95bc1e18fdef101234a1082a81c64e"
+    },
+    {
+      "paragraph": 16,
+      "text": "第一部份(第1至25題，每題2分，共50分)",
+      "text_sha256": "9076972d5a83b42d113631fc2a3e0b34d091e469864c622104d16d837d8e8930"
+    },
+    {
+      "paragraph": 17,
+      "text": "第二部份(第26至50題，每題2分，共50分) ",
+      "text_sha256": "1c6f695464c06873098a89d602be38e24a46ca78520c564763387a42fa4cf626"
+    },
+    {
+      "paragraph": 18,
+      "text": "4.本試卷均為單一選擇題，每題都有 (A)、(B)、(C)、(D) 四個選項，請選一個最適當答案，在答案卡同一題號對應方格內，用 2B 鉛筆塗滿方格，但不超出格外。 ˉ",
+      "text_sha256": "cc55980568ca70b410c5ab7294d9ae843a162b93f903e309cb988c3b3b3c7e70"
+    },
+    {
+      "paragraph": 19,
+      "text": "5.有關數值計算的題目，以最接近的答案為準。 ˉ ",
+      "text_sha256": "deafd226c7375ad717924d4de9fdcad611d7911e86b4b29ca94fc93cfa923700"
+    },
+    {
+      "paragraph": 20,
+      "text": "6.本試卷空白處或背面，可做草稿使用。 ˉ ",
+      "text_sha256": "df0c1804468339bc95c70c99cf33c8fc7358f1256f77f5c788b36bd9529e12b9"
+    },
+    {
+      "paragraph": 21,
+      "text": "7.請在試卷首頁准考證號碼之方格內，填上自己的准考證號碼，考完後將「答案卡(卷)」及「試題」一併繳回。 ˉ ",
+      "text_sha256": "983641fb1907515d47ddd31ba8140b0f4707e7fa3c587fb11dfdb0e72e418114"
+    },
+    {
+      "paragraph": 22,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 23,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 24,
+      "text": "准考證號碼：□□□□□□□□",
+      "text_sha256": "7c4400a1c8f10bc73b24f0fd5c1281340b21f6ab3fa2ebd419a3ffa9fa6b88f3"
+    },
+    {
+      "paragraph": 25,
+      "text": "考試開始鈴(鐘)響時，請先填寫准考證號碼，再翻閱試題本作答。",
+      "text_sha256": "6f944007c593125b289782a7ed0dfb0bca1c818d85fe227fde1994f30fb54734"
+    },
+    {
+      "paragraph": 26,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 27,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 28,
+      "text": "第一部份：電子學 ( 第1至25題，每題2分，共50分 ) ",
+      "text_sha256": "bbe4d306d57b1c747d5faf96ee4dca1dd3f39f9bf6c7c4bed9f06c0b2ff3f88e"
+    },
+    {
+      "paragraph": 29,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 30,
+      "text": "1.如圖(一)所示之電壓信號，頻率為 50 Hz， T為週期，脈波寬度為8 ms，則此信號的平均值為何？ ",
+      "text_sha256": "cf973583a6d2d4292ea559e89ac80afe640e9585bde240bca32b8b7911aa342c"
+    },
+    {
+      "paragraph": 31,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 32,
+      "text": "(A) 10 V",
+      "text_sha256": "ff4e039d7ace44582b8894b80411d8225b667760e32d57a4b210ecb1aea0e662"
+    },
+    {
+      "paragraph": 33,
+      "text": "圖(一)",
+      "text_sha256": "c66e401f569c792efb776cfb89258c070ecf367421293840e5cb55adde56e27d"
+    },
+    {
+      "paragraph": 34,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 35,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 36,
+      "text": "(B) 5 V",
+      "text_sha256": "ca6ff21f6ebf69c6427f9f3cb2a48f873eef436b100a974c8c10ee280de369bb"
+    },
+    {
+      "paragraph": 37,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 38,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 39,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 40,
+      "text": "(C) 4 V",
+      "text_sha256": "626738f7c5e5602d607025c59c9a1dc16f49d0191f057bd89edf96dfd300356f"
+    },
+    {
+      "paragraph": 41,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 42,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 43,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 44,
+      "text": "(D) 2 V",
+      "text_sha256": "8667d8bf3024dd93fdd3f46b1a1ccfe4d95069b915d7e7d81157bb6e5e26fb2d"
+    },
+    {
+      "paragraph": 45,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 46,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 47,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 48,
+      "text": "2.矽二極體的溫度在 25 ° C 時其障壁電壓 V D為 0.7 V，且溫度每上升1 ° C，障壁電壓下降2.5 mV，當 V D為 0.55 V 時，矽二極體溫度為何？ ",
+      "text_sha256": "0710f44829466e36eec3d60e346fd336a5f58d926969bfb4fdc9aef01096d4ce"
+    },
+    {
+      "paragraph": 49,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 50,
+      "text": "(A) 85 ° C ",
+      "text_sha256": "85a61f6e1a84655b5d1ede9c7c70907281247072574ac9fb01117b4809255333"
+    },
+    {
+      "paragraph": 51,
+      "text": "(B) 60 ° C",
+      "text_sha256": "7ea1c9e7d88286fba2111d4c1d85e36d7f14265bfb423499356cd97c11e9a522"
+    },
+    {
+      "paragraph": 52,
+      "text": "(C) − 45 ° C ",
+      "text_sha256": "ac080f6ff7779cd806777ddd83e27a1bbb16949b0de4ad75f6351ed16f2b4122"
+    },
+    {
+      "paragraph": 53,
+      "text": "(D) − 60 ° C",
+      "text_sha256": "ed1b8baf2cd5119f6717a1aa18cc829ddc7aad4254b3e0eee905f6dadff0c14e"
+    },
+    {
+      "paragraph": 54,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 55,
+      "text": "3.如圖(二)所示電路，已知稽納二極體之崩潰電壓 V Z = 5 V、最大崩潰電流 I ZM = 9 mA，若電路維持在正常穩壓狀態，則限流電阻 R 1最小值為何？ ",
+      "text_sha256": "5ec03b88c30abeea6a981bdf20f4ffa3b3b59d0b33492aaa5187d0f8bcce4783"
+    },
+    {
+      "paragraph": 56,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 57,
+      "text": "(A) 200 Ω",
+      "text_sha256": "5e706bab79acec0047853923ba438f789df3eaec9b829fd689f7620942f45dff"
+    },
+    {
+      "paragraph": 58,
+      "text": "圖(二)",
+      "text_sha256": "29e3c2446254c5d83a93fd129319b221842c15c6ba40905546f26a6bb9542eec"
+    },
+    {
+      "paragraph": 59,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 60,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 61,
+      "text": "(B) 300 Ω",
+      "text_sha256": "3ded72827169ce0a1057336a3ccb19be0b35ac656bf4eb8bd864d7b917b23894"
+    },
+    {
+      "paragraph": 62,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 63,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 64,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 65,
+      "text": "(C) 400 Ω",
+      "text_sha256": "bf7431ff85fb2fab9484658e7f76ba043cfb9dac744f1b574e5c7de3ef4ba64c"
+    },
+    {
+      "paragraph": 66,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 67,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 68,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 69,
+      "text": "(D) 500 Ω",
+      "text_sha256": "523d27b7a2fa1969638fa9c48189bf0344d8e2569060f6d0f426bbd28f3994a2"
+    },
+    {
+      "paragraph": 70,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 71,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 72,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 73,
+      "text": "4.如圖(三)所示電路，已知輸入電壓信號 v i及輸出電壓信號 v o，以及電阻 R 1 = R 2＝ 8 k Ω，若考慮二極體的障壁電壓為 0.7 V，且忽略順向電阻，則電路中的電壓 V 1及 V 2分別為何？ ",
+      "text_sha256": "689cb2f2749ba13070b39bd644ac22077e13086e17aeff0d4978053ec8a155f8"
+    },
+    {
+      "paragraph": 74,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 75,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 76,
+      "text": "圖(三)",
+      "text_sha256": "fe9f270b59dd8b4a5f7e475a1bd039bc137384b5b1b1794ac874245bb998c439"
+    },
+    {
+      "paragraph": 77,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 78,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 79,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 80,
+      "text": "(A) V 1 = 5 V、 V 2 = − 3 V",
+      "text_sha256": "33a92595384b936419becbb91aaea2b1cc5a9456da121f74d1e989ab02bef21c"
+    },
+    {
+      "paragraph": 81,
+      "text": "(B) V 1 = 4.3 V、 V 2 = − 3.7 V",
+      "text_sha256": "2bbd2fb283b6ee7ea1d4512996b429d1f9d768ac9360099a82cf28cfea8b2d68"
+    },
+    {
+      "paragraph": 82,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 83,
+      "text": "(C) V 1 = 4.3 V、 V 2 = 2.3 V",
+      "text_sha256": "d486f3469b658bd822e5073256d4b13fcee957fa27ea7727c9c35e18f62f6d66"
+    },
+    {
+      "paragraph": 84,
+      "text": "(D) V 1 = 5.7 V、 V 2 = 3.7 V",
+      "text_sha256": "70a412028a18c2710d6521135974814b8ad6c686df3e837ae52bc2080a7c04b4"
+    },
+    {
+      "paragraph": 85,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 86,
+      "text": "5.承上題， R 1 = 8 k Ω，若輸出電壓信號 v o要為弦波波形，則 R 2最大值為何？ ",
+      "text_sha256": "776809e641e8dec91a7a3edb8f1c1b42f89569aec1ff5c0de1c4274d3d394ac0"
+    },
+    {
+      "paragraph": 87,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 88,
+      "text": "(A) 2 k Ω",
+      "text_sha256": "59208b84f4d630f3791e0bbd5e74e39219be90622c55da50c147d3fd7a25b8ab"
+    },
+    {
+      "paragraph": 89,
+      "text": "(B) 3 k Ω",
+      "text_sha256": "37bce04fc9ddf2ed3a2e3cbd0a657aa56c8abf1c0210b9d3493ec6336de31dfb"
+    },
+    {
+      "paragraph": 90,
+      "text": "(C) 4 k Ω",
+      "text_sha256": "2dea89fdd99138f7ba95523b91a4523306fc46376baa0de9743fc08558f9f47b"
+    },
+    {
+      "paragraph": 91,
+      "text": "(D) 5 k Ω",
+      "text_sha256": "68aa38be1714f2623ba0c41b5bc61a13aeb859de04a64256f9f40474d61d1e82"
+    },
+    {
+      "paragraph": 92,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 93,
+      "text": "6.如圖(四)所示電路，若BJT做開關動作使 LED 呈週期性閃爍，則此電路中的BJT操作模式為何？",
+      "text_sha256": "e14f63a2d4da43e51ef1454e4ff272e6ccbe4addd270301b869aa74b2ce1a7fc"
+    },
+    {
+      "paragraph": 94,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 95,
+      "text": "(A) 飽和模式及主動模式",
+      "text_sha256": "b29e9387edf376651145d6f02a1ea38e26e861f275003cd514b207721bc90f87"
+    },
+    {
+      "paragraph": 96,
+      "text": "圖(四)",
+      "text_sha256": "31eb09d7af03082731d489cef2843d5653639420217a2861db13e5f33822ddde"
+    },
+    {
+      "paragraph": 97,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 98,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 99,
+      "text": "(B) 飽和模式及截止模式",
+      "text_sha256": "20317b7c713f83357f322b6c5c8fef76517a1bf2cbadd95ef271250dee8fffbd"
+    },
+    {
+      "paragraph": 100,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 101,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 102,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 103,
+      "text": "(C) 主動模式及崩潰模式",
+      "text_sha256": "3381119f8ff6c86c394cde06205485ecf9bb315e400e5cc88f480bf257f1fd7c"
+    },
+    {
+      "paragraph": 104,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 105,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 106,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 107,
+      "text": "(D) 主動模式及截止模式",
+      "text_sha256": "b61a28519b651146cf60d25f5429b1ed952d9dc921b984772c9c784f3e7f7c49"
+    },
+    {
+      "paragraph": 108,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 109,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 110,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 111,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 112,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 113,
+      "text": "7.如圖(五)所示電路，BJT之切入電壓V BE = 0.7 V、 V CE = 0.2 V且 V CC = 10.2 V、 V i = 5.7 V、 R B = 10 k Ω、 R C = 1 k Ω，則電流 I C為何？ ",
+      "text_sha256": "c2935b04a061e7ef96f979be3cf879a45cc86ae39dac3db148a9abafc34a7ce0"
+    },
+    {
+      "paragraph": 114,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 115,
+      "text": "(A) 0 mA",
+      "text_sha256": "06fa27e5e0d70805b2072baa2e40ed61760cc9f01d80c5e9c9bfeb7450ccb94c"
+    },
+    {
+      "paragraph": 116,
+      "text": "圖(五)",
+      "text_sha256": "6058d304d880b6df4251db89c4d5bc5841f77a1fa8826b5480c4b4c46b7200d7"
+    },
+    {
+      "paragraph": 117,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 118,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 119,
+      "text": "(B) 0.5 mA",
+      "text_sha256": "c2b83c9cbd4b688d440dea18b0b8e72c5d988ad1cc47d3214c18170c3ee917c6"
+    },
+    {
+      "paragraph": 120,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 121,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 122,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 123,
+      "text": "(C) 5 mA",
+      "text_sha256": "fa6d4cd5392ee755a0c51e8d8cca641cdfe9592d711850ac2875e349c459343a"
+    },
+    {
+      "paragraph": 124,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 125,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 126,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 127,
+      "text": "(D) 10 mA",
+      "text_sha256": "817fe1f6fc3ab106abd73d6b142151bbc13778a9a07f8098eeb2262cf4522521"
+    },
+    {
+      "paragraph": 128,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 129,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 130,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 131,
+      "text": "8.有關 BJT 射極隨耦器之特性，下列敘述何者正確？ ",
+      "text_sha256": "81935eb2cb2d334a478d0f71205667a86f2f7ce65b51d325c10d5215973d19c4"
+    },
+    {
+      "paragraph": 132,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 133,
+      "text": "(A) 高輸入阻抗、高輸出阻抗",
+      "text_sha256": "af56b5a22e9fca455a14381a7049aec1ee8068e8cb23c242745e4ce3ba194cd9"
+    },
+    {
+      "paragraph": 134,
+      "text": "(B) 高輸入阻抗、低輸出阻抗",
+      "text_sha256": "3e5b654f12e1ed47434e9b78982fcd5fc78dc484c53573d27ee5a6680ea1d799"
+    },
+    {
+      "paragraph": 135,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 136,
+      "text": "(C) 低輸入阻抗、高輸出阻抗",
+      "text_sha256": "72a26ebe7087fae76873c6861e17a5f7acd821c97f5cc381a52dccd389d9a544"
+    },
+    {
+      "paragraph": 137,
+      "text": "(D) 低輸入阻抗、低輸出阻抗",
+      "text_sha256": "d841f66a595d78f532567120a338e3a3ab6cf074067a256fc5dfd934e1068299"
+    },
+    {
+      "paragraph": 138,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 139,
+      "text": "9.如圖(六)所示電路，BJT之β = 50，切入電壓V BE = 0.7 V，且 V CC = 10.7 V、 R C = 1 k Ω，若 V CE = 5.7 V，則 R B應為何？ ",
+      "text_sha256": "8e9af20ac641606bcd2ab2452d44e339fa7d4c124a948450ee44ef805646552e"
+    },
+    {
+      "paragraph": 140,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 141,
+      "text": "(A) 51 k Ω",
+      "text_sha256": "45c55d269f0e6cd5d4f565a4d6886635b1c7a9af8866206e4fa24c97c60ec817"
+    },
+    {
+      "paragraph": 142,
+      "text": "圖(六)",
+      "text_sha256": "f20f3e932450b2905d73c6bc8efb4829de67c8b3a00fc569aa959ae11f72e4e9"
+    },
+    {
+      "paragraph": 143,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 144,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 145,
+      "text": "(B) 102 k Ω",
+      "text_sha256": "72ddaff69218f82c2bafeb27fa440e5f6dcea0834cca65bbbe83a7bb50d2a971"
+    },
+    {
+      "paragraph": 146,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 147,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 148,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 149,
+      "text": "(C) 153 k Ω",
+      "text_sha256": "9b83b11aca1ecf5807a7c0f3c232627f01b7b6a2ecadaab10ccc9cf90426fa61"
+    },
+    {
+      "paragraph": 150,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 151,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 152,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 153,
+      "text": "(D) 204 k Ω",
+      "text_sha256": "df93613ddece348adeac77628aa9dce373418e7c82efd3a1cbc4065622942d49"
+    },
+    {
+      "paragraph": 154,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 155,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 156,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 157,
+      "text": "10.若 BJT 共射極組態電路工作於主動區，其直流偏壓基極電流為 10 μ A，集極電流為 1 mA，且熱電壓 V T = 26 mV，則 BJT 之射極交流電阻 r e約為何？ ",
+      "text_sha256": "60913969cca7d7e067adfeca92721affb6751b6981d785321a647ddfca5c503e"
+    },
+    {
+      "paragraph": 158,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 159,
+      "text": "(A) 64.8 Ω",
+      "text_sha256": "d11a952d3dde43ddf0f7e74f814d341c6b9ecab8d2f2da6974053bd3d0672880"
+    },
+    {
+      "paragraph": 160,
+      "text": "(B) 52.2 Ω",
+      "text_sha256": "4ab4cfd0cc030f1479335565a55601efce9bf83eeb6eeb85074345e05e8e72b1"
+    },
+    {
+      "paragraph": 161,
+      "text": "(C) 25.7 Ω",
+      "text_sha256": "f73adf9f900c4ed2edb02e63be8e8642e4b02d8b8817dfb528b000fb4d436e8b"
+    },
+    {
+      "paragraph": 162,
+      "text": "(D) 2.6 Ω",
+      "text_sha256": "927131fccb7e75e0ab2325ca9a09c926e4fb6426bf34c703d724bf711c30164e"
+    },
+    {
+      "paragraph": 163,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 164,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 165,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 166,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 167,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 168,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 169,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 170,
+      "text": "11.如圖(七)所示電路，若 BJT 之β = 100，切入電壓 V BE = 0.7 V，熱電壓 V T = 26 mV，則輸出阻抗 Z o約為何？ ",
+      "text_sha256": "0047bb2256e725c4a2ec0bcc27eb6f1570b225ddfeb71f18f2ce8665e19f955d"
+    },
+    {
+      "paragraph": 171,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 172,
+      "text": "(A) 10 Ω",
+      "text_sha256": "d9108efe0a8e9b9d64b247ca927f858b394f3dbf0beb2aa585756a2a93cb7a87"
+    },
+    {
+      "paragraph": 173,
+      "text": "圖(七)",
+      "text_sha256": "b63bf1720cfa4fc30710ff9ae8883f6461675ab8f01601b5599df48ff34e61a7"
+    },
+    {
+      "paragraph": 174,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 175,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 176,
+      "text": "(B) 22 Ω",
+      "text_sha256": "e5e0594f859685efad4953062ea650a5163832e0579be0242c70790ef62bd57e"
+    },
+    {
+      "paragraph": 177,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 178,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 179,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 180,
+      "text": "(C) 100 Ω",
+      "text_sha256": "a4824c9e3c76617adde73362c2ae90f0b2a152bbd472a5f02b5f614e02d3877b"
+    },
+    {
+      "paragraph": 181,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 182,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 183,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 184,
+      "text": "(D) 220 Ω",
+      "text_sha256": "92f3e4c764a36619f786659d53f351bf1d8931d6a4486c6dd255b22477e73908"
+    },
+    {
+      "paragraph": 185,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 186,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 187,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 188,
+      "text": "12.如圖(八)所示電路，若 BJT 之β = 100，切入電壓 V BE = 0.7 V，熱電壓 V T = 26 mV，則電壓增益 v o / v i約為何？ ",
+      "text_sha256": "49d08a58bec059c0a19a0b707f8f7438c02540c4d3a8882dc4128324b6dfa7eb"
+    },
+    {
+      "paragraph": 189,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 190,
+      "text": "(A) − 101",
+      "text_sha256": "fdb55d6a6246e378b42cf93629b8d8306bd9020c285ef3c22eb1d6db2ab789c8"
+    },
+    {
+      "paragraph": 191,
+      "text": "圖(八)",
+      "text_sha256": "797e1d3fcfe9202eb1763b69210b93bbbfe5a308bafa7960a6ef2f75d59f9625"
+    },
+    {
+      "paragraph": 192,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 193,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 194,
+      "text": "(B) − 121",
+      "text_sha256": "8f585fd6aa31bc857d0de00219bbaef842f9e1309996cb5fd8ced9028aad7660"
+    },
+    {
+      "paragraph": 195,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 196,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 197,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 198,
+      "text": "(C) − 137",
+      "text_sha256": "32a54373ff5a529bb9eee4d71672ae00605c2da4d5656bbb7822e6388b4d8132"
+    },
+    {
+      "paragraph": 199,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 200,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 201,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 202,
+      "text": "(D) − 182",
+      "text_sha256": "ca5a1acebbf6ed4434446bb5630f52826d61dbc37e2f47204175f348970870c4"
+    },
+    {
+      "paragraph": 203,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 204,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 205,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 206,
+      "text": "13.有關兩個相同電晶體(BJT)組成的達靈頓 ( Darlington ) 電路，下列敘述何者錯誤？ ",
+      "text_sha256": "8603e096f767bd6c9c4a4b7bd9663f7e213cff68cc61a0d38e4df5c5ef85009b"
+    },
+    {
+      "paragraph": 207,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 208,
+      "text": "(A) 由兩個共射極組態放大器直接耦合而成",
+      "text_sha256": "19a3b35175f460a67492d40af8a62e1d864439f4c8a57f2aaf5b764132be19c7"
+    },
+    {
+      "paragraph": 209,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 210,
+      "text": "(B) 電流增益很大",
+      "text_sha256": "4f34a8d9f31ed574d6a4e07b4f92e1167e7481bed215ff88e6d038a5ab75ed61"
+    },
+    {
+      "paragraph": 211,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 212,
+      "text": "(C) 具有大的輸入阻抗",
+      "text_sha256": "a0f5c563ad27d9b3b75bf95ab971e6937776dff2a008e9f850eac0f39f79f707"
+    },
+    {
+      "paragraph": 213,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 214,
+      "text": "(D) 具有小的輸出阻抗",
+      "text_sha256": "8e79d9ae039947de0d6f2ad8ca7309231956187f73d9a2692319893bfe2aeaa1"
+    },
+    {
+      "paragraph": 215,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 216,
+      "text": "14.某三級串級放大器，其第一級輸入電壓為 0.2 mV，若各單級電壓增益分別為 40 dB、20 dB 及 20 dB，則第三級輸出電壓的絕對值為何？ ",
+      "text_sha256": "4fb4ee73b7ab09afa6cb1ffb13abf32573afcfa3c2760c0e2cd08610d6b542c3"
+    },
+    {
+      "paragraph": 217,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 218,
+      "text": "(A) 1 V",
+      "text_sha256": "7afc1d94e53bb561ac10725e19b62f32b77fe8a87c56df08299aee0cbf670a66"
+    },
+    {
+      "paragraph": 219,
+      "text": "(B) 2 V",
+      "text_sha256": "eda6ded554525aae441a967d343cc430941e94a30833152f039c742496f94ad8"
+    },
+    {
+      "paragraph": 220,
+      "text": "(C) 4 V",
+      "text_sha256": "626738f7c5e5602d607025c59c9a1dc16f49d0191f057bd89edf96dfd300356f"
+    },
+    {
+      "paragraph": 221,
+      "text": "(D) 8 V",
+      "text_sha256": "72a37fd13fe81620465532340f9f9ecd7da10a45fada81b8359a9aa2736c5270"
+    },
+    {
+      "paragraph": 222,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 223,
+      "text": "15.如圖(九)所示電路，JFET 之截止電壓 V GS ( OFF ) = − 4 V， I DSS = 6 mA，若 JFET 工作於飽和區，則直流電壓源 V DD最小值約為何？ ",
+      "text_sha256": "3e526faa5c28d1195e936fa3e8bd9a797c6f2451fb6231513390e61bfd54537a"
+    },
+    {
+      "paragraph": 224,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 225,
+      "text": "(A) 6 V",
+      "text_sha256": "7ce7e8c2ebf1a3941370d1029c45560dedfd7ae3ae95a5e90f160718172b4f96"
+    },
+    {
+      "paragraph": 226,
+      "text": "圖(九)",
+      "text_sha256": "560384549d7bcb639ab19ca6b485e135b03d8f54fac20915ebd5a14127724fcd"
+    },
+    {
+      "paragraph": 227,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 228,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 229,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 230,
+      "text": "(B) 8 V",
+      "text_sha256": "2b93fc7b5949bc83ea51a1a70e718a11f309b5d73c9a43e46e1c0a4f695b200e"
+    },
+    {
+      "paragraph": 231,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 232,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 233,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 234,
+      "text": "(C) 10 V",
+      "text_sha256": "c86165e37c9fc46bcdcfe9b60d10ab3c1416af301d00d6e1b981d4a721ef79a3"
+    },
+    {
+      "paragraph": 235,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 236,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 237,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 238,
+      "text": "(D) 12 V",
+      "text_sha256": "c2df20308948b475eb7713f63825245e48910bd3ce20c79b2bd1f3bf89f3b35b"
+    },
+    {
+      "paragraph": 239,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 240,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 241,
+      "text": "16.某 N 通道增強型 MOSFET 之臨界電壓 ( threshold voltage ) V T = 2 V，當工作於飽和區且閘-源極間電壓 V GS = 4 V 時，汲極電流為 4 mA；若 V GS = 5 V，則汲極電流為何？ ",
+      "text_sha256": "87cc86b6b5a63ca47f3a5bb5f0fadda0e2548fc3b4439f2c6ab54a849373b8fc"
+    },
+    {
+      "paragraph": 242,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 243,
+      "text": "(A) 11 mA",
+      "text_sha256": "d49db24ad7d7094cc1170397de737e9011edae2a617d84a589111c9490022ecd"
+    },
+    {
+      "paragraph": 244,
+      "text": "(B) 9 mA",
+      "text_sha256": "87f6557e9aff3da4ee127ef74c3392ee528ed7fa4385f475f8839d9d4acb91aa"
+    },
+    {
+      "paragraph": 245,
+      "text": "(C) 7 mA",
+      "text_sha256": "bd8047b1d49a09d3a9ba0bd9b8728d51632eb2cf78498866e7d7fcf7c0562218"
+    },
+    {
+      "paragraph": 246,
+      "text": "(D) 5 mA",
+      "text_sha256": "38cdf44c26d003a9a329e157878c0d9c7f2f325e5947a436fc174ee52fbbcc98"
+    },
+    {
+      "paragraph": 247,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 248,
+      "text": "17.如圖(十)所示電路，MOSFET 之臨界電壓 V T = 2 V，參數 K = 1.2 mA / V 2，則電壓 V DS約為何？ ",
+      "text_sha256": "bad241da6420a066b6412f1a281bf392024e8c0a4042b55ba4b27f39b18dbd17"
+    },
+    {
+      "paragraph": 249,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 250,
+      "text": "(A) 4.6 V",
+      "text_sha256": "ece0bc6394a7b760a96305f3f966de31acfa5bfc795fa1a8ba4bc78bf1bceff5"
+    },
+    {
+      "paragraph": 251,
+      "text": "圖(十)",
+      "text_sha256": "3d16beb952093624355d80632b341a1bafb849704fe271deae7daa8184080a12"
+    },
+    {
+      "paragraph": 252,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 253,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 254,
+      "text": "(B) 5.8 V",
+      "text_sha256": "79afabd86cc004e86308c758a7ff3cbc795bed691b14f59ab39015f5585d89ee"
+    },
+    {
+      "paragraph": 255,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 256,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 257,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 258,
+      "text": "(C) 6.3 V",
+      "text_sha256": "bce3da6446dae67ac42cf5a3a6035062a5f3f742a98510509310b6041df2b7fa"
+    },
+    {
+      "paragraph": 259,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 260,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 261,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 262,
+      "text": "(D) 7.2 V",
+      "text_sha256": "a415f5fe21958bf084ca9b0f380ded67ff0846a6854c2ef0979fc40ba0342cc5"
+    },
+    {
+      "paragraph": 263,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 264,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 265,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 266,
+      "text": "18.如圖(十一)所示電路，JFET 之互導 g m = 10 mA / V 且工作於飽和區，當旁路電容 C s移除後，此放大器電壓增益 v o / v i變化為何？ ",
+      "text_sha256": "1989db235405b3029dc15595b5ac913a2f099e52eedb6d9e8e51150413bfaeb3"
+    },
+    {
+      "paragraph": 267,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 268,
+      "text": "(A) 由− 390 變成− 15",
+      "text_sha256": "7f2b933a56ebaf1ff1db82ee2bbf917a98472fe05e674fb4ad2a42496a72146e"
+    },
+    {
+      "paragraph": 269,
+      "text": "圖(十一)",
+      "text_sha256": "c4e17503e319d03ab28d31fa9a2139e4eac0edbdddfbc9059a97e2d3558a926d"
+    },
+    {
+      "paragraph": 270,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 271,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 272,
+      "text": "(B) 由− 390 變成− 8",
+      "text_sha256": "ad68d9864a62b19e640d2600eadeeb112afd564c041fc0065d5065bbe0d0954e"
+    },
+    {
+      "paragraph": 273,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 274,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 275,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 276,
+      "text": "(C) 由− 200 變成− 5",
+      "text_sha256": "32da230109dc5cf49981a537b713d1bcd61cf8016b49a25d8faee02c4116582d"
+    },
+    {
+      "paragraph": 277,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 278,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 279,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 280,
+      "text": "(D) 由− 200 變成− 3",
+      "text_sha256": "5a599f5abb32059a3dc2f67c574954c0da82f92fb7fe981e023a0fef7f782258"
+    },
+    {
+      "paragraph": 281,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 282,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 283,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 284,
+      "text": "19.如圖(十二)所示電路，JFET 之互導 g m = 5 mA / V 且工作於飽和區，此放大器之電壓增益 v o / v i為何？",
+      "text_sha256": "38be88bf849d05a4a01d23115f5d6e48458e7fbcb76c80da9e0352f25fa59bc5"
+    },
+    {
+      "paragraph": 285,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 286,
+      "text": "(A) 3 / 4",
+      "text_sha256": "f239e79d5c5fdca10bfb0462b3b3a6cd4c483cf0510eb95cfae104c026b001ef"
+    },
+    {
+      "paragraph": 287,
+      "text": "圖(十二)",
+      "text_sha256": "7b89eb9770ea68e1f89678cc797b31c2f55ccd44bfa924c73c3c8ba31a2cca1e"
+    },
+    {
+      "paragraph": 288,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 289,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 290,
+      "text": "(B) 5 / 6",
+      "text_sha256": "13facfba08b9dcfc89b44ec8e6fc7903e5fa466af055526f9028e196d771d0e8"
+    },
+    {
+      "paragraph": 291,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 292,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 293,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 294,
+      "text": "(C) 6 / 7",
+      "text_sha256": "ee8b4de2f631f4a935fe58aa7da068494c501065de6f28cc5003bf4617566b03"
+    },
+    {
+      "paragraph": 295,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 296,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 297,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 298,
+      "text": "(D) 7 / 8",
+      "text_sha256": "c2f15a28862746d939f5f890345f2c2c665c5722605872ae34c7c1b29aed7174"
+    },
+    {
+      "paragraph": 299,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 300,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 301,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 302,
+      "text": "20.如圖(十三)所示之理想運算放大器電路，若 BJT 之 β = 100， R 1 = R 2 = R 3 = 3 k Ω， R C = 1 k Ω，當 V s = 5 V，則 V o 約為何？ ",
+      "text_sha256": "1a5e8e6d4ec234b543c601307dfd5b8ff7d8775bbce779f72cf1180d7df1ee9d"
+    },
+    {
+      "paragraph": 303,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 304,
+      "text": "(A) 9 V",
+      "text_sha256": "3fd102b0834d6acac6ed9de57443afb88027cd9efdfe5cd553198b92f4201be2"
+    },
+    {
+      "paragraph": 305,
+      "text": "圖(十三)",
+      "text_sha256": "6b0c125aeae56c09a011c4fff809f2485e3e6cbe6aed775f9652f99d15b30c52"
+    },
+    {
+      "paragraph": 306,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 307,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 308,
+      "text": "(B) 11 V",
+      "text_sha256": "93b39974868b819ff6029c45e701f75429a2237800aaba3f315519f10625a691"
+    },
+    {
+      "paragraph": 309,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 310,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 311,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 312,
+      "text": "(C) 13 V",
+      "text_sha256": "d4eb3ee2a7e980b9cc3c7cdda5f2e2b499ad5cb47eb4978aa1b80f4f5c9c2f22"
+    },
+    {
+      "paragraph": 313,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 314,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 315,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 316,
+      "text": "(D) 15 V",
+      "text_sha256": "fc1b1bbe5c48cb1dabab25347bc599320a6b9cc60ed8d814f54af24663eb5b4d"
+    },
+    {
+      "paragraph": 317,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 318,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 319,
+      "text": "21.如圖(十四)所示之理想運算放大器電路，若 V 1 = 2 V， V 2 = 1 V， V 3 = − 2 V，則 V o為何？ ",
+      "text_sha256": "31947ff99a9eb8f1ebf40778cd239f1c0943d6a9385d46513ce426d6816c40fa"
+    },
+    {
+      "paragraph": 320,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 321,
+      "text": "(A) − 5.5 V",
+      "text_sha256": "d5f58bfea615b38cd840f35ba4c398f7a237095c7daa52386e69e7e3d5a48bc9"
+    },
+    {
+      "paragraph": 322,
+      "text": "圖(十四)",
+      "text_sha256": "2cc35463d7eede273a97f1c0c441d5bfe291e93b44374408d16367eb1fd22509"
+    },
+    {
+      "paragraph": 323,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 324,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 325,
+      "text": "(B) − 7.5 V",
+      "text_sha256": "120abd4a9be2e99d4b1b5af7a91472874045a2c37f986585ca274a72722c5571"
+    },
+    {
+      "paragraph": 326,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 327,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 328,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 329,
+      "text": "(C) − 9.5 V",
+      "text_sha256": "712b503b005670c244b675eaf3b620379512ac0fc39ca9666f8c9b7b88e8a860"
+    },
+    {
+      "paragraph": 330,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 331,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 332,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 333,
+      "text": "(D) − 11.5 V",
+      "text_sha256": "9ab169fb8cb68b35cd5bb0c8c554de789f77ab40eb3fb7a07af521d4e6bdd34d"
+    },
+    {
+      "paragraph": 334,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 335,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 336,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 337,
+      "text": "22.如圖(十五)所示之理想運算放大器電路，若電路工作於線性放大區且電壓增益 V o / V i為 − 10，輸入電阻 R i為 10 k Ω，則電阻 R 1及 R 2應為何？ ",
+      "text_sha256": "3bc0a88a27300b0b8e9b3059d01e6043b9039ee29639cabec3a97933c58c6568"
+    },
+    {
+      "paragraph": 338,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 339,
+      "text": "(A) R 1 = 20 k Ω、 R 2 = 200 k Ω",
+      "text_sha256": "457be71ac76e0d3e0f1f59deb21115f73254b1e6f9bf50729caf3db363adf8a9"
+    },
+    {
+      "paragraph": 340,
+      "text": "圖(十五)",
+      "text_sha256": "4775b5fc126100564c94b95eec1c7458015efee42cb4ae845cc920c081a96a9b"
+    },
+    {
+      "paragraph": 341,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 342,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 343,
+      "text": "(B) R 1 = 10 k Ω、 R 2 = 200 k Ω",
+      "text_sha256": "efad757a783a0393362c23816aef900dc32182dbc89f4572e68c958ff5957a93"
+    },
+    {
+      "paragraph": 344,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 345,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 346,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 347,
+      "text": "(C) R 1 = 20 k Ω、 R 2 = 100 k Ω",
+      "text_sha256": "ee783bc33e1eb1b043f4b8748583a51663d3ebf53587d47117704298361baee5"
+    },
+    {
+      "paragraph": 348,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 349,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 350,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 351,
+      "text": "(D) R 1 = 10 k Ω、 R 2 = 100 k Ω",
+      "text_sha256": "f7bcf9fcc74d0da32696151f7aeb626fd52ee4f9791ae548d323b11a1008439f"
+    },
+    {
+      "paragraph": 352,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 353,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 354,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 355,
+      "text": "23.有關史密特觸發器 ( Schmitt trigger ) ，下列敘述何者錯誤？ ",
+      "text_sha256": "799b48135942c88645abe5ad20027e7815ffdd0a24d1677c22f2c6b30951f450"
+    },
+    {
+      "paragraph": 356,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 357,
+      "text": "(A) 常用於波形整形電路",
+      "text_sha256": "10f97289ebc050f0355388a90afcab6192c51a93dcdb08a0031884867f96c792"
+    },
+    {
+      "paragraph": 358,
+      "text": "(B) 可消除雜訊干擾",
+      "text_sha256": "1c7dbf0e092361c080981fd4a2f5a6a4823743d9b87479b9213a3ad05dcc1cd2"
+    },
+    {
+      "paragraph": 359,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 360,
+      "text": "(C) 利用負回授技術",
+      "text_sha256": "1192860f1626d4372ee0c31f340944096b1dad0d8a9c9555d439d516ace733f0"
+    },
+    {
+      "paragraph": 361,
+      "text": "(D) 具有兩個臨界電壓",
+      "text_sha256": "afb68f34247dad8a5021704994ecfb0cbc54723d8b78930a857228d39c41f09b"
+    },
+    {
+      "paragraph": 362,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 363,
+      "text": "24.如圖(十六)所示電路，上臨界電壓 V U及遲滯電壓 V H各為何？ ",
+      "text_sha256": "8efb548f5f308a4778021220f4d7751349e4b39a07238119791ec304a3c15799"
+    },
+    {
+      "paragraph": 364,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 365,
+      "text": "(A) V U = 1 V、 V H = 3 V",
+      "text_sha256": "fae55623d141b0c9f08af3d4f42ac7e419befb1a951c1384669bcc81dd4ea0d8"
+    },
+    {
+      "paragraph": 366,
+      "text": "圖(十六) ",
+      "text_sha256": "585c0ce22a7d60533a2d8de8f35d0959e07d91a2a112e668eb5faf7ca9ab286b"
+    },
+    {
+      "paragraph": 367,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 368,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 369,
+      "text": "(B) V U  = 1 V、 V H = 2 V",
+      "text_sha256": "d79b7338899ef58eed34551cd5e0fa60f0a1cdfd09cf6678699d0ba14d263f57"
+    },
+    {
+      "paragraph": 370,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 371,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 372,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 373,
+      "text": "(C) V U  = 2 V、 V H = 3 V",
+      "text_sha256": "29d95f5fd0ec7e15590f4eec251fc2a7128ce411a587cd1fc52756c61690bb8c"
+    },
+    {
+      "paragraph": 374,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 375,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 376,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 377,
+      "text": "(D) V U = 4 V、 V H = 6 V",
+      "text_sha256": "f6c120cb385acaac2e0dff4342b6a18a1143031f4c8ad7061330f2f6d686f558"
+    },
+    {
+      "paragraph": 378,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 379,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 380,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 381,
+      "text": "25.有關多諧振盪器在正常工作下，下列敘述何者錯誤？ ",
+      "text_sha256": "b4f2d7e9badd2daa87ac73063fe33530f20291bb2f3e67f6260df82588bbdc66"
+    },
+    {
+      "paragraph": 382,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 383,
+      "text": "(A) 以 BJT 組成無穩態多諧振盪器，BJT 會切換於飽和區與截止區",
+      "text_sha256": "4c893b80522f180a8aa955062c45b372714b8715322764c428e17240d583e49f"
+    },
+    {
+      "paragraph": 384,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 385,
+      "text": "(B) 單穩態多諧振盪器被觸發時，才會輸出脈波",
+      "text_sha256": "bacdfc542e2e10ad1037d8852b6ed16ea5ef91c304c55ebaf6085c7dfd36344a"
+    },
+    {
+      "paragraph": 386,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 387,
+      "text": "(C) 無穩態多諧振盪器需另加觸發信號才可轉態",
+      "text_sha256": "ba0442c3076d0627ea8e29685bb5095e9e83f67df6102c7c215961c6bb611ad5"
+    },
+    {
+      "paragraph": 388,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 389,
+      "text": "(D) 雙穩態多諧振盪器需另加觸發信號才可轉態",
+      "text_sha256": "8a6ec19fec186989360162419e0ab4f7381b0de354c91f22cc1e085013be0ffa"
+    },
+    {
+      "paragraph": 390,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 391,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 392,
+      "text": "第二部份：基本電學 ( 第26至50題，每題2分，共50分 ) ",
+      "text_sha256": "397f1695dd8a470d8d7c2547da9c4db48137f40e6bf310d10c02422a7d85adbd"
+    },
+    {
+      "paragraph": 393,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 394,
+      "text": "26.有一銅導線的截面積為 0.1 平方公分，導線內的電流值為 16 毫安培，已知銅的電子密度為 10 29個自由電子 / 立方公尺，則電子在導線中的平均速度為何？ ",
+      "text_sha256": "4ec04a7a692ba036a02cbae1ba1f0c263777772672c04f3431c5c225d389aba6"
+    },
+    {
+      "paragraph": 395,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 396,
+      "text": "(A) 10− 3 公尺 / 秒",
+      "text_sha256": "04ad1a41b93aeab5906e87f4a14f44ed65a947318b9ef4e7e63d6d60e670d8bb"
+    },
+    {
+      "paragraph": 397,
+      "text": "(B) 10− 5公尺 / 秒",
+      "text_sha256": "0dbf47bd8dd26c1eb2f3cd96f6e499d3e7d6790a2031b5d260fdfc2b586e50fb"
+    },
+    {
+      "paragraph": 398,
+      "text": "(C) 10− 7公尺 / 秒",
+      "text_sha256": "43a18a353123a938ca944e38fe01e41e86109392f6136162fa34a57f43989a00"
+    },
+    {
+      "paragraph": 399,
+      "text": "(D) 10− 9公尺 / 秒",
+      "text_sha256": "06d94a8dd0f6d2b9f692ea03b7a999a7c95dec8434e9e0a6fe7e1fc80dd00c95"
+    },
+    {
+      "paragraph": 400,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 401,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 402,
+      "text": "27.如圖(十七)所示，下列敘述何者正確？ ",
+      "text_sha256": "fff9cfc4f46c4b6b8e67c24650cef31d6fc2273d545c6d351c62f1852be8baec"
+    },
+    {
+      "paragraph": 403,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 404,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 405,
+      "text": "圖(十七)",
+      "text_sha256": "1efc401720d475d121a6fc6b9f6c51d20355ba1b66f83f50db10f3804c783b52"
+    },
+    {
+      "paragraph": 406,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 407,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 408,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 409,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 410,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 411,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 412,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 413,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 414,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 415,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 416,
+      "text": "(A) 當 c 點接地時， V ae = 4 V",
+      "text_sha256": "c26586da495eb2a290bd721c01a591c83652ca2529768713b25c912751794564"
+    },
+    {
+      "paragraph": 417,
+      "text": "(B) 當 c 點接地時， V ac = − 4 V",
+      "text_sha256": "37e7d08576e5c1916d13c120ba012a79e6f3ed806c65016bfc50722ce80436ea"
+    },
+    {
+      "paragraph": 418,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 419,
+      "text": "(C) 當 b 點接地時， V ae = 4 V",
+      "text_sha256": "0df0d86c168ae1e39479d42f913dbad35f2a27fb103b2412827342f718b9efb4"
+    },
+    {
+      "paragraph": 420,
+      "text": "(D) 當 d 點接地時， V ae = − 4 V",
+      "text_sha256": "72936b506bbcb2154767669e9ab12aaf7da740e1988cf0d7f085f66ef8ff75e3"
+    },
+    {
+      "paragraph": 421,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 422,
+      "text": "28.有一電阻器在 30 ° C 時其電阻值為 3 Ω，在 150 ° C 時其電阻值為 6 Ω，則此電阻器在 30 ° C 時之溫度係數為何？ ",
+      "text_sha256": "bbcbb6c3267874677b2dac5087c0c8058c5824125630ab11a3d16e7dc5863e3d"
+    },
+    {
+      "paragraph": 423,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 424,
+      "text": "(A) ( 1 / 120 ) ° C − 1",
+      "text_sha256": "b961962c16168f12ec6979803910c9d4a964f8f4834948415cccc8d870dd4af7"
+    },
+    {
+      "paragraph": 425,
+      "text": "(B) ( 1 / 90 ) ° C − 1",
+      "text_sha256": "0439e121227971f95529efc908bf06c385029a31a2638f68d005444fbb967485"
+    },
+    {
+      "paragraph": 426,
+      "text": "(C) ( 1 / 60 ) ° C − 1",
+      "text_sha256": "774611d5617d32513b5b56758ce5a229f293b71e5f1b575bccb00dc23e7e6297"
+    },
+    {
+      "paragraph": 427,
+      "text": "(D) ( 1 / 30 ) ° C − 1",
+      "text_sha256": "94720ae0b44936a0478f00ae86e3b9346154913484dbb1e7bba87cfdb36b4d31"
+    },
+    {
+      "paragraph": 428,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 429,
+      "text": "29.如圖(十八)所示，則 a、 b二端看入之戴維寧等效電阻為何？",
+      "text_sha256": "a059cf9ff6668c89e58fa6b1e2bdaec46c6c982874bb6b9c7cdb95a42d08c931"
+    },
+    {
+      "paragraph": 430,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 431,
+      "text": "(A) 1 Ω",
+      "text_sha256": "356771bb5595f4c7b10df9d7e8256274962fd7d01c85dffed530ccf13cd71c6f"
+    },
+    {
+      "paragraph": 432,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 433,
+      "text": "(B) 2 Ω",
+      "text_sha256": "eed5863c60fc5de52a46bc1a197d9315b49718c585a474dfb660c5831d35bf73"
+    },
+    {
+      "paragraph": 434,
+      "text": "圖(十八)",
+      "text_sha256": "8b46cea41399ff3e2a64a0f7063ba5b2dc7ae7a4d93a54fdd645b82c3fc8fa30"
+    },
+    {
+      "paragraph": 435,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 436,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 437,
+      "text": "(C) 4 Ω",
+      "text_sha256": "7ae42f8db654e908885836be371c73fdc1661fb6bec452ab966932cb7c2bad3d"
+    },
+    {
+      "paragraph": 438,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 439,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 440,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 441,
+      "text": "(D) 6 Ω",
+      "text_sha256": "7cad6e571c4161d6baa4b48b02aeeb7a562770921604a0e8f5195cbd3e64054d"
+    },
+    {
+      "paragraph": 442,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 443,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 444,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 445,
+      "text": "30.如圖(十九)所示， R 1 = 8 Ω、 R 2 = 2 Ω、 R 3 = 8 Ω、 R 4 = 4 Ω、 R 5 = 4 Ω、 R 6 = 16 Ω，則電流 I為何？ ",
+      "text_sha256": "447bf4bf190c63c5027d81e3cf2a489790e0a3743c06240f683a475f66918684"
+    },
+    {
+      "paragraph": 446,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 447,
+      "text": "(A) 8 A",
+      "text_sha256": "cd3b4c87b52e9fb078193c38212745078856629ede047850ea9eed798a2d29a2"
+    },
+    {
+      "paragraph": 448,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 449,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 450,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 451,
+      "text": "(B) 6 A",
+      "text_sha256": "fea008e142fafee97a8a952bc8a8a896af49f04a18f8cbc4f01ea765d5ad6bb5"
+    },
+    {
+      "paragraph": 452,
+      "text": "圖(十九)",
+      "text_sha256": "8ebf2cf40c4f46045f09d3460ab6db3be8452e6380f6f3e0df1132d97e162b08"
+    },
+    {
+      "paragraph": 453,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 454,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 455,
+      "text": "(C) 4 A",
+      "text_sha256": "694392749a45124b64093593b1cc499373032c0fd9f1da041b4902cfb8576268"
+    },
+    {
+      "paragraph": 456,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 457,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 458,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 459,
+      "text": "(D) 2 A",
+      "text_sha256": "015b5f9689c6aa9156f0376a56378e780f02eb51602cc692f207a3c922582c51"
+    },
+    {
+      "paragraph": 460,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 461,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 462,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 463,
+      "text": "31.如圖(二十)所示，下列敘述何者正確？ ",
+      "text_sha256": "a6b3168f8f422e2a3b8645100eaf484efc084eed2f63519a2b637acb6abe0c9d"
+    },
+    {
+      "paragraph": 464,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 465,
+      "text": "(A) I 1 = 12 A",
+      "text_sha256": "54cc69afc71d7debc2030d56406333140d4837ed9bfa5a66471d521d79371f42"
+    },
+    {
+      "paragraph": 466,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 467,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 468,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 469,
+      "text": "(B) I 2 = 9 A",
+      "text_sha256": "3647577640e0962f0c433781ae9497a847de632921adbb885439fb66715170d8"
+    },
+    {
+      "paragraph": 470,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 471,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 472,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 473,
+      "text": "(C) I 3 = 6 A",
+      "text_sha256": "d1d064098396d3353f58ede2276e8e3e1788bda6c7d19100d9a436340f4494d5"
+    },
+    {
+      "paragraph": 474,
+      "text": "圖(二十)",
+      "text_sha256": "1e8cb3a6e05712262f5bcde5fd2739de670e083a304511de5fa6c646e6933078"
+    },
+    {
+      "paragraph": 475,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 476,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 477,
+      "text": "(D) I 4 = 3 A",
+      "text_sha256": "d629ca641fa982f3143750e47b43dca8f2d8e60b77b344c66204f01bcc675f72"
+    },
+    {
+      "paragraph": 478,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 479,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 480,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 481,
+      "text": "32.如圖(二十一)所示， I 1、 I 2及 I 3分別為三個迴圈電路的電流，則下列敘述何者正確？ ",
+      "text_sha256": "85b611cb20bae807aaf33d5962ee78d2edf35bfa76d1f4e93c253e0a302315e5"
+    },
+    {
+      "paragraph": 482,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 483,
+      "text": "(A) I 1 = 2 A",
+      "text_sha256": "762cb5accc5fdd84b4e9655862fe87b7df88d86b5a49cea7f15b40d6e3633f2a"
+    },
+    {
+      "paragraph": 484,
+      "text": "圖(二十一)",
+      "text_sha256": "3d94fd2acbc318bca13297f78d40db87637b8c043f7d3effb39280b2aac1f7e2"
+    },
+    {
+      "paragraph": 485,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 486,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 487,
+      "text": "(B) I 2 = 1 A",
+      "text_sha256": "0ca284a8035cb616529e01da55a49ed0db58a5efa6c91bfca1a03b2a3beb8a5c"
+    },
+    {
+      "paragraph": 488,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 489,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 490,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 491,
+      "text": "(C) I 1 = − 1 A",
+      "text_sha256": "b211450a3d941fd175f9c450dfb966c92d5cfdc5492abd8c232fa42fc413768b"
+    },
+    {
+      "paragraph": 492,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 493,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 494,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 495,
+      "text": "(D) I 2 = − 2 A",
+      "text_sha256": "1f785460972ee50889ce2ae73dac036b1be54b276f829d8a27ed17aadd215c54"
+    },
+    {
+      "paragraph": 496,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 497,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 498,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 499,
+      "text": "33.如圖(二十二)所示，則 a、 b兩端看入之諾頓等效電流 I N及等效電阻 R N分別為何？ ",
+      "text_sha256": "87a997c58573bd56aab88b71e56508153b291940a599f44e220a91bd35dba710"
+    },
+    {
+      "paragraph": 500,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 501,
+      "text": "(A) 7 A、2 Ω",
+      "text_sha256": "ce61c848a22a0b37d902e352c1ba9b15f6165d9308abff53c37b04bb31b4da1b"
+    },
+    {
+      "paragraph": 502,
+      "text": "圖(二十二)",
+      "text_sha256": "e9d8ae064d6e39355eae791700a80b12726e7b82ac4c2b1a95eced28cbfb6768"
+    },
+    {
+      "paragraph": 503,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 504,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 505,
+      "text": "(B) 6 A、3 Ω",
+      "text_sha256": "3eaf3d1082175ea217a3f812f20519d140a3d36c4128cb172bf7f8a252f95b4f"
+    },
+    {
+      "paragraph": 506,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 507,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 508,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 509,
+      "text": "(C) 8 A、4 Ω",
+      "text_sha256": "e98c52bc9b6e75a1898a141cd46a39a681d525fcaf4c96d6782af89e7ab76e17"
+    },
+    {
+      "paragraph": 510,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 511,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 512,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 513,
+      "text": "(D) 9 A、5 Ω",
+      "text_sha256": "8bad46a65561385b0e99fa2a9d98fe15caeeb1625231ab1db5e0e6c9f86cdbb6"
+    },
+    {
+      "paragraph": 514,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 515,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 516,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 517,
+      "text": "34.如圖(二十三)所示，若 R L可獲得最大功率，則最大功率值為何？ ",
+      "text_sha256": "7e4ded84010b61301db44febcbfc53bd65f76b69b77443ba588a3380638011ee"
+    },
+    {
+      "paragraph": 518,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 519,
+      "text": "(A) 16 W",
+      "text_sha256": "b54e614a9a1eb92d31211cb1ad07179b823954310740809cd5d7bf2337e8af8b"
+    },
+    {
+      "paragraph": 520,
+      "text": "圖(二十三)",
+      "text_sha256": "9202594fbcfaa53ce0ad42a18af172266cc008d4d1be8d1b39c178eea974051a"
+    },
+    {
+      "paragraph": 521,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 522,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 523,
+      "text": "(B) 32 W",
+      "text_sha256": "2f05029e341ed66cf0cabc1cc07f86f899156d4544871023ba2b3bd1890468d0"
+    },
+    {
+      "paragraph": 524,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 525,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 526,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 527,
+      "text": "(C) 48 W",
+      "text_sha256": "6f5d4136a3d7d202e20e5cbb3cb97d13bfd53b768a68da0c36ca2ec4b2c192ea"
+    },
+    {
+      "paragraph": 528,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 529,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 530,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 531,
+      "text": "(D) 64 W",
+      "text_sha256": "df860e61d9912d9daf4533f66f087c705e5f81eb9c971045fab9f85e1fb05134"
+    },
+    {
+      "paragraph": 532,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 533,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 534,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 535,
+      "text": "35.如圖(二十四)所示，若 a、 b兩端的總電容值為 40 μ F，則下列敘述何者正確？ ",
+      "text_sha256": "0078ae2cadeb4ba039b3c260bb655fd4cc608ae1f867d7c94a54c1a41dc60e2d"
+    },
+    {
+      "paragraph": 536,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 537,
+      "text": "(A) C 1 = 100 μ F、 C 2 = 10 μ F、 C 3 = 10 μ F",
+      "text_sha256": "763008e2d7485b2991e8c218d84847123072d373eed82dd6fee40034bcb38f97"
+    },
+    {
+      "paragraph": 538,
+      "text": "圖(二十四)",
+      "text_sha256": "bce16a96bdf5ad9222325ed95a03c4437c77d74d1a0d28c5dd5b7e17d18e398a"
+    },
+    {
+      "paragraph": 539,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 540,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 541,
+      "text": "(B) C 1 = 80 μ F、 C 2 = 20 μ F、 C 3 = 20 μ F",
+      "text_sha256": "a65bc719918ab887146b79669ceceabec19498c72b9ee95d5e830fc5e7354126"
+    },
+    {
+      "paragraph": 542,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 543,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 544,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 545,
+      "text": "(C) C 1 = 20 μ F、 C 2 = 10 μ F、 C 3 = 10 μ F",
+      "text_sha256": "1f3d69bf173348c7eae1a9fc6377663a96bdbc11a899f357b43d0d17081a9b68"
+    },
+    {
+      "paragraph": 546,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 547,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 548,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 549,
+      "text": "(D) C 1 = 120 μ F、 C 2 = 30 μ F、 C 3 = 30 μ F",
+      "text_sha256": "f520782b11430589edfdc7f035006a247c7084a946c5511e72e2d6c50238f71c"
+    },
+    {
+      "paragraph": 550,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 551,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 552,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 553,
+      "text": "36.某電感器的線圈匝數為 50 匝，其電感值為 5 mH，電感器的磁路結構及材質為固定，且不考慮磁飽和現象，若線圈的匝數更新為 100 匝，則更新後的電感值為何？ ",
+      "text_sha256": "95dbb930520d5f6bccbd03d7f1eb80d1b248a591ce6a3192f0b88d369d3294a6"
+    },
+    {
+      "paragraph": 554,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 555,
+      "text": "(A) 20 mH",
+      "text_sha256": "95ff0a0be716c54ded69aa0c3026a299a1b2cedfdb878be3151b0759fa65b42a"
+    },
+    {
+      "paragraph": 556,
+      "text": "(B) 10 mH",
+      "text_sha256": "0ca15c7f5bd0f87ccdab6fa7c2cb13bbdc11782bf2aa91fe0b2e13f2718a70a9"
+    },
+    {
+      "paragraph": 557,
+      "text": "(C) 2.5 mH",
+      "text_sha256": "7d8156000dd8dcca07c9c6f84db0656764fb3f05c7b98528a3ae33d83bf28b4b"
+    },
+    {
+      "paragraph": 558,
+      "text": "(D) 1.25 mH",
+      "text_sha256": "4d859b813476ce2e53f7297c9f6c6e2db7a2476dca5960255d2cfac494d62111"
+    },
+    {
+      "paragraph": 559,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 560,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 561,
+      "text": "37.如圖(二十五)所示， E 1 = 100 V、 R 1 = 5 Ω、 R 2 = 5 Ω、 L 1 = 100 mH，電路在穩態時，電感電流 I L及電感的儲存能量WL各為何？ ",
+      "text_sha256": "c779083088486cec77f56cb66c685ffef3a2a7d48de07a1583becfb9013d8210"
+    },
+    {
+      "paragraph": 562,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 563,
+      "text": "(A) I L = 20 A、WL = 20 J",
+      "text_sha256": "525e38c55e915617457b3725b205778d0f5b637b7ecb90c636b68f9f320ce976"
+    },
+    {
+      "paragraph": 564,
+      "text": "圖(二十五)",
+      "text_sha256": "2e49414424abcce4a0e9ab87c82266c48dabfc0242e7e76c0bd391521da47f1d"
+    },
+    {
+      "paragraph": 565,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 566,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 567,
+      "text": "(B) I L = 10 A、WL = 5 J",
+      "text_sha256": "c25c089e1f16168935fbf83ec854779765a1938251a01c87e4c9d944a113b4e0"
+    },
+    {
+      "paragraph": 568,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 569,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 570,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 571,
+      "text": "(C) I L = 20 A、WL = 20 mJ",
+      "text_sha256": "b36db53ae4c78af4ee5e889889e498b4fcf52c0a6da5c32b1f2f6ad9ff92fec5"
+    },
+    {
+      "paragraph": 572,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 573,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 574,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 575,
+      "text": "(D) I L = 10 A、WL = 10 mJ",
+      "text_sha256": "bdc4dd112a9756326c0dc15a1d84a7ea47d24a3e5e47404c6fec5c8113b1e45a"
+    },
+    {
+      "paragraph": 576,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 577,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 578,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 579,
+      "text": "38.電阻 R 1與電容 C 1串聯電路，此電路時間常數為 50 ms，電容 C 1為 20 μ F，則電阻 R 1為何？ ",
+      "text_sha256": "6113bb5d86a11e4a7f9e539a173bd94ac3c5617e32165c6d55205a3d4226b201"
+    },
+    {
+      "paragraph": 580,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 581,
+      "text": "(A) 20 k Ω",
+      "text_sha256": "1b03550db284f5f55fd99152a5044069f1c8c3db6bc18af1a958478f2b32a68a"
+    },
+    {
+      "paragraph": 582,
+      "text": "(B) 2.5 k Ω",
+      "text_sha256": "eb2547c885b3d1c4275c0763c3c58e280df6d9bfa62fc1207bc84676fe12aa35"
+    },
+    {
+      "paragraph": 583,
+      "text": "(C) 50 Ω",
+      "text_sha256": "20061f74d99c8f2e5ce827f080afbe1ab8ae626cb21816d7775f4a60f9f4d651"
+    },
+    {
+      "paragraph": 584,
+      "text": "(D) 2.5 Ω",
+      "text_sha256": "b391e9b4cce89c5383e379dad393a83520dcc6b7c5590afc33de13ea96b91d07"
+    },
+    {
+      "paragraph": 585,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 586,
+      "text": "39.如圖(二十六)所示，在開關 S 1閉合前電感無儲存能量，若 S 1在時間 t = 0 秒時閉合，電感電流 i L = 10 ( 1 − e− 20 t ) A，則下列敘述何者正確？ ",
+      "text_sha256": "a30c1c3d0eb93f5affa176b74466223cea601dbce7d76da7d41ed964127d4284"
+    },
+    {
+      "paragraph": 587,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 588,
+      "text": "(A) E 1 = 10 V、 R 1 = 2 Ω、 L 1 = 100 mH",
+      "text_sha256": "f76adc244e31b59127f802f78dfb2e5bf65cdc8de15a38fae9bbcfa4cf1e5bc2"
+    },
+    {
+      "paragraph": 589,
+      "text": "圖(二十六)",
+      "text_sha256": "aea91c2619d1cddb3c4a6b2ad3437b48a9d23a7e030a953c620cee282cc3fc27"
+    },
+    {
+      "paragraph": 590,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 591,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 592,
+      "text": "(B) E 1 = 10 V、 R 1 = 4 Ω、 L 1 = 20 mH",
+      "text_sha256": "a17821fbbde98a7bf60e02dedf8618beb3dcb8523acc5b79a6f25da9d47bcf7e"
+    },
+    {
+      "paragraph": 593,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 594,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 595,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 596,
+      "text": "(C) E 1 = 20 V、 R 1 = 2 Ω、 L 1 = 100 mH",
+      "text_sha256": "fee24aadc9acfb8ef3d352ebab7db3f16e5cc647ea32f28cfd978e0c1269b8bb"
+    },
+    {
+      "paragraph": 597,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 598,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 599,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 600,
+      "text": "(D) E 1 = 40 V、 R 1 = 4 Ω、 L 1 = 50 mH",
+      "text_sha256": "6f936e950b3ad6e518c47588f559ff47e325a85c0189b12344326ea4de926bcf"
+    },
+    {
+      "paragraph": 601,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 602,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 603,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 604,
+      "text": "40.正弦波電壓信號週期函數的峰值 V m為 200 V、週期為 10 ms，此電壓有效值及頻率為何？",
+      "text_sha256": "469cfefc73eafd14983bb588df8798cb9ddbd4be15eeb4ca9129e0c49614070b"
+    },
+    {
+      "paragraph": 605,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 606,
+      "text": "(A) 電壓有效值為 200 V，頻率為 200 Hz",
+      "text_sha256": "bdee9a51c53d9c111038518e213bb939c8a6f06f3017e1d12d8a25fe8bb762bb"
+    },
+    {
+      "paragraph": 607,
+      "text": "(B) 電壓有效值為 100  V，頻率為 100 Hz",
+      "text_sha256": "becf5789a2fbfffab01cb2f64e37b84ba87ca9b407f50af6636f887ddce68987"
+    },
+    {
+      "paragraph": 608,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 609,
+      "text": "(C) 電壓有效值為 50  V，頻率為 100 Hz",
+      "text_sha256": "e670fd01c715daf8bdb348b2e9e4a3668388e03bc0777874dbb214792279193c"
+    },
+    {
+      "paragraph": 610,
+      "text": "(D) 電壓有效值為 50  V，頻率為 50 Hz",
+      "text_sha256": "5ac7857fdac48508f5f65bb1b78bed7f0d6c0703c18275d72d23b79513165a14"
+    },
+    {
+      "paragraph": 611,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 612,
+      "text": "41.已知電流 i 1 = 50 sin ( 2000 t ) A、 i 2 = 50 cos ( 2000 t ) A，若電流 i T = i 1 + i 2，則下列敘述何者正確？ ",
+      "text_sha256": "be7c233c7ba91b7fc4590b31fcbf80782989f5dccc1fbb680e8d96149fb926a2"
+    },
+    {
+      "paragraph": 613,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 614,
+      "text": "(A) 電流 i T的相位領前電流 i 1為 90 °",
+      "text_sha256": "63f21f88f5e0d30cd1cafc4ed55d05a6b177d6553ec843fbecf2a0d02ef262aa"
+    },
+    {
+      "paragraph": 615,
+      "text": "(B) 電流 i T的相位領前電流 i 2為 90 °",
+      "text_sha256": "f1fb90b3746b68b4a5120e03b7ced26e27b28e9198b4a1e9d4d1adc667b8c1e7"
+    },
+    {
+      "paragraph": 616,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 617,
+      "text": "(C) 電流 i T的相位領前電流 i 2為 45 °",
+      "text_sha256": "fe4d3d180b99c61f3a129aafca63fdc20e283227ffbd6def21d7247cbf5b1b23"
+    },
+    {
+      "paragraph": 618,
+      "text": "(D) 電流 i T的相位領前電流 i 1為 45 °",
+      "text_sha256": "c0c9b6c3e62cfe7a5c7ba91ca59f5463a2a9f346f88f53ec9737d6aaaa7f5b00"
+    },
+    {
+      "paragraph": 619,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 620,
+      "text": "42.如圖(二十七)所示之交流穩態電路，電阻 R 1為 40 Ω，電感抗 X L為 30 Ω，若 a、 b兩端電壓的有效值為 200 V，則流經電感抗的電流有效值為何？",
+      "text_sha256": "582786dc45070c85174c73c574935ecd17f0442cc4a9254b6aaa5acc4cb6ebca"
+    },
+    {
+      "paragraph": 621,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 622,
+      "text": "(A) 2 A",
+      "text_sha256": "32010be0fd25f9f2eca3c1f38c71a5f41ee3c3f1428e0e68c24a31309bf560fc"
+    },
+    {
+      "paragraph": 623,
+      "text": "圖(二十七)",
+      "text_sha256": "1640d3302bfb9f2038ca2e21743e24f7672b421d4803759a753a0d1f07692755"
+    },
+    {
+      "paragraph": 624,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 625,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 626,
+      "text": "(B) 3 A",
+      "text_sha256": "2c35302471f4545e6a3403ea09ea4d3c41523cc40457b86b41e9c3de5e0ce748"
+    },
+    {
+      "paragraph": 627,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 628,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 629,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 630,
+      "text": "(C) 4 A",
+      "text_sha256": "694392749a45124b64093593b1cc499373032c0fd9f1da041b4902cfb8576268"
+    },
+    {
+      "paragraph": 631,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 632,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 633,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 634,
+      "text": "(D) 5 A",
+      "text_sha256": "9e550c6a56eb1457ac5075baa14508800bae992f90a8740621ee4e1bbee3281e"
+    },
+    {
+      "paragraph": 635,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 636,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 637,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 638,
+      "text": "43.如圖(二十八)所示之交流穩態電路，已知各支路電流有效值為 IS  = 30 A、 I R = 24 A、 I C = 6 A，則電感電流有效值 I L為何？ ",
+      "text_sha256": "f779f1e7713c26b7772a3814be055276767a62bf12a22df475cedcaaf532f497"
+    },
+    {
+      "paragraph": 639,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 640,
+      "text": "(A) 0 A ",
+      "text_sha256": "4de2e3e354a6b8ab10554ab992eda225608f5f916a9404762ff2cb6f08a9f9cf"
+    },
+    {
+      "paragraph": 641,
+      "text": "圖(二十八)",
+      "text_sha256": "dc9c6e5fb95e14a98aae3891e2919ccae33750af4482169e23595968f746f826"
+    },
+    {
+      "paragraph": 642,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 643,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 644,
+      "text": "(B) 18 A ",
+      "text_sha256": "7a13eff58bb1099bf63f043a624230bb14328fa211002e709b5065d0774634c2"
+    },
+    {
+      "paragraph": 645,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 646,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 647,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 648,
+      "text": "(C) 24 A ",
+      "text_sha256": "475cbd8dd29e2965c32600acb8a071e3d5420e638a1fb5143965c8fff736883f"
+    },
+    {
+      "paragraph": 649,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 650,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 651,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 652,
+      "text": "(D) 30 A",
+      "text_sha256": "5448e94393132a3224be55a67e0850380c343ef67c7827f1c1b3ab0f4911db5c"
+    },
+    {
+      "paragraph": 653,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 654,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 655,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 656,
+      "text": "44.有一 R L C串聯電路，接於電壓為 v ( t ) = 120  cos ( 377 t − 15 o ) V 之電源，經量測得知電流為 i ( t ) = 6  cos ( 377 t + 30 o ) A，則電阻兩端的電壓峰值為何？ ",
+      "text_sha256": "7c7b47489b5d30d9aa9276556686c43ab3658881dd1f9fe88f6f8e78c796730b"
+    },
+    {
+      "paragraph": 657,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 658,
+      "text": "(A) 120  V ",
+      "text_sha256": "f549edf97dfe5dcd5a44065a6816d7911ca811f738d7680c8f659a9cca9df63e"
+    },
+    {
+      "paragraph": 659,
+      "text": "(B) 120 V ",
+      "text_sha256": "809988d9306dcd90e243ca9af6c01c34276318e440da8e26ec9037a07fd0d969"
+    },
+    {
+      "paragraph": 660,
+      "text": "(C) 100  V ",
+      "text_sha256": "ff3bce90f8b4ae6873373ddb9cfa9454697e59139ab5ac4548e22a418b69caad"
+    },
+    {
+      "paragraph": 661,
+      "text": "(D) 100 V",
+      "text_sha256": "339e6cfd0eed137c59d7fd4919bac5182a7efe3d534bc64605faf4c72b54f5d1"
+    },
+    {
+      "paragraph": 662,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 663,
+      "text": "45.有一 RC並聯電路接於正弦波電壓源，在電壓峰值固定及電路正常操作情形下，若將電源頻率由小變大，則下列敘述何者正確？ ",
+      "text_sha256": "2f5dc4aea6b5b1b6d274147eee397bc04c86e5fd1572c36482ffd898e908841e"
+    },
+    {
+      "paragraph": 664,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 665,
+      "text": "(A) RC並聯電路功率因數變低 ",
+      "text_sha256": "5a23df1a355fbbf3d10c40748032cece9d9f2d376ec4297c75dbba67a49c2e64"
+    },
+    {
+      "paragraph": 666,
+      "text": "(B) 電源電流變小 ",
+      "text_sha256": "f9adf7a4ee9ad95f76ce109f321c1dd25dc1bb5549541d21d39094333bd978b6"
+    },
+    {
+      "paragraph": 667,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 668,
+      "text": "(C) 通過電容器的電流變小 ",
+      "text_sha256": "afbc22715f7809e5f430a3912ebb5e99f5ce44fd2c784716f60345e416d0b406"
+    },
+    {
+      "paragraph": 669,
+      "text": "(D) 通過電阻器的電流變小",
+      "text_sha256": "7b5d91e31366fed4d4c75371069d1d89bc618fb09954e8a2c237ab5728e800ae"
+    },
+    {
+      "paragraph": 670,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 671,
+      "text": "46.如圖(二十九)所示之交流穩態電路，若 v ( t ) = 240  cos ( 377 t ) V、 i A ( t ) = 10  cos ( 377 t − 45 o ) A、 i B ( t ) = 20 cos ( 377 t + 90 o ) A，則電源所供應之視在功率為何？ ",
+      "text_sha256": "6ea5afbffc96d3dbf44528989ad6ded0a03dd811cb5efbda1111022cc7611ffc"
+    },
+    {
+      "paragraph": 672,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 673,
+      "text": "(A) 4800 VA ",
+      "text_sha256": "2a8178421a48e2189795c17f835dc6c1edc654f5128ba14dc0620745f0820980"
+    },
+    {
+      "paragraph": 674,
+      "text": "圖(二十九)",
+      "text_sha256": "f54b35d952d7f1c0211fad2c505a094c7a3783028d7d922437a09ded0e0302d3"
+    },
+    {
+      "paragraph": 675,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 676,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 677,
+      "text": "(B) 2400 ( 1 +  ) VA ",
+      "text_sha256": "cf9a2812fcad338ade9915367faf230f3d14f1d997474087c26c59bceebcb24f"
+    },
+    {
+      "paragraph": 678,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 679,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 680,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 681,
+      "text": "(C) 2400  VA ",
+      "text_sha256": "a68000c3d5d8fc95261b7ab97d3dd4b32e4b7e0c4cd37e2a62fd36819663f60a"
+    },
+    {
+      "paragraph": 682,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 683,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 684,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 685,
+      "text": "(D) 2400 VA",
+      "text_sha256": "c12774dd06ce9a66364bcfc9bf217eadc8421458a11935b5196f89f51cac41d9"
+    },
+    {
+      "paragraph": 686,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 687,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 688,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 689,
+      "text": "47.有一 RC串聯電路，已知其電阻 R = 24 Ω以及電容抗 X C = 18 Ω。若將此電路接於 v ( t ) = 120 cos ( 377 t + 30 o ) V 之電源，則電源所供應之最大瞬間功率為何？ ",
+      "text_sha256": "434c795c614fb0b2ceab48d4bb737bcd261545f2e480175015056bb41cebc475"
+    },
+    {
+      "paragraph": 690,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 691,
+      "text": "(A) 480 W ",
+      "text_sha256": "a135bb78f447452b83451698088d15f77d698ee91aea23d54d0f6bc77ab83b48"
+    },
+    {
+      "paragraph": 692,
+      "text": "(B) 432 W ",
+      "text_sha256": "56386bb080e92278ac40df8f7ae1966061e6bc9effd5c637e7ee54765caf5717"
+    },
+    {
+      "paragraph": 693,
+      "text": "(C) 384 W ",
+      "text_sha256": "3a52cc1f2bca16cb4440432e4dff908460a581d86797b24ac64adaf408d64b70"
+    },
+    {
+      "paragraph": 694,
+      "text": "(D) 192 W",
+      "text_sha256": "698dd2ff218a8442d80073901629b4337d47a8ffdf97053a8b92bd043e5e5a64"
+    },
+    {
+      "paragraph": 695,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 696,
+      "text": "48.有一 RLC串聯電路接於正弦波電壓源，已知電源頻率為 60 Hz 、 R = 5 Ω、 X L = 0.4 Ω、 X C = 10 Ω。當此電路發生諧振時，其諧振頻率為何？ ",
+      "text_sha256": "b4b683bf0a970ef5a3593ad9b66aff79abc45ddadd443a63b1396b962efa66ce"
+    },
+    {
+      "paragraph": 697,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 698,
+      "text": "(A) 100 Hz ",
+      "text_sha256": "cc31a65b8cc1a8a24f8302f11ff6a4245a6eb567c9bf316a17fc41c2eb1526d7"
+    },
+    {
+      "paragraph": 699,
+      "text": "(B) 200 Hz ",
+      "text_sha256": "b489eb1807b254d3c008aeabf06a849777b3cfcd77cb21f1f65ed5c82979b9b5"
+    },
+    {
+      "paragraph": 700,
+      "text": "(C) 300 Hz ",
+      "text_sha256": "0da62a7866085e89bc2bd90f720defd31e8f0c239ec3da47b1cdd12b9a466b46"
+    },
+    {
+      "paragraph": 701,
+      "text": "(D) 400 Hz",
+      "text_sha256": "2d3b001d2af9339c27761230261d225fdd41641e1581603d14b8b2c52d15fb62"
+    },
+    {
+      "paragraph": 702,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 703,
+      "text": "49.有關交流 RLC並聯電路之敘述，下列何者正確？ ",
+      "text_sha256": "932633519ce7b34633173b3af80a47cd16482d8a7d8e590e0a100a87bd0c0509"
+    },
+    {
+      "paragraph": 704,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 705,
+      "text": "(A) 電路發生諧振時，若品質因數為 Q，則流經電阻的電流將被放大 Q倍 ",
+      "text_sha256": "b24fa4247b90890e6e1131cfe6fd7026bdf3fb27991c16546d38a79d0b02ebb6"
+    },
+    {
+      "paragraph": 706,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 707,
+      "text": "(B) 當電源頻率小於諧振頻率時，電路呈現電容性 ",
+      "text_sha256": "f52a1ebbfff94ab47c8ab6196030a90db13f88cb209d2774852f4d870dfd7e0e"
+    },
+    {
+      "paragraph": 708,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 709,
+      "text": "(C) 當電源頻率大於諧振頻率時，電源電流隨頻率增加而減少 ",
+      "text_sha256": "6670bb538851112e330885b7bc8c1f3700493cdcbf7352aed1706cd8c82459c3"
+    },
+    {
+      "paragraph": 710,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 711,
+      "text": "(D) 當電路發生諧振時，電路總阻抗為最大",
+      "text_sha256": "d43ee43aee1c8b857b38e879177d296bd697958bebb1335d8b1732665c3ee9c0"
+    },
+    {
+      "paragraph": 712,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 713,
+      "text": "50.有一功率因數為 0.866 落後之三相平衡負載，將其連接於線電壓有效值為 220 V 之三相平衡電源，已知線電流有效值為 10 A，則負載每相所消耗之平均功率約為何？ ",
+      "text_sha256": "2007d798a835d77f94b41a75fc1237aa57dc945b506bf0e72d65982afce65b2a"
+    },
+    {
+      "paragraph": 714,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 715,
+      "text": "(A) 1100 W ",
+      "text_sha256": "294f79da19ef09ab54ade7dd77b52f1edcbcbc704e672ebca657a93384cabc8b"
+    },
+    {
+      "paragraph": 716,
+      "text": "(B) 1100  W ",
+      "text_sha256": "fa191ae4dbc9104bb6ee39773e705a06dfea6c8c552f9fefa2e8a5b89f286326"
+    },
+    {
+      "paragraph": 717,
+      "text": "(C) 2200 W ",
+      "text_sha256": "1e37303011da73d272869138a6c2821d9906a16fb97450c15bb4f30e17595f15"
+    },
+    {
+      "paragraph": 718,
+      "text": "(D) 2200  W",
+      "text_sha256": "8fe0191249134f58abb216331466a8306116a9f033fac4fe11670ff26ee15d92"
+    },
+    {
+      "paragraph": 719,
+      "text": "ˉ ",
+      "text_sha256": "e13f81730d5d770f17ff988ae69cc64f61d1d403d7fdeb689e91f98f2120632e"
+    },
+    {
+      "paragraph": 720,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 721,
+      "text": "【以下空白】",
+      "text_sha256": "347ad980a53edf61906a72ed8cc15b8ce36115e7b03d6c527ee526f7e5394ec2"
+    },
+    {
+      "paragraph": 722,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 723,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    }
+  ],
+  "risks": [
+    "embedded_images_not_reconstructed"
+  ],
+  "omml_count": 0,
+  "omml_xml": [],
+  "embedded_media": [
+    "word/media/image32.emf",
+    "word/media/image31.emf",
+    "word/media/image28.wmf",
+    "word/media/image30.wmf",
+    "word/media/image29.wmf",
+    "word/media/image27.emf",
+    "word/media/image34.wmf",
+    "word/media/image33.wmf",
+    "word/media/image26.emf",
+    "word/media/image22.emf",
+    "word/media/image24.emf",
+    "word/media/image7.emf",
+    "word/media/image8.emf",
+    "word/media/image9.emf",
+    "word/media/image25.emf",
+    "word/media/image6.emf",
+    "word/media/image5.wmf",
+    "word/media/image4.wmf",
+    "word/media/image1.wmf",
+    "word/media/image2.jpg",
+    "word/media/image3.jpg",
+    "word/media/image11.wmf",
+    "word/media/image10.wmf",
+    "word/media/image13.wmf",
+    "word/media/image12.wmf",
+    "word/media/image21.wmf",
+    "word/media/image23.emf",
+    "word/media/image19.emf",
+    "word/media/image20.emf",
+    "word/media/image17.emf",
+    "word/media/image18.emf",
+    "word/media/image14.emf",
+    "word/media/image16.emf",
+    "word/media/image15.emf"
+  ]
+}

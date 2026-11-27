@@ -1,0 +1,92 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/109-4y-04-1.pdf",
+  "parts": [
+    {
+      "page": 1,
+      "text": "公告試題僅供參考\n \n \n   \n   \n- 1- ◢ \n 注意：考試開始鈴(鐘)響前，不可以翻閱試題本  \n \n109 學年度科技校院四年制與專科學校二年制 \n統 一 入 學 測 驗 試 題 本 \n電機與電子群電機類 \n電機與電子群資電類 \n專業科目(一)：電子學、基本電學 \n \n \n【注 意 事 項】  \n \n1.請核對考試科目與報考群(類)別是否相符。 \nˉ  \n2.請檢查答案卡(卷)、座位及准考證三者之號碼是否完全相同，如有\n不符，請監試人員查明處理。 \nˉ  \n3.本試卷分兩部份，共50 題，共100 分，答對給分，答錯不倒扣。試卷\n最後一題後面有備註【以下空白】。 \n第一部份（第1 至25 題，每題2 分，共50 分） \n第二部份（第26 至50 題，每題2 分，共50 分） \nˉ  \n4.本試卷均為單一選擇題，每題都有 (A)、(B)、(C)、(D) 四個選項，請選\n一個最適當答案，在答案卡同一題號對應方格內，用 2B 鉛筆塗滿\n...方格，但不超出格外。 \nˉ  \n5.有關數值計算的題目，以最接近的答案為準。 \nˉ  \n6.本試卷空白處或背面，可做草稿使用。 \nˉ  \n7.請在試卷首頁准考證號碼之方格內，填上自己的准考證號碼，考完後\n將「答案卡(卷)」及「試題」一併繳回。 \nˉ  \n \n \n准考證號碼：□□□□□□□□ \n考試開始鈴(鐘)響時，請先填寫准考證號碼，再翻閱試題本作答。 \n \n",
+      "images": 2,
+      "drawings": 30,
+      "text_sha256": "95240e7cf86b003e47d1fca0baeca839f79b328c22934eb0f953e5c7c3ab5561"
+    },
+    {
+      "page": 2,
+      "text": "公告試題僅供參考\n第2 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-2- \n第一部份：電子學（第1 至25 題，每題2 分，共50 分）  \n  \n1. 有關各種 N 通道場效電晶體偏壓於飽和區 ( 定電流區 ) 工作，下列敘述何者正確？  \n(A) V GS 皆需大於零才可使汲極端流入電流正常操作 ( ID ＞ 0 ) \n(B) V GS 小於零皆可使汲極端流入電流正常操作 ( ID ＞ 0 ) \n(C) FET 內部通道靠近汲極處形成之通道較窄 \n(D) FET 內部通道靠近汲極處形成之空乏區較窄 \n  \n2. 如圖 ( 一 ) 所示之 MOSFET 電路，MOSFET 之臨界電壓 ( threshold voltage ) V T  = 1.8 V， \n…...參數 K = 1.2 mA / V 2，已選擇適當之 R D 使電路操作於飽和區且 I D = 10.8 mA，則 R G 1 應 \n…...調整為何？  \n(A) 150 k Ω \n圖(一)  \n12 V ID\nRG1\nD\nG\nS\nVDS\n\nk\n100\nRD\n \n(B) 180 k Ω \n(C) 210 k Ω \n(D) 250 k Ω \n  \n3. 操作於飽和區之 JFET 放大電路，其 I DSS = 6 mA，夾止電壓 ( pinch - off voltage ) V P = – 3 V，\n若電路工作點之 V GS = – 2 V，則此時電路之互導 g m約為何？  \n(A) 1.21 mS \n(B) 1.33 mS \n(C) 1.82 mS \n(D) 2.43 mS \n  \n4. 如圖 ( 二 ) 所示之 MOSFET 放大電路，已知 MOSFET 之臨界電壓 V T = 1.5 V，參數 \nK = 2 mA / V 2。若 V DD = 15 V， R G 1 = 300 k Ω， R G 2 = 60 k Ω， R S = 1 k Ω， R D = 10 k Ω，則\n此電路之交流信號電壓增益 v o / v i為何？  \n(A) 7.4 \n圖(二)  \nvi\nG\nS\nvo\nCG\nVDD\nRG1\nRG2\nD\nRD\nRS\nCD\nCS\n \n(B) 15.6 \n(C) 20 \n(D) 24 \n  \n5. 如圖 ( 三 ) 所示之JFET 放大電路，已知JFET 之夾止電壓 V P = – 2 V， I DSS = 6 mA。 \n….若V DD = 9 V， R G = 1.2 M Ω， R S = 2 k Ω，則此電路之交流輸出阻抗 Z o為何？ (\n2\nDSS\nP\nI\nK\nV\n\n ) \n(A) 2 k Ω \n圖(三)  \nCG\nvi\nG\nD\nS\nRG\nRS\nCS\nvo\nVDD\nZo\n \n(B) 1.2 k Ω \n(C) 0.6 k Ω \n(D) 0.4 k Ω \n",
+      "images": 0,
+      "drawings": 98,
+      "text_sha256": "c492089f2e2b635bdb4c427366c6440a0d704449f57257bb028d3800ef02235b"
+    },
+    {
+      "page": 3,
+      "text": "公告試題僅供參考\n109 年四技  \n第3 頁 \n電機與電子群電機類、電機與電子群資電類 專業科目(一)  \n 共 12 頁 \n   \n   \n- 3-   ◢ \n6. 一正回授放大器電路形成之振盪器，其回授增益β = 0.02，欲輸出振幅穩定之正弦波，則\n放大器之電壓增益 | A v | 應調整為何？  \n(A) 75 \n(B) 50 \n(C) 48 \n(D) 45 \n  \n7. 如圖 ( 四 ) 所示之振盪器電路，下列敘述何者正確？  \n圖(四)  \nvo2\nC1\nR1\nR2\nR3\nvo1\nA\nB\nVCC\nVCC\nVCC\nVCC\n \n(A) 方塊 A 之 OPA 電路功能為微分電路 \n(B) 方塊 B 之 OPA 電路功能為積分電路 \n(C) v o 2之輸出為方波 \n(D) v o 1之輸出為弦波 \n  \n8. 如圖 ( 五 ) 所示之電路， V CC = 15 V， R 1 = 20 k Ω， R 2 = 100 k Ω，OPA 飽和電壓 V sat = 13.5 V，\n則磁滯 ( hysteresis ) 電壓為何？  \n(A) 3.2 V \n圖(五)  \nvo\nR1\nR2\nvi\nVCC\nVCC\n \n(B) 4.8 V \n(C) 5.4 V \n(D) 7.8 V \n  \n9. 如圖 ( 六 ) 所示為 BJT 共基極放大電路之小信號等效電路模型，於室溫下之熱電壓 \n( thermal voltage ) V T = 26 mV，工作點之 I C = 0.26 mA，α 約為 1.0，下列敘述何者錯誤？  \n圖(六)  \nE\nC\nB\nvi\nii\nRE =\n\nk\n6\nre\nRC =\n\nk\n15\nie\nic\nio\nib\nie\nvo\n\nZi\n \n(A) r e約為 100 Ω  \n(B) 電壓增益 A v = v o / v i約為 150  \n(C) 輸入阻抗 Z i約為 6 k Ω \n(D) 電流增益 A i = i o / i i約為 1 \n  \n \n \n",
+      "images": 0,
+      "drawings": 120,
+      "text_sha256": "9e9bc72e9c447d8b07a76bfdaf7398ca44cf0acd5732292158de88a689c4ec34"
+    },
+    {
+      "page": 4,
+      "text": "公告試題僅供參考\n第4 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-4- \n10. 如圖 ( 七 ) 所示之理想箝位電路和輸入波形v i，其穩態輸出波形 v o為何？  \n圖(七)  \n10 V\nvi\nC\nvo\nvi\n...\n5 V\n5 V\nT\nt\n0\n \n(A) \n \n(B) \n \n(C) \n \n(D) \n \n  \n11. 如圖 ( 八 ) 所示為 BJT 共集極放大電路之小信號等效電路模型，若β = 100，直流偏壓\nI .B = 0.1 mA，熱電壓 V T = 26 mV，則下列敘述何者錯誤？  \n圖(八)  \nC\nvi\nii\nRB =\nib\nic\nie\nib\nB\nr\nE\n\nk\n100\nRE =\n\nk\n2\nvo\nio\n\nZi\n'\nZo\nZi\n \n(A) 電壓增益 A v = v o / v i約為 1  \n(B) rπ約為 260 Ω \n(C) 輸入阻抗 Z i約為 66 k Ω \n(D) 電流增益 A i = i o / i i約為 100 \n  \n12. 如圖 ( 九 ) 所示為 BJT 共射極放大電路之小信號等效電路模型，若β = 99，直流偏壓\nI B = 0.01 mA，熱電壓 V T = 26 mV，則下列敘述何者錯誤？  \n圖(九)  \nC\nvi\nii\nRB =\nib\nic\nie\nB\nr\nE\n\nk\n4\nRE =\n\nk\n2\nio\nvo\nRC =\n\nk\n3\nib\n\nZi\nZi\n'\nZo\n \n(A) 電壓增益 A v = v o / v i約為 – 1.5  \n(B) rπ約為 2.6 k Ω \n(C) 輸出阻抗 Z o約為 3 k Ω \n(D) 電流增益 A i = i o / i i約為 – 20 \nvo\nT\nt\n...\n0\n10V\n20V\n10 V\n20 V\n0\n...\nT\nt\nvo\n...\nT\nt\n10 V\n0 \nvo\n...\nT\nt\n0 \nvo\n10V\n",
+      "images": 0,
+      "drawings": 195,
+      "text_sha256": "1293a3ce974cfd5ca3a9eabdd9fa09981c92f3b65a2493cdbc2be6ae7fcdcd69"
+    },
+    {
+      "page": 5,
+      "text": "公告試題僅供參考\n109 年四技  \n第5 頁 \n電機與電子群電機類、電機與電子群資電類 專業科目(一)  \n 共 12 頁 \n   \n   \n- 5-  \n  \n13. 如圖 ( 十 ) 所示之理想二極體電路，當輸入波形為 v i時，輸出波形 v o為何？  \n圖(十)  \nR\n10 V\nvi\nvo\n5 V\n10V\nvi\nt\nT\n10 V\n...\n0\n \n(A) \n10V\nvo\nt\nT\n5 V\n...\n0\n \n(B) \n5V\nvo\nt\nT\n5 V\n...\n0\n \n(C) \n \n(D) \n5V\nvo\nt\nT\n10 V\n...\n0\n \n  \n14. 如圖 ( 十一 ) 所示之理想二極體電路，若輸入弦波電壓 v i 的有效值為 110 V 且兩電容器值\n適當，則輸出電壓 V o約為何？  \n(A) 11 V \n圖(十一) \n \n(B) 31 V  \n(C) 22 V  \n(D) 15.5 V  \n15. 如圖 ( 十二 ) 所示之理想二極體電路，若輸入正弦波電壓 v i之有效值為 110 V，若 D 1、 D 4\n燒毀時呈現斷路狀態，則輸出波形 v o為何？  \n圖(十二)\nD2\nD1\nD3\nD4\nR\nvo\nvi\nvs\n10：1\n  \n(A) \n \n(B) \n \n(C) \n \n(D) \nt\n...\nT\nvo\n0\n11 2 V\n \n10V\nvo\nt\nT\n10 V\n...\n0\nvi\nvs\nVo\nD1 C1\nC2\nD2\nVm\nVm\n10：1\n11 V\nt\n...\nT\nvo\n0\n \nt\n...\nT\nvo\n0\n11 2 V\n11 V\nt\n...\nT\nvo\n0\n",
+      "images": 0,
+      "drawings": 238,
+      "text_sha256": "55467db8215506fa466856a42fe671322d43223cf4290d77e95dce046317c448"
+    },
+    {
+      "page": 6,
+      "text": "公告試題僅供參考\n第6 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-6- \n16. 如圖 ( 十三 ) 所示之稽納 ( Zener ) 二極體電路，其逆向崩潰電壓為 6 V， P Z 為稽納二極體\n消耗功率， P L為負載 R L功率，則下列何者錯誤？  \n圖(十三) \nVs =9 V\nΩ\n20\nR =\nVZ\nIZ\nVo\nIR\nIL\nΩ\n10\nRL =\n \n(A) I L = 0.3 A  \n(B) I R = 0.3 A  \n(C) P L = 0.9 W  \n(D) P Z = 2.7 W  \n  \n17. NPN 型電晶體於主動區 ( active region ) 工作時，其三接腳 ( B、 C 及 E ) 電壓 ( V B、 V C及 V E ) 之\n大小關係，下列何者正確？  \n(A) V B＞ V C＞ V E \n(B) V C＞ V E＞ V B \n(C) V C＞ V B＞ V E \n(D) V E＞ V C＞ V B \n  \n18. 於主動區工作之電晶體電流增益α = 0.99，若射極電流 I E = 10 mA，漏電流 I CBO = 5 μ A，則\n其集極電流 I C值為何？  \n(A) 0.005 mA \n(B) 9.905 mA \n(C) 10 mA \n(D) 10.005 mA \n  \n19. 如圖 ( 十四 ) 所示之電晶體直流偏壓電路，下列敘述何者正確？ \n圖(十四) \n \n(A) 為共射極固定偏壓電路 \n(B) 為共集極固定偏壓電路 \n(C) 為共射極分壓偏壓電路 \n(D) 為共集極分壓偏壓電路 \n  \n20. 如圖 ( 十五 ) 所示之電晶體直流偏壓電路，若 V BE = 0.7 V，β = 200， V CC = 10 V， \n………. R B = 300 k Ω， R C = 1 k Ω，則其直流工作點 I C與 V CE之值各約為何？  \n圖(十五) \n \n(A) I C = 0.5 mA、 V CE = 9.5 V \n(B) I C = 1.7 mA、 V CE = 8.3 V \n(C) I C = 2.5 mA、 V CE = 7.5 V \n(D) I C = 3.7 mA、 V CE = 6.3 V \nIC\nIE\nI2\nIB\nVCE\nRB1\nRB2\nVBE\nVCC\nRC\nRE\nCE\nCC\nvi\nvo\nCB\nIC\nIB\nVCE\nRB\nRC\nVCC\nVBE\nvi\nCB\nCC\nvo\n",
+      "images": 0,
+      "drawings": 127,
+      "text_sha256": "819056be304a78a50e12e5d9017f19a07a77e354535b4e1f2b234929bbe52d77"
+    },
+    {
+      "page": 7,
+      "text": "公告試題僅供參考\n109 年四技  \n第7 頁 \n電機與電子群電機類、電機與電子群資電類 專業科目(一)  \n 共 12 頁 \n   \n   \n- 7-  \n  \n  \n21. 單級放大電路的低頻截止頻率為 f L，高頻截止頻率為 f H，若將完全相同的放大電路串接\n成 n 級時，則其低頻截止頻率\n( )\nLf\nn ，高頻截止頻率\n( )\nHf\nn ，下列何者正確？  \n(A) \n1\n1\n( )\n( )\n2\n1\n2\n1\nL\nn\nL\nH\nH\nn\nf\nf\nn\nf\nn\nf\n\n\n\n\n、\n \n(B) \n1\n1\n( )\n2\n1\n( )\n2\n1\nH\nn\nL\nL\nH\nn\nf\nf\nn\nf\nf\nn\n\n\n\n\n、\n \n(C) \n( )\n( )\n2\n1\n2\n1\nn\nL\nL\nH\nH\nn\nf\nf\nn\nf\nn\nf\n\n\n\n\n、\n \n(D) \n( )\n2\n1\n( )\n2\n1\nn\nH\nL\nL\nH\nn\nf\nf\nn\nf\nf\nn\n\n\n\n\n、\n \n  \n22. 兩級的串級放大器，第一級放大器電壓增益為 50，第二級放大器電壓增益為 200，若\n兩級間沒有負載效應，則其總電壓增益為何？  \n(A) 40 dB \n(B) 60 dB \n(C) 80 dB \n(D) 10000 dB \n  \n23. 運算放大器輸出方波信號時，若信號在 20 μ s 內由– 5 V 變動到 + 5 V，則其轉動率 ( slew rate )\n為何？  \n(A) 0.25 V / μ s \n(B) 0.5 V / μ s \n(C) 5 V / μ s \n(D) 10 V / μ s \n  \n24. 如圖 ( 十六 ) 所示為具有抑制高頻增益之微分電路，若 R 1 = 1 k Ω， C = 0.1 μ F， R 2 = 100 k Ω，\n則其低頻截止頻率 f L約為何？ \n(A) 16 Hz \n圖(十六) \n \n(B) 1 kHz \n(C) 1.6 kHz \n(D) 1 MHz \n  \n25. 如圖 ( 十七 ) 所示電路，若 R 1 = 2 k Ω， R 2 = 20 k Ω， R 3 = 3 k Ω， R 4 = 30 k Ω， V a = – 0.3 V，\nV b = 0.2 V，則輸出電壓 V o為何？ \n(A) 5 V \n圖(十七) \n \n(B) – 5 V \n(C) 10 V \n(D) – 10 V \n  \n第二部份：基本電學（第26 至50 題，每題2 分，共50 分）  \n  \n26. 電容器 C 1 = 2 μ F 耐壓 300 V，電容器 C 2 = 6 μ F 耐壓 500 V。若將 C 1及 C 2串聯，則其總耐壓\n為何？  \n(A) 800 V \n(B) 600 V \n(C) 500 V \n(D) 400 V \n  \n27. 有一介質的厚度為 2 mm，其耐壓為 100 kV，則該介質的介質強度為何？  \n(A) 5 kV / m \n(B) 50 kV / m \n(C) 5 MV / m \n(D) 50 MV / m \n  \n28. 一線圈之感應電動勢等於零，則該線圈之磁通量如何變化？  \n(A) 隨時間線性增加 \n(B) 隨時間線性遞減 \n(C) 與時間平方成正比 \n(D) 不隨時間變化 \nvo\nR1\nR2\nvi\nC\nVo\nR1\nR2\nVa\nVb\nR3\nR4\n",
+      "images": 0,
+      "drawings": 99,
+      "text_sha256": "12c2061ffa118e1c4b232eda4aef22b235d4955dbb502982e5d7232b6b53220f"
+    },
+    {
+      "page": 8,
+      "text": "公告試題僅供參考\n第8 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-8- \n  \n29. 兩電感 L 1、 L 2為並聯互消連接，若將耦合係數 K 提高，則其總電感量變化為何？  \n(A) 不變 \n(B) 減少 \n(C) 線性增加 \n(D) 平方增加 \n  \n30. 如圖 ( 十八 ) 所示電路，若開關 S 閉合前，電容器無儲存能量。 S 於時間 t = 0 時閉合，則\n在S 閉合瞬間 ( t = 0 ) 和電路穩態 ( t = ∞ ) ，I 分別為何？  \n(A) 0.46 mA，1 mA \n圖(十八) \n \n(B) 1.25 mA，2 mA \n(C) 1.25 mA，0.46 mA \n(D) 1 mA，1.25 mA \n  \n31. 如圖 ( 十九 ) 所示電路，若電感器、電容器於開關 S 閉合前皆無儲存能量，則 S 閉合後之\n電流 I 的穩態值為何？  \n(A) 1.27 mA \n圖(十九) \n \n(B) 1.56 mA \n(C) 2 mA \n(D) 2.8 mA \n  \n32. 如圖 ( 二十 ) 所示電路，若 v ( t ) = 121.2 cos ( 1000 t ) V， i ( t ) = 12.12 sin ( 1000 t ) A，則下列何者\n正確？  \n(A) Z 為電阻，其值為 10 Ω \n圖(二十) \n \n(B) Z 為電容，其值為 100 μ F \n(C) Z 為電感，其值為 10 mH \n(D) Z 為電容，其值為 10 μ F \n  \n33. 如圖 ( 二十一 ) 所示電路，若\n100 0 V\nV \n\n，則下列敘述何者正確？  \n圖(二十一) \n \n \n(A) \n10 0 A\nI \n\n \n(B) \n10 45\nZ \n\n \n(C) 電路呈電感性  \n(D) I 的相位超前V \n\nk\n15\n\nk\n10\nS\n10 V\n\nk\n4\n\nk\n2\nI\n \n0.2μF\n4 mH\n\nk\n8\n\nk\n4\n\nk\n10\n28 V\nS\nI\n 2μF\nZ\nv (t)\ni (t)\nΩ\n10\nΩ\n10\nV\nI\nZ\nΩ\n=10\nXC\nΩ\n=10\nXL\n",
+      "images": 0,
+      "drawings": 103,
+      "text_sha256": "6887667142bdb7df88fa92b8d153541d08dc4193a8a0de43161b95caaed6ce9c"
+    },
+    {
+      "page": 9,
+      "text": "公告試題僅供參考\n109 年四技  \n第9 頁 \n電機與電子群電機類、電機與電子群資電類 專業科目(一)  \n 共 12 頁 \n   \n   \n- 9-  \n  \n \n34. 有一物質其原子序為 32，則下列敘述何者正確？  \n(A) 其價電子 ( valence electron ) 數為 3 個 \n(B) 其 L 層電子軌道總帶電量約為 – 1.28 × 10 – 18庫倫 \n(C) 當環境溫度升高時，此物質的電性可能變為絕緣體 \n(D) 其原子核的總帶電量約為 5.1 × 10 – 19庫倫 \n  \n35. 在一均勻電場中，將一單位正電荷由無窮遠處移到 B 點，所需能量為 3.2 電子伏特 ( eV ) ，\n再將此電荷由 B 點移到 A 點需作功 3.2 × 10 \n– 19焦耳，則下列何者正確？  \n(A) B、A 兩點的電位差 V BA＝ – 2 V \n(B) A、B 兩點的電位差 V AB＝ 4 V \n(C) A 點的電位 V A＝ 2 V \n(D) B 點的電位 V B＝ – 2 V \n  \n36. 用於室內配線之銅導線，在室溫 t 1\n o\n C 下，長為 \n 米、直徑為 D 毫米、電阻係數為\n.Ω m\n\n\n、推論絕對溫度為 – 234.5 o\n C，下列敘述何者正確？ \n(A) 其等效電阻值為\n2\n4\nD\n\n\n \n(B) 若導線被剪掉四分之一長度，則其等效電阻值變為\n2 k\nD\n\n\n \n(C) 若導線被均勻拉長為原來的 N 倍 ( 體積不變 ) ，則其等效電阻值變為\n3\n2 k\nN\nD\n\n\n \n(D) 若室溫上升為 t 2\n o C，則其等效電阻值變為\n2\n2\n1\n4\n(1\n)\n234.5 M\n(1\n)\n234.5\nt\nt\nD\n\n\n\n\n\n \n  \n37. 如圖 ( 二十二 ) 所示電路，若電源 V s提供 40 mW 功率，且 V 1＝ 0.25 V s，則下列何者正確？ \n(A) I s＝ 2 mA \n圖(二十二) \n \n(B) V s＝ 20 V \n(C) R＝ 10 k Ω \n(D) R 消耗 20 mW 功率 \n38. 如圖 ( 二十三 ) 所示電路，20 Ω 電阻消耗 20 W 功率，下列何者正確？  \n(A) 5 Ω 電阻消耗 10 W 功率 \n  \n圖(二十三)\n \n(B) V x＝ 12 V \n(C) I ＝ 1 A \n(D) R＝ 10 Ω \n  \nVs\nIs\n\nk\n8\n\nk\n10\nR\nV1\n\nk\n12\nI\nVx\nR\nΩ\n5\nΩ\n2\nΩ\n20\nΩ\n8\nΩ\n8\nΩ\n30\n50 V\n",
+      "images": 5,
+      "drawings": 65,
+      "text_sha256": "cf77b5c686fb1b6557e7976bfef8e94516b7f7f10e84e0180feb26517df9ef72"
+    },
+    {
+      "page": 10,
+      "text": "公告試題僅供參考\n第10 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-10- \n39. 如圖 ( 二十四 ) 所示電路，若 A、B、C、D、E 為理想的電路元件，則下列敘述何者正確？  \n(A) 元件 A 供應 280 W 功率 \n圖(二十四) \n \n(B) 元件 B 消耗 60 W 功率 \n(C) 電路元件總供應功率為 300 W \n(D) 電路元件總消耗功率為 270 W \n40. 如圖 ( 二十五 ) 所示電路，求 R eq為多少？  \n圖(二十五) \nR\nR\nReq\nR\nR\nR\nR\nR\nR\nR\nR\nR\n \n(A) 3R  \n(B) (1\n3)R\n\n \n(C) \n2R \n(D) (1\n2)R\n\n \n  \n41. 如圖 ( 二十六 ) 所示電路， R 1＝ 2 Ω、 R 2＝ R 3＝ R 7＝ 12 Ω、 R 4＝ 10 Ω、 R 5＝ 4 Ω、 R 6＝ 6 Ω，\n下列敘述何者正確？  \n圖(二十六) \na\nb\n12 V\nR1\nR2\nI1\nI2\nR3\nR5\nR6\nR4\nR7\nVx\nI3\n \n(A) I 1＋ I 2＋ I 3＝ 3 A \n(B) R 3所消耗的功率為 9 W \n(C) V x＝ 6 V \n(D) 由 a、b 兩端所看入之諾頓 ( Norton ) 等效電流為 6 A \n42. 如圖 ( 二十七 ) 所示電路，下列敘述何者正確？  \n(A) 2.5 A 電流源供應 5 W 功率 \n圖(二十七) \n \n(B) 12 V 電壓源供應 10 W 功率 \n(C) V x＝ 12 V \n(D) 四個電阻共消耗 40 W 功率 \n  \n \nE\n4A\n6A\n20V\n6V\n10V\nB\nA\nC\nD\n3 A\nVx\n2.5 A\n12 V\nΩ\n3\nΩ\n6\nΩ\n4\nΩ\n6\n",
+      "images": 0,
+      "drawings": 165,
+      "text_sha256": "f6b2cbb1765555b1b0f482cbb23f6d2f603a1da3fcc8355aa338de1598ee8200"
+    },
+    {
+      "page": 11,
+      "text": "公告試題僅供參考\n109 年四技  \n第11 頁 \n電機與電子群電機類、電機與電子群資電類 專業科目(一)  \n 共 12 頁 \n   \n   \n- 11-  \n  \n \n43. 有一部 8 極的正弦波發電機，線圈轉速為.750 rpm，若輸出電壓的有效值為 110 V，則其\n…...輸出電壓波形為何？  \n(A) \n \n(B) \n \n(C) \n \n(D) \n \n  \n44. 如圖 ( 二十八 ) 所示的電壓波形，其平均值為 V 1，有效值為 V 2，則 V 2 / V 1 的比值為何？  \n(A) 1 \n圖(二十八) \n \n(B) 2 \n(C) 5 \n(D) 10 \n  \n45. 將交流電壓電源( )\n100 2 sin(200\n30 )V\nv t\nt\n\n\n\n 與 50 μ F 電容器串聯，下列敘述何者錯誤？  \n(A) 瞬間功率的最大值為 100 W \n(B) 瞬間功率的角頻率為 200 rad / s \n(C) 平均功率為 0 W \n(D) 電壓相位落後電流相位 90 ° \n  \n46. 如圖 ( 二十九 ) 所示 RLC 並聯電路，電源電壓( )\n100 2 sin(1000 )V\nv t\nt\n\n，若 I 1 的電流大小\n為 10 A， I C的電流大小為 8 A，則電路的功率因數為何？  \n(A) 0.5 \n圖(二十九) \n \n(B) 0.707 \n(C) 0.886 \n(D) 1 \n \n \n \n \n \nv (t)\n110 V\n110 V\n0\n20 ms\nt\nv (t)\n110 V\n110 V\n0\n40 ms\nt\nv (t)\n0\n20 ms\nt\nV\n2\n110\n \nV\n2\n110\n \nv (t)\n0\n40 ms\nt\nV\n2\n110\n \nV\n2\n110\n \n0V\n5V/DIV，2s/DIV\nR\nC\n50 mH\nIC\nI1\nIT\nv (t)\n",
+      "images": 0,
+      "drawings": 215,
+      "text_sha256": "fc5dbdb58cc66683e76273eccaf61304d28f908a2c2540561e7a55e878f4b0d3"
+    },
+    {
+      "page": 12,
+      "text": "公告試題僅供參考\n第12 頁  \n 109 年四技  \n共12 頁 \n 電機與電子群電機類、電機與電子群資電類 專業科目(一) \n-12- \n \n47. 如圖 ( 三十 ) 所示之 RLC 串聯電路，若電流 i ( t ) 與電源電壓 v ( t ) 同相位，則i ( 4 ) 之電流\n值為何？  \n圖(三十) \n \n(A) – 20 A \n(B) 20 A \n(C) \n20 A\n2\n\n  \n(D) 20 A\n2\n \n48. 如圖 ( 三十一 ) 所示之 RLC 並聯電路，若電路之功率因數為 1 及消耗的平均功率為 25 W，\n則電路的品質因數為何？  \n圖(三十一) \nR\n10mF\nL\n( )\n50 2 sin(\n30 )V\nv t\nt\n\n\n\n \n(A) 5 \n(B) 2 \n(C) 1.414 \n(D) 1 \n  \n49. 如圖 ( 三十二 ) 所示單相三線電路，設備 A 及 B 為純電阻性負載，電阻值皆為 2 Ω，於負載 \nB 端發生短路故障，短路電流 I 2之值約為何？  \n(A) 660.3 A \n圖(三十二) \n \n(B) 588.4 A \n(C) 384.7 A \n(D) 76.7 A \n  \n50. 如圖 ( 三十三 ) 所示之三相電路，求線電流\nA\nI 之值為何？  \n圖(三十三) \n \n(A) 20 3\n90 A\n\n\n \n(B) 20 3 90 A\n\n\n \n(C) 20\n90 A\n\n\n \n(D) 20 90 A\n\n\n \n  \n \n【以下空白】 \n1 F\n4 H\nΩ\n5\n \n( )\n100 2 sin(\n45 )V\nv t\nt\n\n\n\n\n \n( )\nsin(\n)A\nm\ni t\nI\nt\n\n\n\n\n設備B\n設備A\n短路\nV\n0\n0\n1\n1\n\n\nΩ\n0.1\nΩ\n0.1\nΩ\n0.1\nΩ\n2\nΩ\n2\nI1\nI2\nV\n0\n0\n1\n1\n\n\nZ\nV\n0\n0\n24\n\n\nV\n0\n12\n0\n24\n\n\n\n\n\n0\n6\n12\na\nb\nc\nIA\n\n\n\n0\n6\n12\n\n\n\n0\n6\n12\n \n240\n120 V\n\n\n",
+      "images": 0,
+      "drawings": 132,
+      "text_sha256": "461d7e4f1527c91ee5490d5046fcb6ff5b6d9ad270da90cc7f6e3838b538a329"
+    }
+  ],
+  "risks": [
+    "diagrams_or_formula_layout_not_reconstructed"
+  ]
+}

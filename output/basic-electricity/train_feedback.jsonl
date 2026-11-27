@@ -1,0 +1,9 @@
+{"attempt_id": "dd5def5483d842ffb7e6d76b7549fa30", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-103-q02", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "dc960770283d43f88556f07b80e837b8", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-103-q10", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "362ff60ad74f448cbe0ecfaf6261f83d", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-104-q26", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "caac9b40628a40078753e906b503923e", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-104-q28", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "f37a2f891f5c4933bb74e747af1a7a99", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-104-q29", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "12645f0dbbf546cdaabd50d0b39574b9", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-104-q36", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "bde885ed572441d7abff6d463a8ff42c", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-104-q47", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "9b7c805c4ea149fd9f77b4aed73839ad", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-105-q27", "split": "train", "verdict": "unparseable"}
+{"attempt_id": "b4aa8795953041919fcbdc308603b7e1", "error_type": "missing_or_ambiguous_final_answer", "hint": "請只保留一個明確答案，最後一行以「答案：」接你選的一個代號。", "question_id": "exam-105-q28", "split": "train", "verdict": "unparseable"}

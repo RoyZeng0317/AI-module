@@ -1,0 +1,1552 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/基本電學-題庫系統.xlsx",
+  "parts": [
+    {
+      "sheet_xml": "xl/worksheets/sheet1.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "題目編號",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "第一章節",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "43.408547477023042",
+          "formula": "RAND()*100"
+        },
+        {
+          "cell": "A4",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "B4",
+          "cached_value": "70.298969197185528",
+          "formula": "RAND()*100"
+        },
+        {
+          "cell": "A5",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "B5",
+          "cached_value": "63.835549196565125",
+          "formula": ""
+        },
+        {
+          "cell": "A6",
+          "cached_value": "4",
+          "formula": ""
+        },
+        {
+          "cell": "B6",
+          "cached_value": "18.396664564751564",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "B7",
+          "cached_value": "62.422618066912506",
+          "formula": ""
+        },
+        {
+          "cell": "A8",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "B8",
+          "cached_value": "43.211390409169212",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "7",
+          "formula": ""
+        },
+        {
+          "cell": "B9",
+          "cached_value": "57.047113482159631",
+          "formula": ""
+        },
+        {
+          "cell": "A10",
+          "cached_value": "8",
+          "formula": ""
+        },
+        {
+          "cell": "B10",
+          "cached_value": "45.03468843433793",
+          "formula": ""
+        },
+        {
+          "cell": "A11",
+          "cached_value": "9",
+          "formula": ""
+        },
+        {
+          "cell": "B11",
+          "cached_value": "19.803885786626939",
+          "formula": ""
+        },
+        {
+          "cell": "A12",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "B12",
+          "cached_value": "31.92969327226557",
+          "formula": ""
+        },
+        {
+          "cell": "A13",
+          "cached_value": "11",
+          "formula": ""
+        },
+        {
+          "cell": "B13",
+          "cached_value": "83.754147693292694",
+          "formula": ""
+        },
+        {
+          "cell": "A14",
+          "cached_value": "12",
+          "formula": ""
+        },
+        {
+          "cell": "B14",
+          "cached_value": "45.164054351605046",
+          "formula": ""
+        },
+        {
+          "cell": "A15",
+          "cached_value": "13",
+          "formula": ""
+        },
+        {
+          "cell": "B15",
+          "cached_value": "13.9330469758006",
+          "formula": ""
+        },
+        {
+          "cell": "A16",
+          "cached_value": "14",
+          "formula": ""
+        },
+        {
+          "cell": "B16",
+          "cached_value": "93.672922049335938",
+          "formula": ""
+        },
+        {
+          "cell": "A17",
+          "cached_value": "15",
+          "formula": ""
+        },
+        {
+          "cell": "B17",
+          "cached_value": "39.324926166536677",
+          "formula": ""
+        },
+        {
+          "cell": "A18",
+          "cached_value": "16",
+          "formula": ""
+        },
+        {
+          "cell": "B18",
+          "cached_value": "42.673831381437886",
+          "formula": ""
+        },
+        {
+          "cell": "A19",
+          "cached_value": "17",
+          "formula": ""
+        },
+        {
+          "cell": "B19",
+          "cached_value": "83.749020692826946",
+          "formula": ""
+        },
+        {
+          "cell": "A20",
+          "cached_value": "18",
+          "formula": ""
+        },
+        {
+          "cell": "B20",
+          "cached_value": "35.659283678407817",
+          "formula": ""
+        },
+        {
+          "cell": "A21",
+          "cached_value": "19",
+          "formula": ""
+        },
+        {
+          "cell": "B21",
+          "cached_value": "91.366390011620851",
+          "formula": ""
+        },
+        {
+          "cell": "A22",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "B22",
+          "cached_value": "19.741195360122031",
+          "formula": ""
+        },
+        {
+          "cell": "A23",
+          "cached_value": "21",
+          "formula": ""
+        },
+        {
+          "cell": "B23",
+          "cached_value": "40.649902691255136",
+          "formula": ""
+        },
+        {
+          "cell": "A24",
+          "cached_value": "22",
+          "formula": ""
+        },
+        {
+          "cell": "B24",
+          "cached_value": "35.928775389253396",
+          "formula": ""
+        },
+        {
+          "cell": "A25",
+          "cached_value": "23",
+          "formula": ""
+        },
+        {
+          "cell": "B25",
+          "cached_value": "42.806858292508309",
+          "formula": ""
+        },
+        {
+          "cell": "A26",
+          "cached_value": "24",
+          "formula": ""
+        },
+        {
+          "cell": "B26",
+          "cached_value": "18.209152328119515",
+          "formula": ""
+        },
+        {
+          "cell": "A27",
+          "cached_value": "25",
+          "formula": ""
+        },
+        {
+          "cell": "B27",
+          "cached_value": "0.33407349830298916",
+          "formula": ""
+        },
+        {
+          "cell": "A28",
+          "cached_value": "26",
+          "formula": ""
+        },
+        {
+          "cell": "B28",
+          "cached_value": "35.234514006554221",
+          "formula": ""
+        },
+        {
+          "cell": "A29",
+          "cached_value": "27",
+          "formula": ""
+        },
+        {
+          "cell": "B29",
+          "cached_value": "66.754687755329286",
+          "formula": ""
+        },
+        {
+          "cell": "A30",
+          "cached_value": "28",
+          "formula": ""
+        },
+        {
+          "cell": "B30",
+          "cached_value": "55.055334291739157",
+          "formula": ""
+        },
+        {
+          "cell": "A31",
+          "cached_value": "29",
+          "formula": ""
+        },
+        {
+          "cell": "B31",
+          "cached_value": "42.427646972342579",
+          "formula": ""
+        },
+        {
+          "cell": "A32",
+          "cached_value": "30",
+          "formula": ""
+        },
+        {
+          "cell": "B32",
+          "cached_value": "12.218414293769131",
+          "formula": ""
+        },
+        {
+          "cell": "A33",
+          "cached_value": "31",
+          "formula": ""
+        },
+        {
+          "cell": "B33",
+          "cached_value": "40.677824057525633",
+          "formula": ""
+        },
+        {
+          "cell": "A34",
+          "cached_value": "32",
+          "formula": ""
+        },
+        {
+          "cell": "B34",
+          "cached_value": "67.388891583768626",
+          "formula": ""
+        },
+        {
+          "cell": "A35",
+          "cached_value": "33",
+          "formula": ""
+        },
+        {
+          "cell": "B35",
+          "cached_value": "44.442421162124511",
+          "formula": ""
+        },
+        {
+          "cell": "A36",
+          "cached_value": "34",
+          "formula": ""
+        },
+        {
+          "cell": "B36",
+          "cached_value": "84.164778523276794",
+          "formula": ""
+        },
+        {
+          "cell": "A37",
+          "cached_value": "35",
+          "formula": ""
+        },
+        {
+          "cell": "B37",
+          "cached_value": "20.14029618517873",
+          "formula": ""
+        },
+        {
+          "cell": "A38",
+          "cached_value": "36",
+          "formula": ""
+        },
+        {
+          "cell": "B38",
+          "cached_value": "57.122791258219863",
+          "formula": ""
+        },
+        {
+          "cell": "A39",
+          "cached_value": "37",
+          "formula": ""
+        },
+        {
+          "cell": "B39",
+          "cached_value": "85.071431426077027",
+          "formula": ""
+        },
+        {
+          "cell": "A40",
+          "cached_value": "38",
+          "formula": ""
+        },
+        {
+          "cell": "B40",
+          "cached_value": "87.353936957677618",
+          "formula": ""
+        },
+        {
+          "cell": "A41",
+          "cached_value": "39",
+          "formula": ""
+        },
+        {
+          "cell": "B41",
+          "cached_value": "69.186399990449814",
+          "formula": ""
+        },
+        {
+          "cell": "A42",
+          "cached_value": "40",
+          "formula": ""
+        },
+        {
+          "cell": "B42",
+          "cached_value": "97.335088689296668",
+          "formula": ""
+        },
+        {
+          "cell": "A43",
+          "cached_value": "41",
+          "formula": ""
+        },
+        {
+          "cell": "B43",
+          "cached_value": "69.77269034258407",
+          "formula": ""
+        },
+        {
+          "cell": "A44",
+          "cached_value": "42",
+          "formula": ""
+        },
+        {
+          "cell": "B44",
+          "cached_value": "69.064701977797966",
+          "formula": ""
+        },
+        {
+          "cell": "A45",
+          "cached_value": "43",
+          "formula": ""
+        },
+        {
+          "cell": "B45",
+          "cached_value": "57.359971419148494",
+          "formula": ""
+        },
+        {
+          "cell": "A46",
+          "cached_value": "44",
+          "formula": ""
+        },
+        {
+          "cell": "B46",
+          "cached_value": "79.117184021290356",
+          "formula": ""
+        },
+        {
+          "cell": "A47",
+          "cached_value": "45",
+          "formula": ""
+        },
+        {
+          "cell": "B47",
+          "cached_value": "53.697692850308066",
+          "formula": ""
+        },
+        {
+          "cell": "A48",
+          "cached_value": "46",
+          "formula": ""
+        },
+        {
+          "cell": "B48",
+          "cached_value": "94.27355762560714",
+          "formula": ""
+        },
+        {
+          "cell": "A49",
+          "cached_value": "47",
+          "formula": ""
+        },
+        {
+          "cell": "B49",
+          "cached_value": "52.636155661650875",
+          "formula": ""
+        },
+        {
+          "cell": "A50",
+          "cached_value": "48",
+          "formula": ""
+        },
+        {
+          "cell": "B50",
+          "cached_value": "96.052915053336108",
+          "formula": ""
+        },
+        {
+          "cell": "A51",
+          "cached_value": "49",
+          "formula": ""
+        },
+        {
+          "cell": "B51",
+          "cached_value": "52.987272014024796",
+          "formula": ""
+        },
+        {
+          "cell": "A52",
+          "cached_value": "50",
+          "formula": ""
+        },
+        {
+          "cell": "B52",
+          "cached_value": "22.995679662363465",
+          "formula": ""
+        },
+        {
+          "cell": "A53",
+          "cached_value": "51",
+          "formula": ""
+        },
+        {
+          "cell": "B53",
+          "cached_value": "1.2921633032384472",
+          "formula": ""
+        },
+        {
+          "cell": "A54",
+          "cached_value": "52",
+          "formula": ""
+        },
+        {
+          "cell": "B54",
+          "cached_value": "78.652089413585074",
+          "formula": ""
+        },
+        {
+          "cell": "A55",
+          "cached_value": "53",
+          "formula": ""
+        },
+        {
+          "cell": "B55",
+          "cached_value": "99.962492817319969",
+          "formula": ""
+        },
+        {
+          "cell": "A56",
+          "cached_value": "54",
+          "formula": ""
+        },
+        {
+          "cell": "B56",
+          "cached_value": "19.214021417367498",
+          "formula": ""
+        },
+        {
+          "cell": "A57",
+          "cached_value": "55",
+          "formula": ""
+        },
+        {
+          "cell": "B57",
+          "cached_value": "86.85998699426338",
+          "formula": ""
+        },
+        {
+          "cell": "A58",
+          "cached_value": "56",
+          "formula": ""
+        },
+        {
+          "cell": "B58",
+          "cached_value": "40.780435410076819",
+          "formula": ""
+        },
+        {
+          "cell": "A59",
+          "cached_value": "57",
+          "formula": ""
+        },
+        {
+          "cell": "B59",
+          "cached_value": "35.956150138440634",
+          "formula": ""
+        },
+        {
+          "cell": "A60",
+          "cached_value": "58",
+          "formula": ""
+        },
+        {
+          "cell": "B60",
+          "cached_value": "91.41937897891485",
+          "formula": ""
+        },
+        {
+          "cell": "A61",
+          "cached_value": "59",
+          "formula": ""
+        },
+        {
+          "cell": "B61",
+          "cached_value": "51.031866653128411",
+          "formula": ""
+        },
+        {
+          "cell": "A62",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "B62",
+          "cached_value": "82.421324744928995",
+          "formula": ""
+        },
+        {
+          "cell": "A63",
+          "cached_value": "61",
+          "formula": ""
+        },
+        {
+          "cell": "B63",
+          "cached_value": "50.731571236714281",
+          "formula": ""
+        },
+        {
+          "cell": "A64",
+          "cached_value": "62",
+          "formula": ""
+        },
+        {
+          "cell": "B64",
+          "cached_value": "50.829031664540082",
+          "formula": ""
+        },
+        {
+          "cell": "A65",
+          "cached_value": "63",
+          "formula": ""
+        },
+        {
+          "cell": "B65",
+          "cached_value": "70.203201798341411",
+          "formula": ""
+        },
+        {
+          "cell": "A66",
+          "cached_value": "64",
+          "formula": ""
+        },
+        {
+          "cell": "B66",
+          "cached_value": "12.99947730860287",
+          "formula": ""
+        },
+        {
+          "cell": "A67",
+          "cached_value": "65",
+          "formula": ""
+        },
+        {
+          "cell": "B67",
+          "cached_value": "70.324075429098059",
+          "formula": ""
+        },
+        {
+          "cell": "A68",
+          "cached_value": "66",
+          "formula": ""
+        },
+        {
+          "cell": "B68",
+          "cached_value": "17.740927261318674",
+          "formula": "RAND()*100"
+        },
+        {
+          "cell": "A69",
+          "cached_value": "67",
+          "formula": ""
+        },
+        {
+          "cell": "B69",
+          "cached_value": "53.774853466620954",
+          "formula": ""
+        },
+        {
+          "cell": "A70",
+          "cached_value": "68",
+          "formula": ""
+        },
+        {
+          "cell": "B70",
+          "cached_value": "41.971508709506367",
+          "formula": ""
+        },
+        {
+          "cell": "A71",
+          "cached_value": "69",
+          "formula": ""
+        },
+        {
+          "cell": "B71",
+          "cached_value": "95.134141736222972",
+          "formula": ""
+        },
+        {
+          "cell": "A72",
+          "cached_value": "70",
+          "formula": ""
+        },
+        {
+          "cell": "B72",
+          "cached_value": "7.6189350491739809",
+          "formula": ""
+        },
+        {
+          "cell": "A73",
+          "cached_value": "71",
+          "formula": ""
+        },
+        {
+          "cell": "B73",
+          "cached_value": "25.247657313833216",
+          "formula": ""
+        },
+        {
+          "cell": "A74",
+          "cached_value": "72",
+          "formula": ""
+        },
+        {
+          "cell": "B74",
+          "cached_value": "71.534443522823992",
+          "formula": ""
+        },
+        {
+          "cell": "A75",
+          "cached_value": "73",
+          "formula": ""
+        },
+        {
+          "cell": "B75",
+          "cached_value": "71.691069541776884",
+          "formula": ""
+        },
+        {
+          "cell": "A76",
+          "cached_value": "74",
+          "formula": ""
+        },
+        {
+          "cell": "B76",
+          "cached_value": "17.118275520419513",
+          "formula": ""
+        },
+        {
+          "cell": "A77",
+          "cached_value": "75",
+          "formula": ""
+        },
+        {
+          "cell": "B77",
+          "cached_value": "64.29212733846947",
+          "formula": ""
+        },
+        {
+          "cell": "A78",
+          "cached_value": "76",
+          "formula": ""
+        },
+        {
+          "cell": "B78",
+          "cached_value": "22.763839856681667",
+          "formula": ""
+        },
+        {
+          "cell": "A79",
+          "cached_value": "77",
+          "formula": ""
+        },
+        {
+          "cell": "B79",
+          "cached_value": "41.751592631195741",
+          "formula": ""
+        },
+        {
+          "cell": "A80",
+          "cached_value": "78",
+          "formula": ""
+        },
+        {
+          "cell": "B80",
+          "cached_value": "12.950637476408088",
+          "formula": ""
+        },
+        {
+          "cell": "A81",
+          "cached_value": "79",
+          "formula": ""
+        },
+        {
+          "cell": "B81",
+          "cached_value": "71.229774785023963",
+          "formula": ""
+        },
+        {
+          "cell": "A82",
+          "cached_value": "80",
+          "formula": ""
+        },
+        {
+          "cell": "B82",
+          "cached_value": "11.858257747687539",
+          "formula": ""
+        },
+        {
+          "cell": "A83",
+          "cached_value": "81",
+          "formula": ""
+        },
+        {
+          "cell": "B83",
+          "cached_value": "27.194019959721594",
+          "formula": ""
+        },
+        {
+          "cell": "A84",
+          "cached_value": "82",
+          "formula": ""
+        },
+        {
+          "cell": "B84",
+          "cached_value": "48.152038887536563",
+          "formula": ""
+        },
+        {
+          "cell": "A85",
+          "cached_value": "83",
+          "formula": ""
+        },
+        {
+          "cell": "B85",
+          "cached_value": "76.936884993835122",
+          "formula": ""
+        },
+        {
+          "cell": "A86",
+          "cached_value": "84",
+          "formula": ""
+        },
+        {
+          "cell": "B86",
+          "cached_value": "63.510373176501858",
+          "formula": ""
+        },
+        {
+          "cell": "A87",
+          "cached_value": "85",
+          "formula": ""
+        },
+        {
+          "cell": "B87",
+          "cached_value": "50.646091667414161",
+          "formula": ""
+        },
+        {
+          "cell": "A88",
+          "cached_value": "86",
+          "formula": ""
+        },
+        {
+          "cell": "B88",
+          "cached_value": "85.368697125389446",
+          "formula": ""
+        },
+        {
+          "cell": "A89",
+          "cached_value": "87",
+          "formula": ""
+        },
+        {
+          "cell": "B89",
+          "cached_value": "93.376562251288746",
+          "formula": ""
+        },
+        {
+          "cell": "A90",
+          "cached_value": "88",
+          "formula": ""
+        },
+        {
+          "cell": "B90",
+          "cached_value": "2.7382410232979493",
+          "formula": ""
+        },
+        {
+          "cell": "A91",
+          "cached_value": "89",
+          "formula": ""
+        },
+        {
+          "cell": "B91",
+          "cached_value": "35.626001492697633",
+          "formula": ""
+        },
+        {
+          "cell": "A92",
+          "cached_value": "90",
+          "formula": ""
+        },
+        {
+          "cell": "B92",
+          "cached_value": "75.052766575605801",
+          "formula": ""
+        },
+        {
+          "cell": "A93",
+          "cached_value": "91",
+          "formula": ""
+        },
+        {
+          "cell": "B93",
+          "cached_value": "40.372469698579152",
+          "formula": ""
+        },
+        {
+          "cell": "A94",
+          "cached_value": "92",
+          "formula": ""
+        },
+        {
+          "cell": "B94",
+          "cached_value": "66.912058462795997",
+          "formula": ""
+        },
+        {
+          "cell": "A95",
+          "cached_value": "93",
+          "formula": ""
+        },
+        {
+          "cell": "B95",
+          "cached_value": "99.915729056964636",
+          "formula": ""
+        },
+        {
+          "cell": "A96",
+          "cached_value": "94",
+          "formula": ""
+        },
+        {
+          "cell": "B96",
+          "cached_value": "54.373159090666746",
+          "formula": ""
+        },
+        {
+          "cell": "A97",
+          "cached_value": "95",
+          "formula": ""
+        },
+        {
+          "cell": "B97",
+          "cached_value": "46.196491378055271",
+          "formula": ""
+        },
+        {
+          "cell": "A98",
+          "cached_value": "96",
+          "formula": ""
+        },
+        {
+          "cell": "B98",
+          "cached_value": "40.255534104696011",
+          "formula": ""
+        },
+        {
+          "cell": "A99",
+          "cached_value": "97",
+          "formula": ""
+        },
+        {
+          "cell": "B99",
+          "cached_value": "93.772112530270675",
+          "formula": ""
+        },
+        {
+          "cell": "A100",
+          "cached_value": "98",
+          "formula": ""
+        },
+        {
+          "cell": "B100",
+          "cached_value": "25.315948518105202",
+          "formula": ""
+        },
+        {
+          "cell": "A101",
+          "cached_value": "99",
+          "formula": ""
+        },
+        {
+          "cell": "B101",
+          "cached_value": "12.648617716062526",
+          "formula": ""
+        },
+        {
+          "cell": "A102",
+          "cached_value": "100",
+          "formula": ""
+        },
+        {
+          "cell": "B102",
+          "cached_value": "11.52246807789904",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "sheet_xml": "xl/worksheets/sheet2.xml",
+      "cells": [
+        {
+          "cell": "A1",
+          "cached_value": "題目編號",
+          "formula": ""
+        },
+        {
+          "cell": "B1",
+          "cached_value": "題目",
+          "formula": ""
+        },
+        {
+          "cell": "A2",
+          "cached_value": "第七章節",
+          "formula": ""
+        },
+        {
+          "cell": "A3",
+          "cached_value": "1",
+          "formula": ""
+        },
+        {
+          "cell": "B3",
+          "cached_value": "有一電阻為XC為20",
+          "formula": ""
+        },
+        {
+          "cell": "A4",
+          "cached_value": "2",
+          "formula": ""
+        },
+        {
+          "cell": "A5",
+          "cached_value": "3",
+          "formula": ""
+        },
+        {
+          "cell": "A6",
+          "cached_value": "4",
+          "formula": ""
+        },
+        {
+          "cell": "A7",
+          "cached_value": "5",
+          "formula": ""
+        },
+        {
+          "cell": "A8",
+          "cached_value": "6",
+          "formula": ""
+        },
+        {
+          "cell": "A9",
+          "cached_value": "7",
+          "formula": ""
+        },
+        {
+          "cell": "A10",
+          "cached_value": "8",
+          "formula": ""
+        },
+        {
+          "cell": "A11",
+          "cached_value": "9",
+          "formula": ""
+        },
+        {
+          "cell": "A12",
+          "cached_value": "10",
+          "formula": ""
+        },
+        {
+          "cell": "A13",
+          "cached_value": "11",
+          "formula": ""
+        },
+        {
+          "cell": "A14",
+          "cached_value": "12",
+          "formula": ""
+        },
+        {
+          "cell": "A15",
+          "cached_value": "13",
+          "formula": ""
+        },
+        {
+          "cell": "A16",
+          "cached_value": "14",
+          "formula": ""
+        },
+        {
+          "cell": "A17",
+          "cached_value": "15",
+          "formula": ""
+        },
+        {
+          "cell": "A18",
+          "cached_value": "16",
+          "formula": ""
+        },
+        {
+          "cell": "A19",
+          "cached_value": "17",
+          "formula": ""
+        },
+        {
+          "cell": "A20",
+          "cached_value": "18",
+          "formula": ""
+        },
+        {
+          "cell": "A21",
+          "cached_value": "19",
+          "formula": ""
+        },
+        {
+          "cell": "A22",
+          "cached_value": "20",
+          "formula": ""
+        },
+        {
+          "cell": "A23",
+          "cached_value": "21",
+          "formula": ""
+        },
+        {
+          "cell": "A24",
+          "cached_value": "22",
+          "formula": ""
+        },
+        {
+          "cell": "A25",
+          "cached_value": "23",
+          "formula": ""
+        },
+        {
+          "cell": "A26",
+          "cached_value": "24",
+          "formula": ""
+        },
+        {
+          "cell": "A27",
+          "cached_value": "25",
+          "formula": ""
+        },
+        {
+          "cell": "A28",
+          "cached_value": "26",
+          "formula": ""
+        },
+        {
+          "cell": "A29",
+          "cached_value": "27",
+          "formula": ""
+        },
+        {
+          "cell": "A30",
+          "cached_value": "28",
+          "formula": ""
+        },
+        {
+          "cell": "A31",
+          "cached_value": "29",
+          "formula": ""
+        },
+        {
+          "cell": "A32",
+          "cached_value": "30",
+          "formula": ""
+        },
+        {
+          "cell": "A33",
+          "cached_value": "31",
+          "formula": ""
+        },
+        {
+          "cell": "A34",
+          "cached_value": "32",
+          "formula": ""
+        },
+        {
+          "cell": "A35",
+          "cached_value": "33",
+          "formula": ""
+        },
+        {
+          "cell": "A36",
+          "cached_value": "34",
+          "formula": ""
+        },
+        {
+          "cell": "A37",
+          "cached_value": "35",
+          "formula": ""
+        },
+        {
+          "cell": "A38",
+          "cached_value": "36",
+          "formula": ""
+        },
+        {
+          "cell": "A39",
+          "cached_value": "37",
+          "formula": ""
+        },
+        {
+          "cell": "A40",
+          "cached_value": "38",
+          "formula": ""
+        },
+        {
+          "cell": "A41",
+          "cached_value": "39",
+          "formula": ""
+        },
+        {
+          "cell": "A42",
+          "cached_value": "40",
+          "formula": ""
+        },
+        {
+          "cell": "A43",
+          "cached_value": "41",
+          "formula": ""
+        },
+        {
+          "cell": "A44",
+          "cached_value": "42",
+          "formula": ""
+        },
+        {
+          "cell": "A45",
+          "cached_value": "43",
+          "formula": ""
+        },
+        {
+          "cell": "A46",
+          "cached_value": "44",
+          "formula": ""
+        },
+        {
+          "cell": "A47",
+          "cached_value": "45",
+          "formula": ""
+        },
+        {
+          "cell": "A48",
+          "cached_value": "46",
+          "formula": ""
+        },
+        {
+          "cell": "A49",
+          "cached_value": "47",
+          "formula": ""
+        },
+        {
+          "cell": "A50",
+          "cached_value": "48",
+          "formula": ""
+        },
+        {
+          "cell": "A51",
+          "cached_value": "49",
+          "formula": ""
+        },
+        {
+          "cell": "A52",
+          "cached_value": "50",
+          "formula": ""
+        },
+        {
+          "cell": "A53",
+          "cached_value": "51",
+          "formula": ""
+        },
+        {
+          "cell": "A54",
+          "cached_value": "52",
+          "formula": ""
+        },
+        {
+          "cell": "A55",
+          "cached_value": "53",
+          "formula": ""
+        },
+        {
+          "cell": "A56",
+          "cached_value": "54",
+          "formula": ""
+        },
+        {
+          "cell": "A57",
+          "cached_value": "55",
+          "formula": ""
+        },
+        {
+          "cell": "A58",
+          "cached_value": "56",
+          "formula": ""
+        },
+        {
+          "cell": "A59",
+          "cached_value": "57",
+          "formula": ""
+        },
+        {
+          "cell": "A60",
+          "cached_value": "58",
+          "formula": ""
+        },
+        {
+          "cell": "A61",
+          "cached_value": "59",
+          "formula": ""
+        },
+        {
+          "cell": "A62",
+          "cached_value": "60",
+          "formula": ""
+        },
+        {
+          "cell": "A63",
+          "cached_value": "61",
+          "formula": ""
+        },
+        {
+          "cell": "A64",
+          "cached_value": "62",
+          "formula": ""
+        },
+        {
+          "cell": "A65",
+          "cached_value": "63",
+          "formula": ""
+        },
+        {
+          "cell": "A66",
+          "cached_value": "64",
+          "formula": ""
+        },
+        {
+          "cell": "A67",
+          "cached_value": "65",
+          "formula": ""
+        },
+        {
+          "cell": "A68",
+          "cached_value": "66",
+          "formula": ""
+        },
+        {
+          "cell": "A69",
+          "cached_value": "67",
+          "formula": ""
+        },
+        {
+          "cell": "A70",
+          "cached_value": "68",
+          "formula": ""
+        },
+        {
+          "cell": "A71",
+          "cached_value": "69",
+          "formula": ""
+        },
+        {
+          "cell": "A72",
+          "cached_value": "70",
+          "formula": ""
+        },
+        {
+          "cell": "A73",
+          "cached_value": "71",
+          "formula": ""
+        },
+        {
+          "cell": "A74",
+          "cached_value": "72",
+          "formula": ""
+        },
+        {
+          "cell": "A75",
+          "cached_value": "73",
+          "formula": ""
+        },
+        {
+          "cell": "A76",
+          "cached_value": "74",
+          "formula": ""
+        },
+        {
+          "cell": "A77",
+          "cached_value": "75",
+          "formula": ""
+        },
+        {
+          "cell": "A78",
+          "cached_value": "76",
+          "formula": ""
+        },
+        {
+          "cell": "A79",
+          "cached_value": "77",
+          "formula": ""
+        },
+        {
+          "cell": "A80",
+          "cached_value": "78",
+          "formula": ""
+        },
+        {
+          "cell": "A81",
+          "cached_value": "79",
+          "formula": ""
+        },
+        {
+          "cell": "A82",
+          "cached_value": "80",
+          "formula": ""
+        },
+        {
+          "cell": "A83",
+          "cached_value": "81",
+          "formula": ""
+        },
+        {
+          "cell": "A84",
+          "cached_value": "82",
+          "formula": ""
+        },
+        {
+          "cell": "A85",
+          "cached_value": "83",
+          "formula": ""
+        },
+        {
+          "cell": "A86",
+          "cached_value": "84",
+          "formula": ""
+        },
+        {
+          "cell": "A87",
+          "cached_value": "85",
+          "formula": ""
+        },
+        {
+          "cell": "A88",
+          "cached_value": "86",
+          "formula": ""
+        },
+        {
+          "cell": "A89",
+          "cached_value": "87",
+          "formula": ""
+        },
+        {
+          "cell": "A90",
+          "cached_value": "88",
+          "formula": ""
+        },
+        {
+          "cell": "A91",
+          "cached_value": "89",
+          "formula": ""
+        },
+        {
+          "cell": "A92",
+          "cached_value": "90",
+          "formula": ""
+        },
+        {
+          "cell": "A93",
+          "cached_value": "91",
+          "formula": ""
+        },
+        {
+          "cell": "A94",
+          "cached_value": "92",
+          "formula": ""
+        },
+        {
+          "cell": "A95",
+          "cached_value": "93",
+          "formula": ""
+        },
+        {
+          "cell": "A96",
+          "cached_value": "94",
+          "formula": ""
+        },
+        {
+          "cell": "A97",
+          "cached_value": "95",
+          "formula": ""
+        },
+        {
+          "cell": "A98",
+          "cached_value": "96",
+          "formula": ""
+        },
+        {
+          "cell": "A99",
+          "cached_value": "97",
+          "formula": ""
+        },
+        {
+          "cell": "A100",
+          "cached_value": "98",
+          "formula": ""
+        },
+        {
+          "cell": "A101",
+          "cached_value": "99",
+          "formula": ""
+        },
+        {
+          "cell": "A102",
+          "cached_value": "100",
+          "formula": ""
+        }
+      ],
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    }
+  ],
+  "risks": [
+    "spreadsheet_formulas_not_executed_not_verified_answer_keys"
+  ]
+}

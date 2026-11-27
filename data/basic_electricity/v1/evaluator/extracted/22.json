@@ -1,0 +1,92 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/101-4y-04-1.pdf",
+  "parts": [
+    {
+      "page": 1,
+      "text": "公告試題僅供參考\n",
+      "images": 1,
+      "drawings": 0,
+      "text_sha256": "c8801976e1d6766263f8e746e0b92cad861d6081e40f141247ba1f978ccdd62f"
+    },
+    {
+      "page": 2,
+      "text": "電機與電子群電機類、電機與電子群電子類 專業科目(一) \n共12 頁                  第2 頁 \n第一部份：基本電學 ( 第1 至25 題，每題2 分，共50 分 )  \n \n本試卷可能用到的函數值 \nθ \n30 \n37\n45 \n53\n60\nsinθ \n0.50 \n0.60 \n0.71 \n0.80 \n0.87 \ncosθ \n0.87 \n0.80 \n0.71 \n0.60 \n0.50 \n     \n      \n1\n2\n3\n0.368 ,\n0.135 ,\n0.050\ne\ne\ne\n\n\n\n\n\n\n \n      \n      \n2\n1.41 ,\n3\n1.73 ,\n5\n2.24\n\n\n\n \n   \n \n1. 將2 庫倫之電荷通過一元件作功6 焦耳，則該元件兩端的電位差為何？  \n(A) 2 V \n(B) 3 V \n(C) 4 V \n(D) 5 V \n  \n2. 三個電阻並聯，其電阻值分別為2 Ω、6 Ω、8 Ω，已知流經6 Ω電阻的電流為2 A，則\n流經2 Ω電阻的電流為何？  \n(A) 2 A \n(B) 4 A \n(C) 6 A \n(D) 8 A \n  \n3. 如圖 ( 一 ) 所示電路，電流I 之值為何？  \n(A) 2 A \n \n \n \n \n \n \n \n \n圖 ( 一) \n            \n \n(B) 3 A \n(C) 4 A \n \n(D) 5 A \n  \n4. R1 與R2 兩電阻並聯，已知流過兩電阻之電流分別為IR1 = 6 A，IR2 = 2 A，且R1 = 5 Ω，則\nR2電阻消耗功率為何？  \n(A) 60 W \n(B) 80 W \n(C) 100 W \n(D) 120 W \n  \n5. 如圖 ( 二 ) 所示電路，負載電阻\nL\nR 為何值時可得最大功率？  \n(A) 3.4 kΩ \n \n \n \n \n \n \n \n \n \n圖 ( 二 ) \n     \n \n  \n(B) 5.4 kΩ \n(C) 7.4 kΩ \n \n(D) 8.4 kΩ \n  \n \n \n \n \n \n \n \n20V\n6\n 3\n 6\n 3\n \n30\nI\n \n12V\n 4k\n 6k\n \n12k\n 4k\nL\nR\na\nb\n公告試題僅供參考\n",
+      "images": 0,
+      "drawings": 102,
+      "text_sha256": "b2305e5c5935ecf30a73a6a08a4ae3f18ca9ba9321e337006ac722e72fdcbef1"
+    },
+    {
+      "page": 3,
+      "text": " \n電機與電子群電機類、電機與電子群電子類 專業科目(一) \n第3 頁                  共12 頁 \n6. 以迴路分析法分析圖 ( 三 ) 之直流電路，其\na11 I1 + a12 I2 + a13 I3 = 10 \na21 I1 + a22 I2 + a23 I3 = 6 \na31 I1 + a32 I2 + a33 I3 = 6 \n則 a11 + a21 + a31 =？  \n所列方程式如下： \n       \n(A) 2 \n \n \n \n圖 ( 三 )\n(B) 4 \n(C) 10 \n(D) 16 \n  \n7. 有一電器使用 100 伏特的電壓，在 5 秒內消耗 2000 焦耳的電能，若此電器連續使用10 小時，\n則消耗多少度電？  \n(A) 1 度 \n(B) 2 度 \n(C) 3 度 \n(D) 4 度 \n  \n8. 以相同材料製作之a、b 兩導線，已知a 的截面積為b 的2 倍，a 的長度為b 的4 倍，則a 導\n線與b 導線電阻值之比為何？  \n(A) 2：1 \n(B) 4：1 \n(C) 1：2 \n(D) 1：4 \n  \n9. 如圖 ( 四 ) 所示電路，則2 μF 電容的充電電量為何？  \n(A) 20 μC \n \n \n \n \n \n \n圖 ( 四 ) \n             \n \n(B) 40 μC \n(C) 60 μC \n \n(D) 80 μC \n  \n10. 電感值為0.1 H 的電感器儲存3.2 焦耳能量，則此電感器通過多少安培電流？  \n(A) 8 A \n(B) 5 A \n(C) 3 A \n(D) 1 A \n  \n11. 如圖 ( 五 ) 所示電路，開關S 在t = 0 時閉合，假設電容在開關閉合前無任何儲能。求經過\n3\n10秒 ( sec ) 時，電容兩端之瞬時電壓VC ( \n \n \n3\nt=10 sec\n\n) 值約為何？ \n(A) 19 V \n \n \n \n圖 ( 五 )\n   \n(B) 26 V \n(C) 29 V \n \n(D) 30 V   \n  \n12. 如圖 ( 六 ) 所示電路，v ( t ) = 100\n2 sin(1000 t +30) V，L = 10 mH，則i ( t )之相量式為何？  \n(A) \n \n \n10\n0 A\n\n \n \n \n \n \n \n \n \n圖 ( 六 )         \n \n(B) \n \n \n10\n30 A\n\n\n \n(C) \n \n10\n30 A\n\n\n \n \n(D) \n \n10\n60 A\n\n\n \n  \n 2\n 3\n 4\n 5\n 3\n 3\n6V\n \n10V\n 6μF\n 1μF\n 2μF\n \n30V\n60\n \n30\n \n30\n \n90V\n \n10μF\n \n \nt=0\n  \n  (t)\nv\n公告試題僅供參考\n",
+      "images": 12,
+      "drawings": 129,
+      "text_sha256": "d19c22cdf1e8c2f86df6efd45f79eb96eb3bdcb687802eb54f5281ae491122cf"
+    },
+    {
+      "page": 4,
+      "text": "電機與電子群電機類、電機與電子群電子類 專業科目(一) \n共12 頁                  第4 頁 \n13. 將一個300 Ω電阻與25\n2π μF 電容串聯接至\n \n \n \n100\n0 V\n\n、100 Hz 之電源，則電路阻抗值為何？ \n(A) 300 Ω \n(B) 400 Ω \n(C) 500 Ω \n(D) 600 Ω \n  \n14. 如圖 ( 七 ) 所示之RLC 串聯交流電路，已知電源角速度ω = 400 弳度 / 秒 ( rad / s ) ，則\nL\nV 值\n為何？  \n(A) 100 V \n \n \n \n \n \n \n圖 ( 七 ) \n   \n \n(B) 50 V \n(C) 20 V \n \n(D) 10 V \n  \n15. 有兩交流電流，\n  \n \n  \n1(t)\nsin(ωt\n30 )A\ni\n\n\n\n，\n \n \n  \n2(t)\ncos(ωt\n30 )A\ni\n\n\n\n，則1i 與2i 的相位關係為何？\n(A) 1i 與2i 同相位 \n(B) 1i 相位超前2i\n 30 \n(C) 1i 相位超前2i\n 60 \n(D) 1i 相位超前2i\n 90 \n  \n16. 如圖 ( 八 ) 所示之純電容交流電路，已知v ( t ) = 100\n2 sin(500 t +30) V，C = 200 μF，則i ( t ) \n為何？  \n(A) 100\n2 sin(500 t +30) A \n \n \n \n \n \n \n \n圖 ( 八 )              \n \n(B) 100\n2 sin(500 t +120) A \n(C) 10\n2 sin(500 t +30) A \n \n(D) 10\n2 sin(500 t +120) A \n  \n17. 有一電阻R = 50 Ω與一電容抗XC = 50 Ω之電容器組成的RC 並聯交流電路。若外加電源電壓\n為v ( t ) = 100 sin( 100 t +30) V，則流經電容器電流的有效值為何？  \n(A) 1 A \n(B) \n2 A \n(C) 2 A \n(D) 2 2 A \n  \n18. 如圖 ( 九 ) 所示之RC 交流電路，已知\n \n120\n15 V\nS\nV \n\n\n，\n \n5 45 A\nI \n\n，則電容抗\nC\nX 之值\n為何？ \n(A) 57.6 Ω \n \n \n \n \n \n圖 ( 九 )                \n \n(B) 47.6 Ω \n(C) 37.6 Ω \n \n(D) 27.6 Ω \n  \n \n \n \n \n \n \n100 0 V\n\n \n30\n \n50μF\n \n25mH\nL\nV\n \n (t)\nv\nS\nV\nI\nC\njX\n\n公告試題僅供參考\n",
+      "images": 6,
+      "drawings": 87,
+      "text_sha256": "ae3e09e89c0686fe8954ddadd31664dd1c6b517376ea355c01a6e551de3428cc"
+    },
+    {
+      "page": 5,
+      "text": " \n電機與電子群電機類、電機與電子群電子類 專業科目(一) \n第5 頁                  共12 頁 \n19. 如圖 ( 十 ) 所示之交流電路，已知\n \n(t)\nsv\n= 100 sin1000 t V，則\n \n( t)\ni\n為何？ \n(A) 10 sin ( 1000 t −45) A \n \n \n \n \n \n \n圖 ( 十 )\n  \n \n             \n(B) 10 sin ( 1000 t −37) A \n(C) 7 sin ( 1000 t −30) A \n \n(D) 7 sin ( 1000 t +30) A \n20. 如圖 ( 十一 ) 所示之RC 交流電路，已知\n \n40 0 V\nS\nV \n\n，則電路功率因數為何？  \n(A) 0.87 \n \n \n \n \n圖 ( 十一 ) \n     \n(B) 0.80 \n(C) 0.71 \n \n(D) 0.50 \n  \n21. 已知RLC 串聯交流電路的R、L、C 電壓分別為\nR\nV\n80V\n\n、\nL\nV\n60V\n\n、\nC\nV\n120V\n\n，且流\n過 R 的電流為\n \n10 0 A\n\n，則此電路的視在功率為何？  \n(A) 2600 VA \n(B) 1400 VA \n(C) 1000 VA \n(D) 800 VA \n  \n22. 如圖 ( 十二 ) 所示之交流電路，已知\n \n(t)\nsv\n= 100 sin500 t V，電路的功率因數為0.8 落後，則\n電容C 之值為何？  \n(A) 65 μ F \n \n \n \n \n \n圖 ( 十二 ) \n \n(B) 50 μ F \n(C) 35 μ F \n \n(D) 20 μ F \n  \n23. 如圖 ( 十三 ) 所示之交流電路，已知\n \n10\n10 V\nS\nV \n\n\n、\n2\n55 A\nI \n\n、\nL\nX 與\nC\nX 的比為\n1： 3，則\nCI 為何？  \n(A) 2.12∠90A \n \n \n \n \n \n圖 ( 十三 ) \n     \n \n(B) 2.12∠80A \n(C) 0.71∠80A \n \n(D) 0.71∠90A \n  \n24. 已知RLC 串聯交流電路的電源角速度ω = 9000 弳度 / 秒 ( rad / s ) ，電路的R、\nL\nX 、\nC\nX\n比為2：3：1，則電路的諧振頻率為何？ \n(A) 716 Hz  \n(B) 827 Hz \n(C) 1013 Hz \n(D) 1755 Hz \n  \n25. 已知三相Y 型連接發電機之兩相電壓分別為ebn ( t ) = 110 sin( 377 t −120) V 及 \necn ( t ) = 110 sin( 377 t +120) V，則線電壓ebc ( t ) = ebn ( t ) − ecn ( t )為何？  \n(A) 191 sin377 t V \n(B) 110 sin377 t V \n(C) 191 sin( 377 t −90) V \n(D) 110 sin( 377 t −90) V \n  \n \n6\n \n25\n 8mH\n \n40μF\n(t)\nsv\n(t)\ni\nS\nV\n \nC\njX =\nj23Ω\n\n\n \n40\n \n12\n \n32mH\n(t)\nsv\nC\nS\nV\nI\nC\njX\n\nL\njX\nCI\n公告試題僅供參考\n",
+      "images": 1,
+      "drawings": 133,
+      "text_sha256": "cf6a3b1d1edebde27bef942a36e1777bbfa946d0de3f297d0bd2ed37233fe9fa"
+    },
+    {
+      "page": 6,
+      "text": "電機與電子群電機類、電機與電子群電子類 專業科目(一) \n共12 頁                  第6 頁 \n第二部份：電子學 ( 第26 至50 題，每題2 分，共50 分 )  \n  \n26. 圖 ( 十四 ) 是由兩個完全相同的電晶體以RC 耦合串級合成的放大電路，假設電路的\n總電壓增益為\n \n  \n   \nVT\nA\n(\n( ) /\n( ))\no\na\nv\nt\nv\nt\n\n*\n \n  \n   \nV2\n(\n( ) /\n( ))\nA\na\ni\nv\nt\nv t\n\n*\nV1\nA\n，試問當負載電阻 ( RL ) 由 \nRL = 10 MΩ逐漸減小到RL = 8 Ω的過程中，\nVT\nA\n會發生什麼樣的變化？  \n(A) 由大漸變小 \n圖 ( 十四 ) \n(B) 由小漸變大 \n(C) 維持不變 \n \n(D) 先變大再變小 \n  \n27. 承上題，當負載電阻由RL = 8 Ω逐漸增大到RL = 10 MΩ的過程中，試問AV1會發生什麼樣\n的變化？  \n(A) 由大漸變小 \n(B) 由小漸變大 \n(C) 維持不變 \n(D) 先變大再變小 \n  \n28. 下列四種典型的FET 共源極偏壓電路中，VGS ( t ) 為FET 導通的臨限電壓，參數k 的單位為 \nmA / V\n2，VDSQ為FET 的汲極與源極間的直流工作電壓，假設四個FET 的歐力電壓皆為，\nV\nA\n( ) /\n( )\no\ni\nv t\nv t\n\n為小信號電壓增益，試問下列何者可得最大的電壓增益 \n \nV\nA\n？  \n \n(A) \n \n(B) \n \n(C) \n \n(D) \n \n  \n \n16k\n \n16k\n \n7.3k\n \n7.3k\n 4k\n \n3.2k\n 4k\n \n3.2k\n( )\niv t\n( )\nov t\n( )\nav t\n9V\n( )\niv t\n( )\nov t\n \n2.5V\n 5MΩ\n 3kΩ\n \n2\n1mA/V\nk \n \n( )\n1V\nGS t\nV\n\n( )\niv t\n10V\n( )\nov t\n 1MΩ\n 1MΩ\n 3kΩ\n \n2.5kΩ\n \n2\n0.4mA/V\nk \n \n( )\n1V\nGS t\nV\n\n( )\niv t\n( )\nov t\n \n2\n0.8mA/V\nk \n \n \n( )\n2.5V\nGS t\nV\n\n 3kΩ\n 5MΩ\n 1kΩ\n 2V\nDSQ\nV\n\n 5MΩ\n 5MΩ\n 3kΩ\n( )\nov t\n( )\niv t\n 2V\nDSQ\nV\n\n \n2\n0.7mA/V\nk \n \n( )\n1V\nGS t\nV\n\n公告試題僅供參考\n",
+      "images": 8,
+      "drawings": 317,
+      "text_sha256": "9cbfe21d270865b0d452c6db82ecdd82c56aa0c67d4cc898bcd5e5b4eed41e90"
+    },
+    {
+      "page": 7,
+      "text": " \n電機與電子群電機類、電機與電子群電子類 專業科目(一) \n第7 頁                  共12 頁 \n29. 圖 ( 十五 ) 所示之FET 放大器電路中，\nV\nA\n( ) /\n( )\no\ni\nv t\nv t\n\n為小信號之電壓增益，試問移除\n旁路電容\nB\nC 後，其\n \nV\nA\n與移除前比較有何不同？  \n(A) 變小 \n \n \n \n \n \n \n \n \n \n \n \n \n圖 ( 十五 ) \n \n(B) 變大 \n(C) 不受影響 \n \n(D) 極性改變 \n  \n30. 圖 ( 十六 ) 為一JFET放大器之小信號等效電路圖，試問此電路之電壓增益\nV\nA\n( ) /\n( )\no\ni\nv t\nv t\n\n=？\n(A) \nV\nA\n = − gm *\n ( Rd rds ) / ( Rd + rds )  \n \n \n \n \n \n \n(B) \nV\nA\n = − ( 1 / RG ) *\n gm *\n ( Rd rds ) / ( Rd + rds ) \n(C) \nV\nA\n = − gm *\n ( Rd + rds ) / ( Rd rds )  \n \n(D) \nV\nA\n = − ( 1 / RG ) *\n gm *\n ( Rd + rds ) / ( Rd rds ) \n \n \n圖 ( 十六 ) \n  \n31. 圖 ( 十七 ) 放大電路中，Vio為考慮運算放大器的輸入抵補電壓後的等效電壓值。若\n \n( )\n0V\niv t \n時，測得\n( )\nov t = 20 mV，則Vio =？  \n(A) 2.5 mV \n \n \n \n \n \n \n圖 ( 十七 ) \n  \n(B) 5 mV \n(C) 10 mV \n \n(D) 20 mV \n  \n32. 圖 ( 十八 ) 所示之運算放大器電路中，VZ為稽納二極體的崩潰電壓，若VZ = 6 V，試問在正常\n工作下的If為何？  \n(A) 2 mA \n \n \n \n \n \n \n \n \n圖 ( 十八 ) \n \n(B) 1.5 mA \n(C) 1.25 mA \n \n(D) 1 mA \n  \n \n20V\n \n20kΩ\n 2kΩ\n 1kΩ\n \n20kΩ\nB\nC\n( )\niv t\n( )\nov t\nG\nS\nD\nG\nR\nd\nR\nGS\nv\nm GS\ng v\nds\nr\n( )\niv t\n( )\nov t\n \n50kΩ\n \n50kΩ\n( )\niv t\n( )\nov t\n 2kΩ\n 4kΩ\n 1kΩ\nfI\n公告試題僅供參考\n",
+      "images": 6,
+      "drawings": 179,
+      "text_sha256": "41234acd8bc9f4c3737b343e7b7aee66a30cb67163eb8f583e925df85e20189d"
+    },
+    {
+      "page": 8,
+      "text": "公告試題僅供參考\n",
+      "images": 1,
+      "drawings": 0,
+      "text_sha256": "c8801976e1d6766263f8e746e0b92cad861d6081e40f141247ba1f978ccdd62f"
+    },
+    {
+      "page": 9,
+      "text": "公告試題僅供參考\n",
+      "images": 1,
+      "drawings": 0,
+      "text_sha256": "c8801976e1d6766263f8e746e0b92cad861d6081e40f141247ba1f978ccdd62f"
+    },
+    {
+      "page": 10,
+      "text": "電機與電子群電機類、電機與電子群電子類 專業科目(一) \n共12 頁                  第10 頁 \n39. 下列何種摻雜的改變行為，可增加BJT 電晶體的電流增益β？  \n(A) 基極與射極摻雜濃度均降低 \n(B) 基極與射極摻雜濃度均增加 \n(C) 基極摻雜濃度增加與射極摻雜濃度降低 \n \n(D) 基極摻雜濃度降低與射極摻雜濃度增加 \n \n40. 下列敘述何者有誤？  \n(A) BJT 當開關使用時是工作於飽和區或截止區 \n(B) BJT 當放大器使用時是工作於主動區 \n(C) BJT 在主動區的偏壓方式是BE 接面順向偏壓，BC 接面逆向偏壓 \n(D) BJT 在飽和區的偏壓方式是BE 接面逆向偏壓，BC 接面逆向偏壓 \n  \n41. 下列對於 JFET 的特性敘述何者正確？  \n(A) VGS接近截止 ( cut - off ) 電壓時，汲極與源極間的崩潰電壓比在VGS = 0 V 時為大 \n(B) 在室溫附近，溫度愈高時，有較小的汲極電流 \n(C) 通道寬度愈窄，夾止 ( pinch - off ) 電壓愈大 \n(D) P 通道接面場效電晶體的高電位在汲極端 \n  \n42. 如圖 ( 二十三 ) 所示電路，場效電晶體之參數為：臨界電壓 ( threshold voltage ) VT = 2.0 V，\nk = 2 mA / V 2。求IDS為何？  \n(A) 8 mA \n \n \n \n \n \n \n \n \n圖 ( 二十三 )\n \n(B) 4 mA \n(C) 2 mA \n \n(D) 0 mA \n  \n43. 如圖 ( 二十四 ) 之電路，假設RC 值遠大於輸入信號\n( )\nsv t 之週期，D 為理想二極體，試問\n輸出電壓\n( )\nov t 之直流準位為何？  \n(A) 0 V \n \n \n \n \n \n圖 ( 二十四 )   \n(B) − 5 V \n(C) − 10 V \n \n(D) − 15 V \n  \n44. 如圖 ( 二十五 ) 所示之電路，假設VBE ( on ) = 0.7 V，β = 80，試問VCE約為下列何值？  \n(A) 1.4 V \n \n \n \n \n \n \n \n圖 ( 二十五 )\n(B) 3.4 V \n(C) 5.4 V \n \n(D) 7.4 V \n2V\n 1kΩ\n10V\n 3kΩ\n \n10kΩ\nD\nV\n 1k\n 2k\n \n500\n \n500\n \n12V\n 5V\n 5V\n\nt\n( )\nsv t\nC\nR\nD\n 5V\n( )\nsv t\n( )\nov t\n公告試題僅供參考\n",
+      "images": 0,
+      "drawings": 115,
+      "text_sha256": "a38711397b96f1270f77f75ab61e208e8321d7257de06db6d92cce9ea9d6062f"
+    },
+    {
+      "page": 11,
+      "text": "公告試題僅供參考\n",
+      "images": 1,
+      "drawings": 0,
+      "text_sha256": "c8801976e1d6766263f8e746e0b92cad861d6081e40f141247ba1f978ccdd62f"
+    },
+    {
+      "page": 12,
+      "text": "電機與電子群電機類、電機與電子群電子類 專業科目(一) \n共12 頁                  第12 頁 \n48. 如圖 ( 二十九 ) 所示之電路，假設電晶體工作於主動區 ( active region ) ，欲使\n \nv\nA\n( ) /\n( )\n40\no\ns\nv t\nv t\n\n\n，則\nC\nR 應為下列何值？  \n(A) 1 kΩ \n \n \n \n \n \n \n \n \n \n \n \n \n圖 ( 二十九 ) \n(B) 2 kΩ \n(C) 3 kΩ \n \n(D) 4 kΩ \n  \n49. 如圖 ( 三十 ) 所示之電路，有關此電路之特性敘述，何者正確？  \n(A) \n2\nC 的耐壓至少需為一倍Vm \n \n(B) \n3\nC 的耐壓至少需為兩倍Vm \n(C) \n1\nD 的峰值逆向電壓至少為兩倍Vm \n \n(D) 此電路為半波三倍壓電路 \n \n  圖 ( 三十 )  \n  \n50. 如圖 ( 三十一 ) 所示之電路，VEB ( on ) = 0.7 V，β = 120，求VEC =？  \n(A) 6.9 V \n \n \n \n \n \n \n \n \n圖 ( 三十一 )\n \n(B) 7.9 V \n(C) 8.9 V \n \n(D) 9.9 V \n  \n \n【以下空白】 \n( )\nsv t\n( )\nov t\n1\nC\n2\nC\nCC\nV\n 1k\n 2k\nC\nR\n100\n\n\n 2k\nr\n\n1\nR\n2\nR\n\n\nA\nV\n3\nC\nm\n( )\nV sin\nsv t\nt\n\n\no\nV\n1\nC\n2\nC\n3\nC\n1\nD\n2\nD\n3\nD\n 5V\n 5V\n \n250k\n \n1.5k\n公告試題僅供參考\n",
+      "images": 0,
+      "drawings": 135,
+      "text_sha256": "97b38922374a9574041b6fcfaeec0e14031b886004ae6ede8c60a970c08bfebe"
+    }
+  ],
+  "risks": [
+    "diagrams_or_formula_layout_not_reconstructed"
+  ]
+}

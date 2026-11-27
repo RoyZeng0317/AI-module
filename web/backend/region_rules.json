@@ -1,0 +1,6 @@
+{
+  "beijing_timezones": ["Asia/Shanghai", "Asia/Chongqing", "Asia/Chungking", "Asia/Harbin", "PRC"],
+  "simplified_sample_chars": "这为个们来时说话国汉语简体马兰关东车书见会开门风无发么吗还过让从实应当学习",
+  "punctuation_chars": "\uff0c\uff1f\u3001\u3002",
+  "phrases": ["三七旮旯话", "三七旮旯話", "那咋啦", "如何呢？又能怎？"]
+}

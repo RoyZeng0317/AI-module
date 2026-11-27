@@ -1,0 +1,71 @@
+{
+  "task": "raw_chat_generation",
+  "split": "val",
+  "checkpoint": "tranning\\gpt_word_sense_runs\\pilot_v2_50ep",
+  "quality_evaluated": false,
+  "rows": [
+    {
+      "id": "incident_report_0",
+      "prompt": "請依語境說明「蘋果」的意思：市場旁發現的蘋果不是水果，螢幕還顯示來電。",
+      "expected_label": "apple_phone",
+      "reference": "指的是蘋果品牌手機。",
+      "raw_reply": "指的是蘋果品牌手機。"
+    },
+    {
+      "id": "incident_report_1",
+      "prompt": "請依語境說明「蘋果」的意思：通訊行桌上的蘋果不是手機，咬開後果汁流了出來。",
+      "expected_label": "apple_fruit",
+      "reference": "指的是可食用的蘋果水果。",
+      "raw_reply": "指的是蘋果品牌手機。"
+    },
+    {
+      "id": "incident_report_2",
+      "prompt": "請依語境說明「鼠」的意思：寵物店裡的鼠沒有生命，只是接在收銀電腦上的指標裝置。",
+      "expected_label": "mouse_device",
+      "reference": "指的是操作電腦的滑鼠。",
+      "raw_reply": "指的是會活動的鼠類動物。"
+    },
+    {
+      "id": "incident_report_3",
+      "prompt": "請依語境說明「鼠」的意思：電腦教室出現的鼠不是周邊設備，牠正啃食餅乾。",
+      "expected_label": "mouse_animal",
+      "reference": "指的是會活動的鼠類動物。",
+      "raw_reply": "指的是會活動的鼠類動物。"
+    },
+    {
+      "id": "incident_report_4",
+      "prompt": "請依語境說明「病毒」的意思：醫院發現的病毒沒有感染病人，而是加密了掛號電腦的檔案。",
+      "expected_label": "virus_computer",
+      "reference": "指的是感染電腦的惡意程式。",
+      "raw_reply": "指的是感染生物的病毒。"
+    },
+    {
+      "id": "incident_report_5",
+      "prompt": "請依語境說明「病毒」的意思：資訊中心談的病毒不是惡意軟體，而是使員工發燒的病原。",
+      "expected_label": "virus_biological",
+      "reference": "指的是感染生物的病毒。",
+      "raw_reply": "指的是感染生物的病毒。"
+    },
+    {
+      "id": "incident_report_6",
+      "prompt": "請依語境說明「蘋果」的意思：有人在車站提到蘋果，沒有說用途。",
+      "expected_label": "insufficient_context",
+      "reference": "資訊不足，請補充用途、行為或其他語境。",
+      "raw_reply": "指的是蘋果品牌手機。"
+    },
+    {
+      "id": "incident_report_7",
+      "prompt": "請依語境說明「鼠」的意思：報告只寫發現鼠，沒有描述特徵。",
+      "expected_label": "insufficient_context",
+      "reference": "資訊不足，請補充用途、行為或其他語境。",
+      "raw_reply": "資訊不足，請補充用途、行為或其他語境。"
+    },
+    {
+      "id": "incident_report_8",
+      "prompt": "請依語境說明「病毒」的意思：公告只說有病毒，沒有說感染對象。",
+      "expected_label": "insufficient_context",
+      "reference": "資訊不足，請補充用途、行為或其他語境。",
+      "raw_reply": "資訊不足，請補充用途、行為或其他語境。"
+    }
+  ]
+}

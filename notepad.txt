@@ -1,0 +1,2 @@
+python lib/Image/img_capture_feature.py --train "data/object_detection/exports/18eb74d258ff418ebd515d6bcaa1cce3"
+python lib/Image/img_capture_feature.py --predict "0d8cde71b6dc4282a91d2746d2707888\images\train" --box x1,y1,x2,y2

@@ -1,0 +1,17 @@
+{
+  "method": "direct transformer_chat.reply; CPU; greedy temperature=0; max_new_tokens=40; existing default checkpoint; not full route",
+  "cases": [
+    {
+      "prompt": "你懂得股票投資嗎?",
+      "reply": "還不用中文回答 seq2seleying,可以陪你討論程式邏輯"
+    },
+    {
+      "prompt": "什麼是交叉商損失?",
+      "reply": "不是用 sinco,把錯誤訊息完整貼出來"
+    },
+    {
+      "prompt": "名詞解釋什麼是RAG",
+      "reply": "S+V,主詞動詞受詞補語,如He gave a me tim"
+    }
+  ]
+}

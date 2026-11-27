@@ -242,7 +242,7 @@ def svg_span(html_str, cls=None):
 
 def icon_button(icon_key, label, on_click=None, btn_id=None, cls="nav-item", **extra_attrs):
     """建立帶圖示的側邊欄按鈕（導覽項目／頁尾動作共用同一個結構）。"""
-    btn = el("button", cls=cls, html=f'{ICONS.get(icon_key, "")}<span>{label}</span>')
+    btn = el("button", cls=cls, html=f'{ICONS.get(icon_key, "")}<span>{_escape(label)}</span>')
     if btn_id:
         btn.id = btn_id
     for k, v in extra_attrs.items():
@@ -327,18 +327,27 @@ def _escape(s):
 
 
 def _inline(line):
-    h = _escape(line)
     # 一次辨識 Markdown 與裸網址，避免把既有連結的 href 再包成連結。
-    def _link(match):
-        label, target, bare = match.groups()
-        url = target or bare.rstrip(".,:!?，。；：！？)")
-        suffix = bare[len(url):] if bare else ""
-        return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{label or url}</a>{suffix}'
-    h = _re.sub(r"\[([^\]\n]+)\]\((https?://[^\s<>\)]+)\)|(?<![\w:/])(https?://[^\s<>]+)", _link, h)
-    h = _re.sub(r"\*\*(.+?)\*\*|__(.+?)__", lambda m: f"<strong>{m[1] or m[2]}</strong>", h)
-    h = _re.sub(r"`([^`]+)`", lambda m: f'<code class="md-code-inline">{m[1]}</code>', h)
-    h = _re.sub(r"(?<!\*)\*([^*\n]+?)\*(?!\*)", lambda m: f"<em>{m[1]}</em>", h)
-    return h
+    # 只在純文字片段套格式；產生的 HTML 屬性不可再次被 Markdown 改寫。
+    def _format(text):
+        text = _re.sub(r"\*\*(.+?)\*\*|__(.+?)__", lambda m: f"<strong>{m[1] or m[2]}</strong>", text)
+        return _re.sub(r"(?<!\*)\*([^*\n]+?)\*(?!\*)", lambda m: f"<em>{m[1]}</em>", text)
+
+    h = _escape(line)
+    parts, offset = [], 0
+    pattern = r"`([^`]+)`|\[([^\]\n]+)\]\((https?://[^\s<>\)]+)\)|(?<![\w:/])(https?://[^\s<>]+)"
+    for match in _re.finditer(pattern, h):
+        parts.append(_format(h[offset:match.start()]))
+        code, label, target, bare = match.groups()
+        if code is not None:
+            parts.append(f'<code class="md-code-inline">{code}</code>')
+        else:
+            url = target or bare.rstrip(".,:!?，。；：！？)")
+            suffix = bare[len(url):] if bare else ""
+            parts.append(f'<a href="{url}" target="_blank" rel="noopener noreferrer">{_format(label) if label else url}</a>{suffix}')
+        offset = match.end()
+    parts.append(_format(h[offset:]))
+    return "".join(parts)
 
 
 _TABLE_ROW_RE = _re.compile(r"^\s*\|(.*)\|\s*$")
@@ -769,7 +778,7 @@ def _draw_detections(data, ctx, overlay, results_el):
 
     results_el.innerHTML = ""
     for lbl, n in counts.items():
-        chip = el("span", cls="chip", html=f'<span class="dot"></span>{lbl} × {n}')
+        chip = el("span", cls="chip", html=f'<span class="dot"></span>{_escape(str(lbl))} × {_escape(str(n))}')
         results_el.appendChild(chip)
     if not counts:
         results_el.textContent = "沒有偵測到物件"
@@ -1496,9 +1505,9 @@ def _render_command_menu(kind, options):
         item = el("button", cls="chat-item-menu-item cmd-menu-item")
         item.setAttribute("type", "button")
         if kind == "name":
-            item.innerHTML = f"<span>/{option}</span>"
+            item.innerHTML = f"<span>/{_escape(str(option))}</span>"
         else:
-            item.innerHTML = f'<span>{option}</span><span class="cmd-menu-hint">引數</span>'
+            item.innerHTML = f'<span>{_escape(str(option))}</span><span class="cmd-menu-hint">引數</span>'
         if i == 0:
             item.classList.add("active")
         # mousedown（不是 click）先攔下：chat_input 的 blur 會在 click 事件

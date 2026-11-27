@@ -1,0 +1,250 @@
+(kicad_sch (version 20231120) (generator circuit_ic_generator) (paper "A4")
+    (lib_symbols
+        (symbol "MCU_Microchip_ATmega:ATmega328P-PU"
+            (symbol "ATmega328P-PU_1_1"
+                (pin input line (at -7.62 16.51 180) (length 2.54)
+                    (name "PC6/RESET" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 13.97 180) (length 2.54)
+                    (name "PD0/RXD" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 11.43 180) (length 2.54)
+                    (name "PD1/TXD" (effects (font (size 1.27 1.27))))
+                    (number "3" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 8.89 180) (length 2.54)
+                    (name "PD2/INT0" (effects (font (size 1.27 1.27))))
+                    (number "4" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 6.35 180) (length 2.54)
+                    (name "PD3/INT1" (effects (font (size 1.27 1.27))))
+                    (number "5" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 3.81 180) (length 2.54)
+                    (name "PD4" (effects (font (size 1.27 1.27))))
+                    (number "6" (effects (font (size 1.27 1.27)))))
+                (pin power_in line (at -7.62 1.27 180) (length 2.54)
+                    (name "VCC" (effects (font (size 1.27 1.27))))
+                    (number "7" (effects (font (size 1.27 1.27)))))
+                (pin power_in line (at -7.62 -1.27 180) (length 2.54)
+                    (name "GND" (effects (font (size 1.27 1.27))))
+                    (number "8" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at -7.62 -3.81 180) (length 2.54)
+                    (name "PB6/XTAL1" (effects (font (size 1.27 1.27))))
+                    (number "9" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at -7.62 -6.35 180) (length 2.54)
+                    (name "PB7/XTAL2" (effects (font (size 1.27 1.27))))
+                    (number "10" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 -8.89 180) (length 2.54)
+                    (name "PD5" (effects (font (size 1.27 1.27))))
+                    (number "11" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 -11.43 180) (length 2.54)
+                    (name "PD6" (effects (font (size 1.27 1.27))))
+                    (number "12" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 -13.97 180) (length 2.54)
+                    (name "PD7" (effects (font (size 1.27 1.27))))
+                    (number "13" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at -7.62 -16.51 180) (length 2.54)
+                    (name "PB0" (effects (font (size 1.27 1.27))))
+                    (number "14" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 -16.51 0) (length 2.54)
+                    (name "PB1" (effects (font (size 1.27 1.27))))
+                    (number "15" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 -13.97 0) (length 2.54)
+                    (name "PB2" (effects (font (size 1.27 1.27))))
+                    (number "16" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 -11.43 0) (length 2.54)
+                    (name "PB3/MOSI" (effects (font (size 1.27 1.27))))
+                    (number "17" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 -8.89 0) (length 2.54)
+                    (name "PB4/MISO" (effects (font (size 1.27 1.27))))
+                    (number "18" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 -6.35 0) (length 2.54)
+                    (name "PB5/SCK" (effects (font (size 1.27 1.27))))
+                    (number "19" (effects (font (size 1.27 1.27)))))
+                (pin power_in line (at 7.62 -3.81 0) (length 2.54)
+                    (name "AVCC" (effects (font (size 1.27 1.27))))
+                    (number "20" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 7.62 -1.27 0) (length 2.54)
+                    (name "AREF" (effects (font (size 1.27 1.27))))
+                    (number "21" (effects (font (size 1.27 1.27)))))
+                (pin power_in line (at 7.62 1.27 0) (length 2.54)
+                    (name "GND" (effects (font (size 1.27 1.27))))
+                    (number "22" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 3.81 0) (length 2.54)
+                    (name "PC0/ADC0" (effects (font (size 1.27 1.27))))
+                    (number "23" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 6.35 0) (length 2.54)
+                    (name "PC1/ADC1" (effects (font (size 1.27 1.27))))
+                    (number "24" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 8.89 0) (length 2.54)
+                    (name "PC2/ADC2" (effects (font (size 1.27 1.27))))
+                    (number "25" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 11.43 0) (length 2.54)
+                    (name "PC3/ADC3" (effects (font (size 1.27 1.27))))
+                    (number "26" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 13.97 0) (length 2.54)
+                    (name "PC4/ADC4/SDA" (effects (font (size 1.27 1.27))))
+                    (number "27" (effects (font (size 1.27 1.27)))))
+                (pin bidirectional line (at 7.62 16.51 0) (length 2.54)
+                    (name "PC5/ADC5/SCL" (effects (font (size 1.27 1.27))))
+                    (number "28" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "Device:R"
+            (symbol "R_1_1"
+                (pin passive line (at -2.54 0 0) (length 2.54)
+                    (name "1" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 2.54 0 0) (length 2.54)
+                    (name "2" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "Device:C"
+            (symbol "C_1_1"
+                (pin passive line (at -2.54 0 0) (length 2.54)
+                    (name "1" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 2.54 0 0) (length 2.54)
+                    (name "2" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "Device:Crystal"
+            (symbol "Crystal_1_1"
+                (pin passive line (at -2.54 0 0) (length 2.54)
+                    (name "1" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+                (pin passive line (at 2.54 0 0) (length 2.54)
+                    (name "2" (effects (font (size 1.27 1.27))))
+                    (number "2" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "power:GND"
+            (power)
+            (symbol "GND_0_1"
+                (pin power_in line (at 0 0 90) (length 0)
+                    (name "GND" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+            )
+        )
+        (symbol "power:+5V"
+            (power)
+            (symbol "+5V_0_1"
+                (pin power_in line (at 0 0 90) (length 0)
+                    (name "+5V" (effects (font (size 1.27 1.27))))
+                    (number "1" (effects (font (size 1.27 1.27)))))
+            )
+        )
+    )
+
+    (symbol (lib_id "MCU_Microchip_ATmega:ATmega328P-PU") (at 0 0 0.0) (unit 1) (uuid "U1-uuid")
+        (property "Reference" "U1" (at 0 0 0.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:+5V") (at -7.62 1.27 0.0) (unit 1) (uuid "#PWR1-uuid")
+        (property "Reference" "#PWR1" (at -7.62 1.27 0.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "Device:C") (at -10.16 1.27 180) (unit 1) (uuid "C1-uuid")
+        (property "Reference" "C1" (at -10.16 1.27 180) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at -12.7 1.27 90.0) (unit 1) (uuid "#PWR2-uuid")
+        (property "Reference" "#PWR2" (at -12.7 1.27 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:+5V") (at 7.62 -3.81 0.0) (unit 1) (uuid "#PWR3-uuid")
+        (property "Reference" "#PWR3" (at 7.62 -3.81 0.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "Device:C") (at 10.16 -3.81 0) (unit 1) (uuid "C2-uuid")
+        (property "Reference" "C2" (at 10.16 -3.81 0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at 12.7 -3.81 90.0) (unit 1) (uuid "#PWR4-uuid")
+        (property "Reference" "#PWR4" (at 12.7 -3.81 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at -7.62 -1.27 90.0) (unit 1) (uuid "#PWR5-uuid")
+        (property "Reference" "#PWR5" (at -7.62 -1.27 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at 7.62 1.27 90.0) (unit 1) (uuid "#PWR6-uuid")
+        (property "Reference" "#PWR6" (at 7.62 1.27 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "Device:C") (at 10.16 -1.27 0) (unit 1) (uuid "C3-uuid")
+        (property "Reference" "C3" (at 10.16 -1.27 0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at 12.7 -1.27 90.0) (unit 1) (uuid "#PWR7-uuid")
+        (property "Reference" "#PWR7" (at 12.7 -1.27 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+(no_connect (at -7.62 13.97))
+(no_connect (at -7.62 11.43))
+(no_connect (at -7.62 8.89))
+(no_connect (at -7.62 6.35))
+(no_connect (at -7.62 3.81))
+(no_connect (at -7.62 -8.89))
+(no_connect (at -7.62 -11.43))
+(no_connect (at -7.62 -13.97))
+(no_connect (at -7.62 -16.51))
+(no_connect (at 7.62 -16.51))
+(no_connect (at 7.62 -13.97))
+(no_connect (at 7.62 -11.43))
+(no_connect (at 7.62 -8.89))
+(no_connect (at 7.62 -6.35))
+(no_connect (at 7.62 3.81))
+(no_connect (at 7.62 6.35))
+(no_connect (at 7.62 8.89))
+(no_connect (at 7.62 11.43))
+(no_connect (at 7.62 13.97))
+(no_connect (at 7.62 16.51))
+
+    (symbol (lib_id "Device:R") (at -10.16 16.51 180) (unit 1) (uuid "R1-uuid")
+        (property "Reference" "R1" (at -10.16 16.51 180) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:+5V") (at -12.7 16.51 0.0) (unit 1) (uuid "#PWR8-uuid")
+        (property "Reference" "#PWR8" (at -12.7 16.51 0.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "Device:Crystal") (at -17.62 -5.08 90.0) (unit 1) (uuid "Y1-uuid")
+        (property "Reference" "Y1" (at -17.62 -5.08 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+(wire (pts (xy -7.62 -3.81) (xy -17.62 -7.62)) (stroke (width 0) (type default)))
+(wire (pts (xy -7.62 -6.35) (xy -17.62 -2.54)) (stroke (width 0) (type default)))
+
+    (symbol (lib_id "Device:C") (at -17.62 -10.16 270) (unit 1) (uuid "C4-uuid")
+        (property "Reference" "C4" (at -17.62 -10.16 270) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at -17.62 -12.7 90.0) (unit 1) (uuid "#PWR9-uuid")
+        (property "Reference" "#PWR9" (at -17.62 -12.7 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "Device:C") (at -17.62 -5.08 270) (unit 1) (uuid "C5-uuid")
+        (property "Reference" "C5" (at -17.62 -5.08 270) (effects (font (size 1.27 1.27))))
+    )
+    
+
+    (symbol (lib_id "power:GND") (at -17.62 -7.62 90.0) (unit 1) (uuid "#PWR10-uuid")
+        (property "Reference" "#PWR10" (at -17.62 -7.62 90.0) (effects (font (size 1.27 1.27))))
+    )
+    
+)

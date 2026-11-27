@@ -1,0 +1,169 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第三章平時測驗卷.docx",
+  "parts": [
+    {
+      "paragraph": 1,
+      "text": "112年學年度第1學期平時測驗卷",
+      "text_sha256": "40ee8e22d4db98ea8f472ff4e0a5271cc0a74a3c3b34444c7a8f123c3467244a"
+    },
+    {
+      "paragraph": 2,
+      "text": "科目",
+      "text_sha256": "4d87d07926165f2ec1c06708616d4963db3e2747614e492103cb3a976170cbfb"
+    },
+    {
+      "paragraph": 3,
+      "text": "基本電學",
+      "text_sha256": "45fba5530b2eb69af05f3a0d3656c03494e2f2584bfcefee9424a9a534e615d8"
+    },
+    {
+      "paragraph": 4,
+      "text": "班級",
+      "text_sha256": "cae58049a16ced11ea28c1c733250fad73a6bd1ac5a8352920f95d7696c74598"
+    },
+    {
+      "paragraph": 5,
+      "text": "資訊一",
+      "text_sha256": "f1c88fb57a0d938d8fccd866a7cf1a068ff485ec8ad599cddaf0654e0d6512db"
+    },
+    {
+      "paragraph": 6,
+      "text": "座號",
+      "text_sha256": "ec106073d80627c946a7369bec45667433bd2cbf253b5b41cd0bfebd2741358b"
+    },
+    {
+      "paragraph": 7,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 8,
+      "text": "姓名",
+      "text_sha256": "2017d0c142dfd10bb37fbbb6b90c12115f7806b74d5e9f73bef6c1adc9e57cad"
+    },
+    {
+      "paragraph": 9,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 10,
+      "text": "範圍",
+      "text_sha256": "55c95af0f23b8171f81a2d357c15e96922545ba6d4a5284dfbae2669021772cf"
+    },
+    {
+      "paragraph": 11,
+      "text": "Ch03",
+      "text_sha256": "a67436ec9181db1f90fb2f503a707096225c7311f93818bd8041bde5924e70e7"
+    },
+    {
+      "paragraph": 12,
+      "text": "一、單一選擇題:",
+      "text_sha256": "7ce80e0633ecde6c6bf6f520415674dd0c42f8faa1c65d1d3b9361dda2281d32"
+    },
+    {
+      "paragraph": 13,
+      "text": "01.有一電路圖如圖()所示，試問該電路圖的總電阻及總功率分別為多少?",
+      "text_sha256": "b389bae9c2f37f617bc1997f1f73c86ec11559e99e89d15fa4affa8dd2735a12"
+    },
+    {
+      "paragraph": 14,
+      "text": "(A)(B)(C)(D)",
+      "text_sha256": "a37ff64cf1134958ea5090cf5040c7fa3e8ee0f1f9f8032acf5aebf1c0739735"
+    },
+    {
+      "paragraph": 15,
+      "text": "02.110V、100W及110V、60W之電燈泡各一個，串聯接於110V之電源上，兩燈泡的消耗功率分別為何?",
+      "text_sha256": "754aae75cd0d839787eb4ad6a8539763f54ca2dbc1ed73f300505a019ea8763d"
+    },
+    {
+      "paragraph": 16,
+      "text": "(A)(B)(C)(D)",
+      "text_sha256": "a37ff64cf1134958ea5090cf5040c7fa3e8ee0f1f9f8032acf5aebf1c0739735"
+    },
+    {
+      "paragraph": 17,
+      "text": "03.串聯電路中，電源供應之電功率應較各電阻消耗電功率之和為?",
+      "text_sha256": "452d0299d22d1b8490e5bf93ee26f5b13187e4035e78b06731d064c6280d8ea7"
+    },
+    {
+      "paragraph": 18,
+      "text": "(A)大(B)小(C)相等(D)無法比較",
+      "text_sha256": "2208505fa1d1ac96bbe0d1d504bc345114c3b2f23accebb216e8fb8d2b8d49a3"
+    },
+    {
+      "paragraph": 19,
+      "text": "04.設兩點間之電壓為220V，總電流為50安培，則三個6歐姆電阻器應如何排列?",
+      "text_sha256": "1d78d4d9dbfbf57182ca42ed8822f6054c16228cb67062df184b086d55815836"
+    },
+    {
+      "paragraph": 20,
+      "text": "(A)兩者並聯與另一串聯(B)三者並聯",
+      "text_sha256": "32d3d3272a7c4ab372bee2c989e33193d9461f1374c8bb93a4b8138fd24d0e59"
+    },
+    {
+      "paragraph": 21,
+      "text": "(C)兩者串聯後另一並聯(D)三者串聯",
+      "text_sha256": "a252a3bd9f44a16e31075c6ce81e129c262e344b09593f8c1e2467b9bc522d09"
+    },
+    {
+      "paragraph": 22,
+      "text": "05.直流並聯電路中之總電流為各支路電流之?",
+      "text_sha256": "089deb1ff2e5bd5dc4c9b52ca187ba539d3448f8e0a996dde1c0df028b0307a8"
+    },
+    {
+      "paragraph": 23,
+      "text": "(A)倒數和(B)代數和(C)差(D)乘積",
+      "text_sha256": "c53b7120ccda592650f37a232c73e69a40dced9b23109704949b816eff4cbe6e"
+    },
+    {
+      "paragraph": 24,
+      "text": "06.110V、100W及110V、60W之電燈泡各一個，並聯接於110V之電源上，兩燈泡的消耗功率分別為何?",
+      "text_sha256": "ee78ef18a21dd98a8cdd2bf13ee4706959f1f22f9c3b298aec4f8032d257bf17"
+    },
+    {
+      "paragraph": 25,
+      "text": "(A)60(B)100(C)160(D)200",
+      "text_sha256": "74a75df3cdd66684129f3f4ee1fb938eab0944ac694344276a151f5fa65bc254"
+    },
+    {
+      "paragraph": 26,
+      "text": "07.",
+      "text_sha256": "9b3704cdd69070f4d2afd04360d760cfb6fbe35515e89b03b99dece38d3609d2"
+    },
+    {
+      "paragraph": 27,
+      "text": "二、填充題:",
+      "text_sha256": "6087e2282b0ef2f3e4dac0cc8eb60af9db370a18b598ba192cb07eb7bc193b5f"
+    },
+    {
+      "paragraph": 28,
+      "text": "01.",
+      "text_sha256": "e6459ed3f629e7906c544be0226344b685e8758268af4f0f9346f4ef705b607f"
+    },
+    {
+      "paragraph": 29,
+      "text": "三、計算題:",
+      "text_sha256": "5f8d3bef714526d0cc994cee00fad34613e82fe37daec4f4661227723a21ed38"
+    },
+    {
+      "paragraph": 30,
+      "text": "01.",
+      "text_sha256": "e6459ed3f629e7906c544be0226344b685e8758268af4f0f9346f4ef705b607f"
+    },
+    {
+      "paragraph": 31,
+      "text": "答題區",
+      "text_sha256": "4da2a027659cb7199694f7dba804c5f75194d779bfa839a70f1c0f6b3e9eb5b9"
+    },
+    {
+      "paragraph": 32,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    }
+  ],
+  "risks": [],
+  "omml_count": 0,
+  "omml_xml": [],
+  "embedded_media": []
+}

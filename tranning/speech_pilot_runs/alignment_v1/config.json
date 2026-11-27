@@ -1,0 +1,5 @@
+{
+  "max_frames": 200,
+  "hidden_size": 256,
+  "pilot_note": "pilot run; not a production checkpoint"
+}

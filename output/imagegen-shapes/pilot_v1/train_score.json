@@ -1,0 +1,523 @@
+{
+  "groups": {
+    "seen": {
+      "count": 24,
+      "unscorable": 24,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "by_split": {
+    "train": {
+      "count": 24,
+      "unscorable": 24,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "by_combo": {
+    "red_circle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "red_square": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "blue_circle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "blue_triangle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "green_square": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "green_triangle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "yellow_circle": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    },
+    "yellow_square": {
+      "count": 3,
+      "unscorable": 3,
+      "color_correct": 0,
+      "shape_correct": 0,
+      "joint_correct": 0,
+      "joint_accuracy": 0.0
+    }
+  },
+  "details": [
+    {
+      "image": "raw/sample_55db1f84cf38412bb8dfda220f287396/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "red_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_262819552ab74dedab1e77f110f98708/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "red_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_39d12e5b33e1498f9e776567788d8130/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "blue_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_d34b0f74c4364f37b9a9fd601c6eed91/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "blue_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_c52973b458d440b6803a2cc731733f00/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "green_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_38cbd0c9c9764b4aa95ecf691aacdcfc/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "green_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_72208726375649f1bb8a9d4453f776d2/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "yellow_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_d0bf8fc8a56d491394cc3de3b03791f4/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "yellow_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_52341169ae064306b0c544a7cd1ce4c1/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "red_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_654bd77d684041c699fa75d4754c7c22/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "red_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_3c82e019b5ed4eff9f387f6c1f37fa17/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "blue_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_06099b092ea14bf4bea7743d024cf856/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "blue_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_dcd03d3109574a2da89529e3a0480e4a/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "green_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_b3d28ad286d94f07a0ba18c14cb58abb/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "green_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_b11fb64ab45943878b5d671eca973f8d/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "yellow_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_32686f819a8148c88a6abd02cd510b22/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "yellow_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_2efcef8225c446e287faad0a0ce4c46a/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "red_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_b87de6f7b37a4c2d8f8d37484633e31a/sample_000.png",
+      "expected": {
+        "color": "red",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "red_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_d945a22a4fd84a159d881d313cd42522/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "blue_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_b9283788b7764a41b7f8afb9ed7e189a/sample_000.png",
+      "expected": {
+        "color": "blue",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "blue_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_b1610d82a13644439f31511ff9b2ed3e/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "green_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_0ba9da6973f642d989c5ab396674ffbc/sample_000.png",
+      "expected": {
+        "color": "green",
+        "shape": "triangle"
+      },
+      "split": "train",
+      "combo": "green_triangle",
+      "prediction": {
+        "scorable": false,
+        "reason": "mixed color",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_6fd98f1405f04c22a0e2b7d23e5b91ba/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "circle"
+      },
+      "split": "train",
+      "combo": "yellow_circle",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    },
+    {
+      "image": "raw/sample_615b4bbb9a1a4692bcacbe8ba790fca1/sample_000.png",
+      "expected": {
+        "color": "yellow",
+        "shape": "square"
+      },
+      "split": "train",
+      "combo": "yellow_square",
+      "prediction": {
+        "scorable": false,
+        "reason": "off palette or blurred",
+        "color": null,
+        "shape": null
+      },
+      "color_correct": false,
+      "shape_correct": false,
+      "joint_correct": false
+    }
+  ],
+  "limitation": "Narrow clean-shape heuristic; human inspection still required. All unscorable outputs count as failures. Aggregate unseen scores do not establish test or per-combination success."
+}

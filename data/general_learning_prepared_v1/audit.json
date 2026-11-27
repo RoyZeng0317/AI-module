@@ -1,0 +1,107 @@
+{
+  "seed": 42,
+  "requested_val_ratio": 0.15,
+  "source_sha256": {
+    "data\\general_learning_overrides.json": "ed0ce18659c5ce008b6896675e425a5393b92c36250aa6d66c6c8add9290dff7",
+    "data\\chat_eval_cases.json": "716b47b1b12169477e705c06a8be42bac2b294dbf5bcf6854452198846afe842",
+    "data\\chat_learning_eval_v1.json": "c96b8dc5f23a8717aa2095013eea6cf0d5f3e018634412baf5ffb90ecd6a4deb",
+    "data\\pairs.json": "91f33f1d6617c466edd49f726a105e4f826db3c8e1e722e947a2d5eaf2821ea6",
+    "data\\general_learning_v1.json": "75988a4d400c3a59b46948967c354cb088f784e4a13bdc09b3823314fe8ab172"
+  },
+  "counts": {
+    "val": 140,
+    "train": 797
+  },
+  "groups": 832,
+  "largest_group": 2,
+  "exclusions": [
+    {
+      "location": "data\\pairs.json:0",
+      "reason": "replaced_by_override",
+      "record": {
+        "prompt": "hi",
+        "reply": "hi, 有什麼可以幫你？"
+      }
+    },
+    {
+      "location": "data\\pairs.json:11",
+      "reason": "replaced_by_override",
+      "record": {
+        "prompt": "hello",
+        "reply": "hello! 我是 sinco,有什麼可以幫你？"
+      }
+    },
+    {
+      "location": "data\\pairs.json:19",
+      "reason": "replaced_by_override",
+      "record": {
+        "prompt": "bye",
+        "reply": "bye, 下次再聊"
+      }
+    },
+    {
+      "location": "data\\pairs.json:272",
+      "reason": "replaced_by_override",
+      "record": {
+        "prompt": "give me an example of the svoo pattern",
+        "reply": "He gave me a gift,這是S+V+O+O句型"
+      }
+    },
+    {
+      "reason": "protected_eval_prompt",
+      "record": {
+        "prompt": "what have you been up to",
+        "reply": "same as always, here whenever you need me",
+        "location": "data\\pairs.json:624",
+        "source_component": 624
+      }
+    },
+    {
+      "reason": "conflicting_prompt",
+      "record": {
+        "prompt": "你是 ChatGPT 嗎",
+        "reply": "不是,我是 sinco,是獨立訓練出來的模型",
+        "location": "data\\pairs.json:6",
+        "source_component": 6
+      }
+    },
+    {
+      "reason": "conflicting_prompt",
+      "record": {
+        "prompt": "你是ChatGPT嗎",
+        "reply": "不是,我是主人自己訓練的 sinco,沒有用 ChatGPT 或其他外部AI",
+        "location": "data\\pairs.json:250",
+        "source_component": 6
+      }
+    },
+    {
+      "reason": "conflicting_prompt",
+      "record": {
+        "prompt": "ok got it",
+        "reply": "great, let me know if you need anything else",
+        "location": "data\\pairs.json:625",
+        "source_component": 625
+      }
+    },
+    {
+      "reason": "conflicting_prompt",
+      "record": {
+        "prompt": "ok, got it.",
+        "reply": "awesome, happy to help",
+        "location": "data\\pairs.json:626",
+        "source_component": 625
+      }
+    }
+  ],
+  "limitations": "Explicit group_id and normalized identical prompts/replies only; semantic paraphrases require human review.",
+  "language_counts": {
+    "zh-Hant-or-CJK": 679,
+    "zh-Hant": 100,
+    "en": 100,
+    "en-or-other": 58
+  },
+  "disjoint": {
+    "prompt": true,
+    "reply": true
+  }
+}

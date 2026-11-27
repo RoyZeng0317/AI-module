@@ -1,0 +1,22 @@
+from PIL import Image
+from PIL import ImageFilter
+
+rushMore = Image.open("rushmore.jpg")
+filterPict = rushMore.filter(ImageFilter.BLUR)
+filterPict.save("out17_19_BLUR.jpg")
+filterPict = rushMore.filter(ImageFilter.CONTOUR)
+filterPict.save("out17_19_CONTOUR.jpg")
+filterPict = rushMore.filter(ImageFilter.EMBOSS)
+filterPict.save("out17_19_EMBOSS.jpg")
+filterPict = rushMore.filter(ImageFilter.FIND_EDGES)
+filterPict.save("out17_19_FIND_EDGES.jpg")
+filterPict = rushMore.filter(ImageFilter.DETAIL)
+filterPict.save("out17_19_DETAIL.jpg")
+filterPict = rushMore.filter(ImageFilter.SHARPEN)
+filterPict.save("out17_19_SHARPEN.jpg")
+filterPict = rushMore.filter(ImageFilter.EDGE_ENHANCE)
+filterPict.save("out17_19_EDGE_ENHANCE.jpg")
+filterPict = rushMore.filter(ImageFilter.SMOOTH)
+filterPict.save("out17_19_SMOOTH.jpg")
+filterPict = rushMore.filter(ImageFilter.EDGE_ENHANCE_MORE)
+filterPict.save("out17_19_EDGE_ENHANCE_MORE.jpg")

@@ -1,0 +1,379 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第二章平時測驗卷.docx",
+  "parts": [
+    {
+      "paragraph": 1,
+      "text": "112年學年度第1學期平時測驗卷",
+      "text_sha256": "40ee8e22d4db98ea8f472ff4e0a5271cc0a74a3c3b34444c7a8f123c3467244a"
+    },
+    {
+      "paragraph": 2,
+      "text": "科目",
+      "text_sha256": "4d87d07926165f2ec1c06708616d4963db3e2747614e492103cb3a976170cbfb"
+    },
+    {
+      "paragraph": 3,
+      "text": "基本電學",
+      "text_sha256": "45fba5530b2eb69af05f3a0d3656c03494e2f2584bfcefee9424a9a534e615d8"
+    },
+    {
+      "paragraph": 4,
+      "text": "班級",
+      "text_sha256": "cae58049a16ced11ea28c1c733250fad73a6bd1ac5a8352920f95d7696c74598"
+    },
+    {
+      "paragraph": 5,
+      "text": "資訊一",
+      "text_sha256": "f1c88fb57a0d938d8fccd866a7cf1a068ff485ec8ad599cddaf0654e0d6512db"
+    },
+    {
+      "paragraph": 6,
+      "text": "座號",
+      "text_sha256": "ec106073d80627c946a7369bec45667433bd2cbf253b5b41cd0bfebd2741358b"
+    },
+    {
+      "paragraph": 7,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 8,
+      "text": "姓名",
+      "text_sha256": "2017d0c142dfd10bb37fbbb6b90c12115f7806b74d5e9f73bef6c1adc9e57cad"
+    },
+    {
+      "paragraph": 9,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 10,
+      "text": "範圍",
+      "text_sha256": "55c95af0f23b8171f81a2d357c15e96922545ba6d4a5284dfbae2669021772cf"
+    },
+    {
+      "paragraph": 11,
+      "text": "Ch02",
+      "text_sha256": "8a1d91eb51d52b58fdaa5414684f948e5f75a81b28eb3bac556ff7ccb28146b7"
+    },
+    {
+      "paragraph": 12,
+      "text": "單一選擇題",
+      "text_sha256": "8982eedde8380d630299854683e93ca9ce17ea4752cc20b8a5ac2f6190f76c9b"
+    },
+    {
+      "paragraph": 13,
+      "text": "01.某電阻色碼之電阻範圍為950Ω至1050Ω之間，則其色環依序為何?",
+      "text_sha256": "9d9f374171984267e6c9f23ee5f477c2ea6a68583846cb8ee5ad8bfd8de20ad0"
+    },
+    {
+      "paragraph": 14,
+      "text": "(A)棕黑紅金(B)白綠黑金(C)棕黑黑銀(D)棕黑黑白",
+      "text_sha256": "ca4d769b190898d057f405463488821398925f839945e257bcd4b5080439ec66"
+    },
+    {
+      "paragraph": 15,
+      "text": "02.有一個電阻值為棕黑紅金，試問其電阻值為多少Ω?",
+      "text_sha256": "738d1c22d22509a41573d11f5221047528b7df96333afe49c43f7f507d04ba8b"
+    },
+    {
+      "paragraph": 16,
+      "text": "(A)102±5%(B)205±10%(C)102±10%(D)205±5%",
+      "text_sha256": "203eef7244426b9e3bfb785fc7628b127b43972abf6f66ee861b61e4be9d2d37"
+    },
+    {
+      "paragraph": 17,
+      "text": "03.設電鍋的電阻為5Ω通以10A之電流，試問電鍋每秒產生之熱量為何?",
+      "text_sha256": "e9acee76fc7855dadafc5b1f37b468ef8b6de0be1e90a024eba50d3d1983014d"
+    },
+    {
+      "paragraph": 18,
+      "text": "(A)50卡(B)120卡(C)250卡(D)500卡",
+      "text_sha256": "5597ae30611b876b78fcfb36a7839f1eb054df39592a2ff18968bf17a0a1808c"
+    },
+    {
+      "paragraph": 19,
+      "text": "04.影響導體電阻大小的因素，除了導體長度及截面積外，尚有哪些因素?",
+      "text_sha256": "93723acdb25a7fa0e81830937654b153531642b21a50bd7e9f5aa8490808cc3f"
+    },
+    {
+      "paragraph": 20,
+      "text": "(A)溫度及電導係數(B)電壓及電導係數",
+      "text_sha256": "dfbf41c29d7dded090ca6530b90e40cda867be77774a69b7e37d30e35491d995"
+    },
+    {
+      "paragraph": 21,
+      "text": "(C)材料及電流(D)溫度及電流",
+      "text_sha256": "e85716ae09d4e9a6ea57abd1af96a53a50da2ceb1a9961eb273a0f293343fd9b"
+    },
+    {
+      "paragraph": 22,
+      "text": "05.材質均勻的導線，在恆溫時，其電導值與導線的關係為何?",
+      "text_sha256": "1764fbc134bcf0a28a772d3bbe478397e43a0ce5af6a1a13efe24f194834f10c"
+    },
+    {
+      "paragraph": 23,
+      "text": "(A)長度成正比，截面積成正比(B)長度成正比，截面積成反比",
+      "text_sha256": "0a2a9d34dcf88598bf989cb403450c2c520364271ecd4c67ddb1f5bf8c1ccfc8"
+    },
+    {
+      "paragraph": 24,
+      "text": "(C)長度成反比，截面積成正比(D)長度成反比，截面積成反比",
+      "text_sha256": "1cc2beac83046c686f594d41444c50847d05b4cd7784eafdf236fc012a584b46"
+    },
+    {
+      "paragraph": 25,
+      "text": "06.有一色碼電阻其顏色為「橙橙棕金」，若用三用電表量測其電阻值，則合理量測讀值為何?",
+      "text_sha256": "7005946995d48aa184743fcd680f752e8ee1d11aefebd7a30db31973761fedf2"
+    },
+    {
+      "paragraph": 26,
+      "text": "(A)230Ω(B)320Ω(C)2.3kΩ(D)3.2kΩ",
+      "text_sha256": "8533d982dd43344a753e8a21df6097492c425de4927a5f772fed5b9e283cabaf"
+    },
+    {
+      "paragraph": 27,
+      "text": "07.使1公克的水溫升高1°C，其所需電能多少焦耳?",
+      "text_sha256": "8135ce1487c93a795e9fa2d331853ba3f4b4e5dcb973f71e2d1cac18b6640f99"
+    },
+    {
+      "paragraph": 28,
+      "text": "(A)0.24(B)1(C)4.2(D)3.6×106",
+      "text_sha256": "8efbe07b4b4230ba94f01987bb74ab5f3033fd5611bd4b53ca6dd55f6043dbe5"
+    },
+    {
+      "paragraph": 29,
+      "text": "08.電壓、電流、電阻、電荷及時間分別以V、I、R、Q及t表示，下列何者不是電能的表示式?",
+      "text_sha256": "fc3f52fc7387937c5ac3895159d2d5e0d8c06ac108fa3326e3f253befb2f1f93"
+    },
+    {
+      "paragraph": 30,
+      "text": "(A)I2Rt(B)V2Rt(C)VIQt(D)QV",
+      "text_sha256": "55405dffadaf8262304882073c1cb3c4243c92993b4f2959eafd06db7003f2e7"
+    },
+    {
+      "paragraph": 31,
+      "text": "09.將2庫侖的電荷在5秒內由電位30V處，移至60V處，則需作功多少焦耳?",
+      "text_sha256": "bb5ba50955d36172cc5742818ea3fa59a84959fa313467852dec97541c44a153"
+    },
+    {
+      "paragraph": 32,
+      "text": "(A)6(B)60(C)120(D)150",
+      "text_sha256": "52b255df2e1d960f65a23f61bbfc8f215210a8a0eef0dca0bbf63f3ad23b1de7"
+    },
+    {
+      "paragraph": 33,
+      "text": "10.有5.5mm2的標準韌銅導線一捲，長100m，則其電阻約為多少Ω?",
+      "text_sha256": "7c93303fcc38b861e4dd7f127f8a7564cc8eac8344466d1e27513599d69ed796"
+    },
+    {
+      "paragraph": 34,
+      "text": "(A)0.18(B)0.31(C)0.4(D)0.55",
+      "text_sha256": "f8f3d882eeab1404ba09b93b710b68ef3cb7df38330694cc882edd71ad63494f"
+    },
+    {
+      "paragraph": 35,
+      "text": "11.有一電阻為紅綠黃金，其電阻值為?",
+      "text_sha256": "25096b3fdf52273df7bbda024c49fd2b34b46dc84aa098cebc4e9684bd57fd05"
+    },
+    {
+      "paragraph": 36,
+      "text": "(A)25370Ω(B)24357Ω(C)12435Ω(D)12513Ω",
+      "text_sha256": "52e1910d6ab8da1ce5117d71d4e62d40eaaed1d7e51bf84d83a6db01a7797495"
+    },
+    {
+      "paragraph": 37,
+      "text": " 12.王媽媽想煮熱開水泡茶，將電熱器從25°C加熱到120°C，試問需用掉多少熱量?",
+      "text_sha256": "b16e79fd245229b329c4673ae44420faa28e6e10b575688c13068b3937d85f8f"
+    },
+    {
+      "paragraph": 38,
+      "text": "(A)",
+      "text_sha256": "559a760ced6e3048c5c10a20679f97e173bcfef3929617cb35ce67a1bb89f364"
+    },
+    {
+      "paragraph": 39,
+      "text": "13.在計算導電率σ%時間，應該以何種材料為基準?",
+      "text_sha256": "734319eb28c97c07f0dce8a751ff14e39ca7e5c3c38f17d97a55c5deaa73788d"
+    },
+    {
+      "paragraph": 40,
+      "text": "(A)鐵(B)標準抽銅(C)標準韌銅(D)銀",
+      "text_sha256": "a57208f2d6ffff7b537567e30b952212aec19c07ab66fb83e871527d2a3b7c03"
+    },
+    {
+      "paragraph": 41,
+      "text": "14.下列材料當作電阻使用，何者導電率最高?",
+      "text_sha256": "601637a53f9f46a7467bdae5d8f12c82f460f53f880ccec9d500ac38d74bc072"
+    },
+    {
+      "paragraph": 42,
+      "text": "(A)銀(B)標準韌銅(C)水銀(D)鐵",
+      "text_sha256": "2049ecff40d5560f8cf9c796869a9fc5cc3b0f6a34ac4a59ce647413a2f7bfbb"
+    },
+    {
+      "paragraph": 43,
+      "text": "15.有一根圓柱形導線其電阻為5Ω，將其拉長使其長度為原來的兩倍，假設原有的體積及形狀並未改變，試求拉長後的電阻為多少歐姆?",
+      "text_sha256": "64f86a7ca6e12460fdc25da5aeec35983d781dbc9937273870cae5b8368bc21f"
+    },
+    {
+      "paragraph": 44,
+      "text": "(A)50(B)40(C)30(D)20Ω",
+      "text_sha256": "f37f579739f8b26ce69f7e8f92a4b6af70191494c3f022b08f9baf45a847a2f6"
+    },
+    {
+      "paragraph": 45,
+      "text": "16.三的電燈泡之規格分別為10W/12V、20W/120V、30W/120V，試問三個電阻比為何?",
+      "text_sha256": "30b68bfa891807cf2d8327d62ef6b87baa9552c93e17db4c414bde61fb58c2fa"
+    },
+    {
+      "paragraph": 46,
+      "text": "(A)1:2:3(B)6:3:2(C)3:4:5(D)3:6:9",
+      "text_sha256": "94266375960acfbab7a97cee51fac973cd78f548288e8597cfbd159535078caf"
+    },
+    {
+      "paragraph": 47,
+      "text": "17.A、B兩導體以相同方式製成，A的直徑為1.6mm、長度為10m，電阻1Ω；B的直徑為0.8mm、長度為40m，則導體B的電阻為多少Ω?",
+      "text_sha256": "672cc486abdc2179f4c205e19a0f826ce9c42c51954331c626653551becda698"
+    },
+    {
+      "paragraph": 48,
+      "text": "(A)0.25(B)0.5(C)4(D)16",
+      "text_sha256": "0fb86bcb4573f6483bd576a5ee310509570dc7fdb1038f4e510bce385524067e"
+    },
+    {
+      "paragraph": 49,
+      "text": "18.有一使用100V",
+      "text_sha256": "fe29a430b42bd59b35a294a92d399ed44acd3017335544de59fdf0d81ffc1212"
+    },
+    {
+      "paragraph": 50,
+      "text": "19.有一0.15A的電流流過一色碼電阻，跨在此色碼電阻的電壓為1.5V，則此電阻由左至右之色碼應為何?",
+      "text_sha256": "17dfe748dcfde51c884348275e448cdff23e8be445c6bab8a6e77d0a0b9d8b03"
+    },
+    {
+      "paragraph": 51,
+      "text": "(A)紫藍棕金(B)棕黑黑銀(C)紫藍黑金(D)棕黑棕銀",
+      "text_sha256": "64ad4063ab5e34900142bfed475661eecb9809e29bcd471cb8cbb14da2664ab8"
+    },
+    {
+      "paragraph": 52,
+      "text": "20.有A、B兩電阻，在t溫度時其電阻值分別為Ra及Rb，而電阻溫度係數分別為αa及αb，將此兩電阻串聯，其總電阻在同溫度時之電阻溫度係數αeq為",
+      "text_sha256": "10ae732ecde28576930303dcc753b90436a33261d3cc59a6c3f63466e9d71026"
+    },
+    {
+      "paragraph": 53,
+      "text": "(A)Ra+Rbαa+αb(B) αa+αbRa+Ra(C)αaRb+αbRaRa+Rb(D) αaRa+αbRbRa+Rb",
+      "text_sha256": "ed232fbfaee72fc7e60e73f4f54808318d29933e0ee80a735bc7c5f15bb5c504"
+    },
+    {
+      "paragraph": 54,
+      "text": "二、填充題:",
+      "text_sha256": "6087e2282b0ef2f3e4dac0cc8eb60af9db370a18b598ba192cb07eb7bc193b5f"
+    },
+    {
+      "paragraph": 55,
+      "text": "01.電阻值會隨著光的亮度而產生變化，稱為",
+      "text_sha256": "c855d712913e6063969240be0d4b358b13cd026ac5b7763a738dfa85158ae59b"
+    },
+    {
+      "paragraph": 56,
+      "text": "02.電阻值顏色分別為藍、綠、紅、棕、金，試問為色環電阻",
+      "text_sha256": "0339c9649034ebd38b77b345a4575a481ec54f1a3f5d9665f4c43d1853205fdb"
+    },
+    {
+      "paragraph": 57,
+      "text": "03.電阻的公式分別為、.",
+      "text_sha256": "fe862101e1e8f9d5bdf59adc235e1bf893daa0da3559b5a46b49b9185218fb43"
+    },
+    {
+      "paragraph": 58,
+      "text": "04.一個電阻值為20Ω的電熱裝置，通過5A電流，通電時間3分鐘，則產生焦耳熱量=卡",
+      "text_sha256": "2d10c9e07541c884717aa5198fe4bc9c6d21a8c5f488b11d75ee385b16b43496"
+    },
+    {
+      "paragraph": 59,
+      "text": "三、計算題:",
+      "text_sha256": "5f8d3bef714526d0cc994cee00fad34613e82fe37daec4f4661227723a21ed38"
+    },
+    {
+      "paragraph": 60,
+      "text": "01.某家庭為節省電費將20個110V、120W的電燈泡換成20個110V、150W電燈泡，試問可節省多少電費?",
+      "text_sha256": "ebfef94acfa137ac009529ca9939d8cb743b4764ae5029c56db28e5d8d5ffe34"
+    },
+    {
+      "paragraph": 61,
+      "text": "02. 使用220V、15A的電熱水器，將5公升的水從15°C將熱到120°C，試問需花費多少分鐘?",
+      "text_sha256": "c58001297df506a250351df614a0db2a4492af3559c436ecdde7a53246bb4e19"
+    },
+    {
+      "paragraph": 62,
+      "text": "03.一金屬導線長20cm，接於電動勢為90V之電池之兩極後，通過之電流為18A，若所接枝電池不便，而欲使通過導線之電流為2安培，則導線應拉長多少公分?",
+      "text_sha256": "e9a1b895bc97bcac254a1ab1914fcfef21ef20380492cf18c6fb7608131578c4"
+    },
+    {
+      "paragraph": 63,
+      "text": "04.",
+      "text_sha256": "6609b282acb3215a1cd410cd3984fd508f68a9ed6caa52aea19eac1c415317c7"
+    }
+  ],
+  "risks": [
+    "omml_structure_requires_review_not_plain_text"
+  ],
+  "omml_count": 52,
+  "omml_xml": [
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>±</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>±</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>±</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>±</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>°</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>C</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>V</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>I</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>t</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSup><ns0:sSupPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:sSupPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>I</ns0:t></ns0:r></ns0:e><ns0:sup><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>2</ns0:t></ns0:r></ns0:sup></ns0:sSup><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Rt</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:sSup><ns0:sSupPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:sSupPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>V</ns0:t></ns0:r></ns0:e><ns0:sup><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>2</ns0:t></ns0:r></ns0:sup></ns0:sSup></ns0:num><ns0:den><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:den></ns0:f><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>t</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>VI</ns0:t></ns0:r></ns0:num><ns0:den><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Q</ns0:t></ns0:r></ns0:den></ns0:f><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>t</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>QV</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>°</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>C</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>°</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>C</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>σ</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>A</ns0:t></ns0:r><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>、</ns0:t></ns0:r><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>A</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>A</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>、</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>t</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>eq</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:num><ns0:den><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:den></ns0:f></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t xml:space=\"preserve\"> </ns0:t></ns0:r><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:num><ns0:den><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:den></ns0:f></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:sub></ns0:sSub><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:num><ns0:den><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:den></ns0:f></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t xml:space=\"preserve\"> </ns0:t></ns0:r><ns0:f><ns0:fPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /><ns1:i /></ns1:rPr></ns0:ctrlPr></ns0:fPr><ns0:num><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>α</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:sub></ns0:sSub><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:num><ns0:den><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>a</ns0:t></ns0:r></ns0:sub></ns0:sSub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>+</ns0:t></ns0:r><ns0:sSub><ns0:sSubPr><ns0:ctrlPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr></ns0:ctrlPr></ns0:sSubPr><ns0:e><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>R</ns0:t></ns0:r></ns0:e><ns0:sub><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>b</ns0:t></ns0:r></ns0:sub></ns0:sSub></ns0:den></ns0:f></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>Ω</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>°</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>°</ns0:t></ns0:r><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>C</ns0:t></ns0:r></ns0:oMath>"
+  ],
+  "embedded_media": []
+}

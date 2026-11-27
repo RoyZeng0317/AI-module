@@ -1,0 +1,14 @@
+{
+  "source": "https://download.db-ip.com/free/dbip-country-lite-2026-10.mmdb.gz",
+  "license": "CC BY 4.0",
+  "attribution": "IP Geolocation by DB-IP (https://db-ip.com)",
+  "bytes": 8348509,
+  "sha256": "dbd70ccfa2a13627eaf4913d19920a1a229f1b3c5439ac01c509995b6364202a",
+  "database_type": "DBIP-Country-Lite",
+  "build_epoch": 1790818572,
+  "samples": {
+    "114.114.114.114": "CN",
+    "1.9.1.1": "MY",
+    "168.95.1.1": "TW"
+  }
+}

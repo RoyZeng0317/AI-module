@@ -1,0 +1,44 @@
+<!-- AI-module 桌面 GUI 安裝包（WiX 5）。由 install/build_msi.ps1 編譯，不要直接 wix build（需要 stage bindpath）。
+     UpgradeCode 固定不可更改，否則新版 MSI 無法升級覆蓋舊版。 -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="AI-module" Manufacturer="Roy Zeng" Version="$(Version)" Scope="perUser"
+           UpgradeCode="{9798FFDD-4638-48E0-9773-5E4C38392ABA}" Language="1028" Codepage="950">
+    <MajorUpgrade DowngradeErrorMessage="已安裝較新版本的 AI-module。" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- 應用程式圖示：GUI 捷徑 + 「新增或移除程式」清單 -->
+    <Icon Id="AppIcon" SourceFile="!(bindpath.stage)\model_icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+
+    <StandardDirectory Id="LocalAppDataFolder"><Directory Id="INSTALLFOLDER" Name="AI-module" /></StandardDirectory>
+    <StandardDirectory Id="DesktopFolder" />
+    <StandardDirectory Id="ProgramMenuFolder"><Directory Id="MenuFolder" Name="AI-module" /></StandardDirectory>
+
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="!(bindpath.stage)\**" />
+    </ComponentGroup>
+
+    <!-- 捷徑：GUI 用 .venv 的 pythonw（不跳黑色主控台），.venv 由下方 RunSetup 建立 -->
+    <Component Id="Shortcuts" Directory="MenuFolder">
+      <Shortcut Id="DesktopGui" Directory="DesktopFolder" Name="AI-module" Target="[INSTALLFOLDER].venv\Scripts\pythonw.exe"
+                Arguments="-m lib.main" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+      <Shortcut Id="MenuGui" Name="AI-module" Target="[INSTALLFOLDER].venv\Scripts\pythonw.exe"
+                Arguments="-m lib.main" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+      <Shortcut Id="MenuCheck" Name="環境檢查" Target="[INSTALLFOLDER]app\install\install_check.exe" WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveMenuFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\AI-module" Name="Shortcuts" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="Shortcuts" />
+    </Feature>
+
+    <!-- 首次安裝完開一個 PowerShell 視窗跑 install.ps1（硬體檢測 + 建 .venv + 裝 torch 等套件，需要網路） -->
+    <CustomAction Id="RunSetup" Directory="INSTALLFOLDER" Return="asyncNoWait" Execute="immediate"
+                  ExeCommand="powershell.exe -NoProfile -NoExit -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]install\install.ps1&quot;" />
+    <InstallExecuteSequence>
+      <Custom Action="RunSetup" After="InstallFinalize" Condition="NOT Installed AND NOT WIX_UPGRADE_DETECTED" />
+    </InstallExecuteSequence>
+  </Package>
+</Wix>

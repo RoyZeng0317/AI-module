@@ -1,0 +1,133 @@
+{
+  "pins": {
+    "cped": {
+      "repo": "scutcyr/CPED",
+      "sha": "1e4b81c28a123f22387e06664f37e5dc9322380f"
+    },
+    "esconv": {
+      "repo": "thu-coai/Emotional-Support-Conversation",
+      "sha": "f262d062ad74cb39b17ea476facc81568ddcba24"
+    },
+    "empathetic": {
+      "repo": "facebookresearch/EmpatheticDialogues",
+      "sha": "9649114c71e1af32189a3973b3598dc311297560"
+    },
+    "goemotions": {
+      "repo": "google-research/google-research",
+      "sha": "a1e7371c5e006f4e8b314bd23d99220d2fe44c51"
+    },
+    "dailydialog": {
+      "repo": "ConvLab/ConvLab-3",
+      "sha": "49503995689a6e80c5f09e83162a6f6c2c2ac8fb"
+    },
+    "dailydialog_original_card": {
+      "repo": "li2017dailydialog/daily_dialog",
+      "sha": "ffde34acefcd956529c39c4fc78d993b5b7f7520",
+      "provider": "huggingface"
+    }
+  },
+  "files": [
+    {
+      "filename": "cped_train.csv",
+      "url": "https://raw.githubusercontent.com/scutcyr/CPED/1e4b81c28a123f22387e06664f37e5dc9322380f/data/CPED/train_split.csv",
+      "sha256": "7bce6a11f0bf0ac353d28e96f6cfa03ff5e83b95810647abb55d18ff7299e487",
+      "bytes": 13993864
+    },
+    {
+      "filename": "cped_valid.csv",
+      "url": "https://raw.githubusercontent.com/scutcyr/CPED/1e4b81c28a123f22387e06664f37e5dc9322380f/data/CPED/valid_split.csv",
+      "sha256": "f434a04d21640bb38c849f3e9598c2b7b2fbdb49be6a7365b2ae016019bd389b",
+      "bytes": 1672923
+    },
+    {
+      "filename": "cped_test.csv",
+      "url": "https://raw.githubusercontent.com/scutcyr/CPED/1e4b81c28a123f22387e06664f37e5dc9322380f/data/CPED/test_split.csv",
+      "sha256": "a4bcde678438ba1f95224d8e772e40f1f1df7c72f348796b3fafd421c2443a53",
+      "bytes": 4137142
+    },
+    {
+      "filename": "cped_LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/scutcyr/CPED/1e4b81c28a123f22387e06664f37e5dc9322380f/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357
+    },
+    {
+      "filename": "esconv.json",
+      "url": "https://raw.githubusercontent.com/thu-coai/Emotional-Support-Conversation/f262d062ad74cb39b17ea476facc81568ddcba24/ESConv.json",
+      "sha256": "aa0556c5b330562ba009c1cd5137486bfa2a7255f33225a6524cd58f7efdd9af",
+      "bytes": 9017487
+    },
+    {
+      "filename": "esconv_LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/thu-coai/Emotional-Support-Conversation/f262d062ad74cb39b17ea476facc81568ddcba24/LICENSE",
+      "sha256": "82656a050544ab820c9aa7b61433f5181f8e80cacd042377140962a3e3eb5721",
+      "bytes": 19332
+    },
+    {
+      "filename": "empathetic_LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/facebookresearch/EmpatheticDialogues/9649114c71e1af32189a3973b3598dc311297560/LICENSE",
+      "sha256": "82656a050544ab820c9aa7b61433f5181f8e80cacd042377140962a3e3eb5721",
+      "bytes": 19332
+    },
+    {
+      "filename": "empathetic.tar.gz",
+      "url": "https://dl.fbaipublicfiles.com/parlai/empatheticdialogues/empatheticdialogues.tar.gz",
+      "sha256": "56f234d77b7dd1f005fd365bb17769cfe346c3c84295b69bc069c8ccb83be03d",
+      "bytes": 28022709
+    },
+    {
+      "filename": "goemotions_train.tsv",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/a1e7371c5e006f4e8b314bd23d99220d2fe44c51/goemotions/data/train.tsv",
+      "sha256": "1c254a142be5c00e80d819b9ae1bbd36d94b2eeb8f4b1271846508d57e57d9c5",
+      "bytes": 3519053
+    },
+    {
+      "filename": "goemotions_dev.tsv",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/a1e7371c5e006f4e8b314bd23d99220d2fe44c51/goemotions/data/dev.tsv",
+      "sha256": "575489c079c9de1097062a01738f998590d6b7ead66dd1c9fd1d2ba01fd8bc62",
+      "bytes": 439059
+    },
+    {
+      "filename": "goemotions_test.tsv",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/a1e7371c5e006f4e8b314bd23d99220d2fe44c51/goemotions/data/test.tsv",
+      "sha256": "0587b2dd8b27b97352adbfc3fb083d46005c8946657fdc2b1ca8b1cc7f1f8be4",
+      "bytes": 436706
+    },
+    {
+      "filename": "goemotions_labels.txt",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/a1e7371c5e006f4e8b314bd23d99220d2fe44c51/goemotions/data/emotions.txt",
+      "sha256": "45c3ef86782d2a4d7fedcd6d8c111aa0d0e94720689bd164fac94fefb4495a89",
+      "bytes": 248
+    },
+    {
+      "filename": "goemotions_LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/a1e7371c5e006f4e8b314bd23d99220d2fe44c51/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "filename": "dailydialog.zip",
+      "url": "https://raw.githubusercontent.com/ConvLab/ConvLab-3/49503995689a6e80c5f09e83162a6f6c2c2ac8fb/data/unified_datasets/dailydialog/data.zip",
+      "sha256": "b1f38f3bf5431f9384107011a943f1a3446027721292e3a248a894b7766fa9d3",
+      "bytes": 3738236
+    },
+    {
+      "filename": "dailydialog_preprocess.py",
+      "url": "https://raw.githubusercontent.com/ConvLab/ConvLab-3/49503995689a6e80c5f09e83162a6f6c2c2ac8fb/data/unified_datasets/dailydialog/preprocess.py",
+      "sha256": "917fe032a104f198e01ddee972da353ae42661ae356b4bd02ce56b43d8e47edf",
+      "bytes": 6460
+    },
+    {
+      "filename": "dailydialog_README.md",
+      "url": "https://huggingface.co/datasets/li2017dailydialog/daily_dialog/raw/ffde34acefcd956529c39c4fc78d993b5b7f7520/README.md",
+      "sha256": "7dee197f33959c15618b4ad2da9641e465e443614e8e00211874d97db94c2580",
+      "bytes": 7270
+    },
+    {
+      "filename": "dailydialog_LICENSE.txt",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt",
+      "sha256": "e66c269d4819aaab34b49ef5220c4ddab6756f21bb5180761a4eb8561f2b7bbd",
+      "bytes": 20850
+    }
+  ]
+}

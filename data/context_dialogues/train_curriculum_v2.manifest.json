@@ -1,0 +1,8 @@
+{
+  "source_sha256": "e76a84d5bb577f0ce368a93fa030bf23862f7abf89a801426f9e1716f3541efe",
+  "seed": 43,
+  "copy_records": 2048,
+  "total_records": 3404,
+  "output_sha256": "bfad5ac0ed19b4b21443fbf4bfaff17cb74c85d501b54b59da50675c80c71148",
+  "scope": "訓練開放字詞複述；原val/test不變。字詞可與評測共用，不宣稱詞彙隔離。"
+}

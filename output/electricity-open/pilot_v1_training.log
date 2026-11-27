@@ -1,0 +1,4 @@
+[finetune] trainable params: 1,775,232 / 17,465,088 (10%)
+[finetune] epoch   1  train_loss=4.2818  val_loss=5.9756  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   2  train_loss=4.0512  val_loss=5.6536  [warning: val loss well above train loss -- possible overfitting]
+[finetune] epoch   3  train_loss=3.7697  val_loss=5.4044  [warning: val loss well above train loss -- possible overfitting]

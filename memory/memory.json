@@ -232,5 +232,11 @@
     "category": "project",
     "text": "2026-10-28：影像卷積必須用Python for迴圈，不得用NumPy。使用者已確認直方圖均衡化採獨立Lenna影像處理練習，不整合CNN-MNIST訓練。新convolution.py實作真卷積核翻轉180度、MatrixA三核與彩色/灰階；Filter2依Word OMML為5x5平均。新histogram_equalization.py用練習Y/Cb/Cr係數與Y的CDF-min均衡化，都是純迴圈。兩張提供WebP已產出結果、20測試通過；保留原尺寸與原始正負數值，顯示映射另存，不宣稱等同不同尺寸的目標圖。實作完成但效果仍待使用者驗收。",
     "created_at": "2026-10-28T07:42:27+00:00"
+  },
+  {
+    "id": "6b51c8d4",
+    "category": "task_progress",
+    "text": "2026-11-26：使用者要求將物件辨識流程依灰階→zero padding→熱力圖／特徵擷取→決策樹順序整合於同一檔案；更正『決策數』為『決策樹』、『熱』為『熱力圖』。資料採專案YOLO匯出資料夾的train/val影像與框標註。2026-11-27：指定lib/Image/img_capture_feature.py新增訓練處理進度列與ETA；ETA按樣本前處理與五折訓練進度估算。支援以images/train或images/val資料夾搭配labels逐框分類及輸出熱力圖；單張圖片需提供有效影像檔與選用的實際bbox座標。使用者選擇依MNIST_5Fold.py做五個seed×五折交叉驗證及CSV、文字、HTML報告，按圖片分組，另保留YOLO val作獨立評估；尚未執行訓練。cv2.normalize 的 dst 型別檢查已改成明確配置陣列。",
+    "created_at": "2026-11-26T00:00:00+00:00"
   }
 ]

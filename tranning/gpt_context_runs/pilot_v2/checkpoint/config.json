@@ -1,0 +1,29 @@
+{
+  "block_size": 512,
+  "n_layer": 8,
+  "n_embd": 384,
+  "n_head": 6,
+  "dropout": 0.1,
+  "context_format": "dialogue_v1",
+  "response_budget": 60,
+  "context_training": {
+    "source_dir": "C:\\Users\\roy\\Documents\\GitHub\\AI-module\\tranning\\gpt_context_runs\\pilot_v1",
+    "source_model_sha256": "b061a009ef44a1230d73ab53aea9c90420c50a6a967097506641763160ae17fe",
+    "tokenizer_sha256": "baeed3e7aeb19ecbe9585b3ac8ad0dd806c155e92f8c109e160d9cc4ae390e2b",
+    "merges_sha256": "d137b0678d6e74eee643ff7c0dff7f84e2695b7634dba68eb4dba6424f024de4",
+    "train_sha256": "bfad5ac0ed19b4b21443fbf4bfaff17cb74c85d501b54b59da50675c80c71148",
+    "val_sha256": "a847c13621b30f1073d04f41cba56ab6511b417020cf933d0368824c4f5c150b",
+    "replay_sha256": "e2f99e3b5e033f4ce52971d0fd3eb4f29d07a013cfaa3deb8ede72a1780e0219",
+    "seed": 42,
+    "epochs": 5,
+    "batch_size": 8,
+    "lr": 5e-05,
+    "freeze_layers": 0,
+    "freeze_embeddings": false,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.05,
+    "train_examples": 4115,
+    "val_examples": 200,
+    "replay_skipped": 11
+  }
+}

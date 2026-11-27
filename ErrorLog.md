@@ -514,3 +514,11 @@ lib/img_nmist.py 的 test_img_dir 原為 Path(__file__)，指向程式本身，�
 
 ## 2026-10-26：字詞語意資料建置工具問題
 資料Builder首次用PowerShell管線傳送含中文Python程式，系統編碼將文字轉成問號；已改為UTF-8原始檔build_fixtures.py重建六個word_sense JSON，新增span、無問號與SFT對齊測試。首次rg對tranning/gpt*路徑在Windows回報os error123，改明確檔名。三個新測試通過；pytest cache因WinError183無法建立，僅快取警告，不更改專案外環境。未執行模型訓練。
+
+## 2026-11-27：物件特徵分類器將資料夾誤當單張影像
+
+使用者將 `images/train` 資料夾傳給只支援單張圖片的 `--predict`，Pillow `Image.open()` 因收到資料夾而回報 `FileNotFoundError`。已調整為辨識 YOLO `images/train`／`images/val` 資料夾，讀取同一匯出快照的 `labels/<split>`，按標註框裁切後逐物件分類、輸出灰階與梯度熱力圖並計算物件分類準確率；同時檢查資料集類別名稱順序需與模型一致。單張圖片仍可用 `--box x1,y1,x2,y2`，座標必須是實際整數，不可照抄佔位字。語法檢查通過，未執行新訓練或資料夾推論。使用者原訓練輸出為驗證集 4 個物件、50%，樣本很少；其後指定 `images/train` 是訓練資料，不可當獨立驗證結果，應改用 `images/val`。
+
+同日依使用者指定仿照 `MNIST_5Fold.py` 格式重整：使用五個 seed、每個 seed 五折，按圖片分組防止同一圖片的多個框跨折；輸出 fold_history.csv、summary.txt、report.html，並以全 train 資料另訓最終模型、保留原 YOLO val 作獨立評估。決策樹沒有 epoch/loss 曲線，因此報告採每折 accuracy、macro precision/recall/F1。只做語法檢查，未啟動 25 次交叉驗證；val 目前僅 2 張影像，4 框結果須謹慎解讀。
+
+同日型別檢查器指出 `cv2.normalize(..., None, ...)` 的 dst 參數不接受 None。已改成先以 `np.empty_like(heatmap)` 建立輸出陣列，再傳入 normalize；未改熱力圖演算法，未執行完整影像推論。

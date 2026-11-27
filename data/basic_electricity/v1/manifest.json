@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "dataset_version": "v1",
+  "split_seed": 43,
+  "archive_sha256": "f14e5f547e0c82b2f65189d888e5fbe59d263777294b950e453797c041c4685b",
+  "reviewed_bank_sha256": "25b992ebdeeb4012ac5b3ad4b49e3258b65b50c165af23a7b6ea38c7711ef7eb",
+  "files": {
+    "evaluator/extracted/00.json": "8a46fefed07ac72d7ff6d6d60ac3d026d50ee23bdef700965664289b00fde8a1",
+    "evaluator/extracted/01.json": "6a5d68011312c2075df19ff8cce097a712af02694809c4d911a07c9f07147d18",
+    "evaluator/extracted/02.json": "924d0c72e6a9fe3fa0eeeda2fb773f8d09c4d069da5e500709590a550fbcbd9d",
+    "evaluator/extracted/03.json": "0c7af91352e829ccc5d3395da02ba8ebdfc876b115593b611d4aa8e1eb1d2119",
+    "evaluator/extracted/04.json": "5e662295fdbf19764ef1da61f367d3f81784a44c72dfd2553f95246e607eee5a",
+    "evaluator/extracted/05.json": "5fc89c69bf0680b3017efed7d9fb9b2287ce73a6e6c2e888ec11e6d88538c59f",
+    "evaluator/extracted/06.json": "bcb23d341398e9e5ccac3660dfae0fcfa7e02fb2aa5d829f0ea5feb3156da78f",
+    "evaluator/extracted/07.json": "1993b5b2fec69b2a82d32dd629d714262602e1ebcc49c5c8dff6be07443554ba",
+    "evaluator/extracted/08.json": "8e24f07f7edb74b949575e54d82b0b43a871741946f9ff2eafbd6cb00cb13bff",
+    "evaluator/extracted/09.json": "20ccc379fa1fa7460705500a8b9d81fef8de554b7d1a2a240bbb3b3d4fb5021f",
+    "evaluator/extracted/10.json": "230081ba5fdac9d939c3b61eccc35a6dd8de44c988a915a455c1e8e7f9bf4953",
+    "evaluator/extracted/11.json": "12ae1840e32a5b436aecac353e6ecc445f1dfa87d801ac5f930ed9f253045133",
+    "evaluator/extracted/12.json": "24f47de41a7fe525c82b596ebb6e3a19f99df289b05422da3cd4ead2ed0880d0",
+    "evaluator/extracted/13.json": "f33787070a63de5a32c8d3a7c893c7d0351435d8bcd0e3f5f2b0a94a988da6a5",
+    "evaluator/extracted/14.json": "e608abd66495a09e889f132961a12d6963508ecd207b9f1f7bac9afa260792b0",
+    "evaluator/extracted/15.json": "b9e0c75730d307e1c9b3ece45418f087f04f193df83b76ecb05986a176aeff47",
+    "evaluator/extracted/16.json": "dcc5915dd02987c0e4bc40b3b87c41bf99e8afcb73c4f9a1187175e63bb868a4",
+    "evaluator/extracted/17.json": "64a015789097d565245f746b430f85247186a462440635d03837abd7ed8043d2",
+    "evaluator/extracted/18.json": "08f05ff1856537e5b70d42ac10d8c80979b3f8325eb278f34b8281ad5dc9dbce",
+    "evaluator/extracted/19.json": "4ae5ba812273ad2dc30201e845ec66a7d64630022894d97fd1e98ade03b0141d",
+    "evaluator/extracted/20.json": "48cadcfaed6904cc6f243194ee37f5baad3e02b590413dedf1b256a52d4fbc22",
+    "evaluator/extracted/21.json": "b48a935feec9b5ce1d57eddb6522c52cd507622d9935034e69408a9a8a9e223b",
+    "evaluator/extracted/22.json": "6f7043f3e6f10491e96c862d33604f9ddd526ecf56fb240d870f6f26b6067540",
+    "evaluator/extracted/23.json": "cab6972e9aa4482a4266bd6e27d659ed6a8326ab075c0155495ed0ad3d2ebc9a",
+    "evaluator/extracted/24.json": "bc3820ad7b26a028a6ab01417be535344996648d4dcc9b70cb819d769a78132b",
+    "evaluator/extracted/25.json": "2f197c08a578f1c8c0211ca2371719199be685845311bd585f0c5dd0231c3f94",
+    "evaluator/extracted/26.json": "20c2e60f3018c0369856f982e1858713715ca871ef008f556472e8d6c56bbcc2",
+    "evaluator/extracted/27.json": "784fb2e3c9997e0efa4f25589f9c965d8a97c85f5c037b665b124d8641e0e954",
+    "evaluator/extracted/28.json": "3dad789b1c62b95b5ba484f58e3e958fa96ee9eebb1691185680b9fb5f8bed31",
+    "evaluator/extracted/29.json": "8a97c960457e6779e56306d69b2b34f1f6c9936e18f9d4a3150a639a3b67ca76",
+    "evaluator/extracted/30.json": "2871fc2f2af27f7fcb06eae561c93a3e634f84ffd9b5fb42010d2fe898499dba",
+    "evaluator/extracted/31.json": "10dce6e56e9022b40598b6d0fce208756fb5ab1079fca8b4dcd4ff56e9582f6a",
+    "evaluator/extracted/32.json": "538d5ec31edc4112dd6465776855b0feb40630363b55d942ce08741641a8ecba",
+    "evaluator/extracted/33.json": "6367fa5f0fe762cde3b9d0569801ad0060e62dc61c8c9f33868c55ab63cf6a43",
+    "evaluator/extracted/34.json": "4c84fa59802e8bc3ebefea44990cbd0de39c7af8471b0d0e3a2d188e3e3b60f3",
+    "evaluator/extracted/35.json": "465c15eb9a5b4cf2c91221b3c369e8ba19ab625d4a21147adbbd9e248a69282f",
+    "evaluator/extracted/36.json": "db7ac3b0f1384f7d4e8e0340b3794a976b90b5640914cd98e2016503a7d35a51",
+    "evaluator/extracted/37.json": "baa29e04e3bb84cde1503b5dc0f495e8f09503a6ded0d6413958f9c5eac3458a",
+    "evaluator/extracted/38.json": "3ae5ac61aecf3e737490d3aa76ff5862b5ff7eb3f619b66179de4e1a3d69329e",
+    "evaluator/extracted/39.json": "188bf681284ca09877e2a56433fcbcafb7d3f81436c16c10e45664512ec8c862",
+    "evaluator/extracted/40.json": "9f887c3f270b6ddad4154ecb95600a185ef499c65b3ee5c6dd9ee499b9afa636",
+    "evaluator/extracted/41.json": "7209d5f5449baaecfd5d0789bda86441cf75d2ea35dd1b84f3875b435ad700e3",
+    "evaluator/extracted/42.json": "7d0e50b9a055cfc97a66864f255b5bee92b5c8c9569e6fb9188ef80f04c4792a",
+    "evaluator/keys.jsonl": "f78840673a5babf6c37da059feb63392a4c0688a46fe126dd29d3504aa899fce",
+    "evaluator/reviewed_bank.json": "db96e226bb3c3f23b30d30d7ef06fa79aff3de4d89763964ed1326f697296f02",
+    "quarantine.jsonl": "86ad9b22591814a3c69b48ec074a5fa0f86553cfd45cf403dc229a0a7530df2c",
+    "questions/dev.jsonl": "28db53751b413135ade30e45987124fcc5a99687c5cd85e847a318ecb3b56e57",
+    "questions/test.jsonl": "214581d5a9441139e0fe30ebff6a7fa03f9f3627f193c4d0f7ba8075ce0baa10",
+    "questions/train.jsonl": "d8598ccd90ff49c2ef15cdfa74e694723816677300a7a474a0a7952e4870d98d",
+    "reports/contamination.json": "96d1c8aad845d010258a11132baa9fea17f275e5a328e3cf1e4c7689ef85c9ee",
+    "reports/duplicate_pages.json": "998c3a67602466097594a49ab373bcf84a30f5737eda4a26d9eb94ca3eefc967",
+    "source_index.json": "497b6de72df546fd864c7e385af447c674729129be6eca41d8562c166972f02a",
+    "source_inventory.json": "928542f8151e01bea6a7c85989e415efc0cfc72db070109704be1bdee614c30e"
+  },
+  "counts": {
+    "train": 18,
+    "dev": 3,
+    "test": 3
+  },
+  "eligible": 24,
+  "source_files": 43,
+  "group_members": {
+    "exam-103": [
+      "exam-103"
+    ],
+    "exam-104": [
+      "exam-104"
+    ],
+    "exam-105": [
+      "exam-105"
+    ],
+    "exam-107": [
+      "exam-107"
+    ],
+    "exam-109": [
+      "exam-109"
+    ],
+    "workbook-ch8": [
+      "workbook-ch8"
+    ]
+  },
+  "heldout_groups_available": true,
+  "test_frozen": true,
+  "normalization": "NFKC/whitespace used only for matching; prompt text preserved",
+  "isolation": "software data-flow separation; not encryption or user access control"
+}

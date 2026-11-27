@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "seed": 42,
+  "size": 64,
+  "variants_per_combo": 30,
+  "counts": {
+    "train": 240,
+    "dev": 60,
+    "test": 60
+  },
+  "unique_pixel_hashes": 360,
+  "combinations": {
+    "train": [
+      "blue_circle",
+      "blue_triangle",
+      "green_square",
+      "green_triangle",
+      "red_circle",
+      "red_square",
+      "yellow_circle",
+      "yellow_square"
+    ],
+    "dev": [
+      "blue_square",
+      "red_triangle"
+    ],
+    "test": [
+      "green_circle",
+      "yellow_triangle"
+    ]
+  },
+  "source": "Algorithmically synthesized teaching images, NOT model generations",
+  "test_policy": "Do not train on test; first real model evaluation is sealed after reporting",
+  "manifests_sha256": {
+    "train": "1a68c789684c92280f60c0c6baee8025c702b6c76eeb8a8d1b756e5a24680944",
+    "dev": "e0386de274ea83722d6d812597b54b3a22a24625ed0ea765649eaa4fecf9e14e",
+    "test": "b79f3219adeeeb22ec68dd12244d118e47e3cc0e6b7d6800fdb9ac9cd00022d6"
+  }
+}

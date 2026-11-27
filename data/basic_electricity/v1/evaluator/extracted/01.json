@@ -1,0 +1,715 @@
+{
+  "source": "data/basic_electricity/source/Basic electricity/基本電學上學期-108課綱-第一章平時測驗卷.docx",
+  "parts": [
+    {
+      "paragraph": 1,
+      "text": "112年學年度第1學期平時測驗卷",
+      "text_sha256": "40ee8e22d4db98ea8f472ff4e0a5271cc0a74a3c3b34444c7a8f123c3467244a"
+    },
+    {
+      "paragraph": 2,
+      "text": "科目",
+      "text_sha256": "4d87d07926165f2ec1c06708616d4963db3e2747614e492103cb3a976170cbfb"
+    },
+    {
+      "paragraph": 3,
+      "text": "基本電學",
+      "text_sha256": "45fba5530b2eb69af05f3a0d3656c03494e2f2584bfcefee9424a9a534e615d8"
+    },
+    {
+      "paragraph": 4,
+      "text": "班級",
+      "text_sha256": "cae58049a16ced11ea28c1c733250fad73a6bd1ac5a8352920f95d7696c74598"
+    },
+    {
+      "paragraph": 5,
+      "text": "資訊一",
+      "text_sha256": "f1c88fb57a0d938d8fccd866a7cf1a068ff485ec8ad599cddaf0654e0d6512db"
+    },
+    {
+      "paragraph": 6,
+      "text": "座號",
+      "text_sha256": "ec106073d80627c946a7369bec45667433bd2cbf253b5b41cd0bfebd2741358b"
+    },
+    {
+      "paragraph": 7,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 8,
+      "text": "姓名",
+      "text_sha256": "2017d0c142dfd10bb37fbbb6b90c12115f7806b74d5e9f73bef6c1adc9e57cad"
+    },
+    {
+      "paragraph": 9,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 10,
+      "text": "範圍",
+      "text_sha256": "55c95af0f23b8171f81a2d357c15e96922545ba6d4a5284dfbae2669021772cf"
+    },
+    {
+      "paragraph": 11,
+      "text": "Ch01",
+      "text_sha256": "49cf5e91b326cd90737f4378178984e72523c2b3d12e7c42e643215d10774a61"
+    },
+    {
+      "paragraph": 12,
+      "text": "一、單一選擇題",
+      "text_sha256": "fcf8f1d280f0128b9a4f657348f43440c9d412dd07d2faf78c1d4b84ca086f70"
+    },
+    {
+      "paragraph": 13,
+      "text": "01.設有一電荷在有2.5×1016個電子，則該電荷帶有多少庫侖的電荷量?",
+      "text_sha256": "b74a1dcf4ff08c8345db9972e7442e4e84a3b26422ead9da63cfa24174957eb1"
+    },
+    {
+      "paragraph": 14,
+      "text": "(A)4(B)4×10-3(C)1.6×10-3(D)2.5×1016",
+      "text_sha256": "a2cd31bcf3ada4240bbd1884448f70568ccd8014a91e937124650d6ab5036741"
+    },
+    {
+      "paragraph": 15,
+      "text": "02.將1庫侖之正電荷由A點移動至B點，需做功1焦耳。若A點對地之電壓為1伏特，則B點對地之電壓為多少伏特?",
+      "text_sha256": "68518b7ade45fd92b8a2d83cc7158a6ebd3f07386a7e95a6674f7a2ef7d602cf"
+    },
+    {
+      "paragraph": 16,
+      "text": "(A)2(B)0(C)-1(D)-2",
+      "text_sha256": "09ff1982822b917d78d2441c939e1c7719c399b33725a1dcb04aff4c5c2c5fce"
+    },
+    {
+      "paragraph": 17,
+      "text": "03.若蓄電池的充電電流為2A且連續充電2小時，則充電的總電荷量為多少庫侖?",
+      "text_sha256": "9ac3d70ee5c96a05d1681d1ec9bb5c46026dcb277fe5c4b931fe0deae15e69b5"
+    },
+    {
+      "paragraph": 18,
+      "text": "(A)40×103(B)36×103(C)14.4×103(D)4×103",
+      "text_sha256": "986f02c5e50ddf5286b7c515564c32b93b0ef4b8a4077f1a10130da6c15225ee"
+    },
+    {
+      "paragraph": 19,
+      "text": "04.下列有關電的敘述，何者正確?",
+      "text_sha256": "c8e3a09c52712db918f4f0c60f6b672f0565ca8efdde8dcf5cfb8792563c9af1"
+    },
+    {
+      "paragraph": 20,
+      "text": "(A)使電荷移動而做功之動力稱為電動勢",
+      "text_sha256": "de516fcff03ccfbc7b9c779a83498797358128c96121bdc3d885786944c82979"
+    },
+    {
+      "paragraph": 21,
+      "text": "(B)導體中電子流動的方向就是傳統電流的反方向",
+      "text_sha256": "a0b09efe42c29a5c59c278dab7e1c8499959f4240f48d85349e3f85199cca37c"
+    },
+    {
+      "paragraph": 22,
+      "text": "(C)1度電相當於1千瓦之電功率",
+      "text_sha256": "1acc6fe310c5259513c3c2bb4ad9b67cdfaa3792f0c7de39af0dd44d02cbbc09"
+    },
+    {
+      "paragraph": 23,
+      "text": "(D)同性電荷相斥、異性電荷相吸",
+      "text_sha256": "3d5c50513b030af3d6e4755934d41cb101a1361b5cc13be934681e3048412b0a"
+    },
+    {
+      "paragraph": 24,
+      "text": "05.有一銅導線截面積為1m2，導線內電流為30mA，已知銅的電子密度為1029個自由電子/m3，則電子在導線中的平均速度為何?(電子為1.6×10-19庫侖)",
+      "text_sha256": "61d8780b0a7467b9e413a3b1dcbaab4974507b01aef021a7af29e01ce554fed9"
+    },
+    {
+      "paragraph": 25,
+      "text": "(A)15.56×10-6m/s(B)17.75×10-4m/s",
+      "text_sha256": "b6889d8ed7c8c6d01a46b2db48317cb5c9b281c863d2de266361f437c53b4aa7"
+    },
+    {
+      "paragraph": 26,
+      "text": "(C)18.75×10-7m/s(D)19.05×10-5m/s",
+      "text_sha256": "86cbf52f849f5d9a184a996290732da5af936cd4cc46d17888f13445aeb0aed2"
+    },
+    {
+      "paragraph": 27,
+      "text": "06.有一12V、60Ah充滿電的理想汽車電瓶，汽車駕駛室內的燈泡規格為12V/12W；若駕駛忘記關燈，請問多少時間會耗盡電瓶的電量",
+      "text_sha256": "3b31178a153345e62a0ba7a747cd992b9b33d7d56f719e82b220f4117ea56202"
+    },
+    {
+      "paragraph": 28,
+      "text": "(A)45分鐘(B)30小時(C)120分鐘(D)60小時",
+      "text_sha256": "cba7638301243a00c662d22115c1aca928fbf69ea6335bb15572c374b464216a"
+    },
+    {
+      "paragraph": 29,
+      "text": "07. 電子在導體中實際移動的速率與電流之速度比較，則",
+      "text_sha256": "9465f51089c441cc811eafb947fb9ae687445f217fdec7eab8db348ab25d31ea"
+    },
+    {
+      "paragraph": 30,
+      "text": "(A)兩者均接近光速(B)前者慢，後者接近光速",
+      "text_sha256": "873a9b13d19180b93cd555ba2ae8764b44fd450e44f3c71067387499c48e4f34"
+    },
+    {
+      "paragraph": 31,
+      "text": "(C)前者接近光速，後者慢(D)兩者均慢",
+      "text_sha256": "d7ecd01f57960962bf6a21ee7791c343190b84ea3bb538b405c35daa4a0a733e"
+    },
+    {
+      "paragraph": 32,
+      "text": "08.有一電燈泡為110V、100W，通以110V電壓，試求該電燈泡的電流及電功率",
+      "text_sha256": "137db3ebe4c214e195e17bd0b17fb7f48670f96010a486a45cafaf5c245afea8"
+    },
+    {
+      "paragraph": 33,
+      "text": "(A)909mA、85.85W(B)909mA、99.99W",
+      "text_sha256": "6a69d4bb51b8e369e2380de6c33a7562671f592ef4f02286788785c255677c02"
+    },
+    {
+      "paragraph": 34,
+      "text": "(C)90mA、65.85W(D)90mA、95.95W",
+      "text_sha256": "80976ed874fef2e375baffcc3313762c4ef56ecc6142078ac289ec8b0b198c68"
+    },
+    {
+      "paragraph": 35,
+      "text": "09.某蓄電池內部電量原蓄有200庫侖，以5分鐘的時間將其充電至800庫侖，則其平均充電電流大小為多少A?",
+      "text_sha256": "725dbff9ff97d34a532a4f55d9561c55a3e7967df57e0319dd3bcb30dba43cca"
+    },
+    {
+      "paragraph": 36,
+      "text": "(A)2(B)4(C)6(D)8",
+      "text_sha256": "a6973c7765e27b563e8d3246e95f2610f6bd1749a09dae44f4299fb916882dae"
+    },
+    {
+      "paragraph": 37,
+      "text": "10.有一銅線的截面積為0.04cm2，其電子密度為1028個電子/m3，電子在銅線中的平均速度為2.34×10-4m/s，試求其流通的電流為多少安培",
+      "text_sha256": "5f5be73da9e1d8ab17365b58984ecbd390e921b62ac8c88fa3ea2d369926facc"
+    },
+    {
+      "paragraph": 38,
+      "text": "(A)1.5(B)3(C)15(D)30",
+      "text_sha256": "bb07986f182fe8d33b2845a24c99280c2c526765ab2aafbb66c2fa1e1e75d09c"
+    },
+    {
+      "paragraph": 39,
+      "text": "11.一直流馬達工作於110V、1A，若效率為91%，則輸出功率約等於",
+      "text_sha256": "94843ba43778c3f88cb4421c09ae7c677afd077ded335ccdb02c0def4cc9d1a0"
+    },
+    {
+      "paragraph": 40,
+      "text": "(A)60W(B)80W(C)100W(D)120W",
+      "text_sha256": "ad554d9d2367a1e027307e0b65a2092db6801c9c0dd47395b64c5a2ac8ef187c"
+    },
+    {
+      "paragraph": 41,
+      "text": "12.一台5馬力的電動機，約使用多久後會消耗一度電?",
+      "text_sha256": "41740344c4cb3f0a6474de556f3fa82f8d20874fb1c49ace5bd01943a61e8b25"
+    },
+    {
+      "paragraph": 42,
+      "text": "(A)0.28小時(B)0.125小時(C)0.96小時(D)1.72小時",
+      "text_sha256": "0f9b5b2275ec6923a2f962df018bc335a156aa32903f420398aa0584c5cad0e2"
+    },
+    {
+      "paragraph": 43,
+      "text": "13.有一110V、10A電燈泡通以110V電壓，點燈2小時候關閉，試問該電燈泡所花費的電功率及電能分別為多少?",
+      "text_sha256": "15c76265a1d2e682a7cd14bcf8f23b521a0acbecfc4ddf11e4b926eb42d1b9a9"
+    },
+    {
+      "paragraph": 44,
+      "text": "(A)550W、0.12度電(B)1100W、0.22度電",
+      "text_sha256": "ffec80029de595d7eaba668fcee610652143729b61be780b4d09d67f7aa9619b"
+    },
+    {
+      "paragraph": 45,
+      "text": "(C)550W、022度電(D)1100W、0.12度電",
+      "text_sha256": "53cdbf120facb17ccb3ec78e4c2462d0d6e36fd07bdb2bb8713581ff9acfa4bd"
+    },
+    {
+      "paragraph": 46,
+      "text": ".一導線截面積為5.5mm2，流過電流10A，則電流持續流動1分鐘之電荷量為何?",
+      "text_sha256": "8987b0a5ef5e35bf79255ce7521ecf92de1de95ee19081125d50334e9ca74cb2"
+    },
+    {
+      "paragraph": 47,
+      "text": "(A)600庫侖(B)55庫侖(C)10庫侖(D)5.5庫侖",
+      "text_sha256": "5ba341ccd579fe4e838c172db7cf311099e85189f651ab7cd1ac5353b5ae0f4c"
+    },
+    {
+      "paragraph": 48,
+      "text": ".有一鋰離子電池上面標示3.7V、4000mAh，試問通以5安培之電流，需花費多少時間充飽電?",
+      "text_sha256": "b441b2e01cc24ebe0903b4d595e38429681170a140e88ae1b170c8a71d0d3c68"
+    },
+    {
+      "paragraph": 49,
+      "text": "(A)30分鐘(B)1小時(C)2小時(D)5小時",
+      "text_sha256": "bd321a796b11174272a4756bd935b9ed766120a7d39d892738fa1e64cea819e7"
+    },
+    {
+      "paragraph": 50,
+      "text": "二、填充題:",
+      "text_sha256": "6087e2282b0ef2f3e4dac0cc8eb60af9db370a18b598ba192cb07eb7bc193b5f"
+    },
+    {
+      "paragraph": 51,
+      "text": "01.電流單位為?、電壓的單位符號為?、電功率的名詞符號為?",
+      "text_sha256": "7cf9b3612923126f32dca3ca5c1732964fd10d3409f003c693c175997e783a29"
+    },
+    {
+      "paragraph": 52,
+      "text": "02.若以奈米(nano meter)為長度計算單位，則180公分為多少奈米",
+      "text_sha256": "b0af60d334b72bb8857565dd336da03c00b24cb1d16575186c8a48c3a662634f"
+    },
+    {
+      "paragraph": 53,
+      "text": "03.有一電器使用100伏特電壓，在5秒內消耗2000焦耳的電能，若此電器連續使用10小時，則消耗多少度電",
+      "text_sha256": "930be11898d2996c5dfe3751a1ef1ed1d4cc5775b41c023c58135df46dffcef3"
+    },
+    {
+      "paragraph": 54,
+      "text": "04.某一色碼電阻標示顏色分別為:藍紫紅金，試問其電阻值為多少歐姆?(計算該電阻的最大電阻值及最小電阻值)",
+      "text_sha256": "79f21c9f9ecf116663dd7a01b6f36a2c858a582ce159f57bea505af34a86da2c"
+    },
+    {
+      "paragraph": 55,
+      "text": "05.有一500W電燈泡點燈30分鐘，試問要花多少度電?",
+      "text_sha256": "f21d5da892d05188a4530a7ab87b9af2aa302b9b4ea682b9cead9604277ed2e4"
+    },
+    {
+      "paragraph": 56,
+      "text": "三、計算題:",
+      "text_sha256": "5f8d3bef714526d0cc994cee00fad34613e82fe37daec4f4661227723a21ed38"
+    },
+    {
+      "paragraph": 57,
+      "text": "01.若15瓦的省電燈泡與10瓦LED燈有相同的亮度，某一家庭原共有10支15瓦的省電燈泡，希望在相同亮度下全部以LED燈來替代。該家庭每天固定點燈8小時，且10支燈泡均同時動作，若使用30天可節省幾度電?",
+      "text_sha256": "dc82890291aa035a20f94a9fb2f8624f98bedab352418bcd492923a862566bd0"
+    },
+    {
+      "paragraph": 58,
+      "text": "02.某地有一部額定800kW的風力發電機及一套額定400kW的太陽發電設備，若風力發電機平均以每日以額定容量運轉8小時，而太陽能設備平均每日以額定容量發電4小時。假設1度電的經濟效益為5元，每月平均運轉24天，則每月可獲得的效益為多少元?",
+      "text_sha256": "2a92b5f66349f0041941987ad94ff1a25a2bb1de5181e313d9d6c77ccf647e32"
+    },
+    {
+      "paragraph": 59,
+      "text": "03.某手機的電池容量為5000mAh，只考慮手機使用在待機及通話的情況下，待機時消耗電力的電流為10mA，通話時消耗的電流為20mA。若電池充飽後至電力消耗完畢期間，手機的總通話時間為10小時，則理想上總待機時間應為多少小時?",
+      "text_sha256": "87e8e4b9a9024e67727e78eee6eb63bb7b214b901142cd788a4c3d1871c0accf"
+    },
+    {
+      "paragraph": 60,
+      "text": "*04.某公司有兩台電動機，一台產生5馬力的電力，另一台產生10馬力的電力，A發電機最多運轉18小時，B發電機最多運轉12小時，每月平均運轉20天，則每月所產生的電力為多少度電?",
+      "text_sha256": "e6a41af137cc5d60cb83671f734ca11fd2de78ba921b880320f367857b6190cf"
+    },
+    {
+      "paragraph": 61,
+      "text": "答題區",
+      "text_sha256": "4da2a027659cb7199694f7dba804c5f75194d779bfa839a70f1c0f6b3e9eb5b9"
+    },
+    {
+      "paragraph": 62,
+      "text": "一、單一選擇題",
+      "text_sha256": "fcf8f1d280f0128b9a4f657348f43440c9d412dd07d2faf78c1d4b84ca086f70"
+    },
+    {
+      "paragraph": 63,
+      "text": "01",
+      "text_sha256": "699cc6e015a59c04d0a0a7cf5376f0e83d4982bc7c781b644f7eecc798558358"
+    },
+    {
+      "paragraph": 64,
+      "text": "02",
+      "text_sha256": "bd5f009185e4b4d0a51749665fc6e366ff1b7cdffad867b500d537ec5a3eb3e7"
+    },
+    {
+      "paragraph": 65,
+      "text": "03",
+      "text_sha256": "0b3aa5a157d032f2f6a566cfa75bcb8230e7d703fb3f143c7752df6d4c17bf32"
+    },
+    {
+      "paragraph": 66,
+      "text": "04",
+      "text_sha256": "27491f50fde78bce6cd4f32a3a92728e2544733a8a529e32d760238b2673196a"
+    },
+    {
+      "paragraph": 67,
+      "text": "05",
+      "text_sha256": "449f34cbc729dfa686d50fb760e160b5da36d88372ad077ab27bd308ee05e01f"
+    },
+    {
+      "paragraph": 68,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 69,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 70,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 71,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 72,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 73,
+      "text": "06",
+      "text_sha256": "46accb2a7507de04e47f86fa02e387043ee11695dfde9c3c409c485d60a82a4d"
+    },
+    {
+      "paragraph": 74,
+      "text": "07",
+      "text_sha256": "50fd1513a346ff6cb5903be2d6f4bdd717364213ee6ef42d405f413150508759"
+    },
+    {
+      "paragraph": 75,
+      "text": "08",
+      "text_sha256": "20f3c1616f9fce60308d92bc7606f06e1c08f8834a8ff685252fa906f6ca58bf"
+    },
+    {
+      "paragraph": 76,
+      "text": "09",
+      "text_sha256": "9ad1e3a3e713b870dc24da1fbeebe78ee5efde040950d055ea4ac248731fb8a1"
+    },
+    {
+      "paragraph": 77,
+      "text": "10",
+      "text_sha256": "536549599ec6c3b859cd3970025779a13d061783c73e663fea7f963e98379aa8"
+    },
+    {
+      "paragraph": 78,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 79,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 80,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 81,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 82,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 83,
+      "text": "11",
+      "text_sha256": "f326bd84707ed76597becb832280595d1a5aaceb0905dc40e3553ebb861bde80"
+    },
+    {
+      "paragraph": 84,
+      "text": "12",
+      "text_sha256": "f9cacf3cb91a12e03bc4546834f95a50a4c5fe02276ac260148ea9296c442d39"
+    },
+    {
+      "paragraph": 85,
+      "text": "13",
+      "text_sha256": "e23f8f39182c82127c1bef3cbfd9b54e30e1df4916da81dcfc2a801c23f3bf01"
+    },
+    {
+      "paragraph": 86,
+      "text": "14",
+      "text_sha256": "789d9e7dc67f986660d9b28f5946cce995f9b145e4c2ef61828679cee07bb316"
+    },
+    {
+      "paragraph": 87,
+      "text": "15",
+      "text_sha256": "47cea6234e51694af3ba37750e249b15a6cd79dce68ac582e3075bb28393b5ea"
+    },
+    {
+      "paragraph": 88,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 89,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 90,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 91,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 92,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 93,
+      "text": "16",
+      "text_sha256": "17eed2c0e7c9788d0b46fafdf328b3e955aa0a22132c16cde72aa4f32dcd5282"
+    },
+    {
+      "paragraph": 94,
+      "text": "17",
+      "text_sha256": "e4bb04eec661be0b6c4cde1d3e6dca3fff3c9bdbb8c1244061f85bab274505e9"
+    },
+    {
+      "paragraph": 95,
+      "text": "18",
+      "text_sha256": "0234a350f4d56ae45c5ece57b08c54496f372bc570bd83a465fb6d2d85531479"
+    },
+    {
+      "paragraph": 96,
+      "text": "19",
+      "text_sha256": "49f65dc5d4333e3ed1ba4c9bbea03134a985509541efa8a4955542d50dea45f0"
+    },
+    {
+      "paragraph": 97,
+      "text": "20",
+      "text_sha256": "046419ca5ecebeb34fdfe9dde8106ccee5ce39f8e4dd115e8ef20b869f8bed82"
+    },
+    {
+      "paragraph": 98,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 99,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 100,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 101,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 102,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 103,
+      "text": "二、填充題",
+      "text_sha256": "2535fd3d5c435975a845a16eaa13f4b631cfcada47a2c7a699a099cfef5e9155"
+    },
+    {
+      "paragraph": 104,
+      "text": "01",
+      "text_sha256": "699cc6e015a59c04d0a0a7cf5376f0e83d4982bc7c781b644f7eecc798558358"
+    },
+    {
+      "paragraph": 105,
+      "text": "02",
+      "text_sha256": "bd5f009185e4b4d0a51749665fc6e366ff1b7cdffad867b500d537ec5a3eb3e7"
+    },
+    {
+      "paragraph": 106,
+      "text": "03",
+      "text_sha256": "0b3aa5a157d032f2f6a566cfa75bcb8230e7d703fb3f143c7752df6d4c17bf32"
+    },
+    {
+      "paragraph": 107,
+      "text": "04",
+      "text_sha256": "27491f50fde78bce6cd4f32a3a92728e2544733a8a529e32d760238b2673196a"
+    },
+    {
+      "paragraph": 108,
+      "text": "05",
+      "text_sha256": "449f34cbc729dfa686d50fb760e160b5da36d88372ad077ab27bd308ee05e01f"
+    },
+    {
+      "paragraph": 109,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 110,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 111,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 112,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 113,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 114,
+      "text": "三、計算題",
+      "text_sha256": "f793c9846a9f1f3b15da6ef5c62a23efdb7326ef5e7dbe23b436eaf21b2cb367"
+    },
+    {
+      "paragraph": 115,
+      "text": "01.",
+      "text_sha256": "e6459ed3f629e7906c544be0226344b685e8758268af4f0f9346f4ef705b607f"
+    },
+    {
+      "paragraph": 116,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 117,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 118,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 119,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 120,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 121,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 122,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 123,
+      "text": "02.",
+      "text_sha256": "f258dc64778769826eb54054825882617238e2aeb5bce1bd43aa66d32e0cd6dc"
+    },
+    {
+      "paragraph": 124,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 125,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 126,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 127,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 128,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 129,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 130,
+      "text": "03.",
+      "text_sha256": "1edcd7de333fbac42397723c2aaea36fbef6dd91406271fe88184006e42daaf0"
+    },
+    {
+      "paragraph": 131,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 132,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 133,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 134,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 135,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 136,
+      "text": "",
+      "text_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+    },
+    {
+      "paragraph": 137,
+      "text": "04.",
+      "text_sha256": "6609b282acb3215a1cd410cd3984fd508f68a9ed6caa52aea19eac1c415317c7"
+    }
+  ],
+  "risks": [
+    "omml_structure_requires_review_not_plain_text"
+  ],
+  "omml_count": 18,
+  "omml_xml": [
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>A</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>A</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" ns1:hint=\"eastAsia\" /></ns1:rPr><ns0:t>B</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns0:rPr><ns0:sty ns0:val=\"p\" /></ns0:rPr><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>",
+    "<ns0:oMath xmlns:ns0=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:ns1=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:r><ns1:rPr><ns1:rFonts ns1:ascii=\"Cambria Math\" ns1:eastAsia=\"標楷體\" ns1:hAnsi=\"Cambria Math\" /></ns1:rPr><ns0:t>×</ns0:t></ns0:r></ns0:oMath>"
+  ],
+  "embedded_media": []
+}

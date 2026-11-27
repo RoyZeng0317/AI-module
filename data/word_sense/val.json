@@ -1,0 +1,110 @@
+[
+  {
+    "id": "incident_report_0",
+    "family": "incident_report",
+    "term": "蘋果",
+    "text": "市場旁發現的蘋果不是水果，螢幕還顯示來電。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "apple_phone",
+    "reply": "指的是蘋果品牌手機。"
+  },
+  {
+    "id": "incident_report_1",
+    "family": "incident_report",
+    "term": "蘋果",
+    "text": "通訊行桌上的蘋果不是手機，咬開後果汁流了出來。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "apple_fruit",
+    "reply": "指的是可食用的蘋果水果。"
+  },
+  {
+    "id": "incident_report_2",
+    "family": "incident_report",
+    "term": "鼠",
+    "text": "寵物店裡的鼠沒有生命，只是接在收銀電腦上的指標裝置。",
+    "span": [
+      5,
+      6
+    ],
+    "label": "mouse_device",
+    "reply": "指的是操作電腦的滑鼠。"
+  },
+  {
+    "id": "incident_report_3",
+    "family": "incident_report",
+    "term": "鼠",
+    "text": "電腦教室出現的鼠不是周邊設備，牠正啃食餅乾。",
+    "span": [
+      7,
+      8
+    ],
+    "label": "mouse_animal",
+    "reply": "指的是會活動的鼠類動物。"
+  },
+  {
+    "id": "incident_report_4",
+    "family": "incident_report",
+    "term": "病毒",
+    "text": "醫院發現的病毒沒有感染病人，而是加密了掛號電腦的檔案。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "virus_computer",
+    "reply": "指的是感染電腦的惡意程式。"
+  },
+  {
+    "id": "incident_report_5",
+    "family": "incident_report",
+    "term": "病毒",
+    "text": "資訊中心談的病毒不是惡意軟體，而是使員工發燒的病原。",
+    "span": [
+      6,
+      8
+    ],
+    "label": "virus_biological",
+    "reply": "指的是感染生物的病毒。"
+  },
+  {
+    "id": "incident_report_6",
+    "family": "incident_report",
+    "term": "蘋果",
+    "text": "有人在車站提到蘋果，沒有說用途。",
+    "span": [
+      7,
+      9
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "incident_report_7",
+    "family": "incident_report",
+    "term": "鼠",
+    "text": "報告只寫發現鼠，沒有描述特徵。",
+    "span": [
+      6,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  },
+  {
+    "id": "incident_report_8",
+    "family": "incident_report",
+    "term": "病毒",
+    "text": "公告只說有病毒，沒有說感染對象。",
+    "span": [
+      5,
+      7
+    ],
+    "label": "insufficient_context",
+    "reply": "資訊不足，請補充用途、行為或其他語境。"
+  }
+]
